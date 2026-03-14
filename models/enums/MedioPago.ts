@@ -1,0 +1,1 @@
+export type MedioPago = "EFECTIVO" | "CREDITO" | "DEBITO";
