@@ -1,14 +1,1140 @@
-[00:00:00.518] Server  LOG     ✓ Ready in 320ms
-[00:00:05.590] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:00:05.701] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:00:05.701] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/","route":"/"}
-[00:00:05.701] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773512268454} /_vercel/insights/view
-[00:10:23.411] Server  WARN    ⚠ Cross origin request detected from rpm-baths-persons-else.trycloudflare.com to /_next/* resource. In a future major version of Next.js, you will need to explicitly configure "allowedDevOrigins" in next.config to allow this.
-Read more: https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins
-[00:10:30.668] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:10:30.669] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/","route":"/"}
-[00:10:30.669] Browser LOG     %c[Vercel Web Analytics]%c [view] https://rpm-baths-persons-else.trycloudflare.com/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"https://rpm-baths-persons-else.trycloudflare.com/","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773512893160} /_vercel/insights/view
-[00:19:24.936] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:19:25.077] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:19:25.077] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/","route":"/"}
-[00:19:25.077] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773513427803} /_vercel/insights/view
+[00:00:00.501] Server  LOG     ✓ Ready in 307ms
+[00:00:04.634] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:05.562] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:00:05.562] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/login","route":"/login"}
+[00:00:05.562] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/login color: rgb(120, 120, 120) color: inherit {"dp":"/login","o":"http://localhost:3000/login","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773517295627} /_vercel/insights/view
+[00:00:15.694] Server  LOG     ✓ Compiled in 37ms
+[00:00:38.163] Server  LOG     ✓ Compiled in 34ms
+[00:00:42.489] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:42.606] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:00:42.606] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/login","route":"/login"}
+[00:00:42.606] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/login color: rgb(120, 120, 120) color: inherit {"dp":"/login","o":"http://localhost:3000/login","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773517333477} /_vercel/insights/view
+[00:00:57.986] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:58.167] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:00:58.167] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/","route":"/"}
+[00:00:58.167] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/login","route":"/login"}
+[00:00:58.167] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773517349038} /_vercel/insights/view
+[00:00:58.167] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/login color: rgb(120, 120, 120) color: inherit {"dp":"/login","o":"http://localhost:3000/login","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773517349038} /_vercel/insights/view
+[00:05:30.294] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:05:31.273] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:05:31.274] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/","route":"/"}
+[00:05:31.274] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/login","route":"/login"}
+[00:05:31.274] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773517621567} /_vercel/insights/view
+[00:05:31.274] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/login color: rgb(120, 120, 120) color: inherit {"dp":"/login","o":"http://localhost:3000/login","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773517621567} /_vercel/insights/view
+[00:05:33.140] Server  LOG     ✓ Compiled in 37ms
+[00:05:52.003] Server  LOG     ✓ Compiled in 33ms
+[00:07:15.610] Server  LOG     ✓ Compiled in 27ms
+[00:07:20.187] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:07:20.371] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:07:20.371] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/login","route":"/login"}
+[00:07:20.371] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/login color: rgb(120, 120, 120) color: inherit {"dp":"/login","o":"http://localhost:3000/login","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773517731241} /_vercel/insights/view
+[00:07:33.097] Server  LOG     ✓ Compiled in 23ms
+[00:07:47.080] Server  LOG     ✓ Compiled in 23ms
+[00:07:49.408] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:07:49.641] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:07:49.818] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:07:49.818] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/login","route":"/login"}
+[00:07:49.818] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/login color: rgb(120, 120, 120) color: inherit {"dp":"/login","o":"http://localhost:3000/login","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773517760679} /_vercel/insights/view
+[00:07:51.228] Browser LOG     {}
+[00:07:51.228] Browser LOG     {}
+[00:07:51.228] Browser LOG     {}
+[00:08:32.329] Server  LOG     ✓ Compiled in 24ms
+[00:08:56.518] Server  LOG     ✓ Compiled in 28ms
+[00:09:02.271] Server  LOG     ✓ Compiled in 24ms
+[00:09:16.730] Server  LOG     ✓ Compiled in 25ms
+[00:09:22.864] Server  LOG     ✓ Compiled in 22ms
+[00:09:33.481] Server  LOG     ✓ Compiled in 23ms
+[00:09:36.847] Server  LOG     ✓ Compiled in 24ms
+[00:10:04.180] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:10:04.316] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:10:04.316] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/login","route":"/login"}
+[00:10:04.316] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/login color: rgb(120, 120, 120) color: inherit {"dp":"/login","o":"http://localhost:3000/login","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773517895187} /_vercel/insights/view
+[00:11:11.676] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:11:11.812] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:11:11.812] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/login","route":"/login"}
+[00:11:11.812] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/login color: rgb(120, 120, 120) color: inherit {"dp":"/login","o":"http://localhost:3000/login","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773517962682} /_vercel/insights/view
+[00:21:25.417] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773518576287} /_vercel/insights/view
+[00:21:34.454] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/nuevo-cierre color: rgb(120, 120, 120) color: inherit {"dp":"/nuevo-cierre","o":"http://localhost:3000/nuevo-cierre","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773518585309} /_vercel/insights/view
+[00:21:41.877] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:21:42.052] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:21:42.052] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/nuevo-cierre","route":"/nuevo-cierre"}
+[00:21:42.052] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/nuevo-cierre color: rgb(120, 120, 120) color: inherit {"dp":"/nuevo-cierre","o":"http://localhost:3000/nuevo-cierre","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773518592911} /_vercel/insights/view
+[00:21:47.692] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773518598562} /_vercel/insights/view
+[00:21:48.848] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/nuevo-cierre color: rgb(120, 120, 120) color: inherit {"dp":"/nuevo-cierre","o":"http://localhost:3000/nuevo-cierre","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773518599712} /_vercel/insights/view
+[00:22:01.101] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:22:01.267] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:22:01.267] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/nuevo-cierre","route":"/nuevo-cierre"}
+[00:22:01.267] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/nuevo-cierre color: rgb(120, 120, 120) color: inherit {"dp":"/nuevo-cierre","o":"http://localhost:3000/nuevo-cierre","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773518612139} /_vercel/insights/view
+[00:22:03.648] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773518614518} /_vercel/insights/view
+[00:22:04.488] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/nuevo-cierre color: rgb(120, 120, 120) color: inherit {"dp":"/nuevo-cierre","o":"http://localhost:3000/nuevo-cierre","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773518615349} /_vercel/insights/view
+[00:22:12.890] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773518623758} /_vercel/insights/view
+[00:22:15.149] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/nuevo-cierre color: rgb(120, 120, 120) color: inherit {"dp":"/nuevo-cierre","o":"http://localhost:3000/nuevo-cierre","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773518626009} /_vercel/insights/view
+[00:24:10.296] Server  WARN    ⚠ Fast Refresh had to perform a full reload when ./lib/auth-context.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+[00:24:10.361] Server  LOG     ✓ Compiled in 27ms
+[00:24:10.560] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:24:10.725] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:24:10.725] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/nuevo-cierre","route":"/nuevo-cierre"}
+[00:24:10.725] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/nuevo-cierre color: rgb(120, 120, 120) color: inherit {"dp":"/nuevo-cierre","o":"http://localhost:3000/nuevo-cierre","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773518741595} /_vercel/insights/view
+[00:24:16.981] Server  WARN    ⚠ Fast Refresh had to perform a full reload when ./lib/auth-context.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+[00:24:17.040] Server  LOG     ✓ Compiled in 21ms
+[00:24:17.234] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:24:17.381] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:24:17.381] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/nuevo-cierre","route":"/nuevo-cierre"}
+[00:24:17.381] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/nuevo-cierre color: rgb(120, 120, 120) color: inherit {"dp":"/nuevo-cierre","o":"http://localhost:3000/nuevo-cierre","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773518748252} /_vercel/insights/view
+[00:24:53.373] Server  LOG     ✓ Compiled in 23ms
+[00:25:26.283] Server  LOG     ✓ Compiled in 28ms
+[00:25:43.229] Server  LOG     ✓ Compiled in 22ms
+[00:26:08.078] Server  LOG     ✓ Compiled in 24ms
+[00:26:08.149] Browser ERROR   The final argument passed to %s changed size between renders. The order and size of this array must remain constant.
+
+Previous: %s
+Incoming: %s useEffect [] [eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyMDMwNDA1MDYwNyIsInJvbCI6IkFETUlOIiwiaWF0IjoxNzczNTE4NTc2LCJleHAiOjE3NzM2MDQ5NzZ9.VF1hrIGpS-_FcUg_rIj4Od-e5eG47_hn9mWFGzQx95k]
+[00:26:22.990] Server  LOG     ✓ Compiled in 24ms
+[00:26:30.708] Server  LOG     ✓ Compiled in 29ms
+[00:26:30.765] Browser ERROR   uncaughtError: ReferenceError: useState is not defined
+[00:26:33.810] Server  WARN    ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:26:33.878] Server  LOG     ✓ Compiled in 25ms
+[00:26:33.944] Server  ERROR   ⨯ ReferenceError: useState is not defined
+[00:26:34.103] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:26:34.220] Browser ERROR   uncaughtError: ReferenceError: useState is not defined
+[00:26:45.611] Server  WARN    ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:26:45.678] Server  LOG     ✓ Compiled in 25ms
+[00:26:45.734] Server  ERROR   ⨯ ReferenceError: useState is not defined
+[00:26:45.868] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:26:45.992] Browser ERROR   uncaughtError: ReferenceError: useState is not defined
+[00:26:51.111] Server  WARN    ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:26:51.171] Server  LOG     ✓ Compiled in 26ms
+[00:26:51.389] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:26:51.515] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:26:51.515] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/nuevo-cierre","route":"/nuevo-cierre"}
+[00:26:51.515] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/nuevo-cierre color: rgb(120, 120, 120) color: inherit {"dp":"/nuevo-cierre","o":"http://localhost:3000/nuevo-cierre","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773518902383} /_vercel/insights/view
+[00:27:17.903] Server  LOG     ✓ Compiled in 23ms
+[00:27:32.466] Server  LOG     ✓ Compiled in 26ms
+[00:27:32.549] Browser ERROR   uncaughtError: Error: Objects are not valid as a React child (found: object with keys {comedores, puntosDeVenta}). If you meant to render a collection of children, use an array instead.
+[00:27:44.039] Server  WARN    ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:27:44.111] Server  LOG     ✓ Compiled in 22ms
+[00:27:44.344] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:27:44.455] Browser ERROR   uncaughtError: Error: Objects are not valid as a React child (found: object with keys {comedores, puntosDeVenta}). If you meant to render a collection of children, use an array instead.
+[00:27:59.693] Server  WARN    ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:27:59.754] Server  LOG     ✓ Compiled in 24ms
+[00:27:59.941] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:28:00.108] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:28:00.108] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/nuevo-cierre","route":"/nuevo-cierre"}
+[00:28:00.108] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/nuevo-cierre color: rgb(120, 120, 120) color: inherit {"dp":"/nuevo-cierre","o":"http://localhost:3000/nuevo-cierre","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773518970979} /_vercel/insights/view
+[00:28:02.562] Server  LOG     ✓ Compiled in 22ms
+[00:28:10.319] Server  LOG     ✓ Compiled in 22ms
+[00:28:15.819] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:28:15.941] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:28:15.941] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/nuevo-cierre","route":"/nuevo-cierre"}
+[00:28:15.941] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/nuevo-cierre color: rgb(120, 120, 120) color: inherit {"dp":"/nuevo-cierre","o":"http://localhost:3000/nuevo-cierre","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773518986809} /_vercel/insights/view
+[00:28:15.941] Browser LOG     [] []
+[00:28:23.552] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:28:23.744] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:28:23.744] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/nuevo-cierre","route":"/nuevo-cierre"}
+[00:28:23.744] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/nuevo-cierre color: rgb(120, 120, 120) color: inherit {"dp":"/nuevo-cierre","o":"http://localhost:3000/nuevo-cierre","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773518994596} /_vercel/insights/view
+[00:28:23.744] Browser LOG     [] []
+[00:28:32.460] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:28:32.576] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:28:32.576] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/nuevo-cierre","route":"/nuevo-cierre"}
+[00:28:32.576] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/nuevo-cierre color: rgb(120, 120, 120) color: inherit {"dp":"/nuevo-cierre","o":"http://localhost:3000/nuevo-cierre","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773519003447} /_vercel/insights/view
+[00:28:32.576] Browser LOG     [] []
+[00:28:48.597] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:28:48.802] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:28:48.802] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/nuevo-cierre","route":"/nuevo-cierre"}
+[00:28:48.802] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/nuevo-cierre color: rgb(120, 120, 120) color: inherit {"dp":"/nuevo-cierre","o":"http://localhost:3000/nuevo-cierre","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773519019641} /_vercel/insights/view
+[00:28:48.802] Browser LOG     [] []
+[00:29:55.883] Server  LOG     ✓ Compiled in 23ms
+[00:30:00.677] Server  LOG     ✓ Compiled in 26ms
+[00:30:27.792] Server  LOG     ✓ Compiled in 24ms
+[00:30:31.329] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:30:31.516] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:30:31.516] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/nuevo-cierre","route":"/nuevo-cierre"}
+[00:30:31.516] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/nuevo-cierre color: rgb(120, 120, 120) color: inherit {"dp":"/nuevo-cierre","o":"http://localhost:3000/nuevo-cierre","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773519122386} /_vercel/insights/view
+[00:30:34.470] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:30:34.622] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:30:34.622] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/nuevo-cierre","route":"/nuevo-cierre"}
+[00:30:34.622] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/nuevo-cierre color: rgb(120, 120, 120) color: inherit {"dp":"/nuevo-cierre","o":"http://localhost:3000/nuevo-cierre","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773519125494} /_vercel/insights/view
+[00:30:38.235] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:30:38.349] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:30:38.349] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/nuevo-cierre","route":"/nuevo-cierre"}
+[00:30:38.349] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/nuevo-cierre color: rgb(120, 120, 120) color: inherit {"dp":"/nuevo-cierre","o":"http://localhost:3000/nuevo-cierre","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773519129219} /_vercel/insights/view
+[00:31:09.155] Server  LOG     ✓ Compiled in 23ms
+[00:31:11.529] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:31:11.812] Browser LOG     [{"id":1,"name":"Galicia","puntosDeVenta":[{"comedorId":1,"id":1,"nombre":"Venta"}]},{"id":2,"name":"Galicia","puntosDeVenta":[]},{"id":3,"name":"Galicia","puntosDeVenta":[]}] [{"comedorId":1,"id":1,"nombre":"Venta"}]
+[00:31:11.812] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:31:11.812] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/nuevo-cierre","route":"/nuevo-cierre"}
+[00:31:11.812] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/login","route":"/login"}
+[00:31:11.812] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/nuevo-cierre color: rgb(120, 120, 120) color: inherit {"dp":"/nuevo-cierre","o":"http://localhost:3000/nuevo-cierre","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773519162594} /_vercel/insights/view
+[00:31:11.812] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/login color: rgb(120, 120, 120) color: inherit {"dp":"/login","o":"http://localhost:3000/login","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773519162594} /_vercel/insights/view
+[00:31:11.812] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773519162682} /_vercel/insights/view
+[00:31:13.071] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:31:13.186] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:31:13.186] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/","route":"/"}
+[00:31:13.186] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773519164058} /_vercel/insights/view
+[00:31:13.897] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/nuevo-cierre color: rgb(120, 120, 120) color: inherit {"dp":"/nuevo-cierre","o":"http://localhost:3000/nuevo-cierre","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773519164722} /_vercel/insights/view
+[00:31:13.897] Browser LOG     [{"id":1,"name":"Galicia","puntosDeVenta":[{"comedorId":1,"id":1,"nombre":"Venta"}]},{"id":2,"name":"Galicia","puntosDeVenta":[]},{"id":3,"name":"Galicia","puntosDeVenta":[]}] [{"comedorId":1,"id":1,"nombre":"Venta"}]
+[00:31:13.897] Browser LOG     [{"id":1,"name":"Galicia","puntosDeVenta":[{"comedorId":1,"id":1,"nombre":"Venta"}]},{"id":2,"name":"Galicia","puntosDeVenta":[]},{"id":3,"name":"Galicia","puntosDeVenta":[]}] [{"comedorId":1,"id":1,"nombre":"Venta"}]
+[00:31:14.536] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:31:14.734] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:31:14.734] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/nuevo-cierre","route":"/nuevo-cierre"}
+[00:31:14.734] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/nuevo-cierre color: rgb(120, 120, 120) color: inherit {"dp":"/nuevo-cierre","o":"http://localhost:3000/nuevo-cierre","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773519165537} /_vercel/insights/view
+[00:31:14.734] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/login color: rgb(120, 120, 120) color: inherit {"dp":"/login","o":"http://localhost:3000/login","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773519165546} /_vercel/insights/view
+[00:31:14.734] Browser LOG     [{"id":1,"name":"Galicia","puntosDeVenta":[{"comedorId":1,"id":1,"nombre":"Venta"}]},{"id":2,"name":"Galicia","puntosDeVenta":[]},{"id":3,"name":"Galicia","puntosDeVenta":[]}] [{"comedorId":1,"id":1,"nombre":"Venta"}]
+[00:31:14.734] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773519165604} /_vercel/insights/view
+[00:31:15.812] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/nuevo-cierre color: rgb(120, 120, 120) color: inherit {"dp":"/nuevo-cierre","o":"http://localhost:3000/nuevo-cierre","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773519166651} /_vercel/insights/view
+[00:31:15.812] Browser LOG     [{"id":1,"name":"Galicia","puntosDeVenta":[{"comedorId":1,"id":1,"nombre":"Venta"}]},{"id":2,"name":"Galicia","puntosDeVenta":[]},{"id":3,"name":"Galicia","puntosDeVenta":[]}] [{"comedorId":1,"id":1,"nombre":"Venta"}]
+[00:31:15.812] Browser LOG     [{"id":1,"name":"Galicia","puntosDeVenta":[{"comedorId":1,"id":1,"nombre":"Venta"}]},{"id":2,"name":"Galicia","puntosDeVenta":[]},{"id":3,"name":"Galicia","puntosDeVenta":[]}] [{"comedorId":1,"id":1,"nombre":"Venta"}]
+[00:31:46.706] Server  LOG     ✓ Compiled in 26ms
+[00:31:46.794] Browser ERROR   uncaughtError: ReferenceError: puntosDeVenta is not defined
+[00:32:12.845] Server  WARN    ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:32:12.916] Server  LOG     ✓ Compiled in 24ms
+[00:32:13.129] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:32:13.250] Browser ERROR   uncaughtError: TypeError: can't access property "filter", puntosDeVenta is undefined
+[00:32:19.884] Server  WARN    ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:32:19.934] Server  LOG     ✓ Compiled in 25ms
+[00:32:20.119] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:32:20.238] Browser ERROR   uncaughtError: TypeError: can't access property "filter", puntosDeVenta is undefined
+[00:32:26.721] Server  WARN    ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:32:26.775] Server  LOG     ✓ Compiled in 23ms
+[00:32:26.961] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:32:27.180] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:32:27.180] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/nuevo-cierre","route":"/nuevo-cierre"}
+[00:32:27.180] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/login","route":"/login"}
+[00:32:27.180] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/nuevo-cierre color: rgb(120, 120, 120) color: inherit {"dp":"/nuevo-cierre","o":"http://localhost:3000/nuevo-cierre","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773519238017} /_vercel/insights/view
+[00:32:27.180] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/login color: rgb(120, 120, 120) color: inherit {"dp":"/login","o":"http://localhost:3000/login","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773519238017} /_vercel/insights/view
+[00:32:27.180] Browser LOG     [{"id":1,"name":"Galicia","puntosDeVenta":[{"comedorId":1,"id":1,"nombre":"Venta"}]},{"id":2,"name":"Galicia","puntosDeVenta":[]},{"id":3,"name":"Galicia","puntosDeVenta":[]}] [{"comedorId":1,"id":1,"nombre":"Venta"}]
+[00:32:27.180] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773519238050} /_vercel/insights/view
+[00:32:28.003] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:32:28.117] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:32:28.117] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/","route":"/"}
+[00:32:28.117] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773519238988} /_vercel/insights/view
+[00:32:28.592] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/nuevo-cierre color: rgb(120, 120, 120) color: inherit {"dp":"/nuevo-cierre","o":"http://localhost:3000/nuevo-cierre","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773519239430} /_vercel/insights/view
+[00:32:28.592] Browser LOG     [{"id":1,"name":"Galicia","puntosDeVenta":[{"comedorId":1,"id":1,"nombre":"Venta"}]},{"id":2,"name":"Galicia","puntosDeVenta":[]},{"id":3,"name":"Galicia","puntosDeVenta":[]}] [{"comedorId":1,"id":1,"nombre":"Venta"}]
+[00:32:28.592] Browser LOG     [{"id":1,"name":"Galicia","puntosDeVenta":[{"comedorId":1,"id":1,"nombre":"Venta"}]},{"id":2,"name":"Galicia","puntosDeVenta":[]},{"id":3,"name":"Galicia","puntosDeVenta":[]}] [{"comedorId":1,"id":1,"nombre":"Venta"}]
+[00:33:39.031] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:33:39.222] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:33:39.222] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/nuevo-cierre","route":"/nuevo-cierre"}
+[00:33:39.222] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/login","route":"/login"}
+[00:33:39.222] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/nuevo-cierre color: rgb(120, 120, 120) color: inherit {"dp":"/nuevo-cierre","o":"http://localhost:3000/nuevo-cierre","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773519310044} /_vercel/insights/view
+[00:33:39.222] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/login color: rgb(120, 120, 120) color: inherit {"dp":"/login","o":"http://localhost:3000/login","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773519310044} /_vercel/insights/view
+[00:33:39.222] Browser LOG     [{"id":1,"name":"Galicia","puntosDeVenta":[{"comedorId":1,"id":1,"nombre":"Venta"}]},{"id":2,"name":"Galicia","puntosDeVenta":[]},{"id":3,"name":"Galicia","puntosDeVenta":[]}] [{"comedorId":1,"id":1,"nombre":"Venta"}]
+[00:33:39.222] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773519310093} /_vercel/insights/view
+[00:33:40.162] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/nuevo-cierre color: rgb(120, 120, 120) color: inherit {"dp":"/nuevo-cierre","o":"http://localhost:3000/nuevo-cierre","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773519311001} /_vercel/insights/view
+[00:33:40.162] Browser LOG     [{"id":1,"name":"Galicia","puntosDeVenta":[{"comedorId":1,"id":1,"nombre":"Venta"}]},{"id":2,"name":"Galicia","puntosDeVenta":[]},{"id":3,"name":"Galicia","puntosDeVenta":[]}] [{"comedorId":1,"id":1,"nombre":"Venta"}]
+[00:33:40.162] Browser LOG     [{"id":1,"name":"Galicia","puntosDeVenta":[{"comedorId":1,"id":1,"nombre":"Venta"}]},{"id":2,"name":"Galicia","puntosDeVenta":[]},{"id":3,"name":"Galicia","puntosDeVenta":[]}] [{"comedorId":1,"id":1,"nombre":"Venta"}]
+[00:34:49.561] Server  LOG     ✓ Compiled in 23ms
+[00:34:51.486] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:34:51.676] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:34:51.676] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/nuevo-cierre","route":"/nuevo-cierre"}
+[00:34:51.676] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/login","route":"/login"}
+[00:34:51.676] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/nuevo-cierre color: rgb(120, 120, 120) color: inherit {"dp":"/nuevo-cierre","o":"http://localhost:3000/nuevo-cierre","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773519382498} /_vercel/insights/view
+[00:34:51.676] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/login color: rgb(120, 120, 120) color: inherit {"dp":"/login","o":"http://localhost:3000/login","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773519382498} /_vercel/insights/view
+[00:34:51.676] Browser LOG     [{"id":1,"name":"Galicia","puntosDeVenta":[{"comedorId":1,"id":1,"nombre":"Venta"}]},{"id":2,"name":"Galicia","puntosDeVenta":[]},{"id":3,"name":"Galicia","puntosDeVenta":[]}] [{"comedorId":1,"id":1,"nombre":"Venta"}]
+[00:34:51.676] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773519382534} /_vercel/insights/view
+[00:34:52.683] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/nuevo-cierre color: rgb(120, 120, 120) color: inherit {"dp":"/nuevo-cierre","o":"http://localhost:3000/nuevo-cierre","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773519383523} /_vercel/insights/view
+[00:34:52.683] Browser LOG     [{"id":1,"name":"Galicia","puntosDeVenta":[{"comedorId":1,"id":1,"nombre":"Venta"}]},{"id":2,"name":"Galicia","puntosDeVenta":[]},{"id":3,"name":"Galicia","puntosDeVenta":[]}] [{"comedorId":1,"id":1,"nombre":"Venta"}]
+[00:34:52.683] Browser LOG     [{"id":1,"name":"Galicia","puntosDeVenta":[{"comedorId":1,"id":1,"nombre":"Venta"}]},{"id":2,"name":"Galicia","puntosDeVenta":[]},{"id":3,"name":"Galicia","puntosDeVenta":[]}] [{"comedorId":1,"id":1,"nombre":"Venta"}]
+[00:35:11.805] Server  LOG     ✓ Compiled in 23ms
+[00:35:14.109] Server  LOG     ✓ Compiled in 23ms
+[00:35:15.204] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:35:15.451] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:35:15.451] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/nuevo-cierre","route":"/nuevo-cierre"}
+[00:35:15.451] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/login","route":"/login"}
+[00:35:15.451] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/nuevo-cierre color: rgb(120, 120, 120) color: inherit {"dp":"/nuevo-cierre","o":"http://localhost:3000/nuevo-cierre","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773519406264} /_vercel/insights/view
+[00:35:15.451] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/login color: rgb(120, 120, 120) color: inherit {"dp":"/login","o":"http://localhost:3000/login","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773519406264} /_vercel/insights/view
+[00:35:15.451] Browser LOG     [{"id":1,"name":"Galicia","puntosDeVenta":[{"comedorId":1,"id":1,"nombre":"Venta"}]},{"id":2,"name":"Galicia","puntosDeVenta":[]},{"id":3,"name":"Galicia","puntosDeVenta":[]}] [{"comedorId":1,"id":1,"nombre":"Venta"}]
+[00:35:15.451] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773519406321} /_vercel/insights/view
+[00:35:16.204] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/nuevo-cierre color: rgb(120, 120, 120) color: inherit {"dp":"/nuevo-cierre","o":"http://localhost:3000/nuevo-cierre","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773519407046} /_vercel/insights/view
+[00:35:16.204] Browser LOG     [{"id":1,"name":"Galicia","puntosDeVenta":[{"comedorId":1,"id":1,"nombre":"Venta"}]},{"id":2,"name":"Galicia","puntosDeVenta":[]},{"id":3,"name":"Galicia","puntosDeVenta":[]}] [{"comedorId":1,"id":1,"nombre":"Venta"}]
+[00:35:16.204] Browser LOG     [{"id":1,"name":"Galicia","puntosDeVenta":[{"comedorId":1,"id":1,"nombre":"Venta"}]},{"id":2,"name":"Galicia","puntosDeVenta":[]},{"id":3,"name":"Galicia","puntosDeVenta":[]}] [{"comedorId":1,"id":1,"nombre":"Venta"}]
+[00:37:00.989] Server  LOG     ✓ Compiled in 27ms
+[00:37:01.989] Browser ERROR   uncaughtError: TypeError: can't access property "filter", puntosDeVenta is undefined
+[00:37:18.397] Server  WARN    ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:37:18.425] Server  LOG     ✓ Compiled in 23ms
+[00:37:18.660] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:37:19.632] Browser ERROR   uncaughtError: TypeError: can't access property "filter", puntosDeVenta is undefined
+[00:37:19.632] Browser ERROR   unhandledRejection: TypeError: NetworkError when attempting to fetch resource.
+[00:37:30.175] Server  WARN    ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:37:30.234] Server  LOG     ✓ Compiled in 23ms
+[00:37:30.418] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:37:31.361] Browser ERROR   uncaughtError: TypeError: can't access property "filter", puntosDeVenta is undefined
+[00:37:33.203] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:37:33.203] Browser ERROR   uncaughtError: TypeError: can't access property "filter", puntosDeVenta is undefined
+[00:37:55.117] Server  WARN    ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:37:55.181] Server  LOG     ✓ Compiled in 25ms
+[00:37:55.363] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:37:56.307] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:37:56.307] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/nuevo-cierre","route":"/nuevo-cierre"}
+[00:37:56.307] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/nuevo-cierre color: rgb(120, 120, 120) color: inherit {"dp":"/nuevo-cierre","o":"http://localhost:3000/nuevo-cierre","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773519566385} /_vercel/insights/view
+[00:38:03.777] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:38:03.895] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:38:03.895] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/nuevo-cierre","route":"/nuevo-cierre"}
+[00:38:03.895] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/nuevo-cierre color: rgb(120, 120, 120) color: inherit {"dp":"/nuevo-cierre","o":"http://localhost:3000/nuevo-cierre","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773519574766} /_vercel/insights/view
+[00:38:15.785] Server  LOG     ✓ Compiled in 25ms
+[00:38:19.051] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:38:19.212] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:38:19.212] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/nuevo-cierre","route":"/nuevo-cierre"}
+[00:38:19.212] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/nuevo-cierre color: rgb(120, 120, 120) color: inherit {"dp":"/nuevo-cierre","o":"http://localhost:3000/nuevo-cierre","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773519590077} /_vercel/insights/view
+[00:38:29.855] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773519600725} /_vercel/insights/view
+[00:39:12.145] Server  LOG     ✓ Compiled in 24ms
+[00:39:48.900] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/nuevo-cierre color: rgb(120, 120, 120) color: inherit {"dp":"/nuevo-cierre","o":"http://localhost:3000/nuevo-cierre","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773519679759} /_vercel/insights/view
+[00:40:49.969] Server  LOG     ✓ Compiled in 25ms
+[00:40:50.071] Browser ERROR   uncaughtError: TypeError: __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$constants$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__.MEDIOS_PAGO.map is not a function
+[00:40:52.895] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:40:53.060] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:40:53.060] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/nuevo-cierre","route":"/nuevo-cierre"}
+[00:40:53.060] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/nuevo-cierre color: rgb(120, 120, 120) color: inherit {"dp":"/nuevo-cierre","o":"http://localhost:3000/nuevo-cierre","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773519743924} /_vercel/insights/view
+[00:40:54.238] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:40:54.358] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:40:54.358] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/nuevo-cierre","route":"/nuevo-cierre"}
+[00:40:54.358] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/nuevo-cierre color: rgb(120, 120, 120) color: inherit {"dp":"/nuevo-cierre","o":"http://localhost:3000/nuevo-cierre","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773519745224} /_vercel/insights/view
+[00:40:54.634] Browser ERROR   uncaughtError: TypeError: __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$constants$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__.MEDIOS_PAGO.map is not a function
+[00:43:20.154] Server  WARN    ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:43:20.224] Server  LOG     ✓ Compiled in 24ms
+[00:43:20.449] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:43:20.603] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:43:20.603] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/nuevo-cierre","route":"/nuevo-cierre"}
+[00:43:20.603] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/nuevo-cierre color: rgb(120, 120, 120) color: inherit {"dp":"/nuevo-cierre","o":"http://localhost:3000/nuevo-cierre","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773519891474} /_vercel/insights/view
+[00:43:27.785] Server  LOG     ✓ Compiled in 22ms
+[00:43:29.498] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:43:29.652] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:43:29.652] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/nuevo-cierre","route":"/nuevo-cierre"}
+[00:43:29.652] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/nuevo-cierre color: rgb(120, 120, 120) color: inherit {"dp":"/nuevo-cierre","o":"http://localhost:3000/nuevo-cierre","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773519900524} /_vercel/insights/view
+[00:45:13.836] Server  LOG     ✓ Compiled in 25ms
+[00:45:27.413] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:45:27.565] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:45:27.565] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/nuevo-cierre","route":"/nuevo-cierre"}
+[00:45:27.565] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/nuevo-cierre color: rgb(120, 120, 120) color: inherit {"dp":"/nuevo-cierre","o":"http://localhost:3000/nuevo-cierre","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773520018434} /_vercel/insights/view
+[00:47:48.044] Server  LOG     ✓ Compiled in 28ms
+[00:47:49.117] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:47:49.289] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:47:49.289] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/nuevo-cierre","route":"/nuevo-cierre"}
+[00:47:49.289] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/nuevo-cierre color: rgb(120, 120, 120) color: inherit {"dp":"/nuevo-cierre","o":"http://localhost:3000/nuevo-cierre","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773520160160} /_vercel/insights/view
+[00:47:53.560] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773520164429} /_vercel/insights/view
+[00:47:56.466] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/nuevo-cierre color: rgb(120, 120, 120) color: inherit {"dp":"/nuevo-cierre","o":"http://localhost:3000/nuevo-cierre","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773520167330} /_vercel/insights/view
+[00:47:59.846] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773520170714} /_vercel/insights/view
+[00:51:25.179] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/login color: rgb(120, 120, 120) color: inherit {"dp":"/login","o":"http://localhost:3000/login","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773520376049} /_vercel/insights/view
+[00:51:43.460] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773520394330} /_vercel/insights/view
+[00:51:51.525] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/nuevo-cierre color: rgb(120, 120, 120) color: inherit {"dp":"/nuevo-cierre","o":"http://localhost:3000/nuevo-cierre","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773520402388} /_vercel/insights/view
+[00:52:24.028] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773520434898} /_vercel/insights/view
+[00:56:47.491] Server  WARN    ⚠ Fast Refresh had to perform a full reload when ./app/nuevo-cierre/page.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+[00:56:47.554] Server  LOG     ✓ Compiled in 66ms
+[00:56:47.678] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:56:48.272] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:56:48.272] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/","route":"/"}
+[00:56:48.272] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773520698670} /_vercel/insights/view
+[00:56:48.843] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:56:48.970] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:56:48.970] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/","route":"/"}
+[00:56:48.970] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773520699841} /_vercel/insights/view
+[00:56:49.329] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:56:49.430] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:56:49.430] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/","route":"/"}
+[00:56:49.430] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773520700329} /_vercel/insights/view
+[00:56:49.548] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:56:49.579] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:56:49.579] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/","route":"/"}
+[00:56:49.579] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773520700541} /_vercel/insights/view
+[00:56:49.717] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:56:49.841] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:56:49.841] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/","route":"/"}
+[00:56:49.841] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773520700712} /_vercel/insights/view
+[00:56:50.885] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:56:51.004] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:56:51.004] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/","route":"/"}
+[00:56:51.004] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773520701875} /_vercel/insights/view
+[00:56:51.207] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:56:51.330] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:56:51.330] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/","route":"/"}
+[00:56:51.330] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773520702201} /_vercel/insights/view
+[00:57:07.408] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:57:07.532] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:57:07.532] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/","route":"/"}
+[00:57:07.532] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773520718403} /_vercel/insights/view
+[00:57:07.965] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:57:08.092] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:57:08.257] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:57:08.381] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:57:08.381] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/","route":"/"}
+[00:57:08.381] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773520719252} /_vercel/insights/view
+[00:57:55.740] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:57:55.863] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:57:55.863] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/","route":"/"}
+[00:57:55.863] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773520766734} /_vercel/insights/view
+[00:58:10.127] Browser ERROR   unhandledRejection: SyntaxError: JSON.parse: unexpected character at line 1 column 1 of the JSON data
+[00:58:11.176] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:58:11.325] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:58:11.325] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/","route":"/"}
+[00:58:11.325] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773520782174} /_vercel/insights/view
+[00:58:11.325] Browser ERROR   unhandledRejection: SyntaxError: JSON.parse: unexpected character at line 1 column 1 of the JSON data
+[00:58:21.901] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:58:22.135] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:58:22.135] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/","route":"/"}
+[00:58:22.135] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773520792960} /_vercel/insights/view
+[00:58:22.135] Browser ERROR   unhandledRejection: SyntaxError: JSON.parse: unexpected character at line 1 column 1 of the JSON data
+[00:58:55.792] Server  LOG     ✓ Compiled in 26ms
+[00:59:23.984] Server  LOG     ✓ Compiled in 24ms
+[00:59:59.633] Server  LOG     ✓ Compiled in 27ms
+[01:00:01.030] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[01:00:01.030] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[01:00:01.030] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/","route":"/"}
+[01:00:01.030] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773520891983} /_vercel/insights/view
+[01:00:23.680] Server  LOG     ✓ Compiled in 25ms
+[01:00:24.900] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[01:00:25.054] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[01:00:25.054] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/","route":"/"}
+[01:00:25.054] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773520915925} /_vercel/insights/view
+[01:01:05.783] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/nuevo-cierre color: rgb(120, 120, 120) color: inherit {"dp":"/nuevo-cierre","o":"http://localhost:3000/nuevo-cierre","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773520956639} /_vercel/insights/view
+[01:01:07.080] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773520957950} /_vercel/insights/view
+[01:02:29.986] Server  LOG     ✓ Compiled in 25ms
+[01:04:41.216] Server  LOG     ✓ Compiled in 22ms
+[01:05:28.180] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[01:05:28.306] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[01:05:28.306] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/","route":"/"}
+[01:05:28.306] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773521219177} /_vercel/insights/view
+[01:05:52.744] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/nuevo-cierre color: rgb(120, 120, 120) color: inherit {"dp":"/nuevo-cierre","o":"http://localhost:3000/nuevo-cierre","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773521243606} /_vercel/insights/view
+[01:05:56.377] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773521247247} /_vercel/insights/view
+[01:06:35.569] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/nuevo-cierre color: rgb(120, 120, 120) color: inherit {"dp":"/nuevo-cierre","o":"http://localhost:3000/nuevo-cierre","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773521286436} /_vercel/insights/view
+[01:06:37.060] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773521287927} /_vercel/insights/view
+[01:06:39.477] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/nuevo-cierre color: rgb(120, 120, 120) color: inherit {"dp":"/nuevo-cierre","o":"http://localhost:3000/nuevo-cierre","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773521290342} /_vercel/insights/view
+[01:06:40.165] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773521291035} /_vercel/insights/view
+[01:06:52.162] Server  ERROR   ⨯ ./app/login/page.tsx:6:1
+Module not found: Can't resolve '@/pages/login-form'
+  4 | import { useRouter } from "next/navigation"
+  5 | import { useAuth } from "@/lib/auth-context"
+> 6 | import { LoginForm } from "@/pages/login-form"
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 |
+  8 | export default function LoginPage() {
+  9 |   const router = useRouter()
+
+Import map: aliased to relative './pages/login-form' inside of [project]/
+
+
+Import traces:
+  Client Component Browser:
+    ./app/login/page.tsx [Client Component Browser]
+    ./app/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/login/page.tsx [Client Component SSR]
+    ./app/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:06:52.163] Server  ERROR   ⨯ ./app/login/page.tsx:6:1
+Module not found: Can't resolve '@/pages/login-form'
+  4 | import { useRouter } from "next/navigation"
+  5 | import { useAuth } from "@/lib/auth-context"
+> 6 | import { LoginForm } from "@/pages/login-form"
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 |
+  8 | export default function LoginPage() {
+  9 |   const router = useRouter()
+
+Import map: aliased to relative './pages/login-form' inside of [project]/
+
+
+Import traces:
+  Client Component Browser:
+    ./app/login/page.tsx [Client Component Browser]
+    ./app/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/login/page.tsx [Client Component SSR]
+    ./app/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:06:52.163] Server  ERROR   ⨯ ./app/login/page.tsx:6:1
+Module not found: Can't resolve '@/pages/login-form'
+  4 | import { useRouter } from "next/navigation"
+  5 | import { useAuth } from "@/lib/auth-context"
+> 6 | import { LoginForm } from "@/pages/login-form"
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 |
+  8 | export default function LoginPage() {
+  9 |   const router = useRouter()
+
+Import map: aliased to relative './pages/login-form' inside of [project]/
+
+
+Import traces:
+  Client Component Browser:
+    ./app/login/page.tsx [Client Component Browser]
+    ./app/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/login/page.tsx [Client Component SSR]
+    ./app/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:06:52.163] Server  ERROR   ⨯ ./app/login/page.tsx:6:1
+Module not found: Can't resolve '@/pages/login-form'
+  4 | import { useRouter } from "next/navigation"
+  5 | import { useAuth } from "@/lib/auth-context"
+> 6 | import { LoginForm } from "@/pages/login-form"
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 |
+  8 | export default function LoginPage() {
+  9 |   const router = useRouter()
+
+Import map: aliased to relative './pages/login-form' inside of [project]/
+
+
+Import traces:
+  Client Component Browser:
+    ./app/login/page.tsx [Client Component Browser]
+    ./app/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/login/page.tsx [Client Component SSR]
+    ./app/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:06:52.302] Browser ERROR   ./app/login/page.tsx:6:1
+Module not found: Can't resolve '@/pages/login-form'
+  4 | import { useRouter } from "next/navigation"
+  5 | import { useAuth } from "@/lib/auth-context"
+> 6 | import { LoginForm } from "@/pages/login-form"
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 |
+  8 | export default function LoginPage() {
+  9 |   const router = useRouter()
+
+Import map: aliased to relative './pages/login-form' inside of [project]/
+
+Import traces:
+  Client Component Browser:
+    ./app/login/page.tsx [Client Component Browser]
+    ./app/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/login/page.tsx [Client Component SSR]
+    ./app/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:06:52.364] Server  ERROR   ⨯ ./app/nuevo-cierre/page.tsx:7:1
+Module not found: Can't resolve '@/pages/nuevo-cierre-form'
+   5 | import { useAuth } from "@/lib/auth-context";
+   6 | import { Header } from "@/components/header";
+>  7 | import { NuevoCierreForm } from "@/pages/nuevo-cierre-form";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   8 | import {
+   9 |   getComedores,
+  10 |   getPuntosDeVenta,
+
+Import map: aliased to relative './pages/nuevo-cierre-form' inside of [project]/
+
+
+Import traces:
+  Client Component Browser:
+    ./app/nuevo-cierre/page.tsx [Client Component Browser]
+    ./app/nuevo-cierre/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/nuevo-cierre/page.tsx [Client Component SSR]
+    ./app/nuevo-cierre/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:06:52.364] Server  ERROR   ⨯ ./app/nuevo-cierre/page.tsx:7:1
+Module not found: Can't resolve '@/pages/nuevo-cierre-form'
+   5 | import { useAuth } from "@/lib/auth-context";
+   6 | import { Header } from "@/components/header";
+>  7 | import { NuevoCierreForm } from "@/pages/nuevo-cierre-form";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   8 | import {
+   9 |   getComedores,
+  10 |   getPuntosDeVenta,
+
+Import map: aliased to relative './pages/nuevo-cierre-form' inside of [project]/
+
+
+Import traces:
+  Client Component Browser:
+    ./app/nuevo-cierre/page.tsx [Client Component Browser]
+    ./app/nuevo-cierre/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/nuevo-cierre/page.tsx [Client Component SSR]
+    ./app/nuevo-cierre/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:06:52.365] Server  ERROR   ⨯ ./app/nuevo-cierre/page.tsx:7:1
+Module not found: Can't resolve '@/pages/nuevo-cierre-form'
+   5 | import { useAuth } from "@/lib/auth-context";
+   6 | import { Header } from "@/components/header";
+>  7 | import { NuevoCierreForm } from "@/pages/nuevo-cierre-form";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   8 | import {
+   9 |   getComedores,
+  10 |   getPuntosDeVenta,
+
+Import map: aliased to relative './pages/nuevo-cierre-form' inside of [project]/
+
+
+Import traces:
+  Client Component Browser:
+    ./app/nuevo-cierre/page.tsx [Client Component Browser]
+    ./app/nuevo-cierre/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/nuevo-cierre/page.tsx [Client Component SSR]
+    ./app/nuevo-cierre/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:06:52.365] Server  ERROR   ⨯ ./app/nuevo-cierre/page.tsx:7:1
+Module not found: Can't resolve '@/pages/nuevo-cierre-form'
+   5 | import { useAuth } from "@/lib/auth-context";
+   6 | import { Header } from "@/components/header";
+>  7 | import { NuevoCierreForm } from "@/pages/nuevo-cierre-form";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   8 | import {
+   9 |   getComedores,
+  10 |   getPuntosDeVenta,
+
+Import map: aliased to relative './pages/nuevo-cierre-form' inside of [project]/
+
+
+Import traces:
+  Client Component Browser:
+    ./app/nuevo-cierre/page.tsx [Client Component Browser]
+    ./app/nuevo-cierre/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/nuevo-cierre/page.tsx [Client Component SSR]
+    ./app/nuevo-cierre/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:06:52.376] Server  ERROR   ⨯ ./app/nuevo-cierre/page.tsx:7:1
+Module not found: Can't resolve '@/pages/nuevo-cierre-form'
+   5 | import { useAuth } from "@/lib/auth-context";
+   6 | import { Header } from "@/components/header";
+>  7 | import { NuevoCierreForm } from "@/pages/nuevo-cierre-form";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   8 | import {
+   9 |   getComedores,
+  10 |   getPuntosDeVenta,
+
+Import map: aliased to relative './pages/nuevo-cierre-form' inside of [project]/
+
+
+Import traces:
+  Client Component Browser:
+    ./app/nuevo-cierre/page.tsx [Client Component Browser]
+    ./app/nuevo-cierre/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/nuevo-cierre/page.tsx [Client Component SSR]
+    ./app/nuevo-cierre/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:06:52.376] Server  ERROR   ⨯ ./app/nuevo-cierre/page.tsx:7:1
+Module not found: Can't resolve '@/pages/nuevo-cierre-form'
+   5 | import { useAuth } from "@/lib/auth-context";
+   6 | import { Header } from "@/components/header";
+>  7 | import { NuevoCierreForm } from "@/pages/nuevo-cierre-form";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   8 | import {
+   9 |   getComedores,
+  10 |   getPuntosDeVenta,
+
+Import map: aliased to relative './pages/nuevo-cierre-form' inside of [project]/
+
+
+Import traces:
+  Client Component Browser:
+    ./app/nuevo-cierre/page.tsx [Client Component Browser]
+    ./app/nuevo-cierre/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/nuevo-cierre/page.tsx [Client Component SSR]
+    ./app/nuevo-cierre/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:06:52.377] Server  ERROR   ⨯ ./app/nuevo-cierre/page.tsx:7:1
+Module not found: Can't resolve '@/pages/nuevo-cierre-form'
+   5 | import { useAuth } from "@/lib/auth-context";
+   6 | import { Header } from "@/components/header";
+>  7 | import { NuevoCierreForm } from "@/pages/nuevo-cierre-form";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   8 | import {
+   9 |   getComedores,
+  10 |   getPuntosDeVenta,
+
+Import map: aliased to relative './pages/nuevo-cierre-form' inside of [project]/
+
+
+Import traces:
+  Client Component Browser:
+    ./app/nuevo-cierre/page.tsx [Client Component Browser]
+    ./app/nuevo-cierre/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/nuevo-cierre/page.tsx [Client Component SSR]
+    ./app/nuevo-cierre/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:06:52.378] Server  ERROR   ⨯ ./app/nuevo-cierre/page.tsx:7:1
+Module not found: Can't resolve '@/pages/nuevo-cierre-form'
+   5 | import { useAuth } from "@/lib/auth-context";
+   6 | import { Header } from "@/components/header";
+>  7 | import { NuevoCierreForm } from "@/pages/nuevo-cierre-form";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   8 | import {
+   9 |   getComedores,
+  10 |   getPuntosDeVenta,
+
+Import map: aliased to relative './pages/nuevo-cierre-form' inside of [project]/
+
+
+Import traces:
+  Client Component Browser:
+    ./app/nuevo-cierre/page.tsx [Client Component Browser]
+    ./app/nuevo-cierre/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/nuevo-cierre/page.tsx [Client Component SSR]
+    ./app/nuevo-cierre/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:06:52.379] Server  ERROR   ⨯ ./app/nuevo-cierre/page.tsx:7:1
+Module not found: Can't resolve '@/pages/nuevo-cierre-form'
+   5 | import { useAuth } from "@/lib/auth-context";
+   6 | import { Header } from "@/components/header";
+>  7 | import { NuevoCierreForm } from "@/pages/nuevo-cierre-form";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   8 | import {
+   9 |   getComedores,
+  10 |   getPuntosDeVenta,
+
+Import map: aliased to relative './pages/nuevo-cierre-form' inside of [project]/
+
+
+Import traces:
+  Client Component Browser:
+    ./app/nuevo-cierre/page.tsx [Client Component Browser]
+    ./app/nuevo-cierre/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/nuevo-cierre/page.tsx [Client Component SSR]
+    ./app/nuevo-cierre/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:06:52.379] Server  ERROR   ⨯ ./app/nuevo-cierre/page.tsx:7:1
+Module not found: Can't resolve '@/pages/nuevo-cierre-form'
+   5 | import { useAuth } from "@/lib/auth-context";
+   6 | import { Header } from "@/components/header";
+>  7 | import { NuevoCierreForm } from "@/pages/nuevo-cierre-form";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   8 | import {
+   9 |   getComedores,
+  10 |   getPuntosDeVenta,
+
+Import map: aliased to relative './pages/nuevo-cierre-form' inside of [project]/
+
+
+Import traces:
+  Client Component Browser:
+    ./app/nuevo-cierre/page.tsx [Client Component Browser]
+    ./app/nuevo-cierre/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/nuevo-cierre/page.tsx [Client Component SSR]
+    ./app/nuevo-cierre/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:06:52.379] Server  ERROR   ⨯ ./app/nuevo-cierre/page.tsx:7:1
+Module not found: Can't resolve '@/pages/nuevo-cierre-form'
+   5 | import { useAuth } from "@/lib/auth-context";
+   6 | import { Header } from "@/components/header";
+>  7 | import { NuevoCierreForm } from "@/pages/nuevo-cierre-form";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   8 | import {
+   9 |   getComedores,
+  10 |   getPuntosDeVenta,
+
+Import map: aliased to relative './pages/nuevo-cierre-form' inside of [project]/
+
+
+Import traces:
+  Client Component Browser:
+    ./app/nuevo-cierre/page.tsx [Client Component Browser]
+    ./app/nuevo-cierre/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/nuevo-cierre/page.tsx [Client Component SSR]
+    ./app/nuevo-cierre/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:06:52.380] Server  ERROR   ⨯ ./app/nuevo-cierre/page.tsx:7:1
+Module not found: Can't resolve '@/pages/nuevo-cierre-form'
+   5 | import { useAuth } from "@/lib/auth-context";
+   6 | import { Header } from "@/components/header";
+>  7 | import { NuevoCierreForm } from "@/pages/nuevo-cierre-form";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   8 | import {
+   9 |   getComedores,
+  10 |   getPuntosDeVenta,
+
+Import map: aliased to relative './pages/nuevo-cierre-form' inside of [project]/
+
+
+Import traces:
+  Client Component Browser:
+    ./app/nuevo-cierre/page.tsx [Client Component Browser]
+    ./app/nuevo-cierre/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/nuevo-cierre/page.tsx [Client Component SSR]
+    ./app/nuevo-cierre/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:06:52.596] Server  LOG     ✓ Compiled in 394ms
+[01:06:52.753] Browser ERROR   ./app/login/page.tsx:6:1
+Module not found: Can't resolve '@/pages/login-form'
+  4 | import { useRouter } from "next/navigation"
+  5 | import { useAuth } from "@/lib/auth-context"
+> 6 | import { LoginForm } from "@/pages/login-form"
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 |
+  8 | export default function LoginPage() {
+  9 |   const router = useRouter()
+
+Import map: aliased to relative './pages/login-form' inside of [project]/
+
+Import traces:
+  Client Component Browser:
+    ./app/login/page.tsx [Client Component Browser]
+    ./app/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/login/page.tsx [Client Component SSR]
+    ./app/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:06:52.753] Browser ERROR   ./app/nuevo-cierre/page.tsx:7:1
+Module not found: Can't resolve '@/pages/nuevo-cierre-form'
+   5 | import { useAuth } from "@/lib/auth-context";
+   6 | import { Header } from "@/components/header";
+>  7 | import { NuevoCierreForm } from "@/pages/nuevo-cierre-form";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   8 | import {
+   9 |   getComedores,
+  10 |   getPuntosDeVenta,
+
+Import map: aliased to relative './pages/nuevo-cierre-form' inside of [project]/
+
+Import traces:
+  Client Component Browser:
+    ./app/nuevo-cierre/page.tsx [Client Component Browser]
+    ./app/nuevo-cierre/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/nuevo-cierre/page.tsx [Client Component SSR]
+    ./app/nuevo-cierre/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:06:52.753] Browser ERROR   ./app/login/page.tsx:6:1
+Module not found: Can't resolve '@/pages/login-form'
+  4 | import { useRouter } from "next/navigation"
+  5 | import { useAuth } from "@/lib/auth-context"
+> 6 | import { LoginForm } from "@/pages/login-form"
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 |
+  8 | export default function LoginPage() {
+  9 |   const router = useRouter()
+
+Import map: aliased to relative './pages/login-form' inside of [project]/
+
+Import traces:
+  Client Component Browser:
+    ./app/login/page.tsx [Client Component Browser]
+    ./app/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/login/page.tsx [Client Component SSR]
+    ./app/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:06:52.753] Browser ERROR   ./app/nuevo-cierre/page.tsx:7:1
+Module not found: Can't resolve '@/pages/nuevo-cierre-form'
+   5 | import { useAuth } from "@/lib/auth-context";
+   6 | import { Header } from "@/components/header";
+>  7 | import { NuevoCierreForm } from "@/pages/nuevo-cierre-form";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   8 | import {
+   9 |   getComedores,
+  10 |   getPuntosDeVenta,
+
+Import map: aliased to relative './pages/nuevo-cierre-form' inside of [project]/
+
+Import traces:
+  Client Component Browser:
+    ./app/nuevo-cierre/page.tsx [Client Component Browser]
+    ./app/nuevo-cierre/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/nuevo-cierre/page.tsx [Client Component SSR]
+    ./app/nuevo-cierre/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:06:52.972] Browser ERROR   ./app/login/page.tsx:6:1
+Module not found: Can't resolve '@/pages/login-form'
+  4 | import { useRouter } from "next/navigation"
+  5 | import { useAuth } from "@/lib/auth-context"
+> 6 | import { LoginForm } from "@/pages/login-form"
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 |
+  8 | export default function LoginPage() {
+  9 |   const router = useRouter()
+
+Import map: aliased to relative './pages/login-form' inside of [project]/
+
+Import traces:
+  Client Component Browser:
+    ./app/login/page.tsx [Client Component Browser]
+    ./app/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/login/page.tsx [Client Component SSR]
+    ./app/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:06:52.972] Browser ERROR   ./app/nuevo-cierre/page.tsx:7:1
+Module not found: Can't resolve '@/pages/nuevo-cierre-form'
+   5 | import { useAuth } from "@/lib/auth-context";
+   6 | import { Header } from "@/components/header";
+>  7 | import { NuevoCierreForm } from "@/pages/nuevo-cierre-form";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   8 | import {
+   9 |   getComedores,
+  10 |   getPuntosDeVenta,
+
+Import map: aliased to relative './pages/nuevo-cierre-form' inside of [project]/
+
+Import traces:
+  Client Component Browser:
+    ./app/nuevo-cierre/page.tsx [Client Component Browser]
+    ./app/nuevo-cierre/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/nuevo-cierre/page.tsx [Client Component SSR]
+    ./app/nuevo-cierre/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:06:53.261] Browser ERROR   uncaughtError: Error: ./app/login/page.tsx:6:1
+Module not found: Can't resolve '@/pages/login-form'
+  4 | import { useRouter } from "next/navigation"
+  5 | import { useAuth } from "@/lib/auth-context"
+> 6 | import { LoginForm } from "@/pages/login-form"
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 |
+  8 | export default function LoginPage() {
+  9 |   const router = useRouter()
+
+Import map: aliased to relative './pages/login-form' inside of [project]/
+
+
+Import traces:
+  Client Component Browser:
+    ./app/login/page.tsx [Client Component Browser]
+    ./app/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/login/page.tsx [Client Component SSR]
+    ./app/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:06:53.261] Browser ERROR   ./app/login/page.tsx:6:1
+Module not found: Can't resolve '@/pages/login-form'
+  4 | import { useRouter } from "next/navigation"
+  5 | import { useAuth } from "@/lib/auth-context"
+> 6 | import { LoginForm } from "@/pages/login-form"
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 |
+  8 | export default function LoginPage() {
+  9 |   const router = useRouter()
+
+Import map: aliased to relative './pages/login-form' inside of [project]/
+
+Import traces:
+  Client Component Browser:
+    ./app/login/page.tsx [Client Component Browser]
+    ./app/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/login/page.tsx [Client Component SSR]
+    ./app/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:06:53.261] Browser ERROR   ./app/nuevo-cierre/page.tsx:7:1
+Module not found: Can't resolve '@/pages/nuevo-cierre-form'
+   5 | import { useAuth } from "@/lib/auth-context";
+   6 | import { Header } from "@/components/header";
+>  7 | import { NuevoCierreForm } from "@/pages/nuevo-cierre-form";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   8 | import {
+   9 |   getComedores,
+  10 |   getPuntosDeVenta,
+
+Import map: aliased to relative './pages/nuevo-cierre-form' inside of [project]/
+
+Import traces:
+  Client Component Browser:
+    ./app/nuevo-cierre/page.tsx [Client Component Browser]
+    ./app/nuevo-cierre/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/nuevo-cierre/page.tsx [Client Component SSR]
+    ./app/nuevo-cierre/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:06:53.261] Browser ERROR   ./app/login/page.tsx:6:1
+Module not found: Can't resolve '@/pages/login-form'
+  4 | import { useRouter } from "next/navigation"
+  5 | import { useAuth } from "@/lib/auth-context"
+> 6 | import { LoginForm } from "@/pages/login-form"
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 |
+  8 | export default function LoginPage() {
+  9 |   const router = useRouter()
+
+Import map: aliased to relative './pages/login-form' inside of [project]/
+
+Import traces:
+  Client Component Browser:
+    ./app/login/page.tsx [Client Component Browser]
+    ./app/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/login/page.tsx [Client Component SSR]
+    ./app/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:06:53.261] Browser ERROR   ./app/nuevo-cierre/page.tsx:7:1
+Module not found: Can't resolve '@/pages/nuevo-cierre-form'
+   5 | import { useAuth } from "@/lib/auth-context";
+   6 | import { Header } from "@/components/header";
+>  7 | import { NuevoCierreForm } from "@/pages/nuevo-cierre-form";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   8 | import {
+   9 |   getComedores,
+  10 |   getPuntosDeVenta,
+
+Import map: aliased to relative './pages/nuevo-cierre-form' inside of [project]/
+
+Import traces:
+  Client Component Browser:
+    ./app/nuevo-cierre/page.tsx [Client Component Browser]
+    ./app/nuevo-cierre/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/nuevo-cierre/page.tsx [Client Component SSR]
+    ./app/nuevo-cierre/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:06:54.884] Browser ERROR   ./app/login/page.tsx:6:1
+Module not found: Can't resolve '@/pages/login-form'
+  4 | import { useRouter } from "next/navigation"
+  5 | import { useAuth } from "@/lib/auth-context"
+> 6 | import { LoginForm } from "@/pages/login-form"
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 |
+  8 | export default function LoginPage() {
+  9 |   const router = useRouter()
+
+Import map: aliased to relative './pages/login-form' inside of [project]/
+
+Import traces:
+  Client Component Browser:
+    ./app/login/page.tsx [Client Component Browser]
+    ./app/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/login/page.tsx [Client Component SSR]
+    ./app/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:06:54.884] Browser ERROR   ./app/nuevo-cierre/page.tsx:7:1
+Module not found: Can't resolve '@/pages/nuevo-cierre-form'
+   5 | import { useAuth } from "@/lib/auth-context";
+   6 | import { Header } from "@/components/header";
+>  7 | import { NuevoCierreForm } from "@/pages/nuevo-cierre-form";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   8 | import {
+   9 |   getComedores,
+  10 |   getPuntosDeVenta,
+
+Import map: aliased to relative './pages/nuevo-cierre-form' inside of [project]/
+
+Import traces:
+  Client Component Browser:
+    ./app/nuevo-cierre/page.tsx [Client Component Browser]
+    ./app/nuevo-cierre/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/nuevo-cierre/page.tsx [Client Component SSR]
+    ./app/nuevo-cierre/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:07:01.696] Server  LOG     ✓ Compiled in 30ms
+[01:07:01.798] Browser ERROR   ./app/login/page.tsx:6:1
+Module not found: Can't resolve '@/pages/login-form'
+  4 | import { useRouter } from "next/navigation"
+  5 | import { useAuth } from "@/lib/auth-context"
+> 6 | import { LoginForm } from "@/pages/login-form"
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 |
+  8 | export default function LoginPage() {
+  9 |   const router = useRouter()
+
+Import map: aliased to relative './pages/login-form' inside of [project]/
+
+Import traces:
+  Client Component Browser:
+    ./app/login/page.tsx [Client Component Browser]
+    ./app/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/login/page.tsx [Client Component SSR]
+    ./app/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:07:08.585] Server  LOG     ✓ Compiled in 26ms
+[01:07:08.672] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[01:07:08.793] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[01:07:08.793] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/","route":"/"}
+[01:07:08.793] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.6.1","sv":"0.1.3","ts":1773521319664} /_vercel/insights/view

@@ -1,10 +1,18 @@
-import type { Metadata } from 'next'
-import { Analytics } from '@vercel/analytics/next'
-import './globals.css'
+import type { Metadata, Viewport } from "next"
+import { Analytics } from "@vercel/analytics/next"
+import { AuthProvider } from "@/lib/auth-context"
+import { Toaster } from "@/components/ui/toaster"
+import "./globals.css"
 
 export const metadata: Metadata = {
-  title: 'LPC Gestión Comedores',
-  description: 'Sistema de gestión de comedores',
+  title: "LPC Gestión Comedores",
+  description: "Sistema de gestión de comedores",
+}
+
+export const viewport: Viewport = {
+  themeColor: "#000000",
+  width: "device-width",
+  initialScale: 1,
 }
 
 export default function RootLayout({
@@ -15,7 +23,10 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body className="font-sans antialiased">
-        {children}
+        <AuthProvider>
+          {children}
+          <Toaster />
+        </AuthProvider>
         <Analytics />
       </body>
     </html>
