@@ -45,7 +45,8 @@ export default function App() {
     setError("")
 
     try {
-      const cuil = Number(usuario)
+      const normalizedUsuario = usuario.replace(/\D/g, "")
+      const cuil = Number(normalizedUsuario)
 
       if (!Number.isFinite(cuil)) {
         throw new Error("Ingresa un CUIL valido")

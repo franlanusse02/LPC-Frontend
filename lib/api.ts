@@ -1,5 +1,3 @@
-const API_URL = "http://10.0.0.50"
-
 export type LoginResponse = {
   token: string
   cuil: number
@@ -42,7 +40,7 @@ async function apiFetch<T>(
     headers.set("Authorization", `Bearer ${token}`)
   }
 
-  const response = await fetch(`${API_URL}${path}`, {
+  const response = await fetch(path, {
     ...options,
     headers,
   })
@@ -60,22 +58,22 @@ async function apiFetch<T>(
 }
 
 export function login(cuil: number, password: string) {
-  return apiFetch<LoginResponse>("/api/usuarios/login", {
+  return apiFetch<LoginResponse>("/backend/usuarios/login", {
     method: "POST",
     body: JSON.stringify({ cuil, password }),
   })
 }
 
 export function getMe(token: string) {
-  return apiFetch<UsuarioMe>("/api/usuarios/me", {}, token)
+  return apiFetch<UsuarioMe>("/backend/usuarios/me", {}, token)
 }
 
 export function getComedores(token: string) {
-  return apiFetch<Comedor[]>("/api/comedor", {}, token)
+  return apiFetch<Comedor[]>("/backend/comedor", {}, token)
 }
 
 export function getPuntosDeVenta(token: string) {
-  return apiFetch<PuntoDeVenta[]>("/api/puntodeventa", {}, token)
+  return apiFetch<PuntoDeVenta[]>("/backend/puntodeventa", {}, token)
 }
 
 export function createCierre(
@@ -83,7 +81,7 @@ export function createCierre(
   payload: CreateCierreInput
 ) {
   return apiFetch<void>(
-    "/api/cierre",
+    "/backend/cierre",
     {
       method: "POST",
       body: JSON.stringify(payload),
@@ -93,9 +91,9 @@ export function createCierre(
 }
 
 export function getComedorById(token: string, id: number) {
-  return apiFetch<Comedor>(`/api/comedor/${id}`, {}, token)
+  return apiFetch<Comedor>(`/backend/comedor/${id}`, {}, token)
 }
 
 export function getPuntoDeVentaById(token: string, id: number) {
-  return apiFetch<PuntoDeVenta>(`/api/puntodeventa/${id}`, {}, token)
+  return apiFetch<PuntoDeVenta>(`/backend/puntodeventa/${id}`, {}, token)
 }
