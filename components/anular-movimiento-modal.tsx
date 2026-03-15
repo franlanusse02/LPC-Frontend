@@ -11,24 +11,26 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
-import { AlertTriangle, RotateCcw } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
 import { FormField } from "./form-field";
 import { Input } from "./ui/input";
 
 interface AnularModalProps {
   open: boolean;
   onClose: () => void;
-  cierreId: number;
-  fechaOperacion: string;
+  movimientoId: number;
+  metodoPago: string;
+  monto: number;
   puntoVenta: string;
-  onConfirm: (cierreId: number, motivo: string) => Promise<void>;
+  onConfirm: (movimientoId: number, motivo: string) => Promise<void>;
 }
 
-export function AnularModal({
+export function AnularMovimientoModal({
   open,
   onClose,
-  cierreId,
-  fechaOperacion,
+  movimientoId,
+  metodoPago,
+  monto,
   puntoVenta,
   onConfirm,
 }: AnularModalProps) {
@@ -38,7 +40,7 @@ export function AnularModal({
   const handleConfirm = async () => {
     setLoading(true);
     try {
-      await onConfirm(cierreId, motivo);
+      await onConfirm(movimientoId, motivo);
       onClose();
     } finally {
       setLoading(false);
@@ -58,17 +60,17 @@ export function AnularModal({
                 <AlertTriangle className="h-5 w-5" />
               </span>
               <DialogTitle className="text-lg font-bold text-gray-900">
-                Anular cierre
+                Anular Linea
               </DialogTitle>
             </div>
 
             <DialogDescription className="text-sm text-gray-500 leading-relaxed">
-              Estás por <strong className="text-gray-700">anular</strong> el
-              cierre del{" "}
-              <strong className="text-gray-700">{fechaOperacion}</strong> del
-              punto de venta{" "}
-              <strong className="text-gray-700">'{puntoVenta}'</strong>. Esta
-              acción podrá revertirse posteriormente.
+              Estás por <strong className="text-gray-700">anular</strong> la
+              linea de pago{" "}
+              <strong className="text-gray-700">'{metodoPago}'</strong> de{" "}
+              <strong className="text-gray-700">${monto}</strong> para el punto
+              de venta <strong className="text-gray-700">'{puntoVenta}'</strong>
+              . Esta acción NO podrá revertirse una vez guardados los cambios.
             </DialogDescription>
           </DialogHeader>
           <FormField label="Motivo">

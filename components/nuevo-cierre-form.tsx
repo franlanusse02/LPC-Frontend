@@ -59,7 +59,10 @@ export function NuevoCierreForm({
   );
 
   const addLine = () => {
-    setLines((prev) => [...prev, { medioPago: "", monto: "" }]);
+    setLines((prev) => [
+      ...prev,
+      { id: null, medioPago: "", monto: "", anulacionId: null },
+    ]);
   };
 
   const removeLine = (index: number) => {
@@ -296,6 +299,7 @@ export function NuevoCierreForm({
                     index={i}
                     onUpdate={updateLine}
                     onRemove={removeLine}
+                    onAnular={() => {}}
                     selectedLines={selectedLines}
                     setSelectedLines={setSelectedLines}
                   />
