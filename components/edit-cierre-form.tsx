@@ -196,7 +196,6 @@ export function EditCierreForm({
 
     setLoading(true);
     try {
-      // 1. Flush pending anulaciones
       if (pendingAnulaciones.length > 0) {
         await Promise.all(
           pendingAnulaciones.map(({ id, motivo }) =>

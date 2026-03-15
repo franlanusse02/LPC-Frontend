@@ -63,7 +63,16 @@ export default function ContabilidadPage() {
         prev.map((c) =>
           c.id !== cierreId
             ? c
-            : { ...c, anulacionId: isAnulado ? null : cierreId },
+            : {
+                ...c,
+                anulacionId: isAnulado ? null : cierreId,
+                montoTotal: 0,
+                movimientos:
+                  c.movimientos!.map((m) => ({
+                    ...m,
+                    anulacionId: isAnulado ? null : cierreId,
+                  })) || [],
+              },
         ),
       );
       toast({
