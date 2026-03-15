@@ -56,7 +56,7 @@ export default function ContabilidadPage() {
   useEffect(() => {
     if (session) {
       apiFetch<DetailedCierreCajaResponse[]>(
-        "/api/cierre?detailed=true",
+        "/api/cierre/detailed",
         {},
         session.token,
       )
