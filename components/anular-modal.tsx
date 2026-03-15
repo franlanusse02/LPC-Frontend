@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
+import { Textarea } from "@/components/ui/textarea";
 import { AlertTriangle, RotateCcw } from "lucide-react";
 
 interface AnularModalProps {
@@ -19,7 +20,7 @@ interface AnularModalProps {
   isAnulado: boolean;
   cierreId: number;
   fechaOperacion: string;
-  onConfirm: (cierreId: number) => Promise<void>;
+  onConfirm: (cierreId: number, motivo: string) => Promise<void>;
 }
 
 export function AnularModal({
@@ -31,14 +32,17 @@ export function AnularModal({
   onConfirm,
 }: AnularModalProps) {
   const [loading, setLoading] = useState(false);
+  const [motivo, setMotivo] = useState("");
 
   const handleConfirm = async () => {
+    if (!isAnulado && !motivo.trim()) return;
     setLoading(true);
     try {
-      await onConfirm(cierreId);
+      await onConfirm(cierreId, motivo);
       onClose();
     } finally {
       setLoading(false);
+      setMotivo("");
     }
   };
 
@@ -48,14 +52,13 @@ export function AnularModal({
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
       <DialogContent className="sm:max-w-md rounded-2xl shadow-xl border-0 p-0 overflow-hidden">
-        {/* Colored top bar */}
         <div
           className={`h-1.5 w-full ${isDestructive ? "bg-red-500" : "bg-emerald-500"}`}
         />
 
         <div className="px-6 pt-5 pb-6 space-y-5">
           <DialogHeader className="space-y-3">
-            <div className={`flex items-center gap-3`}>
+            <div className="flex items-center gap-3">
               <span
                 className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${
                   isDestructive
@@ -93,6 +96,21 @@ export function AnularModal({
             </DialogDescription>
           </DialogHeader>
 
+          {isDestructive && (
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-gray-700">
+                Motivo de anulación <span className="text-red-500">*</span>
+              </label>
+              <Textarea
+                value={motivo}
+                onChange={(e) => setMotivo(e.target.value)}
+                placeholder="Ingresá el motivo..."
+                className="resize-none rounded-lg border-gray-200"
+                rows={3}
+              />
+            </div>
+          )}
+
           <DialogFooter className="flex-row justify-end gap-2 pt-2">
             <Button
               variant="outline"
@@ -104,7 +122,7 @@ export function AnularModal({
             </Button>
             <Button
               onClick={handleConfirm}
-              disabled={loading}
+              disabled={loading || (isDestructive && !motivo.trim())}
               className={`rounded-lg font-semibold ${
                 isDestructive
                   ? "bg-red-500 hover:bg-red-600 text-white"

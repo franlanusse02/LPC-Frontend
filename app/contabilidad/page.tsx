@@ -75,7 +75,7 @@ export default function ContabilidadPage() {
     });
   };
 
-  const handleAnularDesanular = async (cierreId: number) => {
+  const handleAnularDesanular = async (cierreId: number, motivo: string) => {
     if (!session) return;
     const cierre = cierres.find((c) => c.id === cierreId);
     if (!cierre) return;
@@ -86,15 +86,21 @@ export default function ContabilidadPage() {
       : `/api/cierre/${cierreId}/anular`;
 
     try {
-      await apiFetch(endpoint, { method: "POST" }, session.token);
+      await apiFetch(
+        endpoint,
+        {
+          method: "POST",
+          body: JSON.stringify({ motivo }),
+        },
+        session.token,
+      );
 
-      // Optimistically update local state
       setCierres((prev) =>
         prev.map((c) => {
           if (c.id !== cierreId) return c;
           return {
             ...c,
-            anulacionId: isAnulado ? null : cierreId, // toggle
+            anulacionId: isAnulado ? null : cierreId,
           };
         }),
       );
@@ -119,7 +125,7 @@ export default function ContabilidadPage() {
             ? err.message
             : "No se pudo completar la operación.",
       });
-      throw err; // re-throw so modal can handle loading state
+      throw err;
     }
   };
 
