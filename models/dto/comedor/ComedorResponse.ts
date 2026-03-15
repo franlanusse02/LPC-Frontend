@@ -1,4 +1,7 @@
-import { PuntoDeVentaResponse } from "../pto-venta/PuntoDeVentaResponse";
+import {
+  PuntoDeVentaResponse,
+  PuntoDeVentaDetailedResponse,
+} from "../pto-venta/PuntoDeVentaResponse";
 
 export type ComedorResponse = {
   id: number;
@@ -6,3 +9,8 @@ export type ComedorResponse = {
   puntosDeVenta: PuntoDeVentaResponse[] | null;
 };
 
+export type ComedorDetailedResponse = ComedorResponse & {
+  id: number;
+  nombre: string;
+  puntosDeVenta: PuntoDeVentaDetailedResponse[] | null;
+};
