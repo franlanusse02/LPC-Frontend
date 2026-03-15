@@ -26,18 +26,16 @@ import { useToast } from "@/hooks/use-toast";
 import { ComedorResponse } from "@/models/dto/comedor/ComedorResponse";
 import { PuntoDeVentaResponse } from "@/models/dto/pto-venta/PuntoDeVentaResponse";
 import { MovimientoResponse } from "@/models/dto/movimiento/MovimientoResponse";
-import { CierreCajaResponse } from "@/models/dto/cierre-caja/CierreCajaResponse";
+import {
+  CierreCajaResponse,
+  DetailedCierreCajaResponse,
+} from "@/models/dto/cierre-caja/CierreCajaResponse";
 import { MediosPagoDict } from "@/models/enums/MedioPago";
 
 interface EditCierreFormProps {
   comedores: ComedorResponse[];
   puntosDeVenta: PuntoDeVentaResponse[];
-  /** The existing cierre data to pre-populate the form */
-  cierre: CierreCajaResponse & {
-    movimientos?: MovimientoResponse[];
-    comedor?: { id: number; nombre: string };
-    puntoDeVenta?: { id: number; nombre: string; comedorId: number };
-  };
+  cierre: DetailedCierreCajaResponse;
 }
 
 export function EditCierreForm({

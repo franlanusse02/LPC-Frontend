@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useEffect, useState, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { Header } from "@/components/header";
 import { apiFetch } from "@/lib/api";
@@ -14,11 +14,25 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 export default function EditarCierrePage() {
-  const router = useRouter();
-  const params = useParams();
-  const { session, isLoading } = useAuth();
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+        </div>
+      }
+    >
+      <EditarCierrePageInner />
+    </Suspense>
+  );
+}
 
-  const cierreId = params?.id as string;
+function EditarCierrePageInner() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const cierreId = searchParams.get("id") as string;
+  const { session, isLoading } = useAuth();
 
   const [cierre, setCierre] = useState<DetailedCierreCajaResponse | null>(null);
   const [comedores, setComedores] = useState<ComedorResponse[]>([]);

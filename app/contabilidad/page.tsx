@@ -137,7 +137,7 @@ export default function ContabilidadPage() {
   };
 
   const handleEditar = (cierreId: number) => {
-    router.push(`/contabilidad/${cierreId}/editar-cierre`);
+    router.push(`/contabilidad/editar-cierre?id=${cierreId}`);
   };
 
   const formatCurrency = (amount: number) =>
