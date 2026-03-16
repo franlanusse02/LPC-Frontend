@@ -14,6 +14,7 @@ import { useAuth } from "@/lib/auth-context";
 import { LoginResponse } from "@/models/dto/auth/LoginResponse";
 
 export function LoginForm() {
+  const CUIL_LENGTH = 11;
   const router = useRouter();
   const { login: loginSession } = useAuth();
 
@@ -29,6 +30,11 @@ export function LoginForm() {
 
     try {
       const normalizedUsuario = usuario.replace(/\D/g, "");
+
+      if (normalizedUsuario.length !== CUIL_LENGTH) {
+        throw new Error("El CUIL debe tener 11 dígitos");
+      }
+
       const cuil = Number(normalizedUsuario);
 
       if (!Number.isFinite(cuil) || cuil === 0) {
@@ -77,9 +83,15 @@ export function LoginForm() {
               <Input
                 type="text"
                 value={usuario}
-                onChange={(e) => setUsuario(e.target.value)}
+                onChange={(e) =>
+                  setUsuario(
+                    e.target.value.replace(/\D/g, "").slice(0, CUIL_LENGTH),
+                  )
+                }
                 autoComplete="username"
-                placeholder="XX-XXXXXXXX-X"
+                inputMode="numeric"
+                maxLength={CUIL_LENGTH}
+                placeholder="XXXXXXXXXXX"
                 className="bg-muted"
               />
             </FormField>
