@@ -1,8 +1,9 @@
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: "export",
-  basePath: "",
-  assetPrefix: "",
+  basePath: '',
+  assetPrefix: `/${repo}/`,
   typescript: {
     ignoreBuildErrors: true,
   },
