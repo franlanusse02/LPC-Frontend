@@ -37,7 +37,7 @@ export function Header({ showBack }: HeaderProps) {
           )}
 
           <Link href="/" className="flex items-center">
-            <Brand name={session?.name} />
+            <Brand name={session?.nombre} />
           </Link>
         </div>
 

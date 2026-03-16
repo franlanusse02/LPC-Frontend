@@ -8,6 +8,9 @@ import { NuevoCierreForm } from "@/components/nuevo-cierre-form";
 import { apiFetch } from "@/lib/api";
 import { ComedorResponse } from "@/models/dto/comedor/ComedorResponse";
 import { PuntoDeVentaResponse } from "@/models/dto/pto-venta/PuntoDeVentaResponse";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
 
 export default function NuevoCierrePage() {
   const router = useRouter();
@@ -56,8 +59,21 @@ export default function NuevoCierrePage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header showBack />
+      <Header />
       <main className="mx-auto max-w-4xl px-6 py-6">
+        <div className="mb-6">
+          <Button
+            variant="ghost"
+            size="sm"
+            asChild
+            className="gap-2 text-gray-500 hover:text-gray-800"
+          >
+            <Link href="/cierres">
+              <ArrowLeft className="h-4 w-4" />
+              Volver al Menu de Encargado
+            </Link>
+          </Button>
+        </div>
         <NuevoCierreForm comedores={comedores} puntosDeVenta={puntosDeVenta} />
       </main>
     </div>

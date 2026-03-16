@@ -1,10 +1,11 @@
 "use client";
 
-import { Trash2 } from "lucide-react";
+import { Trash2, Ban } from "lucide-react";
 import { MediosPagoDict } from "@/models/enums/MedioPago";
 import { FormField } from "@/components/form-field";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -14,8 +15,10 @@ import {
 } from "@/components/ui/select";
 
 export interface PaymentLine {
+  id: number | null;
   medioPago: string;
-  monto: string;
+  monto: string | number;
+  anulacionId: number | null;
 }
 
 interface PaymentLineRowProps {
@@ -23,6 +26,7 @@ interface PaymentLineRowProps {
   index: number;
   onUpdate: (index: number, field: keyof PaymentLine, value: string) => void;
   onRemove: (index: number) => void;
+  onAnular: (index: number) => void;
   selectedLines: string[];
   setSelectedLines: (lines: string[]) => void;
 }
@@ -32,6 +36,7 @@ export function PaymentLineRow({
   index,
   onUpdate,
   onRemove,
+  onAnular,
   selectedLines,
   setSelectedLines,
 }: PaymentLineRowProps) {
@@ -56,6 +61,84 @@ export function PaymentLineRow({
     onRemove(index);
   };
 
+  const labelForMedioPago = (value: string) =>
+    Object.entries(MediosPagoDict).find(([, v]) => v === value)?.[0] ?? value;
+
+  // ── ANULADO (read-only, greyed out) ──────────────────────────────────────
+  if (line.anulacionId !== null) {
+    return (
+      <div className="flex flex-col gap-3 opacity-50 md:flex-row md:items-end">
+        <div className="flex-1">
+          <FormField label="Medio de Pago">
+            <Input
+              readOnly
+              value={labelForMedioPago(line.medioPago)}
+              className="bg-muted cursor-not-allowed line-through"
+            />
+          </FormField>
+        </div>
+
+        <div className="flex-1">
+          <FormField label="Monto">
+            <Input
+              readOnly
+              value={line.monto}
+              className="bg-muted cursor-not-allowed line-through"
+            />
+          </FormField>
+        </div>
+
+        <div className="flex h-9 shrink-0 items-center self-start md:self-auto">
+          <Badge
+            variant="outline"
+            className="border-destructive/40 text-destructive/60 text-xs"
+          >
+            Anulado
+          </Badge>
+        </div>
+      </div>
+    );
+  }
+
+  // ── ACTIVE PERSISTED (read-only, can be anulado) ──────────────────────────
+  if (line.id !== null) {
+    return (
+      <div className="flex flex-col gap-3 md:flex-row md:items-end">
+        <div className="flex-1">
+          <FormField label="Medio de Pago">
+            <Input
+              readOnly
+              value={labelForMedioPago(line.medioPago)}
+              className="bg-muted cursor-not-allowed"
+            />
+          </FormField>
+        </div>
+
+        <div className="flex-1">
+          <FormField label="Monto">
+            <Input
+              readOnly
+              value={line.monto}
+              className="bg-muted cursor-not-allowed"
+            />
+          </FormField>
+        </div>
+
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          onClick={() => onAnular(index)}
+          aria-label="Anular línea"
+          className="h-9 w-9 shrink-0 self-start border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground md:self-auto"
+        >
+          <Ban className="h-4 w-4" />
+        </Button>
+      </div>
+    );
+  }
+
+  // ── NEW LINE (fully editable, can be deleted) ─────────────────────────────
   return (
     <div className="flex flex-col gap-3 md:flex-row md:items-end">
       <div className="flex-1">

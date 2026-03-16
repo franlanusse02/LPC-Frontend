@@ -59,7 +59,10 @@ export function NuevoCierreForm({
   );
 
   const addLine = () => {
-    setLines((prev) => [...prev, { medioPago: "", monto: "" }]);
+    setLines((prev) => [
+      ...prev,
+      { id: null, medioPago: "", monto: "", anulacionId: null },
+    ]);
   };
 
   const removeLine = (index: number) => {
@@ -125,24 +128,22 @@ export function NuevoCierreForm({
       );
 
       // 2. Create movimientos for each valid payment line
-      if (validLines.length > 0) {
-        const movimientoPromises = validLines.map((line) =>
-          apiFetch<MovimientoResponse>(
-            "/api/movimiento",
-            {
-              method: "POST",
-              body: JSON.stringify({
-                cierreCajaId: cierreResponse.id,
-                medioPago: line.medioPago,
-                monto: Number(line.monto),
-              }),
-            },
-            token,
-          ),
-        );
+      const movimientoPromises = validLines.map((line) =>
+        apiFetch<MovimientoResponse>(
+          "/api/movimiento",
+          {
+            method: "POST",
+            body: JSON.stringify({
+              cierreCajaId: cierreResponse.id,
+              medioPago: line.medioPago,
+              monto: Number(line.monto),
+            }),
+          },
+          token,
+        ),
+      );
 
-        await Promise.all(movimientoPromises);
-      }
+      await Promise.all(movimientoPromises);
 
       // Success toast
       toast({
@@ -296,6 +297,7 @@ export function NuevoCierreForm({
                     index={i}
                     onUpdate={updateLine}
                     onRemove={removeLine}
+                    onAnular={() => {}}
                     selectedLines={selectedLines}
                     setSelectedLines={setSelectedLines}
                   />
@@ -321,9 +323,7 @@ export function NuevoCierreForm({
       <div className="flex justify-center pb-6">
         <Button
           onClick={handleFinalizar}
-          disabled={
-            loading || !puntoVenta || !platosVendidos || lines.length === 0
-          }
+          disabled={loading || !puntoVenta || !platosVendidos}
           size="lg"
           className="px-10 text-sm font-bold uppercase tracking-wide"
         >

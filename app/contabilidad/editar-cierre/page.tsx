@@ -55,7 +55,7 @@ function EditarCierrePageInner() {
 
     Promise.all([
       apiFetch<DetailedCierreCajaResponse>(
-        `/api/cierre/${cierreId}?detailed=true`,
+        `/api/cierre/detailed/${cierreId}`,
         {},
         token,
       ),

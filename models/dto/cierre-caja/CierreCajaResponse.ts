@@ -1,3 +1,4 @@
+import { UsuarioResponse } from "../auth/UsuarioResponse";
 import { ComedorResponse } from "../comedor/ComedorResponse";
 import { MovimientoResponse } from "../movimiento/MovimientoResponse";
 import { PuntoDeVentaResponse } from "../pto-venta/PuntoDeVentaResponse";
@@ -20,7 +21,7 @@ export type DetailedCierreCajaResponse = {
   comedor: ComedorResponse;
   puntoDeVenta: PuntoDeVentaResponse;
   fechaOperacion: string;
-  creadoPorId: number;
+  creadoPor: UsuarioResponse;
   totalPlatosVendidos: number;
   createdAt: string;
   comentarios: string | null;

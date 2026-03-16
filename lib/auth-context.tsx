@@ -11,7 +11,7 @@ import {
 // ── Types ────────────────────────────────────────────────────────────────────
 export interface Session {
   token: string;
-  name: string;
+  nombre: string;
   rol: string;
 }
 
