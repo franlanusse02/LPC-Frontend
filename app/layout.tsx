@@ -4,9 +4,11 @@ import { AuthProvider } from "@/lib/auth-context"
 import { Toaster } from "@/components/ui/toaster"
 import "./globals.css"
 
-export const metadata: Metadata = {
-  title: "LPC Gestión Comedores",
-  description: "Sistema de gestión de comedores",
+export const metadata = {
+  title: "P_COMEDORES",
+  icons: {
+    icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='white'/><text x='50' y='64' font-size='38' font-family='Helvetica Neue, Helvetica, Arial, sans-serif' font-weight='bold' text-anchor='middle' fill='black'>LPC</text></svg>",
+  },
 }
 
 export const viewport: Viewport = {
