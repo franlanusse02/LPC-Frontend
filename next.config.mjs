@@ -1,4 +1,4 @@
-const repo = "LPC-Frontend";
+const repo = "LPC-Frontend-Temp";
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: "export",
