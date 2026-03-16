@@ -47,19 +47,7 @@ export default function ContabilidadPage() {
     }
   }, [session]);
 
-<<<<<<< HEAD
-  const toggleRow = (id: number) => {
-    setExpandedRows((prev) => {
-      const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
-      return next;
-    });
-  };
-
-  const handleAnularDesanular = async (cierreId: number, motivo: string) => {
-=======
   const handleAnular = async (cierreId: number, motivo: string) => {
->>>>>>> 38a1133734fd953f296b05c0a6a31cfa7915d908
     if (!session) return;
     const cierre = cierres.find((c) => c.id === cierreId);
     if (!cierre) return;
@@ -67,24 +55,6 @@ export default function ContabilidadPage() {
 
     try {
       await apiFetch(
-<<<<<<< HEAD
-        endpoint,
-        {
-          method: "POST",
-          body: JSON.stringify({ motivo }),
-        },
-        session.token,
-      );
-
-      setCierres((prev) =>
-        prev.map((c) => {
-          if (c.id !== cierreId) return c;
-          return {
-            ...c,
-            anulacionId: isAnulado ? null : cierreId,
-          };
-        }),
-=======
         `/api/cierre/${cierreId}/anular`,
         { method: "POST", body: JSON.stringify({ motivo }) },
         session.token,
@@ -104,7 +74,6 @@ export default function ContabilidadPage() {
                   })) || [],
               },
         ),
->>>>>>> 38a1133734fd953f296b05c0a6a31cfa7915d908
       );
       toast({
         title: isAnulado ? "Cierre reactivado" : "Cierre anulado",
