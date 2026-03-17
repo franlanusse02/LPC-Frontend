@@ -279,7 +279,7 @@ export function EditCierreForm({
   };
 
   const allMedios = Object.values(MediosPagoDict);
-  const isAddLineDisabled = allMedios.length === selectedLines.length;
+  const isAddLineDisabled = allMedios.length === activeLines.length;
 
   return (
     <>
