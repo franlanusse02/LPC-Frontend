@@ -185,7 +185,7 @@ export function NuevoCierreForm({
   };
 
   const allMedios = Object.values(MediosPagoDict);
-  const isAddLineDisabled = allMedios.length === selectedLines.length;
+  const isAddLineDisabled = lines.length >= allMedios.length;
 
   return (
     <div className="space-y-6">
