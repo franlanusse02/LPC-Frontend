@@ -1,6 +1,6 @@
 import { ApiError, ApiErrorResponse } from "@/models/dto/ApiError";
 
-const API_URL = "https://lpc-gestion-production.up.railway.app";
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080";
 
 export async function apiFetch<T>(
   path: string,
