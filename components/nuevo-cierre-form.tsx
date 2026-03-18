@@ -100,7 +100,7 @@ export function NuevoCierreForm({
       (line) => line.medioPago && line.monto && Number(line.monto) > 0,
     );
 
-    if (validLines.length != lines.length) {
+    if (validLines.length !== lines.length) {
       toast({
         variant: "destructive",
         title: "Campos invalidos",

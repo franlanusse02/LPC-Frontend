@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
-import { AlertTriangle } from "lucide-react";
+import { AlrertTriangle } from "lucide-react";
 import { FormField } from "./form-field";
 import { Input } from "./ui/input";
 
@@ -60,7 +60,7 @@ export function AnularMovimientoModal({
                 <AlertTriangle className="h-5 w-5" />
               </span>
               <DialogTitle className="text-lg font-bold text-gray-900">
-                Anular Linea
+                Anular Linea 
               </DialogTitle>
             </div>
 

@@ -1,6 +1,6 @@
 export type LoginResponse = {
   token: string;
-  cuil: number;
+  cuil: string;
   nombre: string;
   rol: string;
 };
