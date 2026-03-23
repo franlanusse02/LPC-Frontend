@@ -44,7 +44,7 @@ function EditarCierrePageInner() {
   useEffect(() => {
     if (!isLoading) {
       if (!session) router.replace("/login");
-      if (session?.rol === "ENCARGADO") router.replace("/cierres");
+      if (session?.rol === "ENCARGADO") router.replace("/encargado");
     }
   }, [session, isLoading, router]);
 

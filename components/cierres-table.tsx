@@ -27,8 +27,6 @@ import { DetailedCierreCajaResponse } from "@/models/dto/cierre-caja/CierreCajaR
 import { MovimientoResponse } from "@/models/dto/movimiento/MovimientoResponse";
 import Link from "next/link";
 
-// ── Types ─────────────────────────────────────────────────────────────────────
-
 type SortKey =
   | "fechaOperacion"
   | "comedor"
@@ -41,14 +39,22 @@ type StatusFilter = "all" | "active" | "anulado";
 
 export interface CierresTableProps {
   cierres: DetailedCierreCajaResponse[];
+  displayedCierres: DetailedCierreCajaResponse[];
   loading: boolean;
-  /** When true: no actions column, no anulado filter pill, anulados hidden */
   readonly?: boolean;
+  search: string;
+  onSearchChange: (v: string) => void;
+  statusFilter: StatusFilter;
+  onStatusFilterChange: (v: StatusFilter) => void;
+  sortKey: SortKey;
+  sortDir: SortDir;
+  onSort: (key: SortKey) => void;
+  comedorFilter: string;
+  onComedorFilterChange: (v: string) => void;
+  onClearFilters: () => void;
   onEditar?: (cierreId: number) => void;
   onAnular?: (cierre: DetailedCierreCajaResponse) => void;
 }
-
-// ── Helpers ───────────────────────────────────────────────────────────────────
 
 const formatCurrency = (amount: number) =>
   new Intl.NumberFormat("es-CL", {
@@ -75,20 +81,33 @@ function SortIcon({
   );
 }
 
-// ── Main component ────────────────────────────────────────────────────────────
-
 export function CierresTable({
   cierres,
+  displayedCierres,
   loading,
   readonly = false,
+  search,
+  onSearchChange,
+  statusFilter,
+  onStatusFilterChange,
+  sortKey,
+  sortDir,
+  onSort,
+  comedorFilter,
+  onComedorFilterChange,
+  onClearFilters,
   onEditar,
   onAnular,
 }: CierresTableProps) {
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
-  const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>("active");
-  const [sortKey, setSortKey] = useState<SortKey>("fechaOperacion");
-  const [sortDir, setSortDir] = useState<SortDir>("desc");
+
+  const comedorOptions = useMemo(
+    () => [...new Set(cierres.map((c) => c.comedor.nombre))].sort(),
+    [cierres],
+  );
+
+  const hasActiveFilters =
+    search || statusFilter !== "all" || comedorFilter;
 
   const toggleRow = (id: number) => {
     setExpandedRows((prev) => {
@@ -98,77 +117,13 @@ export function CierresTable({
     });
   };
 
-  const handleSort = (key: SortKey) => {
-    if (key === sortKey) {
-      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
-    } else {
-      setSortKey(key);
-      setSortDir("asc");
-    }
-  };
-
-  const displayedCierres = useMemo(() => {
-    let list = [...cierres];
-
-    if (statusFilter === "active")
-      list = list.filter((c) => c.anulacionId === null);
-    if (statusFilter === "anulado")
-      list = list.filter((c) => c.anulacionId !== null);
-
-    if (search.trim()) {
-      const q = search.trim().toLowerCase();
-      list = list.filter(
-        (c) =>
-          c.comedor.nombre.toLowerCase().includes(q) ||
-          c.puntoDeVenta.nombre.toLowerCase().includes(q) ||
-          c.creadoPor.nombre.toLowerCase().includes(q) ||
-          c.fechaOperacion.toLowerCase().includes(q) ||
-          (c.comentarios ?? "").toLowerCase().includes(q),
-      );
-    }
-
-    list.sort((a, b) => {
-      let av: string | number = "";
-      let bv: string | number = "";
-      if (sortKey === "fechaOperacion") {
-        av = a.fechaOperacion;
-        bv = b.fechaOperacion;
-      }
-      if (sortKey === "comedor") {
-        av = a.comedor.nombre;
-        bv = b.comedor.nombre;
-      }
-      if (sortKey === "creadoPor") {
-        av = a.creadoPor.nombre;
-        bv = b.creadoPor.nombre;
-      }
-      if (sortKey === "puntoDeVenta") {
-        av = a.puntoDeVenta.nombre;
-        bv = b.puntoDeVenta.nombre;
-      }
-      if (sortKey === "totalPlatosVendidos") {
-        av = a.totalPlatosVendidos;
-        bv = b.totalPlatosVendidos;
-      }
-      if (sortKey === "montoTotal") {
-        av = a.montoTotal;
-        bv = b.montoTotal;
-      }
-      if (av < bv) return sortDir === "asc" ? -1 : 1;
-      if (av > bv) return sortDir === "asc" ? 1 : -1;
-      return 0;
-    });
-
-    return list;
-  }, [cierres, statusFilter, search, sortKey, sortDir]);
-
   const sortableTh = (label: string, key: SortKey, className?: string) => (
     <th
       className={cn(
         "px-4 py-3 cursor-pointer select-none whitespace-nowrap hover:text-gray-700 transition-colors",
         className,
       )}
-      onClick={() => handleSort(key)}
+      onClick={() => onSort(key)}
     >
       {label}
       <SortIcon col={key} sortKey={sortKey} sortDir={sortDir} />
@@ -179,20 +134,18 @@ export function CierresTable({
 
   return (
     <>
-      {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-2 px-6 py-4 border-b">
-        {/* Search */}
         <div className="relative">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400 pointer-events-none" />
           <Input
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => onSearchChange(e.target.value)}
             placeholder="Buscar..."
             className="pl-8 h-8 w-48 text-sm bg-gray-50 border-gray-200"
           />
           {search && (
             <button
-              onClick={() => setSearch("")}
+              onClick={() => onSearchChange("")}
               className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
             >
               <X className="h-3.5 w-3.5" />
@@ -204,7 +157,7 @@ export function CierresTable({
           {(["all", "active", "anulado"] as StatusFilter[]).map((s) => (
             <button
               key={s}
-              onClick={() => setStatusFilter(s)}
+              onClick={() => onStatusFilterChange(s)}
               className={cn(
                 "rounded-md px-2.5 py-1 text-xs font-medium transition-all",
                 statusFilter === s
@@ -216,6 +169,22 @@ export function CierresTable({
             </button>
           ))}
         </div>
+
+        {comedorOptions.length > 1 && (
+          <select
+            value={comedorFilter}
+            onChange={(e) => onComedorFilterChange(e.target.value)}
+            className="h-8 rounded-md border border-gray-200 bg-gray-50 px-2 text-sm text-gray-600"
+          >
+            <option value="">Todos los comedores</option>
+            {comedorOptions.map((n) => (
+              <option key={n} value={n}>
+                {n}
+              </option>
+            ))}
+          </select>
+        )}
+
         {readonly && (
           <Button
             asChild
@@ -230,7 +199,6 @@ export function CierresTable({
         )}
       </div>
 
-      {/* Body */}
       {loading ? (
         <div className="flex justify-center py-16">
           <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent" />
@@ -245,10 +213,7 @@ export function CierresTable({
           </p>
           {cierres.length > 0 && (
             <button
-              onClick={() => {
-                setSearch("");
-                setStatusFilter("all");
-              }}
+              onClick={onClearFilters}
               className="text-xs text-primary underline-offset-2 hover:underline"
             >
               Limpiar filtros
@@ -257,17 +222,13 @@ export function CierresTable({
         </div>
       ) : (
         <>
-          {/* Result count */}
           <div className="px-6 py-2 border-b bg-gray-50/60">
             <p className="text-xs text-gray-400">
               {displayedCierres.length} resultado
               {displayedCierres.length !== 1 ? "s" : ""}
-              {(search || statusFilter !== "all") && (
+              {hasActiveFilters && (
                 <button
-                  onClick={() => {
-                    setSearch("");
-                    setStatusFilter("all");
-                  }}
+                  onClick={onClearFilters}
                   className="ml-2 text-primary hover:underline underline-offset-2"
                 >
                   Limpiar filtros
@@ -385,7 +346,6 @@ export function CierresTable({
                           )}
                         </td>
 
-                        {/* Actions — only in non-readonly mode */}
                         {!readonly && (
                           <td className="px-4 py-4">
                             <DropdownMenu>
@@ -424,7 +384,6 @@ export function CierresTable({
                         )}
                       </tr>
 
-                      {/* Expanded movimientos sub-table */}
                       {isExpanded && (
                         <tr
                           key={`${cierre.id}-movimientos`}
@@ -440,21 +399,11 @@ export function CierresTable({
                                 <table className="w-full text-sm">
                                   <thead>
                                     <tr className="bg-gray-100 text-left text-xs uppercase text-gray-500 tracking-wider">
-                                      <th className="px-4 py-2.5">
-                                        Fecha y Hora
-                                      </th>
-                                      <th className="px-4 py-2.5">
-                                        Medio de Pago
-                                      </th>
-                                      <th className="px-4 py-2.5 text-right">
-                                        Monto
-                                      </th>
-                                      <th className="px-4 py-2.5 text-center">
-                                        Estado
-                                      </th>
-                                      <th className="px-4 py-2.5">
-                                        Comentarios
-                                      </th>
+                                      <th className="px-4 py-2.5">Fecha y Hora</th>
+                                      <th className="px-4 py-2.5">Medio de Pago</th>
+                                      <th className="px-4 py-2.5 text-right">Monto</th>
+                                      <th className="px-4 py-2.5 text-center">Estado</th>
+                                      <th className="px-4 py-2.5">Comentarios</th>
                                     </tr>
                                   </thead>
                                   <tbody className="divide-y divide-gray-100">
@@ -485,8 +434,6 @@ export function CierresTable({
   );
 }
 
-// ── Sub-components ────────────────────────────────────────────────────────────
-
 function MovimientoRow({ mov }: { mov: MovimientoResponse }) {
   const isAnulado = !!mov.anulacionId;
   return (
@@ -496,13 +443,9 @@ function MovimientoRow({ mov }: { mov: MovimientoResponse }) {
         isAnulado ? "opacity-40" : "hover:bg-white",
       )}
     >
-      <td className="px-4 py-2.5 text-gray-600 whitespace-nowrap">
-        {mov.fechaHora}
-      </td>
+      <td className="px-4 py-2.5 text-gray-600 whitespace-nowrap">{mov.fechaHora}</td>
       <td className="px-4 py-2.5 font-medium">{mov.medioPago}</td>
-      <td className="px-4 py-2.5 text-right font-mono">
-        {formatCurrency(mov.monto)}
-      </td>
+      <td className="px-4 py-2.5 text-right font-mono">{formatCurrency(mov.monto)}</td>
       <td className="px-4 py-2.5 text-center">
         {isAnulado ? (
           <span className="inline-flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-500">
@@ -537,40 +480,44 @@ function AnuladosMovimientosGroup({
             onClick={() => setOpen((v) => !v)}
             className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-600 transition-colors"
           >
-            {open ? (
-              <ChevronUp className="h-3 w-3" />
-            ) : (
-              <ChevronDown className="h-3 w-3" />
-            )}
+            {open ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
             {open ? "Ocultar" : "Mostrar"} anulados ({movimientos.length})
           </button>
         </td>
       </tr>
-      {open &&
-        movimientos.map((mov) => <MovimientoRow key={mov.id} mov={mov} />)}
+      {open && movimientos.map((mov) => <MovimientoRow key={mov.id} mov={mov} />)}
     </>
   );
 }
 
-// ── Stats row (exported separately — used by contabilidad only) ───────────────
-
 export function CierresStats({
   cierres,
+  filteredCierres,
 }: {
   cierres: DetailedCierreCajaResponse[];
+  filteredCierres: DetailedCierreCajaResponse[];
 }) {
   const totalActivos = cierres.filter((c) => c.anulacionId === null).length;
   const totalAnulados = cierres.filter((c) => c.anulacionId !== null).length;
-  const montoActivo = cierres
+  const montoTotal = cierres
     .filter((c) => c.anulacionId === null)
     .reduce((s, c) => s + c.montoTotal, 0);
+  const montoFiltrado = filteredCierres
+    .filter((c) => c.anulacionId === null)
+    .reduce((s, c) => s + c.montoTotal, 0);
+  const isFiltered = filteredCierres.length !== cierres.length;
 
   return (
-    <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+    <div className="grid grid-cols-2 gap-4 sm:grid-cols-5">
       <StatCard label="Total cierres" value={cierres.length} />
       <StatCard label="Activos" value={totalActivos} accent="emerald" />
       <StatCard label="Anulados" value={totalAnulados} accent="red" />
-      <StatCard label="Monto activo" value={formatCurrency(montoActivo)} />
+      <StatCard label="Monto total" value={formatCurrency(montoTotal)} />
+      <StatCard
+        label={isFiltered ? "Monto filtrado" : "Monto activo"}
+        value={formatCurrency(montoFiltrado)}
+        accent={isFiltered ? "blue" : undefined}
+      />
     </div>
   );
 }
@@ -582,7 +529,7 @@ function StatCard({
 }: {
   label: string;
   value: string | number;
-  accent?: "emerald" | "red";
+  accent?: "emerald" | "red" | "blue";
 }) {
   return (
     <div className="rounded-xl border-0 bg-white shadow-sm px-5 py-4">
@@ -594,6 +541,7 @@ function StatCard({
           "mt-1 text-2xl font-bold tabular-nums",
           accent === "emerald" && "text-emerald-600",
           accent === "red" && "text-red-500",
+          accent === "blue" && "text-blue-600",
           !accent && "text-gray-800",
         )}
       >

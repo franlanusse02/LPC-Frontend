@@ -1,3 +1,4 @@
+
 "use client";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -17,6 +18,8 @@ import {
   Utensils,
   ShoppingCart,
   UserPlus,
+  Building2,
+  Truck,
 } from "lucide-react";
 
 export default function HomePage() {
@@ -29,7 +32,7 @@ export default function HomePage() {
         router.replace("/login");
       }
       if (session?.rol === "ENCARGADO") {
-        router.replace("/cierres");
+        router.replace("/encargado");
       } else if (session?.rol === "CONTABILIDAD") {
         router.replace("/contabilidad");
       }
@@ -43,11 +46,11 @@ export default function HomePage() {
       </div>
     );
   }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
       <main className="mx-auto max-w-2xl px-6 py-10 space-y-6">
-        {/* Admin Menu */}
         <Card className="border border-gray-200 shadow-sm rounded-xl">
           <CardHeader className="border-b px-6 py-4">
             <CardTitle className="text-lg font-semibold text-gray-800">
@@ -64,24 +67,19 @@ export default function HomePage() {
               className="flex items-center justify-start gap-3 h-14 px-4 rounded-lg border-gray-200 hover:bg-gray-50 hover:border-gray-300"
             >
               <BarChart3 className="h-5 w-5 text-gray-500 shrink-0" />
-              <span className="text-sm font-medium text-gray-700">
-                Panel Contabilidad
-              </span>
+              <span className="text-sm font-medium text-gray-700">Panel Contabilidad</span>
             </Button>
             <Button
               variant="outline"
-              onClick={() => router.push("/cierres")}
+              onClick={() => router.push("/encargado")}
               className="flex items-center justify-start gap-3 h-14 px-4 rounded-lg border-gray-200 hover:bg-gray-50 hover:border-gray-300"
             >
               <ClipboardList className="h-5 w-5 text-gray-500 shrink-0" />
-              <span className="text-sm font-medium text-gray-700">
-                Panel Cierres
-              </span>
+              <span className="text-sm font-medium text-gray-700">Panel Cierres</span>
             </Button>
           </CardContent>
         </Card>
 
-        {/* Configuraciones */}
         <Card className="border border-gray-200 shadow-sm rounded-xl">
           <CardHeader className="border-b px-6 py-4">
             <CardTitle className="text-lg font-semibold text-gray-800">
@@ -91,7 +89,7 @@ export default function HomePage() {
               Podés crear datos estáticos del sistema
             </CardDescription>
           </CardHeader>
-          <CardContent className="p-4 grid grid-cols-3 gap-3">
+          <CardContent className="p-4 grid grid-cols-5 gap-3">
             <Button
               variant="outline"
               onClick={() => router.push("/comedores")}
@@ -126,6 +124,30 @@ export default function HomePage() {
               </div>
               <span className="text-xs font-medium text-gray-700 text-center leading-tight">
                 Nuevo Usuario
+              </span>
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => router.push("/sociedades")}
+              className="flex flex-col items-center justify-center gap-2 h-20 px-3 rounded-lg border-gray-200 hover:bg-gray-50 hover:border-gray-300"
+            >
+              <div className="flex items-center justify-center w-8 h-8 rounded-md bg-gray-100">
+                <Building2 className="h-4 w-4 text-gray-600" />
+              </div>
+              <span className="text-xs font-medium text-gray-700 text-center leading-tight">
+                Nueva Sociedad
+              </span>
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => router.push("/proveedores")}
+              className="flex flex-col items-center justify-center gap-2 h-20 px-3 rounded-lg border-gray-200 hover:bg-gray-50 hover:border-gray-300"
+            >
+              <div className="flex items-center justify-center w-8 h-8 rounded-md bg-gray-100">
+                <Truck className="h-4 w-4 text-gray-600" />
+              </div>
+              <span className="text-xs font-medium text-gray-700 text-center leading-tight">
+                Proveedores
               </span>
             </Button>
           </CardContent>
