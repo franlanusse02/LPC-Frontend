@@ -54,6 +54,7 @@ export interface CierresTableProps {
   onClearFilters: () => void;
   onEditar?: (cierreId: number) => void;
   onAnular?: (cierre: DetailedCierreCajaResponse) => void;
+  onNuevoCierre?: () => void;
 }
 
 const formatCurrency = (amount: number) =>
@@ -98,6 +99,7 @@ export function CierresTable({
   onClearFilters,
   onEditar,
   onAnular,
+  onNuevoCierre,
 }: CierresTableProps) {
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
 
@@ -186,16 +188,27 @@ export function CierresTable({
         )}
 
         {readonly && (
-          <Button
-            asChild
-            size="sm"
-            className="ml-auto gap-2 px-4 py-2 text-sm font-semibold uppercase tracking-wide transition hover:scale-105"
-          >
-            <Link href="/nuevo-cierre" className="flex items-center gap-2">
+          onNuevoCierre ? (
+            <Button
+              size="sm"
+              onClick={onNuevoCierre}
+              className="ml-auto gap-2 px-4 py-2 text-sm font-semibold uppercase tracking-wide transition hover:scale-105"
+            >
               <Plus className="h-4 w-4" />
               Nuevo Cierre
-            </Link>
-          </Button>
+            </Button>
+          ) : (
+            <Button
+              asChild
+              size="sm"
+              className="ml-auto gap-2 px-4 py-2 text-sm font-semibold uppercase tracking-wide transition hover:scale-105"
+            >
+              <Link href="/nuevo-cierre" className="flex items-center gap-2">
+                <Plus className="h-4 w-4" />
+                Nuevo Cierre
+              </Link>
+            </Button>
+          )
         )}
       </div>
 

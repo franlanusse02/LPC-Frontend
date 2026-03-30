@@ -12,11 +12,13 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
+import { SociedadResponse } from "@/models/dto/sociedad/SociedadResponse";
 
 export default function ComedoresPage() {
   const [comedores, setComedores] = useState<ComedorResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
+  const [sociedades, setSociedades] = useState<SociedadResponse[]>([]);
   const { session, token, isLoading } = useAuth();
   const { toast } = useToast();
   const router = useRouter();
@@ -31,12 +33,20 @@ export default function ComedoresPage() {
 
   const fetchComedores = async () => {
     try {
-      const data = await apiFetch<ComedorResponse[]>(
-        "/api/comedor",
-        {},
-        token || "",
-      );
-      setComedores(data);
+      const [comedoresData, sociedadesData] = await Promise.all([
+        apiFetch<ComedorResponse[]>(
+          "/api/comedor",
+          {},
+          token || "",
+        ),
+        apiFetch<SociedadResponse[]>(
+          "/api/sociedad",
+          {},
+          token || "",
+        ),
+      ]);
+      setComedores(comedoresData);
+      setSociedades(sociedadesData);
     } catch {
       toast({
         title: "Error al obtener comedores",
@@ -55,6 +65,11 @@ export default function ComedoresPage() {
       description: `El comedor ${comedor.nombre} ha sido creado con exito`,
       variant: "default",
     });
+  };
+
+  const handleUpdated = (comedor: ComedorResponse) => {
+    setComedores((prev) => prev.map((c) => c.id === comedor.id ? comedor : c));
+    toast({ title: "Comedor actualizado", description: `${comedor.nombre} actualizado correctamente.` });
   };
 
   return (
@@ -95,8 +110,10 @@ export default function ComedoresPage() {
             </CardHeader>
             <ComedorTable
               comedores={comedores}
+              sociedades={sociedades}
               loading={loading}
               onCreated={handleCreated}
+              onUpdated={handleUpdated}
               setModalOpen={setModalOpen}
               modalOpen={modalOpen}
             />

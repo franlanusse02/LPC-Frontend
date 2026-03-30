@@ -45,6 +45,10 @@ export default function UsuariosPage() {
     setUsuarios((prev) => [...prev, usuario]);
   };
 
+  const handleUpdated = (usuario: UsuarioResponse) => {
+    setUsuarios((prev) => prev.map((u) => u.cuil === usuario.cuil ? usuario : u));
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
@@ -85,6 +89,7 @@ export default function UsuariosPage() {
               usuarios={usuarios}
               loading={loading}
               onCreated={handleCreated}
+              onUpdated={handleUpdated}
               setModalOpen={setModalOpen}
               modalOpen={modalOpen}
             />

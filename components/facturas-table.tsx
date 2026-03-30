@@ -18,11 +18,11 @@ import { FacturaProveedorResponse } from "@/models/dto/compra/FacturaProveedorRe
 import { ProveedorResponse } from "@/models/dto/proveedor/ProveedorResponse";
 import { EstadoFactura } from "@/models/enums/EstadoFactura";
 
-type SortKey = "fechaFactura" | "monto" | "proveedor" | "estado";
-type SortDir = "asc" | "desc";
-type StatusFilter = "all" | EstadoFactura;
+export type FacturaSortKey = "fechaFactura" | "monto" | "proveedor" | "estado";
+export type FacturaSortDir = "asc" | "desc";
+export type FacturaStatusFilter = "all" | EstadoFactura;
 
-const statusLabel: Record<StatusFilter, string> = {
+const statusLabel: Record<FacturaStatusFilter, string> = {
   all: "Todos",
   PENDIENTE: "Pendiente",
   EMITIDA: "Emitida",
@@ -48,9 +48,18 @@ export interface FacturasTableProps {
   proveedores: ProveedorResponse[];
   loading: boolean;
   readonly?: boolean;
+  displayedFacturas?: FacturaProveedorResponse[];
+  comedorNameById?: Record<number, string>;
   dateDesde: string;
   dateHasta: string;
   comedorIdFilter: number | null;
+  search?: string;
+  onSearchChange?: (value: string) => void;
+  statusFilter?: FacturaStatusFilter;
+  onStatusFilterChange?: (value: FacturaStatusFilter) => void;
+  sortKey?: FacturaSortKey;
+  sortDir?: FacturaSortDir;
+  onSort?: (key: FacturaSortKey) => void;
   onNuevaFactura?: () => void;
   onEmitir?: (factura: FacturaProveedorResponse) => void;
   onPagar?: (factura: FacturaProveedorResponse) => void;
@@ -59,7 +68,7 @@ export interface FacturasTableProps {
   onClearFilters: () => void;
 }
 
-function SortIcon({ col, sortKey, sortDir }: { col: SortKey; sortKey: SortKey; sortDir: SortDir }) {
+function SortIcon({ col, sortKey, sortDir }: { col: FacturaSortKey; sortKey: FacturaSortKey; sortDir: FacturaSortDir }) {
   if (col !== sortKey) return <ChevronsUpDown className="ml-1 inline h-3 w-3 opacity-30" />;
   return sortDir === "asc"
     ? <ChevronUp className="ml-1 inline h-3 w-3 text-primary" />
@@ -68,13 +77,29 @@ function SortIcon({ col, sortKey, sortDir }: { col: SortKey; sortKey: SortKey; s
 
 export function FacturasTable({
   facturas, proveedores, loading, readonly = false,
+  displayedFacturas,
+  comedorNameById,
   dateDesde, dateHasta, comedorIdFilter,
+  search,
+  onSearchChange,
+  statusFilter,
+  onStatusFilterChange,
+  sortKey,
+  sortDir,
+  onSort,
   onNuevaFactura, onEmitir, onPagar, onEditar, onAnular, onClearFilters,
 }: FacturasTableProps) {
-  const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
-  const [sortKey, setSortKey] = useState<SortKey>("fechaFactura");
-  const [sortDir, setSortDir] = useState<SortDir>("desc");
+  const [localSearch, setLocalSearch] = useState("");
+  const [localStatusFilter, setLocalStatusFilter] = useState<FacturaStatusFilter>("all");
+  const [localSortKey, setLocalSortKey] = useState<FacturaSortKey>("fechaFactura");
+  const [localSortDir, setLocalSortDir] = useState<FacturaSortDir>("desc");
+
+  const activeSearch = search ?? localSearch;
+  const activeStatusFilter = statusFilter ?? localStatusFilter;
+  const activeSortKey = sortKey ?? localSortKey;
+  const activeSortDir = sortDir ?? localSortDir;
+  const setSearchValue = onSearchChange ?? setLocalSearch;
+  const setStatusFilterValue = onStatusFilterChange ?? setLocalStatusFilter;
 
   const proveedorMap = useMemo(() =>
     Object.fromEntries(proveedores.map((p) => [p.id, p.nombre])),
@@ -82,13 +107,15 @@ export function FacturasTable({
   );
 
   const displayed = useMemo(() => {
+    if (displayedFacturas) return displayedFacturas;
+
     let list = [...facturas];
     if (dateDesde) list = list.filter((f) => f.fechaFactura >= dateDesde);
     if (dateHasta) list = list.filter((f) => f.fechaFactura <= dateHasta);
     if (comedorIdFilter !== null) list = list.filter((f) => f.comedorId === comedorIdFilter);
-    if (statusFilter !== "all") list = list.filter((f) => f.estado === statusFilter);
-    if (search.trim()) {
-      const q = search.trim().toLowerCase();
+    if (activeStatusFilter !== "all") list = list.filter((f) => f.estado === activeStatusFilter);
+    if (activeSearch.trim()) {
+      const q = activeSearch.trim().toLowerCase();
       list = list.filter((f) =>
         f.numero.toLowerCase().includes(q) ||
         (proveedorMap[f.proveedorId] ?? "").toLowerCase().includes(q)
@@ -97,43 +124,58 @@ export function FacturasTable({
     list.sort((a, b) => {
       let av: string | number = "";
       let bv: string | number = "";
-      if (sortKey === "fechaFactura") { av = a.fechaFactura; bv = b.fechaFactura; }
-      if (sortKey === "monto") { av = a.monto; bv = b.monto; }
-      if (sortKey === "proveedor") { av = proveedorMap[a.proveedorId] ?? ""; bv = proveedorMap[b.proveedorId] ?? ""; }
-      if (sortKey === "estado") { av = a.estado; bv = b.estado; }
-      if (av < bv) return sortDir === "asc" ? -1 : 1;
-      if (av > bv) return sortDir === "asc" ? 1 : -1;
+      if (activeSortKey === "fechaFactura") { av = a.fechaFactura; bv = b.fechaFactura; }
+      if (activeSortKey === "monto") { av = a.monto; bv = b.monto; }
+      if (activeSortKey === "proveedor") { av = proveedorMap[a.proveedorId] ?? ""; bv = proveedorMap[b.proveedorId] ?? ""; }
+      if (activeSortKey === "estado") { av = a.estado; bv = b.estado; }
+      if (av < bv) return activeSortDir === "asc" ? -1 : 1;
+      if (av > bv) return activeSortDir === "asc" ? 1 : -1;
       return 0;
     });
     return list;
-  }, [facturas, dateDesde, dateHasta, comedorIdFilter, statusFilter, search, sortKey, sortDir, proveedorMap]);
+  }, [
+    activeSearch,
+    activeSortDir,
+    activeSortKey,
+    activeStatusFilter,
+    comedorIdFilter,
+    dateDesde,
+    dateHasta,
+    displayedFacturas,
+    facturas,
+    proveedorMap,
+  ]);
 
-  const hasActiveFilters = search || statusFilter !== "all" || dateDesde || dateHasta || comedorIdFilter;
+  const hasActiveFilters = activeSearch || activeStatusFilter !== "all" || dateDesde || dateHasta || comedorIdFilter;
 
-  const handleSort = (key: SortKey) => {
-    if (key === sortKey) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
-    else { setSortKey(key); setSortDir("asc"); }
+  const handleSort = (key: FacturaSortKey) => {
+    if (onSort) {
+      onSort(key);
+      return;
+    }
+    if (key === activeSortKey) setLocalSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    else { setLocalSortKey(key); setLocalSortDir("asc"); }
   };
 
-  const sortableTh = (label: string, key: SortKey, className?: string) => (
+  const sortableTh = (label: string, key: FacturaSortKey, className?: string) => (
     <th className={cn("px-4 py-3 cursor-pointer select-none whitespace-nowrap hover:text-gray-700 transition-colors", className)}
       onClick={() => handleSort(key)}>
-      {label}<SortIcon col={key} sortKey={sortKey} sortDir={sortDir} />
+      {label}<SortIcon col={key} sortKey={activeSortKey} sortDir={activeSortDir} />
     </th>
   );
 
-  const statuses: StatusFilter[] = ["all", "PENDIENTE", "EMITIDA", "PAGADA", "ANULADA"];
+  const statuses: FacturaStatusFilter[] = ["all", "PENDIENTE", "EMITIDA", "PAGADA", "ANULADA"];
 
   return (
     <>
       <div className="flex flex-wrap items-center gap-2 px-6 py-4 border-b">
         <div className="relative">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400 pointer-events-none" />
-          <Input value={search} onChange={(e) => setSearch(e.target.value)}
+          <Input value={activeSearch} onChange={(e) => setSearchValue(e.target.value)}
             placeholder="Buscar número o proveedor..."
             className="pl-8 h-8 w-52 text-sm bg-gray-50 border-gray-200" />
-          {search && (
-            <button onClick={() => setSearch("")}
+          {activeSearch && (
+            <button onClick={() => setSearchValue("")}
               className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
               <X className="h-3.5 w-3.5" />
             </button>
@@ -142,9 +184,9 @@ export function FacturasTable({
 
         <div className="flex items-center gap-1 rounded-lg border border-gray-200 bg-gray-50 p-1">
           {statuses.map((s) => (
-            <button key={s} onClick={() => setStatusFilter(s)}
+            <button key={s} onClick={() => setStatusFilterValue(s)}
               className={cn("rounded-md px-2.5 py-1 text-xs font-medium transition-all",
-                statusFilter === s ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-700"
+                activeStatusFilter === s ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-700"
               )}>
               {statusLabel[s]}
             </button>
@@ -216,7 +258,7 @@ export function FacturasTable({
                       <td className="px-4 py-4 font-medium whitespace-nowrap">{factura.fechaFactura}</td>
                       <td className="px-4 py-4 font-mono text-xs">{factura.numero}</td>
                       <td className="px-4 py-4">{proveedorMap[factura.proveedorId] ?? factura.proveedorId}</td>
-                      <td className="px-4 py-4">{factura.comedorId}</td>
+                      <td className="px-4 py-4">{comedorNameById?.[factura.comedorId] ?? factura.comedorId}</td>
                       <td className="px-4 py-4 text-right font-mono">{formatCurrency(factura.monto)}</td>
                       <td className="px-4 py-4 text-center">{estadoBadge(factura.estado)}</td>
                       <td className="px-4 py-4 text-gray-500 whitespace-nowrap">

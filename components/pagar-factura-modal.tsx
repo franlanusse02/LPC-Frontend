@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { CircleDollarSign } from "lucide-react";
 import { FormField } from "./form-field";
-import { Input } from "./ui/input";
+import { DatePickerInput } from "./date-picker-input";
 
 interface PagarFacturaModalProps {
   open: boolean;
@@ -57,8 +57,8 @@ export function PagarFacturaModal({
             </DialogDescription>
           </DialogHeader>
           <FormField label={currentFechaPago ? "Fecha de pago (pre-cargada)" : "Fecha de pago *"}>
-            <Input type="date" value={fechaPago}
-              onChange={(e) => setFechaPago(e.target.value)} className="bg-card" />
+            <DatePickerInput value={fechaPago}
+              onChange={setFechaPago} className="bg-card" />
           </FormField>
           <DialogFooter className="flex-row justify-end gap-2 pt-2">
             <Button variant="outline" onClick={onClose} disabled={loading}

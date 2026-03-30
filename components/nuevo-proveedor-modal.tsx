@@ -11,7 +11,9 @@ import { Spinner } from "@/components/ui/spinner";
 import { Plus, X } from "lucide-react";
 import { FormField } from "./form-field";
 import { Input } from "./ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CreateProveedorRequest } from "@/models/dto/proveedor/CreateProveedorRequest";
+import { MedioPago, MediosPagoDict } from "@/models/enums/MedioPago";
 
 interface NuevoProveedorModalProps {
   open: boolean;
@@ -23,6 +25,7 @@ export function NuevoProveedorModal({ open, onClose, onConfirm }: NuevoProveedor
   const [loading, setLoading] = useState(false);
   const [nombre, setNombre] = useState("");
   const [taxId, setTaxId] = useState("");
+  const [formaDePagoPredeterminada, setFormaDePagoPredeterminada] = useState<MedioPago | "">("");
   const [puntosDeVenta, setPuntosDeVenta] = useState<number[]>([]);
   const [pvInput, setPvInput] = useState("");
 
@@ -40,9 +43,14 @@ export function NuevoProveedorModal({ open, onClose, onConfirm }: NuevoProveedor
     if (!nombre.trim() || !taxId.trim()) return;
     setLoading(true);
     try {
-      await onConfirm({ nombre, taxId, puntosDeVenta });
+      await onConfirm({
+        nombre,
+        taxId,
+        formaDePagoPredeterminada: formaDePagoPredeterminada || null,
+        puntosDeVenta,
+      });
       onClose();
-      setNombre(""); setTaxId(""); setPuntosDeVenta([]); setPvInput("");
+      setNombre(""); setTaxId(""); setFormaDePagoPredeterminada(""); setPuntosDeVenta([]); setPvInput("");
     } finally {
       setLoading(false);
     }
@@ -71,6 +79,22 @@ export function NuevoProveedorModal({ open, onClose, onConfirm }: NuevoProveedor
           <FormField label="Tax ID (CUIT / CUIL) *">
             <Input type="text" value={taxId} onChange={(e) => setTaxId(e.target.value)}
               placeholder="XX-XXXXXXXX-X" className="bg-card" />
+          </FormField>
+          <FormField label="Forma de pago predeterminada (opcional)">
+            <Select
+              value={formaDePagoPredeterminada}
+              onValueChange={(v) => setFormaDePagoPredeterminada(v === "__none__" ? "" : v as MedioPago)}
+            >
+              <SelectTrigger className="bg-card">
+                <SelectValue placeholder="Sin predeterminado" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="__none__">Sin predeterminado</SelectItem>
+                {Object.entries(MediosPagoDict).map(([label, value]) => (
+                  <SelectItem key={value} value={value}>{label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </FormField>
           <FormField label="Puntos de venta (opcional)">
             <div className="flex gap-2">

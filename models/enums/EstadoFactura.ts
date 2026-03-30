@@ -1,8 +1,8 @@
-export type EstadoFactura = "ANULADO" | "EMITIDO" | "PAGADO" | "PENDIENTE";
+export type EstadoFactura = "ANULADA" | "EMITIDA" | "PAGADA" | "PENDIENTE";
 
 export const EstadoFacturaLabel: Record<EstadoFactura, string> = {
-  "Anulado": "ANULADO",
-  "Emitido": "EMITIDO",
-  "Pagado": "PAGADO",
-  "Pendiente": "PENDIENTE"
+  ANULADA: "Anulada",
+  EMITIDA: "Emitida",
+  PAGADA: "Pagada",
+  PENDIENTE: "Pendiente",
 };

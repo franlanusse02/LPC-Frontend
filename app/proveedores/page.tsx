@@ -2,11 +2,27 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { Header } from "@/components/header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { apiFetch } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import { ApiError } from "@/models/dto/ApiError";
@@ -15,7 +31,8 @@ import { CreateProveedorRequest } from "@/models/dto/proveedor/CreateProveedorRe
 import { AgregarPuntoDeVentaRequest } from "@/models/dto/proveedor/AgregarPuntoDeVentaRequest";
 import { NuevoProveedorModal } from "@/components/nuevo-proveedor-modal";
 import { AgregarPuntoDeVentaModal } from "@/components/agregar-punto-de-venta-modal";
-import { Plus } from "lucide-react";
+import { ArrowLeft, Pencil, Plus } from "lucide-react";
+import { MediosPagoDict, MedioPago } from "@/models/enums/MedioPago";
 
 export default function ProveedoresPage() {
   const router = useRouter();
@@ -26,6 +43,12 @@ export default function ProveedoresPage() {
   const [loading, setLoading] = useState(true);
   const [nuevoOpen, setNuevoOpen] = useState(false);
   const [agregarModal, setAgregarModal] = useState<ProveedorResponse | null>(null);
+  const [editarProveedor, setEditarProveedor] = useState<ProveedorResponse | null>(null);
+  const [editForm, setEditForm] = useState<{ nombre: string; taxId: string; formaDePagoPredeterminada: MedioPago | "" }>({ nombre: "", taxId: "", formaDePagoPredeterminada: "" });
+  const [editSubmitting, setEditSubmitting] = useState(false);
+
+  const backHref = session?.rol === "ADMIN" ? "/" : "/contabilidad";
+  const backLabel = session?.rol === "ADMIN" ? "Volver a Panel Administrador" : "Volver a Contabilidad";
 
   useEffect(() => {
     if (!isLoading) {
@@ -48,6 +71,35 @@ export default function ProveedoresPage() {
       title: "Error",
       description: err instanceof ApiError ? err.message : "No se pudo completar la operación.",
     });
+  };
+
+  const openEdit = (p: ProveedorResponse) => {
+    setEditarProveedor(p);
+    setEditForm({ nombre: p.nombre, taxId: p.taxId, formaDePagoPredeterminada: (p.formaDePagoPredeterminada as MedioPago | null) ?? "" });
+  };
+
+  const handleEditarProveedor = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editarProveedor || !editForm.nombre.trim() || !editForm.taxId.trim()) return;
+    setEditSubmitting(true);
+    try {
+      const updated = await apiFetch<ProveedorResponse>(
+        `/api/proveedores/${editarProveedor.id}`,
+        {
+          method: "PATCH",
+          body: JSON.stringify({
+            nombre: editForm.nombre.trim(),
+            taxId: editForm.taxId.trim(),
+            formaDePagoPredeterminada: editForm.formaDePagoPredeterminada || null,
+          }),
+        },
+        session!.token,
+      );
+      setProveedores((prev) => prev.map((p) => p.id === updated.id ? updated : p));
+      setEditarProveedor(null);
+      toast({ title: "Proveedor actualizado", description: `${updated.nombre} actualizado correctamente.` });
+    } catch (err) { handleError(err); }
+    finally { setEditSubmitting(false); }
   };
 
   const handleNuevoProveedor = async (req: CreateProveedorRequest) => {
@@ -85,6 +137,15 @@ export default function ProveedoresPage() {
     <div className="min-h-screen bg-gray-50">
       <Header />
       <main className="mx-auto max-w-4xl px-6 py-10">
+        <div className="mb-6">
+          <Button variant="ghost" size="sm" asChild className="gap-2 text-gray-500 hover:text-gray-800">
+            <Link href={backHref}>
+              <ArrowLeft className="h-4 w-4" />
+              {backLabel}
+            </Link>
+          </Button>
+        </div>
+
         <Card className="border-0 shadow-md rounded-xl">
           <CardHeader className="flex flex-row items-center justify-between border-b px-6 py-4">
             <CardTitle className="text-xl font-bold text-gray-800">Proveedores</CardTitle>
@@ -110,7 +171,9 @@ export default function ProveedoresPage() {
                     <tr className="bg-gray-100/80 text-left text-xs uppercase text-gray-500 tracking-wider">
                       <th className="px-4 py-3">Nombre</th>
                       <th className="px-4 py-3">Tax ID</th>
+                      <th className="px-4 py-3">Forma de Pago</th>
                       <th className="px-4 py-3">Puntos de Venta</th>
+                      <th className="px-4 py-3 w-12" />
                       <th className="px-4 py-3 w-12" />
                     </tr>
                   </thead>
@@ -119,8 +182,14 @@ export default function ProveedoresPage() {
                       <tr key={p.id} className="border-b hover:bg-gray-50/80 transition-colors">
                         <td className="px-4 py-4 font-medium text-gray-800">{p.nombre}</td>
                         <td className="px-4 py-4 font-mono text-xs text-gray-600">{p.taxId}</td>
+                        <td className="px-4 py-4 text-sm text-gray-600">
+                          {p.formaDePagoPredeterminada
+                            ? Object.entries(MediosPagoDict).find(([, v]) => v === p.formaDePagoPredeterminada)?.[0] ?? p.formaDePagoPredeterminada
+                            : <span className="text-gray-300">—</span>
+                          }
+                        </td>
                         <td className="px-4 py-4">
-                          {p.puntosDeVenta.length === 0 ? (
+                          {!p.puntosDeVenta?.length ? (
                             <span className="text-gray-300">—</span>
                           ) : (
                             <div className="flex flex-wrap gap-1">
@@ -137,6 +206,11 @@ export default function ProveedoresPage() {
                           <Button variant="outline" size="sm" onClick={() => setAgregarModal(p)}
                             className="text-xs border-gray-200 text-gray-600 hover:bg-gray-50">
                             + Punto de venta
+                          </Button>
+                        </td>
+                        <td className="px-4 py-4 text-right">
+                          <Button variant="ghost" size="sm" onClick={() => openEdit(p)} className="h-7 w-7 p-0 text-gray-400 hover:text-gray-700">
+                            <Pencil className="h-3.5 w-3.5" />
                           </Button>
                         </td>
                       </tr>
@@ -161,6 +235,64 @@ export default function ProveedoresPage() {
           onConfirm={handleAgregarPuntoVenta}
         />
       )}
+
+      <Dialog open={!!editarProveedor} onOpenChange={(v) => !v && setEditarProveedor(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Editar Proveedor</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleEditarProveedor} className="space-y-4 pt-2">
+            <div className="space-y-1">
+              <Label htmlFor="ep-nombre">Nombre</Label>
+              <Input
+                id="ep-nombre"
+                value={editForm.nombre}
+                onChange={(e) => setEditForm((p) => ({ ...p, nombre: e.target.value }))}
+                required
+              />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="ep-taxid">Tax ID</Label>
+              <Input
+                id="ep-taxid"
+                value={editForm.taxId}
+                onChange={(e) => setEditForm((p) => ({ ...p, taxId: e.target.value }))}
+                required
+              />
+            </div>
+            <div className="space-y-1">
+              <Label>Forma de Pago Predeterminada</Label>
+              <Select
+                value={editForm.formaDePagoPredeterminada || undefined}
+                onValueChange={(v) => setEditForm((p) => ({ ...p, formaDePagoPredeterminada: v as MedioPago }))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Sin forma de pago" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.entries(MediosPagoDict).map(([label, value]) => (
+                    <SelectItem key={value} value={value}>{label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {editForm.formaDePagoPredeterminada && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="text-xs text-gray-400 hover:text-gray-600 px-0"
+                  onClick={() => setEditForm((p) => ({ ...p, formaDePagoPredeterminada: "" }))}
+                >
+                  Quitar forma de pago
+                </Button>
+              )}
+            </div>
+            <Button type="submit" className="w-full" disabled={editSubmitting}>
+              {editSubmitting ? "Guardando..." : "Guardar Cambios"}
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

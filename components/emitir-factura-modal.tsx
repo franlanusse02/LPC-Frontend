@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { Send } from "lucide-react";
 import { FormField } from "./form-field";
-import { Input } from "./ui/input";
+import { DatePickerInput } from "./date-picker-input";
 
 interface EmitirFacturaModalProps {
   open: boolean;
@@ -58,12 +58,12 @@ export function EmitirFacturaModal({
             </DialogDescription>
           </DialogHeader>
           <FormField label="Fecha de emisión *">
-            <Input type="date" value={fechaEmision}
-              onChange={(e) => setFechaEmision(e.target.value)} className="bg-card" />
+            <DatePickerInput value={fechaEmision}
+              onChange={setFechaEmision} className="bg-card" />
           </FormField>
           <FormField label="Fecha de pago (opcional)">
-            <Input type="date" value={fechaPago}
-              onChange={(e) => setFechaPago(e.target.value)} className="bg-card" />
+            <DatePickerInput value={fechaPago}
+              onChange={setFechaPago} className="bg-card" />
           </FormField>
           <DialogFooter className="flex-row justify-end gap-2 pt-2">
             <Button variant="outline" onClick={onClose} disabled={loading}

@@ -19,6 +19,8 @@ import { CreateFacturaProveedorRequest } from "@/models/dto/compra/CreateFactura
 import { CierresTable } from "@/components/cierres-table";
 import { FacturasTable } from "@/components/facturas-table";
 import { NuevaFacturaModal } from "@/components/nueva-factura-modal";
+import { NuevoCierreModal } from "@/components/nuevo-cierre-modal";
+import { PuntoDeVentaResponse } from "@/models/dto/pto-venta/PuntoDeVentaResponse";
 
 type View = "cierres" | "compras";
 
@@ -47,7 +49,9 @@ export default function EncargadoPage() {
   const [loadingFacturas, setLoadingFacturas] = useState(true);
   const [proveedores, setProveedores] = useState<ProveedorResponse[]>([]);
   const [comedores, setComedores] = useState<ComedorResponse[]>([]);
+  const [puntosDeVenta, setPuntosDeVenta] = useState<PuntoDeVentaResponse[]>([]);
   const [nuevaFacturaOpen, setNuevaFacturaOpen] = useState(false);
+  const [nuevoCierreOpen, setNuevoCierreOpen] = useState(false);
 
   const comedorIdFilter = useMemo(
     () => comedores.find((c) => c.nombre === comedorFilter)?.id ?? null,
@@ -117,6 +121,7 @@ export default function EncargadoPage() {
       .finally(() => setLoadingFacturas(false));
     apiFetch<ProveedorResponse[]>("/api/proveedores", {}, session.token).then(setProveedores);
     apiFetch<ComedorResponse[]>("/api/comedor", {}, session.token).then(setComedores);
+    apiFetch<PuntoDeVentaResponse[]>("/api/puntodeventa", {}, session.token).then(setPuntosDeVenta);
   }, [session]);
 
   const handleNuevaFactura = async (req: CreateFacturaProveedorRequest) => {
@@ -209,6 +214,7 @@ export default function EncargadoPage() {
                 comedorFilter={comedorFilter}
                 onComedorFilterChange={setComedorFilter}
                 onClearFilters={clearFilters}
+                onNuevoCierre={() => setNuevoCierreOpen(true)}
               />
             )}
             {view === "compras" && (
@@ -234,6 +240,16 @@ export default function EncargadoPage() {
         proveedores={proveedores}
         comedores={comedores}
         onConfirm={handleNuevaFactura}
+      />
+
+      <NuevoCierreModal
+        open={nuevoCierreOpen}
+        onClose={() => setNuevoCierreOpen(false)}
+        comedores={comedores}
+        puntosDeVenta={puntosDeVenta}
+        onSuccess={() => {
+          apiFetch<DetailedCierreCajaResponse[]>("/api/cierre", {}, session!.token).then(setCierres);
+        }}
       />
     </div>
   );

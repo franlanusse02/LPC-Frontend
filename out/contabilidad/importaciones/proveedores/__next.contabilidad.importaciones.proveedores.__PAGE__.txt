@@ -1,0 +1,9 @@
+1:"$Sreact.fragment"
+2:I[1304,[],"ClientPageRoot"]
+3:I[2890,["625","static/chunks/625-027cd057bc45de37.js","739","static/chunks/739-c70698d3b33d4f9f.js","9","static/chunks/9-f469318b73e0114c.js","713","static/chunks/713-ac6ecac1b9cee352.js","142","static/chunks/142-3d79fc50d9094212.js","831","static/chunks/831-162cd3e809beb76c.js","483","static/chunks/483-ab9f1c1d7e1e717e.js","963","static/chunks/963-77d1bde5ba0898b7.js","487","static/chunks/487-ab325e65ce4cceda.js","681","static/chunks/681-0259228b163e1482.js","522","static/chunks/app/contabilidad/importaciones/proveedores/page-f97ec5d87689b56b.js"],"default"]
+6:I[484,[],"OutletBoundary"]
+7:"$Sreact.suspense"
+0:{"buildId":"nYIGJhhijJ-fKuGFa76xD","rsc":["$","$1","c",{"children":[["$","$L2",null,{"Component":"$3","serverProvidedParams":{"searchParams":{},"params":{},"promises":["$@4","$@5"]}}],null,["$","$L6",null,{"children":["$","$7",null,{"name":"Next.MetadataOutlet","children":"$@8"}]}]]}],"loading":null,"isPartial":false}
+4:{}
+5:"$0:rsc:props:children:0:props:serverProvidedParams:params"
+8:null

@@ -20,6 +20,7 @@ import {
   UserPlus,
   Building2,
   Truck,
+  Landmark,
 } from "lucide-react";
 
 export default function HomePage() {
@@ -75,7 +76,7 @@ export default function HomePage() {
               className="flex items-center justify-start gap-3 h-14 px-4 rounded-lg border-gray-200 hover:bg-gray-50 hover:border-gray-300"
             >
               <ClipboardList className="h-5 w-5 text-gray-500 shrink-0" />
-              <span className="text-sm font-medium text-gray-700">Panel Cierres</span>
+              <span className="text-sm font-medium text-gray-700">Panel Encargado</span>
             </Button>
           </CardContent>
         </Card>
@@ -89,7 +90,7 @@ export default function HomePage() {
               Podés crear datos estáticos del sistema
             </CardDescription>
           </CardHeader>
-          <CardContent className="p-4 grid grid-cols-5 gap-3">
+          <CardContent className="grid grid-cols-2 gap-3 p-4 sm:grid-cols-3 lg:grid-cols-3">
             <Button
               variant="outline"
               onClick={() => router.push("/comedores")}
@@ -148,6 +149,18 @@ export default function HomePage() {
               </div>
               <span className="text-xs font-medium text-gray-700 text-center leading-tight">
                 Proveedores
+              </span>
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => router.push("/bancos")}
+              className="flex h-20 flex-col items-center justify-center gap-2 rounded-lg border-gray-200 px-3 hover:border-gray-300 hover:bg-gray-50"
+            >
+              <div className="flex h-8 w-8 items-center justify-center rounded-md bg-gray-100">
+                <Landmark className="h-4 w-4 text-gray-600" />
+              </div>
+              <span className="text-center text-xs font-medium leading-tight text-gray-700">
+                Bancos
               </span>
             </Button>
           </CardContent>

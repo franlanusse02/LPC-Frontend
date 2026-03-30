@@ -1,9 +1,9 @@
 1:"$Sreact.fragment"
 2:I[1304,[],"ClientPageRoot"]
-3:I[2291,["625","static/chunks/625-027cd057bc45de37.js","739","static/chunks/739-c70698d3b33d4f9f.js","353","static/chunks/353-75db9e8dd75947ea.js","740","static/chunks/740-c831546e827dca26.js","758","static/chunks/758-3c1ff1395e896694.js","681","static/chunks/681-6c3cfcf31869a032.js","895","static/chunks/app/puntos-de-venta/page-d9d86c162fa5b0a8.js"],"default"]
+3:I[2291,["625","static/chunks/625-027cd057bc45de37.js","739","static/chunks/739-c70698d3b33d4f9f.js","9","static/chunks/9-f469318b73e0114c.js","713","static/chunks/713-ac6ecac1b9cee352.js","142","static/chunks/142-3d79fc50d9094212.js","831","static/chunks/831-162cd3e809beb76c.js","963","static/chunks/963-77d1bde5ba0898b7.js","681","static/chunks/681-0259228b163e1482.js","895","static/chunks/app/puntos-de-venta/page-42b21f8d702f189a.js"],"default"]
 6:I[484,[],"OutletBoundary"]
 7:"$Sreact.suspense"
-0:{"buildId":"D9GW2nbNqx5VA5t83ECLX","rsc":["$","$1","c",{"children":[["$","$L2",null,{"Component":"$3","serverProvidedParams":{"searchParams":{},"params":{},"promises":["$@4","$@5"]}}],null,["$","$L6",null,{"children":["$","$7",null,{"name":"Next.MetadataOutlet","children":"$@8"}]}]]}],"loading":null,"isPartial":false}
+0:{"buildId":"nYIGJhhijJ-fKuGFa76xD","rsc":["$","$1","c",{"children":[["$","$L2",null,{"Component":"$3","serverProvidedParams":{"searchParams":{},"params":{},"promises":["$@4","$@5"]}}],null,["$","$L6",null,{"children":["$","$7",null,{"name":"Next.MetadataOutlet","children":"$@8"}]}]]}],"loading":null,"isPartial":false}
 4:{}
 5:"$0:rsc:props:children:0:props:serverProvidedParams:params"
 8:null

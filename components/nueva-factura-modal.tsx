@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Dialog, DialogContent, DialogHeader,
   DialogTitle, DialogFooter,
@@ -10,10 +10,14 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { Plus } from "lucide-react";
 import { FormField } from "./form-field";
+import { DatePickerInput } from "./date-picker-input";
 import { Input } from "./ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Combobox } from "@/components/ui/combobox";
 import { ProveedorResponse } from "@/models/dto/proveedor/ProveedorResponse";
 import { ComedorResponse } from "@/models/dto/comedor/ComedorResponse";
 import { CreateFacturaProveedorRequest } from "@/models/dto/compra/CreateFacturaProveedorRequest";
+import { MedioPago, MediosPagoDict } from "@/models/enums/MedioPago";
 
 interface NuevaFacturaModalProps {
   open: boolean;
@@ -34,9 +38,20 @@ export function NuevaFacturaModal({
   const [monto, setMonto] = useState("");
   const [comentarios, setComentarios] = useState("");
   const [puntoDeVenta, setPuntoDeVenta] = useState("");
+  const [medioPago, setMedioPago] = useState<MedioPago | "">("");
 
   const selectedProveedor = proveedores.find((p) => p.id === Number(proveedorId));
   const requiresPuntoDeVenta = selectedProveedor && selectedProveedor.puntosDeVenta.length > 0;
+
+  useEffect(() => {
+    if (selectedProveedor?.formaDePagoPredeterminada) {
+      setMedioPago(selectedProveedor.formaDePagoPredeterminada);
+    } else {
+      setMedioPago("");
+    }
+    setPuntoDeVenta("");
+  }, [proveedorId]);
+
   const canSubmit = proveedorId && comedorId && fechaFactura && numero && monto &&
     (!requiresPuntoDeVenta || puntoDeVenta);
 
@@ -52,14 +67,18 @@ export function NuevaFacturaModal({
         monto: Number(monto),
         comentarios,
         puntoDeVenta: puntoDeVenta ? Number(puntoDeVenta) : null as any,
+        medioPago: medioPago || null,
       });
       onClose();
       setProveedorId(""); setComedorId(""); setFechaFactura("");
-      setNumero(""); setMonto(""); setComentarios(""); setPuntoDeVenta("");
+      setNumero(""); setMonto(""); setComentarios(""); setPuntoDeVenta(""); setMedioPago("");
     } finally {
       setLoading(false);
     }
   };
+
+  const proveedorOptions = proveedores.map((p) => ({ value: String(p.id), label: p.nombre }));
+  const comedorOptions = comedores.map((c) => ({ value: String(c.id), label: c.nombre }));
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
@@ -79,22 +98,22 @@ export function NuevaFacturaModal({
 
           <div className="grid grid-cols-2 gap-4">
             <FormField label="Proveedor *">
-              <select value={proveedorId} onChange={(e) => { setProveedorId(e.target.value); setPuntoDeVenta(""); }}
-                className="h-9 w-full rounded-md border border-gray-200 bg-card px-2 text-sm text-gray-700">
-                <option value="">Seleccionar...</option>
-                {proveedores.map((p) => (
-                  <option key={p.id} value={p.id}>{p.nombre}</option>
-                ))}
-              </select>
+              <Combobox
+                options={proveedorOptions}
+                value={proveedorId}
+                onChange={setProveedorId}
+                placeholder="Seleccionar proveedor..."
+                searchPlaceholder="Buscar proveedor..."
+              />
             </FormField>
             <FormField label="Comedor *">
-              <select value={comedorId} onChange={(e) => setComedorId(e.target.value)}
-                className="h-9 w-full rounded-md border border-gray-200 bg-card px-2 text-sm text-gray-700">
-                <option value="">Seleccionar...</option>
-                {comedores.map((c) => (
-                  <option key={c.id} value={c.id}>{c.nombre}</option>
-                ))}
-              </select>
+              <Combobox
+                options={comedorOptions}
+                value={comedorId}
+                onChange={setComedorId}
+                placeholder="Seleccionar comedor..."
+                searchPlaceholder="Buscar comedor..."
+              />
             </FormField>
             <FormField label="Número de factura *">
               <Input type="text" value={numero}
@@ -102,13 +121,29 @@ export function NuevaFacturaModal({
                 placeholder="Ej: 0001-00001234" className="bg-card" />
             </FormField>
             <FormField label="Fecha factura *">
-              <Input type="date" value={fechaFactura}
-                onChange={(e) => setFechaFactura(e.target.value)} className="bg-card" />
+              <DatePickerInput value={fechaFactura}
+                onChange={setFechaFactura} className="bg-card" />
             </FormField>
             <FormField label="Monto *">
               <Input type="number" value={monto}
                 onChange={(e) => setMonto(e.target.value)}
                 placeholder="0.00" className="bg-card" />
+            </FormField>
+            <FormField label="Medio de pago">
+              <Select
+                value={medioPago}
+                onValueChange={(v) => setMedioPago(v === "__none__" ? "" : v as MedioPago)}
+              >
+                <SelectTrigger className="bg-card">
+                  <SelectValue placeholder="Sin especificar" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__none__">Sin especificar</SelectItem>
+                  {Object.entries(MediosPagoDict).map(([label, value]) => (
+                    <SelectItem key={value} value={value}>{label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </FormField>
             {requiresPuntoDeVenta && (
               <FormField label="Punto de venta *">

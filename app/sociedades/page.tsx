@@ -7,7 +7,7 @@ import { apiFetch } from "@/lib/api";
 import { useAuth } from "@/lib/auth-context";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Plus, Building2 } from "lucide-react";
+import { ArrowLeft, Plus, Building2, Pencil } from "lucide-react";
 import Link from "next/link";
 import { SociedadResponse } from "@/models/dto/sociedad/SociedadResponse";
 import { CreateSociedadRequest } from "@/models/dto/sociedad/CreateSociedadRequest";
@@ -32,6 +32,9 @@ export default function SociedadesPage() {
     direccion: "",
     cuit: "",
   });
+  const [editarSociedad, setEditarSociedad] = useState<SociedadResponse | null>(null);
+  const [editForm, setEditForm] = useState({ nombre: "", direccion: "", cuit: "" });
+  const [editSubmitting, setEditSubmitting] = useState(false);
   const { session, token, isLoading } = useAuth();
   const router = useRouter();
 
@@ -50,6 +53,31 @@ export default function SociedadesPage() {
     } catch {
     } finally {
       setLoading(false);
+    }
+  };
+
+  const openEdit = (s: SociedadResponse) => {
+    setEditarSociedad(s);
+    setEditForm({ nombre: s.nombre, direccion: s.direccion, cuit: s.cuit });
+  };
+
+  const handleEditSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editarSociedad) return;
+    setEditSubmitting(true);
+    try {
+      const updated = await apiFetch<SociedadResponse>(
+        `/api/sociedad/${editarSociedad.id}`,
+        { method: "PATCH", body: JSON.stringify(editForm) },
+        token || "",
+      );
+      setSociedades((prev) => prev.map((s) => s.id === updated.id ? updated : s));
+      setEditarSociedad(null);
+      toast.success("Sociedad actualizada correctamente.");
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : "Error al actualizar sociedad.");
+    } finally {
+      setEditSubmitting(false);
     }
   };
 
@@ -113,10 +141,15 @@ export default function SociedadesPage() {
             ) : (
               <div className="divide-y divide-gray-100">
                 {sociedades.map((s) => (
-                  <div key={s.id} className="px-6 py-4 flex flex-col gap-1">
-                    <span className="font-medium text-gray-800">{s.nombre}</span>
-                    <span className="text-sm text-gray-500">{s.direccion}</span>
-                    <span className="text-xs text-gray-400">CUIT: {s.cuit}</span>
+                  <div key={s.id} className="px-6 py-4 flex items-start justify-between gap-4">
+                    <div className="flex flex-col gap-1">
+                      <span className="font-medium text-gray-800">{s.nombre}</span>
+                      <span className="text-sm text-gray-500">{s.direccion}</span>
+                      <span className="text-xs text-gray-400">CUIT: {s.cuit}</span>
+                    </div>
+                    <Button variant="ghost" size="sm" onClick={() => openEdit(s)} className="h-7 w-7 p-0 text-gray-400 hover:text-gray-700 shrink-0 mt-1">
+                      <Pencil className="h-3.5 w-3.5" />
+                    </Button>
                   </div>
                 ))}
               </div>
@@ -159,6 +192,31 @@ export default function SociedadesPage() {
               </div>
               <Button type="submit" className="w-full" disabled={submitting}>
                 {submitting ? "Creando..." : "Crear Sociedad"}
+              </Button>
+            </form>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={!!editarSociedad} onOpenChange={(v) => !v && setEditarSociedad(null)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Editar Sociedad</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleEditSubmit} className="space-y-4 pt-2">
+              <div className="space-y-1">
+                <Label htmlFor="edit-nombre">Nombre</Label>
+                <Input id="edit-nombre" value={editForm.nombre} onChange={(e) => setEditForm({ ...editForm, nombre: e.target.value })} required />
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="edit-direccion">Dirección</Label>
+                <Input id="edit-direccion" value={editForm.direccion} onChange={(e) => setEditForm({ ...editForm, direccion: e.target.value })} required />
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="edit-cuit">CUIT</Label>
+                <Input id="edit-cuit" value={editForm.cuit} onChange={(e) => setEditForm({ ...editForm, cuit: e.target.value })} required />
+              </div>
+              <Button type="submit" className="w-full" disabled={editSubmitting}>
+                {editSubmitting ? "Guardando..." : "Guardar Cambios"}
               </Button>
             </form>
           </DialogContent>

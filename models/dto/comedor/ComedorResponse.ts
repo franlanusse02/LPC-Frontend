@@ -7,6 +7,7 @@ export type ComedorResponse = {
   id: number;
   nombre: string;
   puntosDeVenta: PuntoDeVentaResponse[] | null;
+  sociedadId: number;
 };
 
 export type ComedorDetailedResponse = ComedorResponse & {

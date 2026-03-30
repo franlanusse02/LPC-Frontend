@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Header } from "@/components/header";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { PuntoDeVentaTable } from "@/components/puntos-de-venta-table";
-import { PuntoDeVentaResponse } from "@/models/dto/punto-de-venta/PuntoDeVentaResponse";
+import { PuntoDeVentaResponse } from "@/models/dto/pto-venta/PuntoDeVentaResponse";
 import { ComedorResponse } from "@/models/dto/comedor/ComedorResponse";
 import { apiFetch } from "@/lib/api";
 import { useAuth } from "@/lib/auth-context";
@@ -47,6 +47,10 @@ export default function PuntosDeVentaPage() {
 
   const handleCreated = (punto: PuntoDeVentaResponse) => {
     setPuntosDeVenta((prev) => [...prev, punto]);
+  };
+
+  const handleUpdated = (punto: PuntoDeVentaResponse) => {
+    setPuntosDeVenta((prev) => prev.map((p) => p.id === punto.id ? punto : p));
   };
 
   return (
@@ -92,6 +96,7 @@ export default function PuntosDeVentaPage() {
               comedores={comedores}
               loading={loading}
               onCreated={handleCreated}
+              onUpdated={handleUpdated}
               setModalOpen={setModalOpen}
               modalOpen={modalOpen}
             />

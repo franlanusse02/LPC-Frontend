@@ -10,7 +10,9 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { Pencil } from "lucide-react";
 import { FormField } from "./form-field";
+import { DatePickerInput } from "./date-picker-input";
 import { Input } from "./ui/input";
+import { Combobox } from "@/components/ui/combobox";
 import { FacturaProveedorResponse } from "@/models/dto/compra/FacturaProveedorResponse";
 import { PatchFacturaProveedorRequest } from "@/models/dto/compra/PatchFacturaProveedorRequest";
 import { ProveedorResponse } from "@/models/dto/proveedor/ProveedorResponse";
@@ -60,6 +62,9 @@ export function EditarFacturaModal({
     }
   };
 
+  const proveedorOptions = proveedores.map((p) => ({ value: String(p.id), label: p.nombre }));
+  const comedorOptions = comedores.map((c) => ({ value: String(c.id), label: c.nombre }));
+
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
       <DialogContent className="sm:max-w-lg shadow-xl border-0 p-0 overflow-hidden">
@@ -78,24 +83,26 @@ export function EditarFacturaModal({
 
           <div className="grid grid-cols-2 gap-4">
             <FormField label="Proveedor *">
-              <select value={proveedorId} onChange={(e) => { setProveedorId(e.target.value); setPuntoDeVenta(""); }}
-                className="h-9 w-full rounded-md border border-gray-200 bg-card px-2 text-sm">
-                {proveedores.map((p) => (
-                  <option key={p.id} value={p.id}>{p.nombre}</option>
-                ))}
-              </select>
+              <Combobox
+                options={proveedorOptions}
+                value={proveedorId}
+                onChange={(v) => { setProveedorId(v); setPuntoDeVenta(""); }}
+                placeholder="Seleccionar proveedor..."
+                searchPlaceholder="Buscar proveedor..."
+              />
             </FormField>
             <FormField label="Comedor *">
-              <select value={comedorId} onChange={(e) => setComedorId(e.target.value)}
-                className="h-9 w-full rounded-md border border-gray-200 bg-card px-2 text-sm">
-                {comedores.map((c) => (
-                  <option key={c.id} value={c.id}>{c.nombre}</option>
-                ))}
-              </select>
+              <Combobox
+                options={comedorOptions}
+                value={comedorId}
+                onChange={setComedorId}
+                placeholder="Seleccionar comedor..."
+                searchPlaceholder="Buscar comedor..."
+              />
             </FormField>
             <FormField label="Fecha factura *">
-              <Input type="date" value={fechaFactura}
-                onChange={(e) => setFechaFactura(e.target.value)} className="bg-card" />
+              <DatePickerInput value={fechaFactura}
+                onChange={setFechaFactura} className="bg-card" />
             </FormField>
             <FormField label="Monto *">
               <Input type="number" value={monto}
@@ -114,14 +121,14 @@ export function EditarFacturaModal({
             )}
             {factura.estado === "PENDIENTE" && (
               <FormField label="Fecha emisión">
-                <Input type="date" value={fechaEmision}
-                  onChange={(e) => setFechaEmision(e.target.value)} className="bg-card" />
+                <DatePickerInput value={fechaEmision}
+                  onChange={setFechaEmision} className="bg-card" />
               </FormField>
             )}
             {factura.estado === "EMITIDA" && (
               <FormField label="Fecha pago">
-                <Input type="date" value={fechaPago}
-                  onChange={(e) => setFechaPago(e.target.value)} className="bg-card" />
+                <DatePickerInput value={fechaPago}
+                  onChange={setFechaPago} className="bg-card" />
               </FormField>
             )}
             <FormField label="Comentarios" className="col-span-2">

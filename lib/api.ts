@@ -1,14 +1,16 @@
 import { ApiError, ApiErrorResponse } from "@/models/dto/ApiError";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080";
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? process.env.NEXT_STAGING_PUBLIC_API_URL ?? "http://localhost:8080";
 
 export async function apiFetch<T>(
   path: string,
   options: RequestInit = {},
   token?: string,
 ): Promise<T> {
+  const isFormData =
+    typeof FormData !== "undefined" && options.body instanceof FormData;
   const headers = {
-    "Content-Type": "application/json",
+    ...(isFormData ? {} : { "Content-Type": "application/json" }),
     ...options.headers,
   } as Record<string, string>;
 

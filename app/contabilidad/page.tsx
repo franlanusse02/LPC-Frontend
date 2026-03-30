@@ -16,23 +16,41 @@ import { DetailedCierreCajaResponse } from "@/models/dto/cierre-caja/CierreCajaR
 import { FacturaProveedorResponse } from "@/models/dto/compra/FacturaProveedorResponse";
 import { ProveedorResponse } from "@/models/dto/proveedor/ProveedorResponse";
 import { ComedorResponse } from "@/models/dto/comedor/ComedorResponse";
+import { PuntoDeVentaResponse } from "@/models/dto/pto-venta/PuntoDeVentaResponse";
 import { CreateFacturaProveedorRequest } from "@/models/dto/compra/CreateFacturaProveedorRequest";
 import { PatchFacturaProveedorRequest } from "@/models/dto/compra/PatchFacturaProveedorRequest";
 import { AnularCierreModal } from "@/components/anular-cierre-modal";
+import { EditarCierreModal } from "@/components/editar-cierre-modal";
 import { CierresTable } from "@/components/cierres-table";
-import { FacturasTable } from "@/components/facturas-table";
+import { FacturaSortDir, FacturaSortKey, FacturaStatusFilter, FacturasTable } from "@/components/facturas-table";
 import { NuevaFacturaModal } from "@/components/nueva-factura-modal";
 import { EmitirFacturaModal } from "@/components/emitir-factura-modal";
 import { PagarFacturaModal } from "@/components/pagar-factura-modal";
 import { EditarFacturaModal } from "@/components/editar-factura-modal";
 import { AnularFacturaModal } from "@/components/anular-factura-modal";
-import { Truck } from "lucide-react";
+import { EstadoFacturaLabel } from "@/models/enums/EstadoFactura";
+import { buildExportFilename, exportRowsToXlsx, formatIsoDateForFilename } from "@/lib/export-xlsx";
+import { Download, FileSpreadsheet, Truck } from "lucide-react";
 
 type View = "cierres" | "compras";
 type PageResponse<T> = { content: T[] };
 
 const formatCurrency = (n: number) =>
   new Intl.NumberFormat("es-CL", { style: "currency", currency: "ARS", minimumFractionDigits: 0 }).format(n);
+
+const buildDateRangePart = (dateDesde: string, dateHasta: string) => {
+  if (dateDesde && dateHasta) {
+    return `from_${formatIsoDateForFilename(dateDesde)}_to_${formatIsoDateForFilename(dateHasta)}`;
+  }
+  if (dateDesde) return `from_${formatIsoDateForFilename(dateDesde)}`;
+  if (dateHasta) return `to_${formatIsoDateForFilename(dateHasta)}`;
+  return null;
+};
+
+const buildSearchPart = (value: string) => {
+  const trimmed = value.trim();
+  return trimmed ? `search_${trimmed.slice(0, 32)}` : null;
+};
 
 export default function ContabilidadPage() {
   const router = useRouter();
@@ -56,6 +74,8 @@ export default function ContabilidadPage() {
   const [anularCierreModal, setAnularCierreModal] = useState<{
     open: boolean; cierreId: number; fechaOperacion: string; puntoVenta: string;
   } | null>(null);
+  const [editarCierreModal, setEditarCierreModal] = useState<DetailedCierreCajaResponse | null>(null);
+  const [puntosDeVenta, setPuntosDeVenta] = useState<PuntoDeVentaResponse[]>([]);
 
   // compras
   const [facturas, setFacturas] = useState<FacturaProveedorResponse[]>([]);
@@ -67,10 +87,24 @@ export default function ContabilidadPage() {
   const [pagarFactura, setPagarFactura] = useState<FacturaProveedorResponse | null>(null);
   const [editarFactura, setEditarFactura] = useState<FacturaProveedorResponse | null>(null);
   const [anularFactura, setAnularFactura] = useState<FacturaProveedorResponse | null>(null);
+  const [facturaSearch, setFacturaSearch] = useState("");
+  const [facturaStatusFilter, setFacturaStatusFilter] = useState<FacturaStatusFilter>("all");
+  const [facturaSortKey, setFacturaSortKey] = useState<FacturaSortKey>("fechaFactura");
+  const [facturaSortDir, setFacturaSortDir] = useState<FacturaSortDir>("desc");
 
   const comedorIdFilter = useMemo(
     () => comedores.find((c) => c.nombre === comedorFilter)?.id ?? null,
     [comedores, comedorFilter],
+  );
+
+  const proveedorNameById = useMemo(
+    () => Object.fromEntries(proveedores.map((proveedor) => [proveedor.id, proveedor.nombre])),
+    [proveedores],
+  );
+
+  const comedorNameById = useMemo(
+    () => Object.fromEntries(comedores.map((comedor) => [comedor.id, comedor.nombre])),
+    [comedores],
   );
 
   const comedorOptions = useMemo(
@@ -122,6 +156,11 @@ export default function ContabilidadPage() {
     return list.reduce((s, c) => s + c.montoTotal, 0);
   }, [cierres, dateDesde, dateHasta, comedorFilter]);
 
+  const ventasBanco = useMemo(() => {
+    if (!montoVentas) return 0;
+    return montoVentas / 0.72 - montoVentas;
+  }, [montoVentas]);
+
   const montoCompras = useMemo(() => {
     let list = facturas.filter((f) => f.estado !== "ANULADA");
     if (dateDesde) list = list.filter((f) => f.fechaFactura >= dateDesde);
@@ -132,9 +171,98 @@ export default function ContabilidadPage() {
 
   const balance = montoVentas - montoCompras;
 
+  const displayedFacturas = useMemo(() => {
+    let list = [...facturas];
+    if (dateDesde) list = list.filter((factura) => factura.fechaFactura >= dateDesde);
+    if (dateHasta) list = list.filter((factura) => factura.fechaFactura <= dateHasta);
+    if (comedorIdFilter !== null) list = list.filter((factura) => factura.comedorId === comedorIdFilter);
+    if (facturaStatusFilter !== "all") list = list.filter((factura) => factura.estado === facturaStatusFilter);
+    if (facturaSearch.trim()) {
+      const query = facturaSearch.trim().toLowerCase();
+      list = list.filter((factura) =>
+        factura.numero.toLowerCase().includes(query) ||
+        (proveedorNameById[factura.proveedorId] ?? "").toLowerCase().includes(query),
+      );
+    }
+    list.sort((left, right) => {
+      let leftValue: string | number = "";
+      let rightValue: string | number = "";
+      if (facturaSortKey === "fechaFactura") { leftValue = left.fechaFactura; rightValue = right.fechaFactura; }
+      if (facturaSortKey === "monto") { leftValue = left.monto; rightValue = right.monto; }
+      if (facturaSortKey === "proveedor") {
+        leftValue = proveedorNameById[left.proveedorId] ?? "";
+        rightValue = proveedorNameById[right.proveedorId] ?? "";
+      }
+      if (facturaSortKey === "estado") { leftValue = left.estado; rightValue = right.estado; }
+      if (leftValue < rightValue) return facturaSortDir === "asc" ? -1 : 1;
+      if (leftValue > rightValue) return facturaSortDir === "asc" ? 1 : -1;
+      return 0;
+    });
+    return list;
+  }, [
+    comedorIdFilter,
+    dateDesde,
+    dateHasta,
+    facturaSearch,
+    facturaSortDir,
+    facturaSortKey,
+    facturaStatusFilter,
+    facturas,
+    proveedorNameById,
+  ]);
+
   const clearFilters = () => {
     setDateDesde(""); setDateHasta(""); setComedorFilter("");
     setSearch(""); setStatusFilter("active");
+    setFacturaSearch(""); setFacturaStatusFilter("all");
+  };
+
+  const handleExportCurrentView = () => {
+    if (view === "cierres") {
+      exportRowsToXlsx(
+        displayedCierres.map((cierre) => ({
+          Fecha: cierre.fechaOperacion,
+          Comedor: cierre.comedor.nombre,
+          "Creado por": cierre.creadoPor.nombre,
+          "Punto de venta": cierre.puntoDeVenta.nombre,
+          Platos: cierre.totalPlatosVendidos,
+          "Monto total": cierre.montoTotal,
+          Estado: cierre.anulacionId === null ? "Activo" : "Anulado",
+          Comentarios: cierre.comentarios ?? "",
+        })),
+        "Cierres",
+        buildExportFilename("cierres", [
+          comedorFilter,
+          buildDateRangePart(dateDesde, dateHasta),
+          statusFilter !== "active" ? (statusFilter === "all" ? "todos" : "anulados") : null,
+          buildSearchPart(search),
+        ]),
+      );
+      return;
+    }
+
+    exportRowsToXlsx(
+      displayedFacturas.map((factura) => ({
+        "Fecha factura": factura.fechaFactura,
+        Número: factura.numero,
+        Proveedor: proveedorNameById[factura.proveedorId] ?? String(factura.proveedorId),
+        Comedor: comedorNameById[factura.comedorId] ?? String(factura.comedorId),
+        Monto: factura.monto,
+        Estado: EstadoFacturaLabel[factura.estado],
+        "Fecha emisión": factura.fechaEmision ?? "",
+        "Fecha pago": factura.fechaPago ?? "",
+        "Número operación": factura.numeroOperacion ?? "",
+        "Medio de pago": factura.medioPago ?? "",
+        Banco: factura.bancoNombre ?? "",
+      })),
+      "Compras",
+      buildExportFilename("compras", [
+        comedorFilter,
+        buildDateRangePart(dateDesde, dateHasta),
+        facturaStatusFilter !== "all" ? EstadoFacturaLabel[facturaStatusFilter] : null,
+        buildSearchPart(facturaSearch),
+      ]),
+    );
   };
 
   useEffect(() => {
@@ -154,6 +282,7 @@ export default function ContabilidadPage() {
       .finally(() => setLoadingFacturas(false));
     apiFetch<ProveedorResponse[]>("/api/proveedores", {}, session.token).then(setProveedores);
     apiFetch<ComedorResponse[]>("/api/comedor", {}, session.token).then(setComedores);
+    apiFetch<PuntoDeVentaResponse[]>("/api/puntodeventa", {}, session.token).then(setPuntosDeVenta);
   }, [session]);
 
   const handleError = (err: unknown) => {
@@ -246,11 +375,15 @@ export default function ContabilidadPage() {
       <main className="mx-auto max-w-7xl px-6 py-10 space-y-6">
 
         {!loadingCierres && !loadingFacturas && (
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
             <div className="rounded-xl bg-white shadow-sm px-5 py-4">
               <p className="text-xs font-medium uppercase tracking-wide text-gray-400">Monto Ventas</p>
               <p className="mt-1 text-2xl font-bold tabular-nums text-emerald-600">{formatCurrency(montoVentas)}</p>
             </div>
+            {/* <div className="rounded-xl bg-white shadow-sm px-5 py-4">
+              <p className="text-xs font-medium uppercase tracking-wide text-gray-400">Ventas Banco</p>
+              <p className="mt-1 text-2xl font-bold tabular-nums text-sky-600">{formatCurrency(ventasBanco)}</p>
+            </div> */}
             <div className="rounded-xl bg-white shadow-sm px-5 py-4">
               <p className="text-xs font-medium uppercase tracking-wide text-gray-400">Monto Compras</p>
               <p className="mt-1 text-2xl font-bold tabular-nums text-red-500">{formatCurrency(montoCompras)}</p>
@@ -264,7 +397,7 @@ export default function ContabilidadPage() {
           </div>
         )}
 
-        <div className="flex justify-start">
+        <div className="flex justify-start gap-2">
           <Button
             variant="outline"
             size="sm"
@@ -274,21 +407,46 @@ export default function ContabilidadPage() {
             <Truck className="h-4 w-4" />
             Proveedores
           </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => router.push("/contabilidad/importaciones")}
+            className="gap-2 border-gray-200 text-sm font-semibold"
+          >
+            <FileSpreadsheet className="h-4 w-4" />
+            Importaciones
+          </Button>
         </div>
 
         <Card className="border-0 shadow-md rounded-xl">
           <CardHeader className="border-b px-6 py-4 space-y-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-xl font-bold text-gray-800">Contabilidad</CardTitle>
-              <div className="flex items-center gap-1 rounded-lg border border-gray-200 bg-gray-50 p-1">
-                {(["cierres", "compras"] as View[]).map((v) => (
-                  <button key={v} onClick={() => setView(v)}
-                    className={cn("rounded-md px-2.5 py-1 text-xs font-medium transition-all",
-                      view === v ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-700"
-                    )}>
-                    {v === "cierres" ? "Cierres" : "Compras"}
-                  </button>
-                ))}
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1 rounded-lg border border-gray-200 bg-gray-50 p-1">
+                  {(["cierres", "compras"] as View[]).map((v) => (
+                    <button key={v} onClick={() => setView(v)}
+                      className={cn("rounded-md px-2.5 py-1 text-xs font-medium transition-all",
+                        view === v ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-700"
+                      )}>
+                      {v === "cierres" ? "Cierres" : "Compras"}
+                    </button>
+                  ))}
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleExportCurrentView}
+                  disabled={
+                    view === "cierres"
+                      ? loadingCierres || displayedCierres.length === 0
+                      : loadingFacturas || displayedFacturas.length === 0
+                  }
+                  className="gap-2 bg-black text-white hover:bg-black/90"
+                >
+                  <Download className="h-4 w-4" />
+                  Descargar Excel
+                </Button>
               </div>
             </div>
             <div className="flex flex-wrap items-center gap-2">
@@ -326,7 +484,10 @@ export default function ContabilidadPage() {
                 comedorFilter={comedorFilter}
                 onComedorFilterChange={setComedorFilter}
                 onClearFilters={clearFilters}
-                onEditar={(id) => router.push(`/contabilidad/editar-cierre?id=${id}`)}
+                onEditar={(id) => {
+                  const found = cierres.find((c) => c.id === id);
+                  if (found) setEditarCierreModal(found);
+                }}
                 onAnular={(cierre) => setAnularCierreModal({
                   open: true, cierreId: cierre.id,
                   fechaOperacion: cierre.fechaOperacion, puntoVenta: cierre.puntoDeVenta.nombre,
@@ -336,12 +497,23 @@ export default function ContabilidadPage() {
             {view === "compras" && (
               <FacturasTable
                 facturas={facturas}
+                displayedFacturas={displayedFacturas}
                 proveedores={proveedores}
                 loading={loadingFacturas}
+                comedorNameById={comedorNameById}
                 dateDesde={dateDesde}
                 dateHasta={dateHasta}
                 comedorIdFilter={comedorIdFilter}
-                onNuevaFactura={() => setNuevaFacturaOpen(true)}
+                search={facturaSearch}
+                onSearchChange={setFacturaSearch}
+                statusFilter={facturaStatusFilter}
+                onStatusFilterChange={setFacturaStatusFilter}
+                sortKey={facturaSortKey}
+                sortDir={facturaSortDir}
+                onSort={(key) => {
+                  if (key === facturaSortKey) setFacturaSortDir((direction) => (direction === "asc" ? "desc" : "asc"));
+                  else { setFacturaSortKey(key); setFacturaSortDir("asc"); }
+                }}
                 onEmitir={setEmitirFactura}
                 onPagar={setPagarFactura}
                 onEditar={setEditarFactura}
@@ -361,6 +533,19 @@ export default function ContabilidadPage() {
           fechaOperacion={anularCierreModal.fechaOperacion}
           puntoVenta={anularCierreModal.puntoVenta}
           onConfirm={handleAnularCierre}
+        />
+      )}
+
+      {editarCierreModal && (
+        <EditarCierreModal
+          open={!!editarCierreModal}
+          onClose={() => setEditarCierreModal(null)}
+          cierre={editarCierreModal}
+          comedores={comedores}
+          puntosDeVenta={puntosDeVenta}
+          onSuccess={() => {
+            apiFetch<DetailedCierreCajaResponse[]>("/api/cierre/detailed", {}, session!.token).then(setCierres);
+          }}
         />
       )}
 
