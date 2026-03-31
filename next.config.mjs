@@ -1,4 +1,6 @@
 /** @type {import('next').NextConfig} */
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
+
 const nextConfig = {
   ...(process.env.NODE_ENV === "production" ? { output: "export" } : {}),
   typescript: {
@@ -7,6 +9,8 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  basePath,
+  assetPrefix: basePath ? `${basePath}/` : undefined,
 };
 
 export default nextConfig;
