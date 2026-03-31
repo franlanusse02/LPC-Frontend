@@ -18,11 +18,15 @@ import { ComedorResponse } from "@/models/dto/comedor/ComedorResponse";
 import { CreateFacturaProveedorRequest } from "@/models/dto/compra/CreateFacturaProveedorRequest";
 import { CierresTable } from "@/components/cierres-table";
 import { FacturasTable } from "@/components/facturas-table";
+import { EventosTable, EventoSortKey, EventoSortDir, EventoStatusFilter } from "@/components/eventos-table";
 import { NuevaFacturaModal } from "@/components/nueva-factura-modal";
 import { NuevoCierreModal } from "@/components/nuevo-cierre-modal";
+import { NuevoEventoModal } from "@/components/nuevo-evento-modal";
 import { PuntoDeVentaResponse } from "@/models/dto/pto-venta/PuntoDeVentaResponse";
+import { EventoResponse } from "@/models/dto/evento/EventoResponse";
+import { CreateEventoRequest } from "@/models/dto/evento/CreateEventoRequest";
 
-type View = "cierres" | "compras";
+type View = "cierres" | "compras" | "eventos";
 
 export default function EncargadoPage() {
   const router = useRouter();
@@ -53,10 +57,49 @@ export default function EncargadoPage() {
   const [nuevaFacturaOpen, setNuevaFacturaOpen] = useState(false);
   const [nuevoCierreOpen, setNuevoCierreOpen] = useState(false);
 
+  // eventos
+  const [eventos, setEventos] = useState<EventoResponse[]>([]);
+  const [loadingEventos, setLoadingEventos] = useState(true);
+  const [nuevoEventoOpen, setNuevoEventoOpen] = useState(false);
+  const [eventoSearch, setEventoSearch] = useState("");
+  const [eventoStatusFilter, setEventoStatusFilter] = useState<EventoStatusFilter>("all");
+  const [eventoSortKey, setEventoSortKey] = useState<EventoSortKey>("fechaEvento");
+  const [eventoSortDir, setEventoSortDir] = useState<EventoSortDir>("desc");
+
   const comedorIdFilter = useMemo(
     () => comedores.find((c) => c.nombre === comedorFilter)?.id ?? null,
     [comedores, comedorFilter],
   );
+
+  const comedorNameById = useMemo(
+    () => Object.fromEntries(comedores.map((c) => [c.id, c.nombre])),
+    [comedores],
+  );
+
+  const displayedEventos = useMemo(() => {
+    let list = [...eventos];
+    if (eventoStatusFilter !== "all") list = list.filter((e) => e.estado === eventoStatusFilter);
+    if (eventoSearch.trim()) {
+      const q = eventoSearch.trim().toLowerCase();
+      list = list.filter((e) =>
+        (comedorNameById[e.comedorId] ?? "").toLowerCase().includes(q) ||
+        (e.solicitante ?? "").toLowerCase().includes(q) ||
+        e.fechaEvento.includes(q),
+      );
+    }
+    list.sort((a, b) => {
+      let av: string | number = "";
+      let bv: string | number = "";
+      if (eventoSortKey === "fechaEvento") { av = a.fechaEvento; bv = b.fechaEvento; }
+      if (eventoSortKey === "comedor") { av = comedorNameById[a.comedorId] ?? ""; bv = comedorNameById[b.comedorId] ?? ""; }
+      if (eventoSortKey === "montoTotal") { av = a.montoTotal ?? 0; bv = b.montoTotal ?? 0; }
+      if (eventoSortKey === "estado") { av = a.estado; bv = b.estado; }
+      if (av < bv) return eventoSortDir === "asc" ? -1 : 1;
+      if (av > bv) return eventoSortDir === "asc" ? 1 : -1;
+      return 0;
+    });
+    return list;
+  }, [eventos, eventoStatusFilter, eventoSearch, eventoSortKey, eventoSortDir, comedorNameById]);
 
   const comedorOptions = useMemo(
     () => [...new Set([
@@ -102,6 +145,28 @@ export default function EncargadoPage() {
   const clearFilters = () => {
     setDateDesde(""); setDateHasta(""); setComedorFilter("");
     setSearch(""); setStatusFilter("active");
+    setEventoSearch(""); setEventoStatusFilter("all");
+  };
+
+  const handleNuevoEvento = async (req: CreateEventoRequest) => {
+    if (!session) return;
+    try {
+      const nuevo = await apiFetch<EventoResponse>(
+        "/api/eventos",
+        { method: "POST", body: JSON.stringify(req) },
+        session.token,
+      );
+      setEventos((prev) => [nuevo, ...prev]);
+      toast({ title: "Evento creado" });
+    } catch (err) {
+      if (ApiError.isUnauthorized(err)) { logout(); router.replace("/login"); return; }
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: err instanceof ApiError ? err.message : "No se pudo crear el evento.",
+      });
+      throw err;
+    }
   };
 
   useEffect(() => {
@@ -122,6 +187,10 @@ export default function EncargadoPage() {
     apiFetch<ProveedorResponse[]>("/api/proveedores", {}, session.token).then(setProveedores);
     apiFetch<ComedorResponse[]>("/api/comedor", {}, session.token).then(setComedores);
     apiFetch<PuntoDeVentaResponse[]>("/api/puntodeventa", {}, session.token).then(setPuntosDeVenta);
+    apiFetch<EventoResponse[]>("/api/eventos/mis-eventos", {}, session.token)
+      .then(setEventos)
+      .catch(() => setEventos([]))
+      .finally(() => setLoadingEventos(false));
   }, [session]);
 
   const handleNuevaFactura = async (req: CreateFacturaProveedorRequest) => {
@@ -163,16 +232,16 @@ export default function EncargadoPage() {
           <CardHeader className="border-b px-6 py-4 space-y-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-xl font-bold text-gray-800">
-                {view === "cierres" ? "Tus Cierres" : "Tus Compras"}
+                {view === "cierres" ? "Tus Cierres" : view === "compras" ? "Tus Compras" : "Tus Eventos"}
               </CardTitle>
               <div className="flex items-center gap-1 rounded-lg border border-gray-200 bg-gray-50 p-1">
-                {(["cierres", "compras"] as View[]).map((v) => (
+                {(["cierres", "compras", "eventos"] as View[]).map((v) => (
                   <button key={v} onClick={() => setView(v)}
                     className={cn(
                       "rounded-md px-2.5 py-1 text-xs font-medium transition-all",
                       view === v ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-700",
                     )}>
-                    {v === "cierres" ? "Cierres" : "Compras"}
+                    {v === "cierres" ? "Cierres" : v === "compras" ? "Compras" : "Eventos"}
                   </button>
                 ))}
               </div>
@@ -230,6 +299,27 @@ export default function EncargadoPage() {
                 onClearFilters={clearFilters}
               />
             )}
+            {view === "eventos" && (
+              <EventosTable
+                eventos={eventos}
+                displayedEventos={displayedEventos}
+                comedorNameById={comedorNameById}
+                loading={loadingEventos}
+                readonly
+                search={eventoSearch}
+                onSearchChange={setEventoSearch}
+                statusFilter={eventoStatusFilter}
+                onStatusFilterChange={setEventoStatusFilter}
+                sortKey={eventoSortKey}
+                sortDir={eventoSortDir}
+                onSort={(key) => {
+                  if (key === eventoSortKey) setEventoSortDir((d) => (d === "asc" ? "desc" : "asc"));
+                  else { setEventoSortKey(key); setEventoSortDir("asc"); }
+                }}
+                onNuevoEvento={() => setNuevoEventoOpen(true)}
+                onClearFilters={clearFilters}
+              />
+            )}
           </CardContent>
         </Card>
       </main>
@@ -250,6 +340,13 @@ export default function EncargadoPage() {
         onSuccess={() => {
           apiFetch<DetailedCierreCajaResponse[]>("/api/cierre", {}, session!.token).then(setCierres);
         }}
+      />
+
+      <NuevoEventoModal
+        open={nuevoEventoOpen}
+        onClose={() => setNuevoEventoOpen(false)}
+        comedores={comedores}
+        onConfirm={handleNuevoEvento}
       />
     </div>
   );

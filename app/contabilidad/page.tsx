@@ -17,6 +17,7 @@ import { FacturaProveedorResponse } from "@/models/dto/compra/FacturaProveedorRe
 import { ProveedorResponse } from "@/models/dto/proveedor/ProveedorResponse";
 import { ComedorResponse } from "@/models/dto/comedor/ComedorResponse";
 import { PuntoDeVentaResponse } from "@/models/dto/pto-venta/PuntoDeVentaResponse";
+import { SociedadResponse } from "@/models/dto/sociedad/SociedadResponse";
 import { CreateFacturaProveedorRequest } from "@/models/dto/compra/CreateFacturaProveedorRequest";
 import { PatchFacturaProveedorRequest } from "@/models/dto/compra/PatchFacturaProveedorRequest";
 import { AnularCierreModal } from "@/components/anular-cierre-modal";
@@ -31,8 +32,13 @@ import { AnularFacturaModal } from "@/components/anular-factura-modal";
 import { EstadoFacturaLabel } from "@/models/enums/EstadoFactura";
 import { buildExportFilename, exportRowsToXlsx, formatIsoDateForFilename } from "@/lib/export-xlsx";
 import { Download, FileSpreadsheet, Truck } from "lucide-react";
+import { Combobox } from "@/components/ui/combobox";
+import { EventoResponse } from "@/models/dto/evento/EventoResponse";
+import { EstadoEventoLabel } from "@/models/enums/EstadoEvento";
+import { EventoSortDir, EventoSortKey, EventoStatusFilter, EventosTable } from "@/components/eventos-table";
+import { AnularEventoModal } from "@/components/anular-evento-modal";
 
-type View = "cierres" | "compras";
+type View = "cierres" | "compras" | "eventos";
 type PageResponse<T> = { content: T[] };
 
 const formatCurrency = (n: number) =>
@@ -63,6 +69,7 @@ export default function ContabilidadPage() {
   const [dateDesde, setDateDesde] = useState("");
   const [dateHasta, setDateHasta] = useState("");
   const [comedorFilter, setComedorFilter] = useState("");
+  const [sociedadFilter, setSociedadFilter] = useState("");
 
   // cierres
   const [cierres, setCierres] = useState<DetailedCierreCajaResponse[]>([]);
@@ -82,6 +89,7 @@ export default function ContabilidadPage() {
   const [loadingFacturas, setLoadingFacturas] = useState(true);
   const [proveedores, setProveedores] = useState<ProveedorResponse[]>([]);
   const [comedores, setComedores] = useState<ComedorResponse[]>([]);
+  const [sociedades, setSociedades] = useState<SociedadResponse[]>([]);
   const [nuevaFacturaOpen, setNuevaFacturaOpen] = useState(false);
   const [emitirFactura, setEmitirFactura] = useState<FacturaProveedorResponse | null>(null);
   const [pagarFactura, setPagarFactura] = useState<FacturaProveedorResponse | null>(null);
@@ -91,6 +99,32 @@ export default function ContabilidadPage() {
   const [facturaStatusFilter, setFacturaStatusFilter] = useState<FacturaStatusFilter>("all");
   const [facturaSortKey, setFacturaSortKey] = useState<FacturaSortKey>("fechaFactura");
   const [facturaSortDir, setFacturaSortDir] = useState<FacturaSortDir>("desc");
+
+  // eventos
+  const [eventos, setEventos] = useState<EventoResponse[]>([]);
+  const [loadingEventos, setLoadingEventos] = useState(true);
+  const [eventoSearch, setEventoSearch] = useState("");
+  const [eventoStatusFilter, setEventoStatusFilter] = useState<EventoStatusFilter>("all");
+  const [eventoSortKey, setEventoSortKey] = useState<EventoSortKey>("fechaEvento");
+  const [eventoSortDir, setEventoSortDir] = useState<EventoSortDir>("desc");
+  const [editarEvento, setEditarEvento] = useState<EventoResponse | null>(null);
+  const [anularEvento, setAnularEvento] = useState<EventoResponse | null>(null);
+
+  // sociedad → comedor filtering helpers
+  const comedoresDeSociedad = useMemo(() => {
+    if (!sociedadFilter) return comedores;
+    return comedores.filter((c) => c.sociedadId === Number(sociedadFilter));
+  }, [comedores, sociedadFilter]);
+
+  const comedorIdsDeSociedad = useMemo(
+    () => new Set(comedoresDeSociedad.map((c) => c.id)),
+    [comedoresDeSociedad],
+  );
+
+  const comedorNamesDeSociedad = useMemo(
+    () => new Set(comedoresDeSociedad.map((c) => c.nombre)),
+    [comedoresDeSociedad],
+  );
 
   const comedorIdFilter = useMemo(
     () => comedores.find((c) => c.nombre === comedorFilter)?.id ?? null,
@@ -109,10 +143,17 @@ export default function ContabilidadPage() {
 
   const comedorOptions = useMemo(
     () => [...new Set([
-      ...cierres.map((c) => c.comedor.nombre),
-      ...comedores.map((c) => c.nombre),
+      ...cierres
+        .filter((c) => !sociedadFilter || comedorNamesDeSociedad.has(c.comedor.nombre))
+        .map((c) => c.comedor.nombre),
+      ...comedoresDeSociedad.map((c) => c.nombre),
     ])].sort(),
-    [cierres, comedores],
+    [cierres, comedoresDeSociedad, comedorNamesDeSociedad, sociedadFilter],
+  );
+
+  const sociedadOptions = useMemo(
+    () => [...sociedades].sort((a, b) => a.nombre.localeCompare(b.nombre)),
+    [sociedades],
   );
 
   const displayedCierres = useMemo(() => {
@@ -120,6 +161,7 @@ export default function ContabilidadPage() {
     if (statusFilter === "active") list = list.filter((c) => c.anulacionId === null);
     if (statusFilter === "anulado") list = list.filter((c) => c.anulacionId !== null);
     if (comedorFilter) list = list.filter((c) => c.comedor.nombre === comedorFilter);
+    else if (sociedadFilter) list = list.filter((c) => comedorNamesDeSociedad.has(c.comedor.nombre));
     if (dateDesde) list = list.filter((c) => c.fechaOperacion >= dateDesde);
     if (dateHasta) list = list.filter((c) => c.fechaOperacion <= dateHasta);
     if (search.trim()) {
@@ -146,36 +188,73 @@ export default function ContabilidadPage() {
       return 0;
     });
     return list;
-  }, [cierres, statusFilter, comedorFilter, dateDesde, dateHasta, search, sortKey, sortDir]);
+  }, [cierres, statusFilter, comedorFilter, sociedadFilter, comedorNamesDeSociedad, dateDesde, dateHasta, search, sortKey, sortDir]);
 
   const montoVentas = useMemo(() => {
     let list = cierres.filter((c) => c.anulacionId === null);
     if (dateDesde) list = list.filter((c) => c.fechaOperacion >= dateDesde);
     if (dateHasta) list = list.filter((c) => c.fechaOperacion <= dateHasta);
     if (comedorFilter) list = list.filter((c) => c.comedor.nombre === comedorFilter);
+    else if (sociedadFilter) list = list.filter((c) => comedorNamesDeSociedad.has(c.comedor.nombre));
     return list.reduce((s, c) => s + c.montoTotal, 0);
-  }, [cierres, dateDesde, dateHasta, comedorFilter]);
-
-  const ventasBanco = useMemo(() => {
-    if (!montoVentas) return 0;
-    return montoVentas / 0.72 - montoVentas;
-  }, [montoVentas]);
+  }, [cierres, dateDesde, dateHasta, comedorFilter, sociedadFilter, comedorNamesDeSociedad]);
 
   const montoCompras = useMemo(() => {
     let list = facturas.filter((f) => f.estado !== "ANULADA");
     if (dateDesde) list = list.filter((f) => f.fechaFactura >= dateDesde);
     if (dateHasta) list = list.filter((f) => f.fechaFactura <= dateHasta);
     if (comedorIdFilter !== null) list = list.filter((f) => f.comedorId === comedorIdFilter);
+    else if (sociedadFilter) list = list.filter((f) => comedorIdsDeSociedad.has(f.comedorId));
     return list.reduce((s, f) => s + f.monto, 0);
-  }, [facturas, dateDesde, dateHasta, comedorIdFilter]);
+  }, [facturas, dateDesde, dateHasta, comedorIdFilter, sociedadFilter, comedorIdsDeSociedad]);
 
-  const balance = montoVentas - montoCompras;
+  const montoEventos = useMemo(() => {
+    let list = eventos.filter((e) => e.estado !== "ANULADO");
+    if (dateDesde) list = list.filter((e) => e.fechaEvento >= dateDesde);
+    if (dateHasta) list = list.filter((e) => e.fechaEvento <= dateHasta);
+    if (comedorIdFilter !== null) list = list.filter((e) => e.comedorId === comedorIdFilter);
+    else if (sociedadFilter) list = list.filter((e) => comedorIdsDeSociedad.has(e.comedorId));
+    return list.reduce((s, e) => s + (e.montoTotal ?? 0), 0);
+  }, [eventos, dateDesde, dateHasta, comedorIdFilter, sociedadFilter, comedorIdsDeSociedad]);
+
+  const displayedEventos = useMemo(() => {
+    let list = [...eventos];
+    if (dateDesde) list = list.filter((e) => e.fechaEvento >= dateDesde);
+    if (dateHasta) list = list.filter((e) => e.fechaEvento <= dateHasta);
+    if (comedorIdFilter !== null) list = list.filter((e) => e.comedorId === comedorIdFilter);
+    else if (sociedadFilter) list = list.filter((e) => comedorIdsDeSociedad.has(e.comedorId));
+    if (eventoStatusFilter !== "all") list = list.filter((e) => e.estado === eventoStatusFilter);
+    if (eventoSearch.trim()) {
+      const q = eventoSearch.trim().toLowerCase();
+      list = list.filter((e) =>
+        (comedorNameById[e.comedorId] ?? "").toLowerCase().includes(q) ||
+        (e.solicitante ?? "").toLowerCase().includes(q) ||
+        (e.tipoEventoNombre ?? "").toLowerCase().includes(q) ||
+        e.fechaEvento.includes(q),
+      );
+    }
+    list.sort((a, b) => {
+      let av: string | number = "";
+      let bv: string | number = "";
+      if (eventoSortKey === "fechaEvento") { av = a.fechaEvento; bv = b.fechaEvento; }
+      if (eventoSortKey === "comedor") { av = comedorNameById[a.comedorId] ?? ""; bv = comedorNameById[b.comedorId] ?? ""; }
+      if (eventoSortKey === "montoTotal") { av = a.montoTotal ?? 0; bv = b.montoTotal ?? 0; }
+      if (eventoSortKey === "estado") { av = a.estado; bv = b.estado; }
+      if (av < bv) return eventoSortDir === "asc" ? -1 : 1;
+      if (av > bv) return eventoSortDir === "asc" ? 1 : -1;
+      return 0;
+    });
+    return list;
+  }, [eventos, dateDesde, dateHasta, comedorIdFilter, sociedadFilter, comedorIdsDeSociedad, eventoStatusFilter, eventoSearch, eventoSortKey, eventoSortDir, comedorNameById]);
+
+  const balance = montoVentas + montoEventos - montoCompras;
 
   const displayedFacturas = useMemo(() => {
     let list = [...facturas];
     if (dateDesde) list = list.filter((factura) => factura.fechaFactura >= dateDesde);
     if (dateHasta) list = list.filter((factura) => factura.fechaFactura <= dateHasta);
     if (comedorIdFilter !== null) list = list.filter((factura) => factura.comedorId === comedorIdFilter);
+    else if (sociedadFilter) list = list.filter((factura) => comedorIdsDeSociedad.has(factura.comedorId));
     if (facturaStatusFilter !== "all") list = list.filter((factura) => factura.estado === facturaStatusFilter);
     if (facturaSearch.trim()) {
       const query = facturaSearch.trim().toLowerCase();
@@ -209,12 +288,15 @@ export default function ContabilidadPage() {
     facturaStatusFilter,
     facturas,
     proveedorNameById,
+    sociedadFilter,
+    comedorIdsDeSociedad,
   ]);
 
   const clearFilters = () => {
-    setDateDesde(""); setDateHasta(""); setComedorFilter("");
+    setDateDesde(""); setDateHasta(""); setComedorFilter(""); setSociedadFilter("");
     setSearch(""); setStatusFilter("active");
     setFacturaSearch(""); setFacturaStatusFilter("all");
+    setEventoSearch(""); setEventoStatusFilter("all");
   };
 
   const handleExportCurrentView = () => {
@@ -241,26 +323,67 @@ export default function ContabilidadPage() {
       return;
     }
 
+    if (view === "compras") {
+      exportRowsToXlsx(
+        displayedFacturas.map((factura) => ({
+          "Fecha factura": factura.fechaFactura,
+          Número: factura.numero,
+          Proveedor: proveedorNameById[factura.proveedorId] ?? String(factura.proveedorId),
+          Comedor: comedorNameById[factura.comedorId] ?? String(factura.comedorId),
+          Monto: factura.monto,
+          Estado: EstadoFacturaLabel[factura.estado],
+          "Fecha emisión": factura.fechaEmision ?? "",
+          "Fecha pago": factura.fechaPago ?? "",
+          "Número operación": factura.numeroOperacion ?? "",
+          "Medio de pago": factura.medioPago ?? "",
+          Banco: factura.bancoNombre ?? "",
+        })),
+        "Compras",
+        buildExportFilename("compras", [
+          comedorFilter,
+          buildDateRangePart(dateDesde, dateHasta),
+          facturaStatusFilter !== "all" ? EstadoFacturaLabel[facturaStatusFilter] : null,
+          buildSearchPart(facturaSearch),
+        ]),
+      );
+      return;
+    }
+
+    // view === "eventos"
     exportRowsToXlsx(
-      displayedFacturas.map((factura) => ({
-        "Fecha factura": factura.fechaFactura,
-        Número: factura.numero,
-        Proveedor: proveedorNameById[factura.proveedorId] ?? String(factura.proveedorId),
-        Comedor: comedorNameById[factura.comedorId] ?? String(factura.comedorId),
-        Monto: factura.monto,
-        Estado: EstadoFacturaLabel[factura.estado],
-        "Fecha emisión": factura.fechaEmision ?? "",
-        "Fecha pago": factura.fechaPago ?? "",
-        "Número operación": factura.numeroOperacion ?? "",
-        "Medio de pago": factura.medioPago ?? "",
-        Banco: factura.bancoNombre ?? "",
+      displayedEventos.map((e) => ({
+        Fecha: e.fechaEvento,
+        Comedor: comedorNameById[e.comedorId] ?? String(e.comedorId),
+        "Tipo de evento": e.tipoEventoNombre ?? "",
+        Solicitante: e.solicitante ?? "",
+        "Cantidad personas": e.cantidadPersonas ?? "",
+        "Monto total": e.montoTotal ?? "",
+        Estado: EstadoEventoLabel[e.estado],
+        "Centro de costo": e.centroCosto ?? "",
+        Edificio: e.edificio ?? "",
+        Sala: e.sala ?? "",
+        Funcionario: e.funcionario ?? "",
+        Oficina: e.oficina ?? "",
+        Responsable: e.responsable ?? "",
+        Empresa: e.empresa ?? "",
+        "Dest. facturación": e.destinatarioFactura ?? "",
+        Área: e.area ?? "",
+        "Email solicitante": e.emailSolicitante ?? "",
+        Lugar: e.lugar ?? "",
+        "Medio de pago": e.medioPago ?? "",
+        "Nro. operación": e.numeroOperacion ?? "",
+        "Nro. orden/pedido": e.numeroOrden ?? "",
+        Concepto: e.concepto ?? "",
+        "Tipo comprobante": e.tipoComprobante ?? "",
+        "Nro. comprobante": e.numeroComprobante ?? "",
+        "Factura PDF": e.facturaPdfNombre ?? "",
       })),
-      "Compras",
-      buildExportFilename("compras", [
+      "Eventos",
+      buildExportFilename("eventos", [
         comedorFilter,
         buildDateRangePart(dateDesde, dateHasta),
-        facturaStatusFilter !== "all" ? EstadoFacturaLabel[facturaStatusFilter] : null,
-        buildSearchPart(facturaSearch),
+        eventoStatusFilter !== "all" ? EstadoEventoLabel[eventoStatusFilter] : null,
+        buildSearchPart(eventoSearch),
       ]),
     );
   };
@@ -283,6 +406,11 @@ export default function ContabilidadPage() {
     apiFetch<ProveedorResponse[]>("/api/proveedores", {}, session.token).then(setProveedores);
     apiFetch<ComedorResponse[]>("/api/comedor", {}, session.token).then(setComedores);
     apiFetch<PuntoDeVentaResponse[]>("/api/puntodeventa", {}, session.token).then(setPuntosDeVenta);
+    apiFetch<SociedadResponse[]>("/api/sociedad", {}, session.token).then(setSociedades);
+    apiFetch<EventoResponse[]>("/api/eventos", {}, session.token)
+      .then(setEventos)
+      .catch(() => {})
+      .finally(() => setLoadingEventos(false));
   }, [session]);
 
   const handleError = (err: unknown) => {
@@ -349,6 +477,16 @@ export default function ContabilidadPage() {
     } catch (err) { handleError(err); throw err; }
   };
 
+  const handleAnularEvento = async (eventoId: number, motivo: string) => {
+    if (!session) return;
+    try {
+      const updated = await apiFetch<EventoResponse>(`/api/eventos/${eventoId}/anular`,
+        { method: "PATCH", body: JSON.stringify({ motivo }) }, session.token);
+      setEventos((prev) => prev.map((e) => e.id === eventoId ? updated : e));
+      toast({ title: "Evento anulado" });
+    } catch (err) { handleError(err); throw err; }
+  };
+
   const handleAnularFactura = async (facturaId: number, motivo: string) => {
     if (!session) return;
     try {
@@ -375,15 +513,15 @@ export default function ContabilidadPage() {
       <main className="mx-auto max-w-7xl px-6 py-10 space-y-6">
 
         {!loadingCierres && !loadingFacturas && (
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
             <div className="rounded-xl bg-white shadow-sm px-5 py-4">
               <p className="text-xs font-medium uppercase tracking-wide text-gray-400">Monto Ventas</p>
               <p className="mt-1 text-2xl font-bold tabular-nums text-emerald-600">{formatCurrency(montoVentas)}</p>
             </div>
-            {/* <div className="rounded-xl bg-white shadow-sm px-5 py-4">
-              <p className="text-xs font-medium uppercase tracking-wide text-gray-400">Ventas Banco</p>
-              <p className="mt-1 text-2xl font-bold tabular-nums text-sky-600">{formatCurrency(ventasBanco)}</p>
-            </div> */}
+            <div className="rounded-xl bg-white shadow-sm px-5 py-4">
+              <p className="text-xs font-medium uppercase tracking-wide text-gray-400">Monto Eventos</p>
+              <p className="mt-1 text-2xl font-bold tabular-nums text-violet-600">{formatCurrency(montoEventos)}</p>
+            </div>
             <div className="rounded-xl bg-white shadow-sm px-5 py-4">
               <p className="text-xs font-medium uppercase tracking-wide text-gray-400">Monto Compras</p>
               <p className="mt-1 text-2xl font-bold tabular-nums text-red-500">{formatCurrency(montoCompras)}</p>
@@ -424,12 +562,12 @@ export default function ContabilidadPage() {
               <CardTitle className="text-xl font-bold text-gray-800">Contabilidad</CardTitle>
               <div className="flex items-center gap-2">
                 <div className="flex items-center gap-1 rounded-lg border border-gray-200 bg-gray-50 p-1">
-                  {(["cierres", "compras"] as View[]).map((v) => (
+                  {(["cierres", "compras", "eventos"] as View[]).map((v) => (
                     <button key={v} onClick={() => setView(v)}
                       className={cn("rounded-md px-2.5 py-1 text-xs font-medium transition-all",
                         view === v ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-700"
                       )}>
-                      {v === "cierres" ? "Cierres" : "Compras"}
+                      {v === "cierres" ? "Cierres" : v === "compras" ? "Compras" : "Eventos"}
                     </button>
                   ))}
                 </div>
@@ -440,7 +578,9 @@ export default function ContabilidadPage() {
                   disabled={
                     view === "cierres"
                       ? loadingCierres || displayedCierres.length === 0
-                      : loadingFacturas || displayedFacturas.length === 0
+                      : view === "compras"
+                        ? loadingFacturas || displayedFacturas.length === 0
+                        : loadingEventos || displayedEventos.length === 0
                   }
                   className="gap-2 bg-black text-white hover:bg-black/90"
                 >
@@ -457,11 +597,22 @@ export default function ContabilidadPage() {
                 <Input type="date" value={dateHasta} onChange={(e) => setDateHasta(e.target.value)}
                   className="h-8 w-36 text-sm bg-gray-50 border-gray-200" />
               </div>
-              <select value={comedorFilter} onChange={(e) => setComedorFilter(e.target.value)}
-                className="h-8 min-w-48 rounded-md border border-gray-200 bg-gray-50 px-2 text-sm text-gray-600">
-                <option value="">Todos los comedores</option>
-                {comedorOptions.map((n) => <option key={n} value={n}>{n}</option>)}
-              </select>
+              {sociedadOptions.length > 0 && (
+                <Combobox
+                  options={sociedadOptions.map((s) => ({ value: String(s.id), label: s.nombre }))}
+                  value={sociedadFilter}
+                  onChange={(v) => { setSociedadFilter(v); setComedorFilter(""); }}
+                  placeholder="Todas las sociedades"
+                  className="h-8 w-auto min-w-44 text-sm bg-gray-50 border-gray-200"
+                />
+              )}
+              <Combobox
+                options={comedorOptions.map((n) => ({ value: n, label: n }))}
+                value={comedorFilter}
+                onChange={setComedorFilter}
+                placeholder="Todos los comedores"
+                className="h-8 w-auto min-w-48 text-sm bg-gray-50 border-gray-200"
+              />
             </div>
           </CardHeader>
 
@@ -521,6 +672,27 @@ export default function ContabilidadPage() {
                 onClearFilters={clearFilters}
               />
             )}
+            {view === "eventos" && (
+              <EventosTable
+                eventos={eventos}
+                displayedEventos={displayedEventos}
+                comedorNameById={comedorNameById}
+                loading={loadingEventos}
+                search={eventoSearch}
+                onSearchChange={setEventoSearch}
+                statusFilter={eventoStatusFilter}
+                onStatusFilterChange={setEventoStatusFilter}
+                sortKey={eventoSortKey}
+                sortDir={eventoSortDir}
+                onSort={(key) => {
+                  if (key === eventoSortKey) setEventoSortDir((d) => (d === "asc" ? "desc" : "asc"));
+                  else { setEventoSortKey(key); setEventoSortDir("asc"); }
+                }}
+                onEditar={setEditarEvento}
+                onAnular={setAnularEvento}
+                onClearFilters={clearFilters}
+              />
+            )}
           </CardContent>
         </Card>
       </main>
@@ -568,6 +740,16 @@ export default function ContabilidadPage() {
       {anularFactura && (
         <AnularFacturaModal open={!!anularFactura} onClose={() => setAnularFactura(null)}
           facturaId={anularFactura.id} numeroFactura={anularFactura.numero} onConfirm={handleAnularFactura} />
+      )}
+      {anularEvento && (
+        <AnularEventoModal
+          open={!!anularEvento}
+          onClose={() => setAnularEvento(null)}
+          eventoId={anularEvento.id}
+          fechaEvento={anularEvento.fechaEvento}
+          comedorNombre={comedorNameById[anularEvento.comedorId] ?? String(anularEvento.comedorId)}
+          onConfirm={handleAnularEvento}
+        />
       )}
     </div>
   );

@@ -103,11 +103,6 @@ export function CierresTable({
 }: CierresTableProps) {
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
 
-  const comedorOptions = useMemo(
-    () => [...new Set(cierres.map((c) => c.comedor.nombre))].sort(),
-    [cierres],
-  );
-
   const hasActiveFilters =
     search || statusFilter !== "all" || comedorFilter;
 
@@ -171,21 +166,6 @@ export function CierresTable({
             </button>
           ))}
         </div>
-
-        {comedorOptions.length > 1 && (
-          <select
-            value={comedorFilter}
-            onChange={(e) => onComedorFilterChange(e.target.value)}
-            className="h-8 rounded-md border border-gray-200 bg-gray-50 px-2 text-sm text-gray-600"
-          >
-            <option value="">Todos los comedores</option>
-            {comedorOptions.map((n) => (
-              <option key={n} value={n}>
-                {n}
-              </option>
-            ))}
-          </select>
-        )}
 
         {readonly && (
           onNuevoCierre ? (

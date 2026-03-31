@@ -21,6 +21,9 @@ import {
   Building2,
   Truck,
   Landmark,
+  Tag,
+  Building,
+  DoorOpen,
 } from "lucide-react";
 
 export default function HomePage() {
@@ -161,6 +164,42 @@ export default function HomePage() {
               </div>
               <span className="text-center text-xs font-medium leading-tight text-gray-700">
                 Bancos
+              </span>
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => router.push("/tipos-evento")}
+              className="flex h-20 flex-col items-center justify-center gap-2 rounded-lg border-gray-200 px-3 hover:border-gray-300 hover:bg-gray-50"
+            >
+              <div className="flex h-8 w-8 items-center justify-center rounded-md bg-gray-100">
+                <Tag className="h-4 w-4 text-gray-600" />
+              </div>
+              <span className="text-center text-xs font-medium leading-tight text-gray-700">
+                Tipos de Evento
+              </span>
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => router.push("/edificios")}
+              className="flex h-20 flex-col items-center justify-center gap-2 rounded-lg border-gray-200 px-3 hover:border-gray-300 hover:bg-gray-50"
+            >
+              <div className="flex h-8 w-8 items-center justify-center rounded-md bg-gray-100">
+                <Building className="h-4 w-4 text-gray-600" />
+              </div>
+              <span className="text-center text-xs font-medium leading-tight text-gray-700">
+                Edificios
+              </span>
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => router.push("/salas")}
+              className="flex h-20 flex-col items-center justify-center gap-2 rounded-lg border-gray-200 px-3 hover:border-gray-300 hover:bg-gray-50"
+            >
+              <div className="flex h-8 w-8 items-center justify-center rounded-md bg-gray-100">
+                <DoorOpen className="h-4 w-4 text-gray-600" />
+              </div>
+              <span className="text-center text-xs font-medium leading-tight text-gray-700">
+                Salas
               </span>
             </Button>
           </CardContent>
