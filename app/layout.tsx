@@ -3,6 +3,7 @@ import { Analytics } from "@vercel/analytics/next"
 import { AuthProvider } from "@/lib/auth-context"
 import { Toaster } from "@/components/ui/toaster"
 import "./globals.css"
+//h
 
 export const metadata = {
   title: "P_COMEDORES",
