@@ -1,13 +1,13 @@
 export type CreateEventoRequest = {
   comedorId: number;
+  tipoEventoId: number;
   fechaEvento: string;
   montoTotal: number | null;
   solicitante: string | null;
   cantidadPersonas: number | null;
 
-  // Galicia
-  edificio: string | null;
-  sala: string | null;
+  edificioId: number | null;
+  salaId: number | null;
   funcionario: string | null;
   centroCosto: string | null;
   oficina: string | null;
