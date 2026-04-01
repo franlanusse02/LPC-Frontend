@@ -41,6 +41,7 @@ export default function TiposEventoPage() {
   const [editSubmitting, setEditSubmitting] = useState(false);
 
   const comedorOptions = comedores.map((c) => ({ value: String(c.id), label: c.nombre }));
+  const comedorNameById = Object.fromEntries(comedores.map((c) => [c.id, c.nombre]));
 
   useEffect(() => {
     if (!isLoading) {
@@ -74,7 +75,7 @@ export default function TiposEventoPage() {
 
   const buildBody = (f: FormState) => ({
     nombre: f.nombre.trim(),
-    precioUnitario: f.precioUnitario ? Number(f.precioUnitario) : null,
+    precio: f.precioUnitario ? Number(f.precioUnitario) : null,
     comedorId: Number(f.comedorId),
   });
 
@@ -103,7 +104,7 @@ export default function TiposEventoPage() {
     setEditarTipo(tipo);
     setEditForm({
       nombre: tipo.nombre,
-      precioUnitario: tipo.precioUnitario != null ? String(tipo.precioUnitario) : "",
+      precioUnitario: tipo.precio != null ? String(tipo.precio) : "",
       comedorId: String(tipo.comedorId),
     });
   };
@@ -226,9 +227,9 @@ export default function TiposEventoPage() {
                     {tipos.map((tipo) => (
                       <tr key={tipo.id} className="border-b transition-colors hover:bg-gray-50/80">
                         <td className="px-4 py-4 font-medium text-gray-800">{tipo.nombre}</td>
-                        <td className="px-4 py-4 text-gray-600">{tipo.comedorNombre}</td>
+                        <td className="px-4 py-4 text-gray-600">{comedorNameById[tipo.comedorId] ?? `ID ${tipo.comedorId}`}</td>
                         <td className="px-4 py-4 text-right font-mono text-gray-600">
-                          {tipo.precioUnitario != null ? formatCurrency(tipo.precioUnitario) : <span className="text-gray-300">—</span>}
+                          {tipo.precio != null ? formatCurrency(tipo.precio) : <span className="text-gray-300">—</span>}
                         </td>
                         <td className="px-4 py-4 text-right">
                           <Button variant="ghost" size="sm" onClick={() => openEdit(tipo)} className="h-7 w-7 p-0 text-gray-400 hover:text-gray-700">

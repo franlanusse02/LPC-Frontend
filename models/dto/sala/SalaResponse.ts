@@ -3,4 +3,6 @@ export type SalaResponse = {
   nombre: string;
   edificioId: number;
   edificioNombre: string;
+  comedorId: number;
+  activo: boolean;
 };

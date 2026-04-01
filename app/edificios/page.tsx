@@ -9,11 +9,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Combobox } from "@/components/ui/combobox";
 import { useAuth } from "@/lib/auth-context";
 import { apiFetch } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import { ApiError } from "@/models/dto/ApiError";
 import { EdificioResponse } from "@/models/dto/edificio/EdificioResponse";
+import { ComedorResponse } from "@/models/dto/comedor/ComedorResponse";
 import { ArrowLeft, Building, Pencil, Plus } from "lucide-react";
 
 export default function EdificiosPage() {
@@ -22,14 +24,19 @@ export default function EdificiosPage() {
   const { toast } = useToast();
 
   const [edificios, setEdificios] = useState<EdificioResponse[]>([]);
+  const [comedores, setComedores] = useState<ComedorResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [nombre, setNombre] = useState("");
+  const [comedorId, setComedorId] = useState("");
 
   const [editarEdificio, setEditarEdificio] = useState<EdificioResponse | null>(null);
   const [editNombre, setEditNombre] = useState("");
+  const [editComedorId, setEditComedorId] = useState("");
   const [editSubmitting, setEditSubmitting] = useState(false);
+  const comedorOptions = comedores.map((comedor) => ({ value: String(comedor.id), label: comedor.nombre }));
+  const comedorNameById = Object.fromEntries(comedores.map((comedor) => [comedor.id, comedor.nombre]));
 
   useEffect(() => {
     if (!isLoading) {
@@ -40,8 +47,14 @@ export default function EdificiosPage() {
 
   useEffect(() => {
     if (!session || session.rol !== "ADMIN") return;
-    apiFetch<EdificioResponse[]>("/api/edificios", {}, token || "")
-      .then((data) => setEdificios(data.sort((a, b) => a.nombre.localeCompare(b.nombre))))
+    Promise.all([
+      apiFetch<EdificioResponse[]>("/api/edificios-evento", {}, token || ""),
+      apiFetch<ComedorResponse[]>("/api/comedor", {}, token || ""),
+    ])
+      .then(([edificiosData, comedoresData]) => {
+        setEdificios(edificiosData.sort((a, b) => a.nombre.localeCompare(b.nombre)));
+        setComedores(comedoresData.sort((a, b) => a.nombre.localeCompare(b.nombre)));
+      })
       .catch(handleError)
       .finally(() => setLoading(false));
   }, [session]);
@@ -57,17 +70,18 @@ export default function EdificiosPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!nombre.trim()) return;
+    if (!nombre.trim() || !comedorId) return;
     setSubmitting(true);
     try {
       const created = await apiFetch<EdificioResponse>(
-        "/api/edificios",
-        { method: "POST", body: JSON.stringify({ nombre: nombre.trim() }) },
+        "/api/edificios-evento",
+        { method: "POST", body: JSON.stringify({ nombre: nombre.trim(), comedorId: Number(comedorId) }) },
         token || "",
       );
       setEdificios((prev) => [...prev, created].sort((a, b) => a.nombre.localeCompare(b.nombre)));
       setModalOpen(false);
       setNombre("");
+      setComedorId("");
       toast({ title: "Edificio creado", description: `${created.nombre} agregado correctamente.` });
     } catch (error) {
       handleError(error);
@@ -79,16 +93,17 @@ export default function EdificiosPage() {
   const openEdit = (edificio: EdificioResponse) => {
     setEditarEdificio(edificio);
     setEditNombre(edificio.nombre);
+    setEditComedorId(String(edificio.comedorId));
   };
 
   const handleEditSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!editarEdificio || !editNombre.trim()) return;
+    if (!editarEdificio || !editNombre.trim() || !editComedorId) return;
     setEditSubmitting(true);
     try {
       const updated = await apiFetch<EdificioResponse>(
-        `/api/edificios/${editarEdificio.id}`,
-        { method: "PATCH", body: JSON.stringify({ nombre: editNombre.trim() }) },
+        `/api/edificios-evento/${editarEdificio.id}`,
+        { method: "PATCH", body: JSON.stringify({ nombre: editNombre.trim(), comedorId: Number(editComedorId) }) },
         token || "",
       );
       setEdificios((prev) => prev.map((e) => e.id === updated.id ? updated : e).sort((a, b) => a.nombre.localeCompare(b.nombre)));
@@ -125,7 +140,7 @@ export default function EdificiosPage() {
           <CardHeader className="flex flex-row items-center border-b px-6 py-4">
             <div>
               <h1 className="text-2xl font-bold text-gray-800">Edificios</h1>
-              <p className="mt-1 text-sm text-gray-500">Gestioná el catálogo de edificios para eventos Galicia.</p>
+              <p className="mt-1 text-sm text-gray-500">Gestioná el catálogo de edificios por comedor para eventos.</p>
             </div>
             <Button
               size="sm"
@@ -152,6 +167,7 @@ export default function EdificiosPage() {
                 <table className="w-full table-auto border-collapse text-sm">
                   <thead>
                     <tr className="bg-gray-100/80 text-left text-xs uppercase tracking-wider text-gray-500">
+                      <th className="px-4 py-3">Comedor</th>
                       <th className="px-4 py-3">Nombre</th>
                       <th className="px-4 py-3 w-12" />
                     </tr>
@@ -159,6 +175,7 @@ export default function EdificiosPage() {
                   <tbody>
                     {edificios.map((edificio) => (
                       <tr key={edificio.id} className="border-b transition-colors hover:bg-gray-50/80">
+                        <td className="px-4 py-4 text-gray-600">{comedorNameById[edificio.comedorId] ?? `ID ${edificio.comedorId}`}</td>
                         <td className="px-4 py-4 font-medium text-gray-800">{edificio.nombre}</td>
                         <td className="px-4 py-4 text-right">
                           <Button variant="ghost" size="sm" onClick={() => openEdit(edificio)} className="h-7 w-7 p-0 text-gray-400 hover:text-gray-700">
@@ -179,10 +196,21 @@ export default function EdificiosPage() {
             <DialogHeader><DialogTitle>Nuevo Edificio</DialogTitle></DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4 pt-2">
               <div className="space-y-1">
+                <Label>Comedor</Label>
+                <Combobox
+                  options={comedorOptions}
+                  value={comedorId}
+                  onChange={(value) => setComedorId(value ?? "")}
+                  placeholder="Seleccionar comedor..."
+                  searchPlaceholder="Buscar comedor..."
+                  emptyText="No se encontraron comedores."
+                />
+              </div>
+              <div className="space-y-1">
                 <Label htmlFor="nombre">Nombre</Label>
                 <Input id="nombre" value={nombre} onChange={(e) => setNombre(e.target.value)} required />
               </div>
-              <Button type="submit" className="w-full" disabled={submitting || !nombre.trim()}>
+              <Button type="submit" className="w-full" disabled={submitting || !nombre.trim() || !comedorId}>
                 {submitting ? "Creando..." : "Crear Edificio"}
               </Button>
             </form>
@@ -194,10 +222,21 @@ export default function EdificiosPage() {
             <DialogHeader><DialogTitle>Editar Edificio</DialogTitle></DialogHeader>
             <form onSubmit={handleEditSubmit} className="space-y-4 pt-2">
               <div className="space-y-1">
+                <Label>Comedor</Label>
+                <Combobox
+                  options={comedorOptions}
+                  value={editComedorId}
+                  onChange={(value) => setEditComedorId(value ?? "")}
+                  placeholder="Seleccionar comedor..."
+                  searchPlaceholder="Buscar comedor..."
+                  emptyText="No se encontraron comedores."
+                />
+              </div>
+              <div className="space-y-1">
                 <Label htmlFor="edit-nombre">Nombre</Label>
                 <Input id="edit-nombre" value={editNombre} onChange={(e) => setEditNombre(e.target.value)} required />
               </div>
-              <Button type="submit" className="w-full" disabled={editSubmitting || !editNombre.trim()}>
+              <Button type="submit" className="w-full" disabled={editSubmitting || !editNombre.trim() || !editComedorId}>
                 {editSubmitting ? "Guardando..." : "Guardar Cambios"}
               </Button>
             </form>
