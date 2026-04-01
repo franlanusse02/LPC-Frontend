@@ -1,5 +1,5 @@
 export type CreateTipoEventoRequest = {
   nombre: string;
-  precioUnitario: number | null;
+  precio: number | null;
   comedorId: number;
 };

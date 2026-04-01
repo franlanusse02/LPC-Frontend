@@ -187,7 +187,7 @@ export default function EncargadoPage() {
     apiFetch<ProveedorResponse[]>("/api/proveedores", {}, session.token).then(setProveedores);
     apiFetch<ComedorResponse[]>("/api/comedor", {}, session.token).then(setComedores);
     apiFetch<PuntoDeVentaResponse[]>("/api/puntodeventa", {}, session.token).then(setPuntosDeVenta);
-    apiFetch<EventoResponse[]>("/api/eventos/mis-eventos", {}, session.token)
+    apiFetch<EventoResponse[]>("/api/eventos/mis-cierres", {}, session.token)
       .then(setEventos)
       .catch(() => setEventos([]))
       .finally(() => setLoadingEventos(false));
