@@ -24,6 +24,51 @@ const formatCurrency = (n: number) =>
 type FormState = { nombre: string; precioUnitario: string; comedorId: string };
 const emptyForm: FormState = { nombre: "", precioUnitario: "", comedorId: "" };
 
+type FormFieldsProps = {
+  f: FormState;
+  setF: React.Dispatch<React.SetStateAction<FormState>>;
+  comedorOptions: Array<{ value: string; label: string }>;
+};
+
+function FormFields({ f, setF, comedorOptions }: FormFieldsProps) {
+  return (
+    <>
+      <div className="space-y-1">
+        <Label>Comedor</Label>
+        <Combobox
+          options={comedorOptions}
+          value={f.comedorId}
+          onChange={(v) => setF((p) => ({ ...p, comedorId: v ?? "" }))}
+          placeholder="Seleccionar comedor..."
+          searchPlaceholder="Buscar comedor..."
+          emptyText="No se encontraron comedores."
+        />
+      </div>
+      <div className="space-y-1">
+        <Label htmlFor="nombre">Nombre</Label>
+        <Input
+          id="nombre"
+          value={f.nombre}
+          onChange={(e) => setF((p) => ({ ...p, nombre: e.target.value }))}
+          required
+        />
+      </div>
+      <div className="space-y-1">
+        <Label htmlFor="precio">Precio Unitario <span className="text-gray-400 font-normal">(opcional)</span></Label>
+        <Input
+          id="precio"
+          type="number"
+          min="0"
+          step="0.01"
+          value={f.precioUnitario}
+          onChange={(e) => setF((p) => ({ ...p, precioUnitario: e.target.value }))}
+          placeholder="0.00"
+        />
+      </div>
+    </>
+  );
+}
+
 export default function TiposEventoPage() {
   const router = useRouter();
   const { session, token, isLoading, logout } = useAuth();
@@ -139,43 +184,6 @@ export default function TiposEventoPage() {
 
   if (!session || session.rol !== "ADMIN") return null;
 
-  const FormFields = ({ f, setF }: { f: FormState; setF: (fn: (p: FormState) => FormState) => void }) => (
-    <>
-      <div className="space-y-1">
-        <Label>Comedor</Label>
-        <Combobox
-          options={comedorOptions}
-          value={f.comedorId}
-          onChange={(v) => setF((p) => ({ ...p, comedorId: v ?? "" }))}
-          placeholder="Seleccionar comedor..."
-          searchPlaceholder="Buscar comedor..."
-          emptyText="No se encontraron comedores."
-        />
-      </div>
-      <div className="space-y-1">
-        <Label htmlFor="nombre">Nombre</Label>
-        <Input
-          id="nombre"
-          value={f.nombre}
-          onChange={(e) => setF((p) => ({ ...p, nombre: e.target.value }))}
-          required
-        />
-      </div>
-      <div className="space-y-1">
-        <Label htmlFor="precio">Precio Unitario <span className="text-gray-400 font-normal">(opcional)</span></Label>
-        <Input
-          id="precio"
-          type="number"
-          min="0"
-          step="0.01"
-          value={f.precioUnitario}
-          onChange={(e) => setF((p) => ({ ...p, precioUnitario: e.target.value }))}
-          placeholder="0.00"
-        />
-      </div>
-    </>
-  );
-
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
@@ -249,7 +257,7 @@ export default function TiposEventoPage() {
           <DialogContent>
             <DialogHeader><DialogTitle>Nuevo Tipo de Evento</DialogTitle></DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4 pt-2">
-              <FormFields f={form} setF={setForm} />
+              <FormFields f={form} setF={setForm} comedorOptions={comedorOptions} />
               <Button type="submit" className="w-full" disabled={submitting || !form.nombre.trim() || !form.comedorId}>
                 {submitting ? "Creando..." : "Crear Tipo de Evento"}
               </Button>
@@ -261,7 +269,7 @@ export default function TiposEventoPage() {
           <DialogContent>
             <DialogHeader><DialogTitle>Editar Tipo de Evento</DialogTitle></DialogHeader>
             <form onSubmit={handleEditSubmit} className="space-y-4 pt-2">
-              <FormFields f={editForm} setF={setEditForm} />
+              <FormFields f={editForm} setF={setEditForm} comedorOptions={comedorOptions} />
               <Button type="submit" className="w-full" disabled={editSubmitting || !editForm.nombre.trim() || !editForm.comedorId}>
                 {editSubmitting ? "Guardando..." : "Guardar Cambios"}
               </Button>
