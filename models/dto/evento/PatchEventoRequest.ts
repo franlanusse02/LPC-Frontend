@@ -1,0 +1,34 @@
+import { EstadoEvento } from "@/models/enums/EstadoEvento";
+import { MedioPago } from "@/models/enums/MedioPago";
+
+export type PatchEventoRequest = {
+  comedorId?: number | null;
+  tipoEventoId?: number | null;
+  estado?: EstadoEvento | null;
+  medioPago?: MedioPago | null;
+  fechaEvento?: string | null;
+  fechaEmision?: string | null;
+  fechaPago?: string | null;
+  solicitante?: string | null;
+  emailSolicitante?: string | null;
+  funcionario?: string | null;
+  responsable?: string | null;
+  cantidadPersonas?: number | null;
+  precioUnitario?: number | null;
+  montoTotal?: number | null;
+  numeroOrden?: string | null;
+  numeroOperacion?: string | null;
+  centroCosto?: string | null;
+  empresa?: string | null;
+  concepto?: string | null;
+  lugar?: string | null;
+  area?: string | null;
+  oficina?: string | null;
+  edificioId?: number | null;
+  salaId?: number | null;
+  destinatarioFactura?: string | null;
+  tipoComprobante?: string | null;
+  numeroComprobante?: string | null;
+  observaciones?: string | null;
+  retenciones?: number | null;
+};

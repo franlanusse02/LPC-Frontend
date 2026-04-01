@@ -1,9 +1,9 @@
 1:"$Sreact.fragment"
-2:I[1304,[],"ClientPageRoot"]
-3:I[1414,["625","static/chunks/625-027cd057bc45de37.js","739","static/chunks/739-c70698d3b33d4f9f.js","9","static/chunks/9-f469318b73e0114c.js","713","static/chunks/713-ac6ecac1b9cee352.js","483","static/chunks/483-ab9f1c1d7e1e717e.js","662","static/chunks/662-fdd8b81935056697.js","809","static/chunks/app/sociedades/page-74e4e53078d0252d.js"],"default"]
-6:I[484,[],"OutletBoundary"]
+2:I[1779,[],"ClientPageRoot"]
+3:I[4030,["946","static/chunks/946-e77d35266b83c33a.js","720","static/chunks/720-eaecf4fcc890d168.js","51","static/chunks/51-f3eb2e67f29e0b41.js","355","static/chunks/355-cc8ab444448de5f3.js","633","static/chunks/633-cd9e7484afb40cd1.js","231","static/chunks/231-4114b78f8bc6f186.js","809","static/chunks/app/sociedades/page-e75646c68930b11d.js"],"default"]
+6:I[9835,[],"OutletBoundary"]
 7:"$Sreact.suspense"
-0:{"buildId":"tIj3wUmu52D1v853kpWq9","rsc":["$","$1","c",{"children":[["$","$L2",null,{"Component":"$3","serverProvidedParams":{"searchParams":{},"params":{},"promises":["$@4","$@5"]}}],null,["$","$L6",null,{"children":["$","$7",null,{"name":"Next.MetadataOutlet","children":"$@8"}]}]]}],"loading":null,"isPartial":false}
+0:{"buildId":"A-NMk90W5l4LfVcLU-QYi","rsc":["$","$1","c",{"children":[["$","$L2",null,{"Component":"$3","serverProvidedParams":{"searchParams":{},"params":{},"promises":["$@4","$@5"]}}],null,["$","$L6",null,{"children":["$","$7",null,{"name":"Next.MetadataOutlet","children":"$@8"}]}]]}],"loading":null,"isPartial":false}
 4:{}
 5:"$0:rsc:props:children:0:props:serverProvidedParams:params"
 8:null

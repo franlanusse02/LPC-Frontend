@@ -345,6 +345,7 @@ export default function EncargadoPage() {
       <NuevoEventoModal
         open={nuevoEventoOpen}
         onClose={() => setNuevoEventoOpen(false)}
+        token={session.token}
         comedores={comedores}
         onConfirm={handleNuevoEvento}
       />
