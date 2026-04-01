@@ -1,12 +1,25 @@
 import { ApiError, ApiErrorResponse } from "@/models/dto/ApiError";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080";
+function getApiUrl(): string {
+  const configuredUrl = process.env.NEXT_PUBLIC_API_URL?.trim();
+
+  if (configuredUrl) {
+    return configuredUrl.replace(/\/$/, "");
+  }
+
+  if (process.env.NODE_ENV !== "production") {
+    return "http://localhost:8080";
+  }
+
+  throw new Error("NEXT_PUBLIC_API_URL no esta configurada para este deploy.");
+}
 
 export async function apiFetch<T>(
   path: string,
   options: RequestInit = {},
   token?: string,
 ): Promise<T> {
+  const apiUrl = getApiUrl();
   const headers = {
     "Content-Type": "application/json",
     ...options.headers,
@@ -15,7 +28,7 @@ export async function apiFetch<T>(
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;
   }
-  const response = await fetch(`${API_URL}${path}`, {
+  const response = await fetch(`${apiUrl}${path}`, {
     headers,
     ...options,
   });
