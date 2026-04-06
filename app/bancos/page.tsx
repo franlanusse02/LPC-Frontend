@@ -26,7 +26,7 @@ import { Combobox } from "@/components/ui/combobox";
 
 export default function BancosPage() {
   const router = useRouter();
-  const { session, token, isLoading, logout } = useAuth();
+  const { session, token, isLoading } = useAuth();
   const { toast } = useToast();
 
   const [bancos, setBancos] = useState<BancoResponse[]>([]);
@@ -60,11 +60,7 @@ export default function BancosPage() {
   }, [session]);
 
   const handleError = (error: unknown) => {
-    if (ApiError.isUnauthorized(error)) {
-      logout();
-      router.replace("/login");
-      return;
-    }
+    if (ApiError.isUnauthorized(error)) return; // handled centrally by AuthProvider
     toast({
       variant: "destructive",
       title: "Error",

@@ -4,7 +4,7 @@ import { Fragment, useMemo, useState } from "react";
 import {
   ChevronDown, ChevronUp, ChevronsUpDown,
   MoreHorizontal, Ban, Pencil, Search, X,
-  SlidersHorizontal, Paperclip,
+  SlidersHorizontal, Paperclip, CircleCheckBig, Send, CircleDollarSign, Trash2,
 } from "lucide-react";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
@@ -60,9 +60,26 @@ export interface EventosTableProps {
   sortDir: EventoSortDir;
   onSort: (key: EventoSortKey) => void;
   onEditar?: (evento: EventoResponse) => void;
+  onRealizar?: (evento: EventoResponse) => void;
+  onEmitir?: (evento: EventoResponse) => void;
+  onPagar?: (evento: EventoResponse) => void;
+  onEliminarPdf?: (evento: EventoResponse) => void;
   onAnular?: (evento: EventoResponse) => void;
   onNuevoEvento?: () => void;
   onClearFilters: () => void;
+}
+
+const EVENTOS_PDF_BASE_URL = process.env.NEXT_PUBLIC_EVENTOS_PDF_BASE_URL?.replace(/\/$/, "");
+
+function getEventoPdfHref(evento: EventoResponse) {
+  if (!evento.facturaPdfObjectKey) return null;
+  if (/^https?:\/\//i.test(evento.facturaPdfObjectKey)) {
+    return evento.facturaPdfObjectKey;
+  }
+  if (EVENTOS_PDF_BASE_URL) {
+    return `${EVENTOS_PDF_BASE_URL}/${evento.facturaPdfObjectKey.replace(/^\/+/, "")}`;
+  }
+  return null;
 }
 
 function SortIcon({ col, sortKey, sortDir }: { col: EventoSortKey; sortKey: EventoSortKey; sortDir: EventoSortDir }) {
@@ -108,18 +125,25 @@ function EventoDetail({ evento, comedorName }: { evento: EventoResponse; comedor
       <DetailField label="Concepto" value={evento.concepto} />
       <DetailField label="Tipo comprobante" value={evento.tipoComprobante} />
       <DetailField label="Nro. comprobante" value={evento.numeroComprobante} />
-      {evento.facturaPdfNombre && (
+      {evento.facturaPdfNombreArchivo && (
         <div className="flex flex-col gap-0.5">
           <span className="text-xs font-medium uppercase tracking-wide text-gray-400">Factura PDF</span>
-          <a
-            href={evento.facturaPdfUrl ?? "#"}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 text-sm text-primary hover:underline underline-offset-2"
-          >
-            <Paperclip className="h-3.5 w-3.5" />
-            {evento.facturaPdfNombre}
-          </a>
+          {getEventoPdfHref(evento) ? (
+            <a
+              href={getEventoPdfHref(evento) ?? "#"}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 text-sm text-primary hover:underline underline-offset-2"
+            >
+              <Paperclip className="h-3.5 w-3.5" />
+              {evento.facturaPdfNombreArchivo}
+            </a>
+          ) : (
+            <span className="inline-flex items-center gap-1 text-sm text-gray-700">
+              <Paperclip className="h-3.5 w-3.5" />
+              {evento.facturaPdfNombreArchivo}
+            </span>
+          )}
         </div>
       )}
     </div>
@@ -140,6 +164,10 @@ export function EventosTable({
   sortDir,
   onSort,
   onEditar,
+  onRealizar,
+  onEmitir,
+  onPagar,
+  onEliminarPdf,
   onAnular,
   onNuevoEvento,
   onClearFilters,
@@ -263,6 +291,20 @@ export function EventosTable({
                   const isExpanded = expandedRows.has(evento.id);
                   const isAnulado = evento.estado === "ANULADO";
                   const comedorName = comedorNameById[evento.comedorId] ?? String(evento.comedorId);
+                  const pdfHref = getEventoPdfHref(evento);
+                  const hasPdf = !!evento.facturaPdfObjectKey;
+                  const canRealizar = evento.estado === "SOLICITADO";
+                  const canEmitir = evento.estado === "SOLICITADO" || evento.estado === "REALIZADO";
+                  const canPagar = evento.estado === "FACTURA_EMITIDA";
+                  const hasNonAnularActions =
+                    !!onEditar ||
+                    (canRealizar && !!onRealizar) ||
+                    (canEmitir && !!onEmitir) ||
+                    (canPagar && !!onPagar) ||
+                    (hasPdf && !!onEliminarPdf);
+                  const hasActions =
+                    hasNonAnularActions ||
+                    !!onAnular;
 
                   return (
                     <Fragment key={evento.id}>
@@ -292,10 +334,14 @@ export function EventosTable({
                           {estadoBadge(evento.estado)}
                         </td>
                         <td className="px-4 py-4 text-center">
-                          {evento.facturaPdfUrl ? (
-                            <a href={evento.facturaPdfUrl} target="_blank" rel="noopener noreferrer" className="inline-flex text-gray-400 hover:text-primary transition-colors">
+                          {pdfHref ? (
+                            <a href={pdfHref} target="_blank" rel="noopener noreferrer" className="inline-flex text-gray-400 hover:text-primary transition-colors">
                               <Paperclip className="h-4 w-4" />
                             </a>
+                          ) : hasPdf ? (
+                            <span className="inline-flex text-gray-500">
+                              <Paperclip className="h-4 w-4" />
+                            </span>
                           ) : (
                             <span className="text-gray-200">—</span>
                           )}
@@ -303,7 +349,7 @@ export function EventosTable({
                         {!readonly && (
                           <td className="px-4 py-4">
                             <DropdownMenu>
-                              <DropdownMenuTrigger asChild disabled={isAnulado}>
+                              <DropdownMenuTrigger asChild disabled={isAnulado || !hasActions}>
                                 <Button
                                   variant="ghost"
                                   size="icon"
@@ -314,21 +360,61 @@ export function EventosTable({
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end" className="w-44 rounded-xl shadow-lg border-gray-100">
-                                <DropdownMenuItem
-                                  onClick={() => onEditar?.(evento)}
-                                  className="gap-2.5 cursor-pointer rounded-lg text-gray-700 focus:text-gray-900"
-                                >
-                                  <Pencil className="h-4 w-4 text-gray-400" />
-                                  Editar
-                                </DropdownMenuItem>
-                                <DropdownMenuSeparator className="my-1" />
-                                <DropdownMenuItem
-                                  onClick={() => onAnular?.(evento)}
-                                  className="gap-2.5 cursor-pointer rounded-lg text-red-600 focus:text-red-700 focus:bg-red-50"
-                                >
-                                  <Ban className="h-4 w-4" />
-                                  Anular
-                                </DropdownMenuItem>
+                                {canRealizar && onRealizar && (
+                                  <DropdownMenuItem
+                                    onClick={() => onRealizar(evento)}
+                                    className="gap-2.5 cursor-pointer rounded-lg text-emerald-700 focus:text-emerald-800"
+                                  >
+                                    <CircleCheckBig className="h-4 w-4" />
+                                    Realizado
+                                  </DropdownMenuItem>
+                                )}
+                                {canEmitir && onEmitir && (
+                                  <DropdownMenuItem
+                                    onClick={() => onEmitir(evento)}
+                                    className="gap-2.5 cursor-pointer rounded-lg text-blue-700 focus:text-blue-800"
+                                  >
+                                    <Send className="h-4 w-4" />
+                                    Emitir
+                                  </DropdownMenuItem>
+                                )}
+                                {canPagar && onPagar && (
+                                  <DropdownMenuItem
+                                    onClick={() => onPagar(evento)}
+                                    className="gap-2.5 cursor-pointer rounded-lg text-emerald-700 focus:text-emerald-800"
+                                  >
+                                    <CircleDollarSign className="h-4 w-4" />
+                                    Marcar pagado
+                                  </DropdownMenuItem>
+                                )}
+                                {onEditar && (
+                                  <DropdownMenuItem
+                                    onClick={() => onEditar(evento)}
+                                    className="gap-2.5 cursor-pointer rounded-lg text-gray-700 focus:text-gray-900"
+                                  >
+                                    <Pencil className="h-4 w-4 text-gray-400" />
+                                    Editar
+                                  </DropdownMenuItem>
+                                )}
+                                {hasPdf && onEliminarPdf && (
+                                  <DropdownMenuItem
+                                    onClick={() => onEliminarPdf(evento)}
+                                    className="gap-2.5 cursor-pointer rounded-lg text-amber-700 focus:text-amber-800"
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                    Quitar PDF
+                                  </DropdownMenuItem>
+                                )}
+                                {onAnular && hasNonAnularActions && <DropdownMenuSeparator className="my-1" />}
+                                {onAnular && (
+                                  <DropdownMenuItem
+                                    onClick={() => onAnular(evento)}
+                                    className="gap-2.5 cursor-pointer rounded-lg text-red-600 focus:text-red-700 focus:bg-red-50"
+                                  >
+                                    <Ban className="h-4 w-4" />
+                                    Anular
+                                  </DropdownMenuItem>
+                                )}
                               </DropdownMenuContent>
                             </DropdownMenu>
                           </td>

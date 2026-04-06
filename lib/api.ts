@@ -23,6 +23,11 @@ export async function apiFetch<T>(
   });
 
   if (!response.ok) {
+    // Signal session expiry for authenticated requests that get 401
+    if (token && response.status === 401) {
+      window.dispatchEvent(new Event("auth:unauthorized"));
+    }
+
     try {
       const errorBody = await response.json();
       if (errorBody && typeof errorBody.message === "string") {

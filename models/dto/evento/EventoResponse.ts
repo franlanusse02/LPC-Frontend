@@ -1,18 +1,18 @@
 import { EstadoEvento } from "@/models/enums/EstadoEvento";
+import { MedioPago } from "@/models/enums/MedioPago";
 
 export type EventoResponse = {
   id: number;
   comedorId: number;
   tipoEventoId: number | null;
+  tipoEventoNombre: string | null;
   fechaEvento: string;
   estado: EstadoEvento;
+  medioPago: MedioPago | null;
+  fechaEmision: string | null;
+  fechaPago: string | null;
   precioUnitario: number | null;
   montoTotal: number | null;
-  tipoEventoNombre: string | null;
-
-  // Factura PDF adjunta
-  facturaPdfUrl: string | null;
-  facturaPdfNombre: string | null;
 
   // Campos comunes
   solicitante: string | null;
@@ -34,9 +34,7 @@ export type EventoResponse = {
   area: string | null;
 
   // BBVA
-  emailSolicitante: string | null;
   lugar: string | null;
-  medioPago: string | null;
   numeroOperacion: string | null;
 
   // Compartido: UDESA (nro pedido), BBVA (nro orden), TECHINT (nro pedido)
@@ -46,6 +44,18 @@ export type EventoResponse = {
   concepto: string | null;
   tipoComprobante: string | null;
   numeroComprobante: string | null;
+  observaciones: string | null;
+  retenciones: number | null;
+
+  // Factura PDF adjunta
+  facturaPdfObjectKey: string | null;
+  facturaPdfNombreArchivo: string | null;
+  facturaPdfContentType: string | null;
+  facturaPdfByteSize: number | null;
+  facturaPdfSubidoEn: string | null;
+
+  creadoEn: string;
+  actualizadoEn: string | null;
   creadoPorId: number | null;
   anulacionId: number | null;
 };
