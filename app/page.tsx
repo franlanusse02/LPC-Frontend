@@ -127,7 +127,7 @@ export default function HomePage() {
                 <UserPlus className="h-4 w-4 text-gray-600" />
               </div>
               <span className="text-xs font-medium text-gray-700 text-center leading-tight">
-                Nuevo Usuario
+                Usuarios
               </span>
             </Button>
             <Button
@@ -139,7 +139,7 @@ export default function HomePage() {
                 <Building2 className="h-4 w-4 text-gray-600" />
               </div>
               <span className="text-xs font-medium text-gray-700 text-center leading-tight">
-                Nueva Sociedad
+                Sociedades
               </span>
             </Button>
             <Button
@@ -187,7 +187,7 @@ export default function HomePage() {
                 <Building className="h-4 w-4 text-gray-600" />
               </div>
               <span className="text-center text-xs font-medium leading-tight text-gray-700">
-                Edificios
+                Edificios Eventos
               </span>
             </Button>
             <Button
@@ -199,7 +199,7 @@ export default function HomePage() {
                 <DoorOpen className="h-4 w-4 text-gray-600" />
               </div>
               <span className="text-center text-xs font-medium leading-tight text-gray-700">
-                Salas
+                Salas Eventos
               </span>
             </Button>
           </CardContent>
