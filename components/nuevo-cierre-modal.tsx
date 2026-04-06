@@ -18,7 +18,6 @@ import { apiFetch } from "@/lib/api";
 import { getTodayDate } from "@/lib/dateParser";
 import { useAuth } from "@/lib/auth-context";
 import { useToast } from "@/hooks/use-toast";
-import { useRouter } from "next/navigation";
 import { ApiError } from "@/models/dto/ApiError";
 import { ComedorResponse } from "@/models/dto/comedor/ComedorResponse";
 import { PuntoDeVentaResponse } from "@/models/dto/pto-venta/PuntoDeVentaResponse";
@@ -41,8 +40,7 @@ export function NuevoCierreModal({
   puntosDeVenta,
   onSuccess,
 }: NuevoCierreModalProps) {
-  const router = useRouter();
-  const { session, logout } = useAuth();
+  const { session } = useAuth();
   const { toast } = useToast();
 
   const [fechaOperacion, setFechaOperacion] = useState(getTodayDate());
@@ -149,12 +147,7 @@ export function NuevoCierreModal({
       onClose();
       onSuccess();
     } catch (err) {
-      if (ApiError.isUnauthorized(err)) {
-        toast({ variant: "destructive", title: "Sesión expirada", description: "Tu sesión ha expirado." });
-        logout();
-        router.replace("/login");
-        return;
-      }
+      if (ApiError.isUnauthorized(err)) return; // handled centrally by AuthProvider
       toast({
         variant: "destructive",
         title: "Error",

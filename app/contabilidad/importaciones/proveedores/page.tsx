@@ -27,7 +27,7 @@ function ProveedorImportJobDetailContent() {
   const searchParams = useSearchParams();
   const jobId = Number(searchParams.get("jobId"));
   const router = useRouter();
-  const { session, token, isLoading, logout } = useAuth();
+  const { session, token, isLoading } = useAuth();
   const { toast } = useToast();
 
   const [job, setJob] = useState<ProveedorImportJobResponse | null>(null);
@@ -54,11 +54,7 @@ function ProveedorImportJobDetailContent() {
   }, [session, jobId]);
 
   const handleError = async (error: unknown, conflictMessage?: string) => {
-    if (ApiError.isUnauthorized(error)) {
-      logout();
-      router.replace("/login");
-      return;
-    }
+    if (ApiError.isUnauthorized(error)) return; // handled centrally by AuthProvider
 
     if (error instanceof ApiError && error.status === 409) {
       toast({

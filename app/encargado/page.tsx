@@ -30,7 +30,7 @@ type View = "cierres" | "compras" | "eventos";
 
 export default function EncargadoPage() {
   const router = useRouter();
-  const { session, isLoading, logout } = useAuth();
+  const { session, isLoading } = useAuth();
   const { toast } = useToast();
 
   const [view, setView] = useState<View>("cierres");
@@ -159,7 +159,7 @@ export default function EncargadoPage() {
       setEventos((prev) => [nuevo, ...prev]);
       toast({ title: "Evento creado" });
     } catch (err) {
-      if (ApiError.isUnauthorized(err)) { logout(); router.replace("/login"); return; }
+      if (ApiError.isUnauthorized(err)) return; // handled centrally by AuthProvider
       toast({
         variant: "destructive",
         title: "Error",
@@ -204,7 +204,7 @@ export default function EncargadoPage() {
       setFacturas((prev) => [nueva, ...prev]);
       toast({ title: "Factura creada", description: `Factura #${nueva.numero} creada correctamente.` });
     } catch (err) {
-      if (ApiError.isUnauthorized(err)) { logout(); router.replace("/login"); return; }
+      if (ApiError.isUnauthorized(err)) return; // handled centrally by AuthProvider
       toast({
         variant: "destructive",
         title: "Error",

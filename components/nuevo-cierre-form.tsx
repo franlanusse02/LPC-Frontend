@@ -38,7 +38,7 @@ export function NuevoCierreForm({
   puntosDeVenta: PuntoDeVentaResponse[];
 }) {
   const router = useRouter();
-  const { session, logout } = useAuth();
+  const { session } = useAuth();
   const { toast } = useToast();
 
   const [fechaOperacion, setFechaOperacion] = useState(getTodayDate());
@@ -155,17 +155,7 @@ export function NuevoCierreForm({
       });
       router.push("/");
     } catch (err) {
-      if (ApiError.isUnauthorized(err)) {
-        toast({
-          variant: "destructive",
-          title: "Sesión expirada",
-          description:
-            "Tu sesión ha expirado. Por favor, inicia sesión nuevamente.",
-        });
-        logout();
-        router.replace("/login");
-        return;
-      }
+      if (ApiError.isUnauthorized(err)) return; // handled centrally by AuthProvider
 
       const errorMessage =
         err instanceof ApiError

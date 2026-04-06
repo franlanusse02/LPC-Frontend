@@ -20,7 +20,7 @@ import { ArrowLeft, Building, Pencil, Plus } from "lucide-react";
 
 export default function EdificiosPage() {
   const router = useRouter();
-  const { session, token, isLoading, logout } = useAuth();
+  const { session, token, isLoading } = useAuth();
   const { toast } = useToast();
 
   const [edificios, setEdificios] = useState<EdificioResponse[]>([]);
@@ -60,7 +60,7 @@ export default function EdificiosPage() {
   }, [session]);
 
   const handleError = (error: unknown) => {
-    if (ApiError.isUnauthorized(error)) { logout(); router.replace("/login"); return; }
+    if (ApiError.isUnauthorized(error)) return; // handled centrally by AuthProvider
     toast({
       variant: "destructive",
       title: "Error",

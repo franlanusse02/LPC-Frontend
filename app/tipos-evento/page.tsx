@@ -71,7 +71,7 @@ function FormFields({ f, setF, comedorOptions }: FormFieldsProps) {
 
 export default function TiposEventoPage() {
   const router = useRouter();
-  const { session, token, isLoading, logout } = useAuth();
+  const { session, token, isLoading } = useAuth();
   const { toast } = useToast();
 
   const [tipos, setTipos] = useState<TipoEventoResponse[]>([]);
@@ -110,7 +110,7 @@ export default function TiposEventoPage() {
   }, [session]);
 
   const handleError = (error: unknown) => {
-    if (ApiError.isUnauthorized(error)) { logout(); router.replace("/login"); return; }
+    if (ApiError.isUnauthorized(error)) return; // handled centrally by AuthProvider
     toast({
       variant: "destructive",
       title: "Error",

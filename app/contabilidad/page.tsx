@@ -37,6 +37,10 @@ import { EventoResponse } from "@/models/dto/evento/EventoResponse";
 import { EstadoEventoLabel } from "@/models/enums/EstadoEvento";
 import { EventoSortDir, EventoSortKey, EventoStatusFilter, EventosTable } from "@/components/eventos-table";
 import { AnularEventoModal } from "@/components/anular-evento-modal";
+import { RealizarEventoModal } from "@/components/realizar-evento-modal";
+import { EmitirEventoModal, EmitirEventoPayload } from "@/components/emitir-evento-modal";
+import { PagarEventoModal, PagarEventoPayload } from "@/components/pagar-evento-modal";
+import { EliminarPdfEventoModal } from "@/components/eliminar-pdf-evento-modal";
 
 type View = "cierres" | "compras" | "eventos";
 type PageResponse<T> = { content: T[] };
@@ -60,7 +64,7 @@ const buildSearchPart = (value: string) => {
 
 export default function ContabilidadPage() {
   const router = useRouter();
-  const { session, isLoading, logout } = useAuth();
+  const { session, isLoading } = useAuth();
   const { toast } = useToast();
 
   const [view, setView] = useState<View>("cierres");
@@ -107,7 +111,10 @@ export default function ContabilidadPage() {
   const [eventoStatusFilter, setEventoStatusFilter] = useState<EventoStatusFilter>("all");
   const [eventoSortKey, setEventoSortKey] = useState<EventoSortKey>("fechaEvento");
   const [eventoSortDir, setEventoSortDir] = useState<EventoSortDir>("desc");
-  const [editarEvento, setEditarEvento] = useState<EventoResponse | null>(null);
+  const [realizarEvento, setRealizarEvento] = useState<EventoResponse | null>(null);
+  const [emitirEvento, setEmitirEvento] = useState<EventoResponse | null>(null);
+  const [pagarEvento, setPagarEvento] = useState<EventoResponse | null>(null);
+  const [eliminarPdfEvento, setEliminarPdfEvento] = useState<EventoResponse | null>(null);
   const [anularEvento, setAnularEvento] = useState<EventoResponse | null>(null);
 
   // sociedad → comedor filtering helpers
@@ -377,7 +384,7 @@ export default function ContabilidadPage() {
         Concepto: e.concepto ?? "",
         "Tipo comprobante": e.tipoComprobante ?? "",
         "Nro. comprobante": e.numeroComprobante ?? "",
-        "Factura PDF": e.facturaPdfNombre ?? "",
+        "Factura PDF": e.facturaPdfNombreArchivo ?? "",
       })),
       "Eventos",
       buildExportFilename("eventos", [
@@ -415,7 +422,7 @@ export default function ContabilidadPage() {
   }, [session]);
 
   const handleError = (err: unknown) => {
-    if (ApiError.isUnauthorized(err)) { logout(); router.replace("/login"); return; }
+    if (ApiError.isUnauthorized(err)) return; // handled centrally by AuthProvider
     toast({
       variant: "destructive",
       title: "Error",
@@ -485,6 +492,46 @@ export default function ContabilidadPage() {
         { method: "PATCH", body: JSON.stringify({ motivo }) }, session.token);
       setEventos((prev) => prev.map((e) => e.id === eventoId ? updated : e));
       toast({ title: "Evento anulado" });
+    } catch (err) { handleError(err); throw err; }
+  };
+
+  const handleRealizarEvento = async (eventoId: number) => {
+    if (!session) return;
+    try {
+      const updated = await apiFetch<EventoResponse>(`/api/eventos/${eventoId}/realizar`,
+        { method: "PATCH" }, session.token);
+      setEventos((prev) => prev.map((e) => e.id === eventoId ? updated : e));
+      toast({ title: "Evento marcado como realizado" });
+    } catch (err) { handleError(err); throw err; }
+  };
+
+  const handleEmitirEvento = async (eventoId: number, payload: EmitirEventoPayload) => {
+    if (!session) return;
+    try {
+      const updated = await apiFetch<EventoResponse>(`/api/eventos/${eventoId}/emitir`,
+        { method: "PATCH", body: JSON.stringify(payload) }, session.token);
+      setEventos((prev) => prev.map((e) => e.id === eventoId ? updated : e));
+      toast({ title: "Factura de evento emitida" });
+    } catch (err) { handleError(err); throw err; }
+  };
+
+  const handlePagarEvento = async (eventoId: number, payload: PagarEventoPayload) => {
+    if (!session) return;
+    try {
+      const updated = await apiFetch<EventoResponse>(`/api/eventos/${eventoId}/pagado`,
+        { method: "PATCH", body: JSON.stringify(payload) }, session.token);
+      setEventos((prev) => prev.map((e) => e.id === eventoId ? updated : e));
+      toast({ title: "Pago del evento registrado" });
+    } catch (err) { handleError(err); throw err; }
+  };
+
+  const handleEliminarPdfEvento = async (eventoId: number) => {
+    if (!session) return;
+    try {
+      const updated = await apiFetch<EventoResponse>(`/api/eventos/${eventoId}/eliminar-factura-pdf`,
+        { method: "PATCH" }, session.token);
+      setEventos((prev) => prev.map((e) => e.id === eventoId ? updated : e));
+      toast({ title: "PDF del evento eliminado" });
     } catch (err) { handleError(err); throw err; }
   };
 
@@ -689,7 +736,10 @@ export default function ContabilidadPage() {
                   if (key === eventoSortKey) setEventoSortDir((d) => (d === "asc" ? "desc" : "asc"));
                   else { setEventoSortKey(key); setEventoSortDir("asc"); }
                 }}
-                onEditar={setEditarEvento}
+                onRealizar={setRealizarEvento}
+                onEmitir={setEmitirEvento}
+                onPagar={setPagarEvento}
+                onEliminarPdf={setEliminarPdfEvento}
                 onAnular={setAnularEvento}
                 onClearFilters={clearFilters}
               />
@@ -750,6 +800,41 @@ export default function ContabilidadPage() {
           fechaEvento={anularEvento.fechaEvento}
           comedorNombre={comedorNameById[anularEvento.comedorId] ?? String(anularEvento.comedorId)}
           onConfirm={handleAnularEvento}
+        />
+      )}
+      {realizarEvento && (
+        <RealizarEventoModal
+          open={!!realizarEvento}
+          onClose={() => setRealizarEvento(null)}
+          eventoId={realizarEvento.id}
+          fechaEvento={realizarEvento.fechaEvento}
+          comedorNombre={comedorNameById[realizarEvento.comedorId] ?? String(realizarEvento.comedorId)}
+          onConfirm={handleRealizarEvento}
+        />
+      )}
+      {emitirEvento && (
+        <EmitirEventoModal
+          open={!!emitirEvento}
+          onClose={() => setEmitirEvento(null)}
+          evento={emitirEvento}
+          onConfirm={handleEmitirEvento}
+        />
+      )}
+      {pagarEvento && (
+        <PagarEventoModal
+          open={!!pagarEvento}
+          onClose={() => setPagarEvento(null)}
+          evento={pagarEvento}
+          onConfirm={handlePagarEvento}
+        />
+      )}
+      {eliminarPdfEvento && (
+        <EliminarPdfEventoModal
+          open={!!eliminarPdfEvento}
+          onClose={() => setEliminarPdfEvento(null)}
+          eventoId={eliminarPdfEvento.id}
+          nombreArchivo={eliminarPdfEvento.facturaPdfNombreArchivo ?? "PDF"}
+          onConfirm={handleEliminarPdfEvento}
         />
       )}
     </div>

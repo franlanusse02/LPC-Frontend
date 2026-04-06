@@ -36,7 +36,7 @@ import { MediosPagoDict, MedioPago } from "@/models/enums/MedioPago";
 
 export default function ProveedoresPage() {
   const router = useRouter();
-  const { session, isLoading, logout } = useAuth();
+  const { session, isLoading } = useAuth();
   const { toast } = useToast();
 
   const [proveedores, setProveedores] = useState<ProveedorResponse[]>([]);
@@ -65,7 +65,7 @@ export default function ProveedoresPage() {
   }, [session]);
 
   const handleError = (err: unknown) => {
-    if (ApiError.isUnauthorized(err)) { logout(); router.replace("/login"); return; }
+    if (ApiError.isUnauthorized(err)) return; // handled centrally by AuthProvider
     toast({
       variant: "destructive",
       title: "Error",

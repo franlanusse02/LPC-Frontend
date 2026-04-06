@@ -45,7 +45,7 @@ export function EditCierreForm({
   cierre,
 }: EditCierreFormProps) {
   const router = useRouter();
-  const { session, logout } = useAuth();
+  const { session } = useAuth();
   const { toast } = useToast();
 
   const initialComedorId = cierre.comedor
@@ -249,17 +249,7 @@ export function EditCierreForm({
       });
       router.push("/contabilidad");
     } catch (err) {
-      if (ApiError.isUnauthorized(err)) {
-        toast({
-          variant: "destructive",
-          title: "Sesión expirada",
-          description:
-            "Tu sesión ha expirado. Por favor, inicia sesión nuevamente.",
-        });
-        logout();
-        router.replace("/login");
-        return;
-      }
+      if (ApiError.isUnauthorized(err)) return; // handled centrally by AuthProvider
 
       const errorMessage =
         err instanceof ApiError
