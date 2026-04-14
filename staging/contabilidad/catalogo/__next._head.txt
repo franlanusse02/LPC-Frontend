@@ -1,0 +1,6 @@
+1:"$Sreact.fragment"
+2:I[97367,["/staging/_next/static/chunks/ff1a16fafef87110.js","/staging/_next/static/chunks/d2be314c3ece3fbe.js"],"ViewportBoundary"]
+3:I[97367,["/staging/_next/static/chunks/ff1a16fafef87110.js","/staging/_next/static/chunks/d2be314c3ece3fbe.js"],"MetadataBoundary"]
+4:"$Sreact.suspense"
+5:I[27201,["/staging/_next/static/chunks/ff1a16fafef87110.js","/staging/_next/static/chunks/d2be314c3ece3fbe.js"],"IconMark"]
+0:{"buildId":"H05cJFPmlSZg2ya2UgAUL","rsc":["$","$1","h",{"children":[null,["$","$L2",null,{"children":[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}],["$","meta","2",{"name":"theme-color","content":"#000000"}]]}],["$","div",null,{"hidden":true,"children":["$","$L3",null,{"children":["$","$4",null,{"name":"Next.Metadata","children":[["$","title","0",{"children":"P_COMEDORES"}],["$","link","1",{"rel":"icon","href":"data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='white'/><text x='50' y='64' font-size='38' font-family='Helvetica Neue, Helvetica, Arial, sans-serif' font-weight='bold' text-anchor='middle' fill='black'>LPC</text></svg>"}],["$","$L5","2",{}]]}]}]}],null]}],"loading":null,"isPartial":false}
