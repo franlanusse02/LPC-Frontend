@@ -176,8 +176,8 @@ export function NuevoEventoModal({ open, onClose, token, comedores, onConfirm }:
     setSalas([]);
 
     Promise.all([
-      apiFetch<TipoEventoResponse[]>(`/api/tipos-evento/activos?comedorId=${comedorId}`, {}, token),
-      apiFetch<EdificioResponse[]>(`/api/edificios-evento/activos?comedorId=${comedorId}`, {}, token),
+      apiFetch<TipoEventoResponse[]>(`/api/eventos/tipos/activos?comedorId=${comedorId}`, {}, token),
+      apiFetch<EdificioResponse[]>(`/api/eventos/edificios/activos?comedorId=${comedorId}`, {}, token),
     ])
       .then(([tipos, edificiosData]) => {
         if (cancelled) return;
@@ -213,7 +213,7 @@ export function NuevoEventoModal({ open, onClose, token, comedores, onConfirm }:
     setLoadingSalas(true);
     setSalaId("");
 
-    apiFetch<SalaResponse[]>(`/api/salas-evento/activos?edificioId=${edificioId}`, {}, token)
+    apiFetch<SalaResponse[]>(`/api/eventos/salas/activos?edificioId=${edificioId}`, {}, token)
       .then((salasData) => {
         if (cancelled) return;
         setSalas(salasData.sort((a, b) => a.nombre.localeCompare(b.nombre)));

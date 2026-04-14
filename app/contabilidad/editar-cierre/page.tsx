@@ -55,12 +55,12 @@ function EditarCierrePageInner() {
 
     Promise.all([
       apiFetch<DetailedCierreCajaResponse>(
-        `/api/cierre/detailed/${cierreId}`,
+        `/api/cierres/detailed/${cierreId}`,
         {},
         token,
       ),
-      apiFetch<ComedorResponse[]>("/api/comedor", {}, token),
-      apiFetch<PuntoDeVentaResponse[]>("/api/puntodeventa", {}, token),
+      apiFetch<ComedorResponse[]>("/api/comedores", {}, token),
+      apiFetch<PuntoDeVentaResponse[]>("/api/comedores/puntos-de-venta", {}, token),
     ])
       .then(([cierreData, comedoresData, puntosData]) => {
         setCierre(cierreData);

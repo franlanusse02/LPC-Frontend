@@ -85,7 +85,7 @@ function FacturaImportJobDetailContent() {
     try {
       const [proveedoresData, comedoresData, bancosData] = await Promise.all([
         apiFetch<ProveedorResponse[]>("/api/proveedores", {}, token || ""),
-        apiFetch<ComedorResponse[]>("/api/comedor", {}, token || ""),
+        apiFetch<ComedorResponse[]>("/api/comedores", {}, token || ""),
         apiFetch<BancoResponse[]>("/api/bancos", {}, token || ""),
       ]);
       setProveedores(proveedoresData);

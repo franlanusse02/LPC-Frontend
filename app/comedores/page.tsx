@@ -9,10 +9,10 @@ import { apiFetch } from "@/lib/api";
 import { useAuth } from "@/lib/auth-context";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import Link from "next/link";
 import { SociedadResponse } from "@/models/dto/sociedad/SociedadResponse";
+import { BackButton } from "@/components/back-button";
 
 export default function ComedoresPage() {
   const [comedores, setComedores] = useState<ComedorResponse[]>([]);
@@ -26,7 +26,8 @@ export default function ComedoresPage() {
   useEffect(() => {
     if (!isLoading) {
       if (!session) router.replace("/login");
-      else if (session?.rol !== "ADMIN") router.replace("/");
+      else if (session.rol !== "ADMIN" && session.rol !== "CONTABILIDAD")
+        router.replace("/");
       else fetchComedores();
     }
   }, [session, isLoading, router]);
@@ -35,12 +36,12 @@ export default function ComedoresPage() {
     try {
       const [comedoresData, sociedadesData] = await Promise.all([
         apiFetch<ComedorResponse[]>(
-          "/api/comedor",
+          "/api/comedores",
           {},
           token || "",
         ),
         apiFetch<SociedadResponse[]>(
-          "/api/sociedad",
+          "/api/sociedades",
           {},
           token || "",
         ),
@@ -77,17 +78,9 @@ export default function ComedoresPage() {
       <Header />
       <main className="mx-auto max-w-3xl px-6 py-10">
         <div className="mb-6">
-          <Button
-            variant="ghost"
-            size="sm"
-            asChild
-            className="gap-2 text-gray-500 hover:text-gray-800"
-          >
-            <Link href="/">
-              <ArrowLeft className="h-4 w-4" />
-              Volver a Menu Administrador
-            </Link>
-          </Button>
+          <BackButton
+            fallbackHref={session?.rol === "ADMIN" ? "/" : "/contabilidad/catalogo"}
+          />
         </div>
         <Card className="border border-gray-200 shadow-sm rounded-xl overflow-hidden">
           <CardContent>

@@ -24,11 +24,15 @@ import {
   Tag,
   Building,
   DoorOpen,
+  Package2,
+  UsersRound,
 } from "lucide-react";
 
 export default function HomePage() {
   const router = useRouter();
   const { session, isLoading } = useAuth();
+  const configButtonClass =
+    "flex h-20 w-full flex-col items-center justify-center gap-2 rounded-lg border-gray-200 px-3 hover:border-gray-300 hover:bg-gray-50 sm:w-[calc(50%-0.375rem)] lg:w-[calc(33.333%-0.5rem)]";
 
   useEffect(() => {
     if (!isLoading) {
@@ -64,7 +68,7 @@ export default function HomePage() {
               Podés elegir cómo ver el sistema
             </CardDescription>
           </CardHeader>
-          <CardContent className="p-4 grid grid-cols-2 gap-3">
+          <CardContent className="grid grid-cols-2 gap-3 p-4">
             <Button
               variant="outline"
               onClick={() => router.push("/contabilidad")}
@@ -93,11 +97,11 @@ export default function HomePage() {
               Podés crear datos estáticos del sistema
             </CardDescription>
           </CardHeader>
-          <CardContent className="grid grid-cols-2 gap-3 p-4 sm:grid-cols-3 lg:grid-cols-3">
+          <CardContent className="flex flex-wrap justify-center gap-3 p-4">
             <Button
               variant="outline"
               onClick={() => router.push("/comedores")}
-              className="flex flex-col items-center justify-center gap-2 h-20 px-3 rounded-lg border-gray-200 hover:bg-gray-50 hover:border-gray-300"
+              className={configButtonClass}
             >
               <div className="flex items-center justify-center w-8 h-8 rounded-md bg-gray-100">
                 <Utensils className="h-4 w-4 text-gray-600" />
@@ -109,7 +113,7 @@ export default function HomePage() {
             <Button
               variant="outline"
               onClick={() => router.push("/puntos-de-venta")}
-              className="flex flex-col items-center justify-center gap-2 h-20 px-3 rounded-lg border-gray-200 hover:bg-gray-50 hover:border-gray-300"
+              className={configButtonClass}
             >
               <div className="flex items-center justify-center w-8 h-8 rounded-md bg-gray-100">
                 <ShoppingCart className="h-4 w-4 text-gray-600" />
@@ -121,7 +125,7 @@ export default function HomePage() {
             <Button
               variant="outline"
               onClick={() => router.push("/usuarios")}
-              className="flex flex-col items-center justify-center gap-2 h-20 px-3 rounded-lg border-gray-200 hover:bg-gray-50 hover:border-gray-300"
+              className={configButtonClass}
             >
               <div className="flex items-center justify-center w-8 h-8 rounded-md bg-gray-100">
                 <UserPlus className="h-4 w-4 text-gray-600" />
@@ -133,7 +137,7 @@ export default function HomePage() {
             <Button
               variant="outline"
               onClick={() => router.push("/sociedades")}
-              className="flex flex-col items-center justify-center gap-2 h-20 px-3 rounded-lg border-gray-200 hover:bg-gray-50 hover:border-gray-300"
+              className={configButtonClass}
             >
               <div className="flex items-center justify-center w-8 h-8 rounded-md bg-gray-100">
                 <Building2 className="h-4 w-4 text-gray-600" />
@@ -145,7 +149,7 @@ export default function HomePage() {
             <Button
               variant="outline"
               onClick={() => router.push("/proveedores")}
-              className="flex flex-col items-center justify-center gap-2 h-20 px-3 rounded-lg border-gray-200 hover:bg-gray-50 hover:border-gray-300"
+              className={configButtonClass}
             >
               <div className="flex items-center justify-center w-8 h-8 rounded-md bg-gray-100">
                 <Truck className="h-4 w-4 text-gray-600" />
@@ -156,8 +160,32 @@ export default function HomePage() {
             </Button>
             <Button
               variant="outline"
+              onClick={() => router.push("/productos-consumo")}
+              className={configButtonClass}
+            >
+              <div className="flex h-8 w-8 items-center justify-center rounded-md bg-gray-100">
+                <Package2 className="h-4 w-4 text-gray-600" />
+              </div>
+              <span className="text-center text-xs font-medium leading-tight text-gray-700">
+                Productos
+              </span>
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => router.push("/consumidores")}
+              className={configButtonClass}
+            >
+              <div className="flex h-8 w-8 items-center justify-center rounded-md bg-gray-100">
+                <UsersRound className="h-4 w-4 text-gray-600" />
+              </div>
+              <span className="text-center text-xs font-medium leading-tight text-gray-700">
+                Consumidores
+              </span>
+            </Button>
+            <Button
+              variant="outline"
               onClick={() => router.push("/bancos")}
-              className="flex h-20 flex-col items-center justify-center gap-2 rounded-lg border-gray-200 px-3 hover:border-gray-300 hover:bg-gray-50"
+              className={configButtonClass}
             >
               <div className="flex h-8 w-8 items-center justify-center rounded-md bg-gray-100">
                 <Landmark className="h-4 w-4 text-gray-600" />
@@ -169,7 +197,7 @@ export default function HomePage() {
             <Button
               variant="outline"
               onClick={() => router.push("/tipos-evento")}
-              className="flex h-20 flex-col items-center justify-center gap-2 rounded-lg border-gray-200 px-3 hover:border-gray-300 hover:bg-gray-50"
+              className={configButtonClass}
             >
               <div className="flex h-8 w-8 items-center justify-center rounded-md bg-gray-100">
                 <Tag className="h-4 w-4 text-gray-600" />
@@ -181,7 +209,7 @@ export default function HomePage() {
             <Button
               variant="outline"
               onClick={() => router.push("/edificios")}
-              className="flex h-20 flex-col items-center justify-center gap-2 rounded-lg border-gray-200 px-3 hover:border-gray-300 hover:bg-gray-50"
+              className={configButtonClass}
             >
               <div className="flex h-8 w-8 items-center justify-center rounded-md bg-gray-100">
                 <Building className="h-4 w-4 text-gray-600" />
@@ -193,7 +221,7 @@ export default function HomePage() {
             <Button
               variant="outline"
               onClick={() => router.push("/salas")}
-              className="flex h-20 flex-col items-center justify-center gap-2 rounded-lg border-gray-200 px-3 hover:border-gray-300 hover:bg-gray-50"
+              className={configButtonClass}
             >
               <div className="flex h-8 w-8 items-center justify-center rounded-md bg-gray-100">
                 <DoorOpen className="h-4 w-4 text-gray-600" />
