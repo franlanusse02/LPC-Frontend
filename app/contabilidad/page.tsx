@@ -619,17 +619,17 @@ export default function ContabilidadPage() {
 
   useEffect(() => {
     if (!session) return;
-    apiFetch<DetailedCierreCajaResponse[]>("/api/cierre", {}, session.token)
+    apiFetch<DetailedCierreCajaResponse[]>("/api/cierres", {}, session.token)
       .then(setCierres)
       .finally(() => setLoadingCierres(false));
-    apiFetch<PageResponse<FacturaProveedorResponse>>("/api/facturas-proveedor?size=10000", {}, session.token)
+    apiFetch<PageResponse<FacturaProveedorResponse>>("/api/facturas/proveedor?size=10000", {}, session.token)
       .then((res) => setFacturas(res.content))
       .finally(() => setLoadingFacturas(false));
     apiFetch<ProveedorResponse[]>("/api/proveedores", {}, session.token).then(setProveedores);
-    apiFetch<ComedorResponse[]>("/api/comedor", {}, session.token).then(setComedores);
-    apiFetch<PuntoDeVentaResponse[]>("/api/puntodeventa", {}, session.token).then(setPuntosDeVenta);
-    apiFetch<SociedadResponse[]>("/api/sociedad", {}, session.token).then(setSociedades);
-    apiFetch<ConsumidorResponse[]>("/api/consumos/consumidor/all", {}, session.token)
+    apiFetch<ComedorResponse[]>("/api/comedores", {}, session.token).then(setComedores);
+    apiFetch<PuntoDeVentaResponse[]>("/api/comedores/puntos-de-venta", {}, session.token).then(setPuntosDeVenta);
+    apiFetch<SociedadResponse[]>("/api/sociedades", {}, session.token).then(setSociedades);
+    apiFetch<ConsumidorResponse[]>("/api/consumos/consumidores/all", {}, session.token)
       .then(setConsumidores)
       .catch(() => setConsumidores([]));
   }, [session]);
@@ -638,7 +638,7 @@ export default function ContabilidadPage() {
     if (!session) return;
     if (view !== "consumos" && !editarConsumo) return;
 
-    apiFetch<ProductoResponse[]>("/api/consumos/producto", {}, session.token)
+    apiFetch<ProductoResponse[]>("/api/consumos/productos", {}, session.token)
       .then(setProductosConsumo)
       .catch(() => setProductosConsumo([]));
   }, [session, view, editarConsumo]);
@@ -710,8 +710,8 @@ export default function ContabilidadPage() {
   const handleAnularCierre = async (cierreId: number, motivo: string) => {
     if (!session) return;
     try {
-      await apiFetch(`/api/cierre/${cierreId}/anular`,
-        { method: "POST", body: JSON.stringify({ motivo }) }, session.token);
+      await apiFetch(`/api/cierres/${cierreId}`,
+        { method: "DELETE", body: JSON.stringify({ motivo }) }, session.token);
       setCierres((prev) => prev.map((c) =>
         c.id !== cierreId ? c : {
           ...c, anulacionId: cierreId, montoTotal: 0,
@@ -725,7 +725,7 @@ export default function ContabilidadPage() {
   const handleNuevaFactura = async (req: CreateFacturaProveedorRequest) => {
     if (!session) return;
     try {
-      const nueva = await apiFetch<FacturaProveedorResponse>("/api/facturas-proveedor",
+      const nueva = await apiFetch<FacturaProveedorResponse>("/api/facturas/proveedor",
         { method: "POST", body: JSON.stringify(req) }, session.token);
       setFacturas((prev) => [nueva, ...prev]);
       toast({ title: "Factura creada", description: `Factura #${nueva.numero} creada correctamente.` });
@@ -735,7 +735,7 @@ export default function ContabilidadPage() {
   const handleEmitir = async (facturaId: number, fechaEmision: string, fechaPago: string | null) => {
     if (!session) return;
     try {
-      const updated = await apiFetch<FacturaProveedorResponse>(`/api/facturas-proveedor/${facturaId}/emitir`,
+      const updated = await apiFetch<FacturaProveedorResponse>(`/api/facturas/proveedor/${facturaId}/emitir`,
         { method: "PATCH", body: JSON.stringify({ fechaEmision, fechaPago }) }, session.token);
       setFacturas((prev) => prev.map((f) => f.id === facturaId ? updated : f));
       toast({ title: "Factura emitida" });
@@ -745,7 +745,7 @@ export default function ContabilidadPage() {
   const handlePagar = async (facturaId: number, fechaPago: string | null) => {
     if (!session) return;
     try {
-      const updated = await apiFetch<FacturaProveedorResponse>(`/api/facturas-proveedor/${facturaId}/pagar`,
+      const updated = await apiFetch<FacturaProveedorResponse>(`/api/facturas/proveedor/${facturaId}/pagar`,
         { method: "PATCH", body: JSON.stringify({ fechaPago }) }, session.token);
       setFacturas((prev) => prev.map((f) => f.id === facturaId ? updated : f));
       toast({ title: "Pago registrado" });
@@ -755,7 +755,7 @@ export default function ContabilidadPage() {
   const handleEditar = async (facturaId: number, req: PatchFacturaProveedorRequest) => {
     if (!session) return;
     try {
-      const updated = await apiFetch<FacturaProveedorResponse>(`/api/facturas-proveedor/${facturaId}/editar`,
+      const updated = await apiFetch<FacturaProveedorResponse>(`/api/facturas/proveedor/${facturaId}`,
         { method: "PATCH", body: JSON.stringify(req) }, session.token);
       setFacturas((prev) => prev.map((f) => f.id === facturaId ? updated : f));
       toast({ title: "Factura actualizada" });
@@ -815,8 +815,8 @@ export default function ContabilidadPage() {
   const handleAnularFactura = async (facturaId: number, motivo: string) => {
     if (!session) return;
     try {
-      const updated = await apiFetch<FacturaProveedorResponse>(`/api/facturas-proveedor/${facturaId}/anular`,
-        { method: "PATCH", body: JSON.stringify({ motivo }) }, session.token);
+      const updated = await apiFetch<FacturaProveedorResponse>(`/api/facturas/proveedor/${facturaId}`,
+        { method: "DELETE", body: JSON.stringify({ motivo }) }, session.token);
       setFacturas((prev) => prev.map((f) => f.id === facturaId ? updated : f));
       toast({ title: "Factura anulada" });
     } catch (err) { handleError(err); throw err; }
@@ -843,8 +843,8 @@ export default function ContabilidadPage() {
     if (!session) return;
     try {
       const updated = await apiFetch<ConsumoResponse>(
-        `/api/consumos/${consumoId}/anular`,
-        { method: "POST", body: JSON.stringify({ motivo }) },
+        `/api/consumos/${consumoId}`,
+        { method: "DELETE", body: JSON.stringify({ motivo }) },
         session.token,
       );
       setConsumos((prev) => prev.map((item) =>
@@ -1354,7 +1354,7 @@ export default function ContabilidadPage() {
           comedores={comedores}
           puntosDeVenta={puntosDeVenta}
           onSuccess={() => {
-            apiFetch<DetailedCierreCajaResponse[]>("/api/cierre", {}, session!.token).then(setCierres);
+            apiFetch<DetailedCierreCajaResponse[]>("/api/cierres", {}, session!.token).then(setCierres);
           }}
         />
       )}

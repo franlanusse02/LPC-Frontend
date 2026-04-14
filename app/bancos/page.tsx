@@ -74,7 +74,7 @@ export default function BancosPage() {
     try {
       const [bancosData, sociedadesData] = await Promise.all([
         apiFetch<BancoResponse[]>("/api/bancos", {}, token || ""),
-        apiFetch<SociedadResponse[]>("/api/sociedad", {}, token || ""),
+        apiFetch<SociedadResponse[]>("/api/sociedades", {}, token || ""),
       ]);
       setBancos(bancosData);
       setSociedades(sociedadesData);

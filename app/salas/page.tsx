@@ -48,8 +48,8 @@ export default function SalasPage() {
     if (!session || (session.rol !== "ADMIN" && session.rol !== "CONTABILIDAD"))
       return;
     Promise.all([
-      apiFetch<SalaResponse[]>("/api/salas-evento", {}, token || ""),
-      apiFetch<EdificioResponse[]>("/api/edificios-evento", {}, token || ""),
+      apiFetch<SalaResponse[]>("/api/eventos/salas", {}, token || ""),
+      apiFetch<EdificioResponse[]>("/api/eventos/edificios", {}, token || ""),
     ])
       .then(([salasData, edificiosData]) => {
         setSalas(salasData.sort((a, b) => `${a.edificioNombre}-${a.nombre}`.localeCompare(`${b.edificioNombre}-${b.nombre}`)));
@@ -74,7 +74,7 @@ export default function SalasPage() {
     setSubmitting(true);
     try {
       const created = await apiFetch<SalaResponse>(
-        "/api/salas-evento",
+        "/api/eventos/salas",
         { method: "POST", body: JSON.stringify({ nombre: form.nombre.trim(), edificioId: Number(form.edificioId) }) },
         token || "",
       );
@@ -100,7 +100,7 @@ export default function SalasPage() {
     setEditSubmitting(true);
     try {
       const updated = await apiFetch<SalaResponse>(
-        `/api/salas-evento/${editarSala.id}`,
+        `/api/eventos/salas/${editarSala.id}`,
         { method: "PATCH", body: JSON.stringify({ nombre: editForm.nombre.trim(), edificioId: Number(editForm.edificioId) }) },
         token || "",
       );

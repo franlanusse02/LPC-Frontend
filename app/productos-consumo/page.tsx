@@ -35,8 +35,8 @@ export default function ProductosConsumoPage() {
   const fetchAll = async () => {
     try {
       const [productosData, comedoresData] = await Promise.all([
-        apiFetch<ProductoResponse[]>("/api/consumos/producto", {}, token || ""),
-        apiFetch<ComedorResponse[]>("/api/comedor", {}, token || ""),
+        apiFetch<ProductoResponse[]>("/api/consumos/productos", {}, token || ""),
+        apiFetch<ComedorResponse[]>("/api/comedores", {}, token || ""),
       ]);
       setProductos(productosData);
       setComedores(comedoresData);

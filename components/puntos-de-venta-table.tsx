@@ -103,7 +103,7 @@ function NuevoPuntoDeVentaModal({
     setErrors({});
     try {
       const response = await apiFetch<PuntoDeVentaResponse>(
-        "/api/puntodeventa",
+        "/api/comedores/puntos-de-venta",
         {
           method: "POST",
           body: JSON.stringify({
@@ -269,7 +269,7 @@ function EditarPuntoDeVentaModal({
     setError(null);
     try {
       const response = await apiFetch<PuntoDeVentaResponse>(
-        `/api/puntodeventa/${punto.id}`,
+        `/api/comedores/puntos-de-venta/${punto.id}`,
         { method: "PATCH", body: JSON.stringify({ nombre: nombre.trim() }) },
         token || "",
       );

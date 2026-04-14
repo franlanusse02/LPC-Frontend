@@ -241,19 +241,19 @@ export default function EncargadoPage() {
 
   useEffect(() => {
     if (!session) return;
-    apiFetch<DetailedCierreCajaResponse[]>("/api/cierre", {}, session.token)
+    apiFetch<DetailedCierreCajaResponse[]>("/api/cierres", {}, session.token)
       .then(setCierres)
       .finally(() => setLoadingCierres(false));
-    apiFetch<FacturaProveedorResponse[]>("/api/facturas-proveedor/mis-facturas", {}, session.token)
+    apiFetch<FacturaProveedorResponse[]>("/api/facturas/proveedor/mis-facturas", {}, session.token)
       .then(setFacturas)
       .finally(() => setLoadingFacturas(false));
     apiFetch<ProveedorResponse[]>("/api/proveedores", {}, session.token).then(setProveedores);
-    apiFetch<ComedorResponse[]>("/api/comedor", {}, session.token).then(setComedores);
-    apiFetch<PuntoDeVentaResponse[]>("/api/puntodeventa", {}, session.token).then(setPuntosDeVenta);
-    apiFetch<ConsumidorResponse[]>("/api/consumos/consumidor/all", {}, session.token)
+    apiFetch<ComedorResponse[]>("/api/comedores", {}, session.token).then(setComedores);
+    apiFetch<PuntoDeVentaResponse[]>("/api/comedores/puntos-de-venta", {}, session.token).then(setPuntosDeVenta);
+    apiFetch<ConsumidorResponse[]>("/api/consumos/consumidores/all", {}, session.token)
       .then(setConsumidores)
       .catch(() => setConsumidores([]));
-    apiFetch<ProductoResponse[]>("/api/consumos/producto", {}, session.token)
+    apiFetch<ProductoResponse[]>("/api/consumos/productos", {}, session.token)
       .then(setProductosConsumo)
       .catch(() => setProductosConsumo([]));
     apiFetch<EventoResponse[]>("/api/eventos/mis-cierres", {}, session.token)
@@ -310,7 +310,7 @@ export default function EncargadoPage() {
     if (!session) return;
     try {
       const nueva = await apiFetch<FacturaProveedorResponse>(
-        "/api/facturas-proveedor",
+        "/api/facturas/proveedor",
         { method: "POST", body: JSON.stringify(req) },
         session.token,
       );
@@ -510,7 +510,7 @@ export default function EncargadoPage() {
         comedores={comedores}
         puntosDeVenta={puntosDeVenta}
         onSuccess={() => {
-          apiFetch<DetailedCierreCajaResponse[]>("/api/cierre", {}, session!.token).then(setCierres);
+          apiFetch<DetailedCierreCajaResponse[]>("/api/cierres", {}, session!.token).then(setCierres);
         }}
       />
 

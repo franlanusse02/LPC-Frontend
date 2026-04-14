@@ -35,8 +35,8 @@ export default function PuntosDeVentaPage() {
   const fetchAll = async () => {
     try {
       const [puntosData, comedoresData] = await Promise.all([
-        apiFetch<PuntoDeVentaResponse[]>("/api/puntodeventa", {}, token || ""),
-        apiFetch<ComedorResponse[]>("/api/comedor", {}, token || ""),
+        apiFetch<PuntoDeVentaResponse[]>("/api/comedores/puntos-de-venta", {}, token || ""),
+        apiFetch<ComedorResponse[]>("/api/comedores", {}, token || ""),
       ]);
       setPuntosDeVenta(puntosData);
       setComedores(comedoresData);

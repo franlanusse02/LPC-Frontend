@@ -50,8 +50,8 @@ export default function EdificiosPage() {
     if (!session || (session.rol !== "ADMIN" && session.rol !== "CONTABILIDAD"))
       return;
     Promise.all([
-      apiFetch<EdificioResponse[]>("/api/edificios-evento", {}, token || ""),
-      apiFetch<ComedorResponse[]>("/api/comedor", {}, token || ""),
+      apiFetch<EdificioResponse[]>("/api/eventos/edificios", {}, token || ""),
+      apiFetch<ComedorResponse[]>("/api/comedores", {}, token || ""),
     ])
       .then(([edificiosData, comedoresData]) => {
         setEdificios(edificiosData.sort((a, b) => a.nombre.localeCompare(b.nombre)));
@@ -76,7 +76,7 @@ export default function EdificiosPage() {
     setSubmitting(true);
     try {
       const created = await apiFetch<EdificioResponse>(
-        "/api/edificios-evento",
+        "/api/eventos/edificios",
         { method: "POST", body: JSON.stringify({ nombre: nombre.trim(), comedorId: Number(comedorId) }) },
         token || "",
       );
@@ -104,7 +104,7 @@ export default function EdificiosPage() {
     setEditSubmitting(true);
     try {
       const updated = await apiFetch<EdificioResponse>(
-        `/api/edificios-evento/${editarEdificio.id}`,
+        `/api/eventos/edificios/${editarEdificio.id}`,
         { method: "PATCH", body: JSON.stringify({ nombre: editNombre.trim(), comedorId: Number(editComedorId) }) },
         token || "",
       );

@@ -48,7 +48,7 @@ export default function SociedadesPage() {
 
   const fetchAll = async () => {
     try {
-      const data = await apiFetch<SociedadResponse[]>("/api/sociedad", {}, token || "");
+      const data = await apiFetch<SociedadResponse[]>("/api/sociedades", {}, token || "");
       setSociedades(data);
     } catch {
     } finally {
@@ -67,7 +67,7 @@ export default function SociedadesPage() {
     setEditSubmitting(true);
     try {
       const updated = await apiFetch<SociedadResponse>(
-        `/api/sociedad/${editarSociedad.id}`,
+        `/api/sociedades/${editarSociedad.id}`,
         { method: "PATCH", body: JSON.stringify(editForm) },
         token || "",
       );
@@ -85,7 +85,7 @@ export default function SociedadesPage() {
     e.preventDefault();
     setSubmitting(true);
     try {
-      const created = await apiFetch<SociedadResponse>("/api/sociedad", {
+      const created = await apiFetch<SociedadResponse>("/api/sociedades", {
         method: "POST",
         body: JSON.stringify(form),
       }, token || "");

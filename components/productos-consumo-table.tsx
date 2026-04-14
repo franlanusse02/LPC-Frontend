@@ -344,7 +344,7 @@ export function ProductosConsumoTable({
   ) => {
     try {
       const created = await apiFetch<ProductoResponse>(
-        "/api/consumos/producto",
+        "/api/consumos/productos",
         {
           method: "POST",
           body: JSON.stringify(payload),
@@ -374,7 +374,7 @@ export function ProductosConsumoTable({
 
     try {
       const updated = await apiFetch<ProductoResponse>(
-        `/api/consumos/producto/${productoId}/patch`,
+        `/api/consumos/productos/${productoId}`,
         {
           method: "PATCH",
           body: JSON.stringify(payload),
@@ -399,9 +399,9 @@ export function ProductosConsumoTable({
   const handleDelete = async (producto: ProductoResponse) => {
     try {
       await apiFetch<void>(
-        `/api/consumos/producto/${producto.productoId}/borrar`,
+        `/api/consumos/productos/${producto.productoId}`,
         {
-          method: "PATCH",
+          method: "DELETE",
         },
         token || "",
       );

@@ -36,12 +36,12 @@ export default function ComedoresPage() {
     try {
       const [comedoresData, sociedadesData] = await Promise.all([
         apiFetch<ComedorResponse[]>(
-          "/api/comedor",
+          "/api/comedores",
           {},
           token || "",
         ),
         apiFetch<SociedadResponse[]>(
-          "/api/sociedad",
+          "/api/sociedades",
           {},
           token || "",
         ),

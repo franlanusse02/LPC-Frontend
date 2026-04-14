@@ -451,7 +451,7 @@ export function ConsumidoresTable({
   ) => {
     try {
       const created = await apiFetch<ConsumidorResponse>(
-        "/api/consumos/consumidor",
+        "/api/consumos/consumidores",
         {
           method: "POST",
           body: JSON.stringify(payload),
@@ -481,7 +481,7 @@ export function ConsumidoresTable({
 
     try {
       const updated = await apiFetch<ConsumidorResponse>(
-        `/api/consumos/consumidor/${consumidorId}/patch`,
+        `/api/consumos/consumidores/${consumidorId}`,
         {
           method: "PATCH",
           body: JSON.stringify(payload),
@@ -506,9 +506,9 @@ export function ConsumidoresTable({
   const handleDelete = async (consumidor: ConsumidorResponse) => {
     try {
       await apiFetch<void>(
-        `/api/consumos/consumidor/${consumidor.id}/borrar`,
+        `/api/consumos/consumidores/${consumidor.id}`,
         {
-          method: "PATCH",
+          method: "DELETE",
         },
         token || "",
       );

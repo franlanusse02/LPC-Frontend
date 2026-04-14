@@ -100,8 +100,8 @@ export default function TiposEventoPage() {
     if (!session || (session.rol !== "ADMIN" && session.rol !== "CONTABILIDAD"))
       return;
     Promise.all([
-      apiFetch<TipoEventoResponse[]>("/api/tipos-evento", {}, token || ""),
-      apiFetch<ComedorResponse[]>("/api/comedor", {}, token || ""),
+      apiFetch<TipoEventoResponse[]>("/api/eventos/tipos", {}, token || ""),
+      apiFetch<ComedorResponse[]>("/api/comedores", {}, token || ""),
     ])
       .then(([tiposData, comedoresData]) => {
         setTipos(tiposData.sort((a, b) => a.nombre.localeCompare(b.nombre)));
@@ -132,7 +132,7 @@ export default function TiposEventoPage() {
     setSubmitting(true);
     try {
       const created = await apiFetch<TipoEventoResponse>(
-        "/api/tipos-evento",
+        "/api/eventos/tipos",
         { method: "POST", body: JSON.stringify(buildBody(form)) },
         token || "",
       );
@@ -162,7 +162,7 @@ export default function TiposEventoPage() {
     setEditSubmitting(true);
     try {
       const updated = await apiFetch<TipoEventoResponse>(
-        `/api/tipos-evento/${editarTipo.id}`,
+        `/api/eventos/tipos/${editarTipo.id}`,
         { method: "PATCH", body: JSON.stringify(buildBody(editForm)) },
         token || "",
       );

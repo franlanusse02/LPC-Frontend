@@ -114,7 +114,7 @@ export function NuevoCierreForm({
     try {
       // 1. Create the cierre
       const cierreResponse = await apiFetch<CierreCajaResponse>(
-        "/api/cierre",
+        "/api/cierres",
         {
           method: "POST",
           body: JSON.stringify({
@@ -130,7 +130,7 @@ export function NuevoCierreForm({
       // 2. Create movimientos for each valid payment line
       const movimientoPromises = validLines.map((line) =>
         apiFetch<MovimientoResponse>(
-          "/api/movimiento",
+          "/api/movimientos",
           {
             method: "POST",
             body: JSON.stringify({

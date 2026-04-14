@@ -36,11 +36,11 @@ export default function ConsumidoresPage() {
     try {
       const [consumidoresData, comedoresData] = await Promise.all([
         apiFetch<ConsumidorResponse[]>(
-          "/api/consumos/consumidor/all",
+          "/api/consumos/consumidores/all",
           {},
           token || "",
         ),
-        apiFetch<ComedorResponse[]>("/api/comedor", {}, token || ""),
+        apiFetch<ComedorResponse[]>("/api/comedores", {}, token || ""),
       ]);
       setConsumidores(consumidoresData);
       setComedores(comedoresData);

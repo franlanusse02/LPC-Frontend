@@ -27,7 +27,7 @@ export default function CierresPage() {
 
   useEffect(() => {
     if (session) {
-      apiFetch<DetailedCierreCajaResponse[]>("/api/cierre", {}, session.token)
+      apiFetch<DetailedCierreCajaResponse[]>("/api/cierres", {}, session.token)
         .then(setCierres)
         .finally(() => setLoadingCierres(false));
     }
