@@ -19,14 +19,21 @@ import { CreateFacturaProveedorRequest } from "@/models/dto/compra/CreateFactura
 import { CierresTable } from "@/components/cierres-table";
 import { FacturasTable } from "@/components/facturas-table";
 import { EventosTable, EventoSortKey, EventoSortDir, EventoStatusFilter } from "@/components/eventos-table";
+import { ConsumosTable, ConsumoSortDir, ConsumoSortKey, ConsumoStatusFilter } from "@/components/consumos-table";
 import { NuevaFacturaModal } from "@/components/nueva-factura-modal";
 import { NuevoCierreModal } from "@/components/nuevo-cierre-modal";
 import { NuevoEventoModal } from "@/components/nuevo-evento-modal";
+import { NuevoConsumoModal } from "@/components/nuevo-consumo-modal";
 import { PuntoDeVentaResponse } from "@/models/dto/pto-venta/PuntoDeVentaResponse";
 import { EventoResponse } from "@/models/dto/evento/EventoResponse";
 import { CreateEventoRequest } from "@/models/dto/evento/CreateEventoRequest";
+import { ConsumoResponse } from "@/models/dto/consumos/ConsumoResponse";
+import { ConsumidorResponse } from "@/models/dto/consumos/ConsumidorResponse";
+import { ProductoResponse } from "@/models/dto/consumos/ProductoResponse";
+import { CreateConsumoRequest } from "@/models/dto/consumos/CreateConsumoRequest";
+import { buildConsumoListItem, ConsumoListItem, enrichConsumos } from "@/lib/consumos";
 
-type View = "cierres" | "compras" | "eventos";
+type View = "cierres" | "compras" | "eventos" | "consumos";
 
 export default function EncargadoPage() {
   const router = useRouter();
@@ -66,6 +73,20 @@ export default function EncargadoPage() {
   const [eventoSortKey, setEventoSortKey] = useState<EventoSortKey>("fechaEvento");
   const [eventoSortDir, setEventoSortDir] = useState<EventoSortDir>("desc");
 
+  // consumos
+  const [consumos, setConsumos] = useState<ConsumoListItem[]>([]);
+  const [loadingConsumos, setLoadingConsumos] = useState(true);
+  const [consumidores, setConsumidores] = useState<ConsumidorResponse[]>([]);
+  const [productosConsumo, setProductosConsumo] = useState<ProductoResponse[]>([]);
+  const [nuevoConsumoOpen, setNuevoConsumoOpen] = useState(false);
+  const [consumoSearch, setConsumoSearch] = useState("");
+  const [consumoStatusFilter, setConsumoStatusFilter] =
+    useState<ConsumoStatusFilter>("active");
+  const [consumoSortKey, setConsumoSortKey] =
+    useState<ConsumoSortKey>("fecha");
+  const [consumoSortDir, setConsumoSortDir] =
+    useState<ConsumoSortDir>("desc");
+
   const comedorIdFilter = useMemo(
     () => comedores.find((c) => c.nombre === comedorFilter)?.id ?? null,
     [comedores, comedorFilter],
@@ -100,6 +121,47 @@ export default function EncargadoPage() {
     });
     return list;
   }, [eventos, eventoStatusFilter, eventoSearch, eventoSortKey, eventoSortDir, comedorNameById]);
+
+  const displayedConsumos = useMemo(() => {
+    let list = [...consumos];
+    if (consumoStatusFilter === "active") list = list.filter((item) => !item.anulado);
+    if (consumoStatusFilter === "anulado") list = list.filter((item) => item.anulado);
+    if (comedorFilter) list = list.filter((item) => item.comedorNombre === comedorFilter);
+    if (dateDesde) list = list.filter((item) => item.fecha >= dateDesde);
+    if (dateHasta) list = list.filter((item) => item.fecha <= dateHasta);
+    if (consumoSearch.trim()) {
+      const query = consumoSearch.trim().toLowerCase();
+      list = list.filter((item) =>
+        item.comedorNombre.toLowerCase().includes(query) ||
+        item.puntoDeVentaNombre.toLowerCase().includes(query) ||
+        item.consumidorNombre.toLowerCase().includes(query) ||
+        item.fecha.includes(query) ||
+        (item.observaciones ?? "").toLowerCase().includes(query),
+      );
+    }
+    list.sort((left, right) => {
+      let leftValue: string | number = "";
+      let rightValue: string | number = "";
+      if (consumoSortKey === "fecha") { leftValue = left.fecha; rightValue = right.fecha; }
+      if (consumoSortKey === "comedor") { leftValue = left.comedorNombre; rightValue = right.comedorNombre; }
+      if (consumoSortKey === "puntoDeVenta") { leftValue = left.puntoDeVentaNombre; rightValue = right.puntoDeVentaNombre; }
+      if (consumoSortKey === "consumidor") { leftValue = left.consumidorNombre; rightValue = right.consumidorNombre; }
+      if (consumoSortKey === "total") { leftValue = left.total; rightValue = right.total; }
+      if (leftValue < rightValue) return consumoSortDir === "asc" ? -1 : 1;
+      if (leftValue > rightValue) return consumoSortDir === "asc" ? 1 : -1;
+      return 0;
+    });
+    return list;
+  }, [
+    comedorFilter,
+    consumoSearch,
+    consumoSortDir,
+    consumoSortKey,
+    consumoStatusFilter,
+    consumos,
+    dateDesde,
+    dateHasta,
+  ]);
 
   const comedorOptions = useMemo(
     () => [...new Set([
@@ -146,6 +208,7 @@ export default function EncargadoPage() {
     setDateDesde(""); setDateHasta(""); setComedorFilter("");
     setSearch(""); setStatusFilter("active");
     setEventoSearch(""); setEventoStatusFilter("all");
+    setConsumoSearch(""); setConsumoStatusFilter("active");
   };
 
   const handleNuevoEvento = async (req: CreateEventoRequest) => {
@@ -187,11 +250,61 @@ export default function EncargadoPage() {
     apiFetch<ProveedorResponse[]>("/api/proveedores", {}, session.token).then(setProveedores);
     apiFetch<ComedorResponse[]>("/api/comedor", {}, session.token).then(setComedores);
     apiFetch<PuntoDeVentaResponse[]>("/api/puntodeventa", {}, session.token).then(setPuntosDeVenta);
+    apiFetch<ConsumidorResponse[]>("/api/consumos/consumidor/all", {}, session.token)
+      .then(setConsumidores)
+      .catch(() => setConsumidores([]));
+    apiFetch<ProductoResponse[]>("/api/consumos/producto", {}, session.token)
+      .then(setProductosConsumo)
+      .catch(() => setProductosConsumo([]));
     apiFetch<EventoResponse[]>("/api/eventos/mis-cierres", {}, session.token)
       .then(setEventos)
       .catch(() => setEventos([]))
       .finally(() => setLoadingEventos(false));
   }, [session]);
+
+  useEffect(() => {
+    if (!session || comedores.length === 0 || puntosDeVenta.length === 0) return;
+
+    let cancelled = false;
+
+    const loadConsumos = async () => {
+      setLoadingConsumos(true);
+      try {
+        const path = dateDesde && dateHasta
+          ? `/api/consumos/dates?fechaInicio=${dateDesde}&fechaFin=${dateHasta}`
+          : "/api/consumos";
+        const data = await apiFetch<ConsumoResponse[]>(path, {}, session.token);
+        const enriched = enrichConsumos(
+          data,
+          comedores,
+          puntosDeVenta,
+          consumidores,
+        );
+        if (!cancelled) {
+          setConsumos(enriched);
+        }
+      } catch {
+        if (!cancelled) {
+          setConsumos([]);
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: "No se pudieron obtener los consumos.",
+          });
+        }
+      } finally {
+        if (!cancelled) {
+          setLoadingConsumos(false);
+        }
+      }
+    };
+
+    loadConsumos();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [session, comedores, puntosDeVenta, consumidores, dateDesde, dateHasta, toast]);
 
   const handleNuevaFactura = async (req: CreateFacturaProveedorRequest) => {
     if (!session) return;
@@ -209,6 +322,33 @@ export default function EncargadoPage() {
         variant: "destructive",
         title: "Error",
         description: err instanceof ApiError ? err.message : "No se pudo crear la factura.",
+      });
+      throw err;
+    }
+  };
+
+  const handleNuevoConsumo = async (req: CreateConsumoRequest) => {
+    if (!session) return;
+    try {
+      const nuevo = await apiFetch<ConsumoResponse>(
+        "/api/consumos",
+        { method: "POST", body: JSON.stringify(req) },
+        session.token,
+      );
+      const enriched = buildConsumoListItem(
+        nuevo,
+        comedores,
+        puntosDeVenta,
+        consumidores,
+      );
+      setConsumos((prev) => [enriched, ...prev]);
+      toast({ title: "Consumo creado" });
+    } catch (err) {
+      if (ApiError.isUnauthorized(err)) return;
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: err instanceof ApiError ? err.message : "No se pudo crear el consumo.",
       });
       throw err;
     }
@@ -232,16 +372,28 @@ export default function EncargadoPage() {
           <CardHeader className="border-b px-6 py-4 space-y-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-xl font-bold text-gray-800">
-                {view === "cierres" ? "Tus Cierres" : view === "compras" ? "Tus Compras" : "Tus Eventos"}
+                {view === "cierres"
+                  ? "Tus Cierres"
+                  : view === "compras"
+                    ? "Tus Compras"
+                    : view === "eventos"
+                      ? "Tus Eventos"
+                      : "Tus Consumos"}
               </CardTitle>
               <div className="flex items-center gap-1 rounded-lg border border-gray-200 bg-gray-50 p-1">
-                {(["cierres", "compras", "eventos"] as View[]).map((v) => (
+                {(["cierres", "compras", "eventos", "consumos"] as View[]).map((v) => (
                   <button key={v} onClick={() => setView(v)}
                     className={cn(
                       "rounded-md px-2.5 py-1 text-xs font-medium transition-all",
                       view === v ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-700",
                     )}>
-                    {v === "cierres" ? "Cierres" : v === "compras" ? "Compras" : "Eventos"}
+                    {v === "cierres"
+                      ? "Cierres"
+                      : v === "compras"
+                        ? "Compras"
+                        : v === "eventos"
+                          ? "Eventos"
+                          : "Consumos"}
                   </button>
                 ))}
               </div>
@@ -320,6 +472,26 @@ export default function EncargadoPage() {
                 onClearFilters={clearFilters}
               />
             )}
+            {view === "consumos" && (
+              <ConsumosTable
+                consumos={consumos}
+                displayedConsumos={displayedConsumos}
+                loading={loadingConsumos}
+                readonly
+                search={consumoSearch}
+                onSearchChange={setConsumoSearch}
+                statusFilter={consumoStatusFilter}
+                onStatusFilterChange={setConsumoStatusFilter}
+                sortKey={consumoSortKey}
+                sortDir={consumoSortDir}
+                onSort={(key) => {
+                  if (key === consumoSortKey) setConsumoSortDir((dir) => (dir === "asc" ? "desc" : "asc"));
+                  else { setConsumoSortKey(key); setConsumoSortDir("asc"); }
+                }}
+                onNuevoConsumo={() => setNuevoConsumoOpen(true)}
+                onClearFilters={clearFilters}
+              />
+            )}
           </CardContent>
         </Card>
       </main>
@@ -348,6 +520,16 @@ export default function EncargadoPage() {
         token={session.token}
         comedores={comedores}
         onConfirm={handleNuevoEvento}
+      />
+
+      <NuevoConsumoModal
+        open={nuevoConsumoOpen}
+        onClose={() => setNuevoConsumoOpen(false)}
+        comedores={comedores}
+        puntosDeVenta={puntosDeVenta}
+        consumidores={consumidores}
+        productos={productosConsumo}
+        onConfirm={handleNuevoConsumo}
       />
     </div>
   );
