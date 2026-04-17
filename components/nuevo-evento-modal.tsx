@@ -532,6 +532,9 @@ export function NuevoEventoModal({ open, onClose, token, comedores, onConfirm }:
                     <FormField label="Concepto">
                       <Input value={concepto} onChange={(event) => setConcepto(event.target.value)} placeholder="Descripcion del evento" className="bg-card" />
                     </FormField>
+                    <FormField label={selectedTipoPrecio !== null ? "Cantidad de personas *" : "Cantidad de personas"}>
+                      <Input type="number" min="1" step="1" value={cantidadPersonas} onChange={(event) => setCantidadPersonas(event.target.value)} placeholder="0" className="bg-card" />
+                    </FormField>
                     {renderTotalField(requiresManualTotal ? "Monto *" : "Monto")}
                     <FormField label="Tipo de factura">
                       <Select value={tipoComprobante} onValueChange={(value) => setTipoComprobante(value === "__none__" ? "" : value)}>
