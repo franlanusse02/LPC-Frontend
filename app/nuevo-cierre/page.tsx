@@ -30,12 +30,12 @@ export default function NuevoCierrePage() {
     async function fetchData() {
       if (!token) return;
       const fetchedComedores = await apiFetch<ComedorResponse[]>(
-        "/api/comedor",
+        "/api/comedores",
         {},
         token,
       );
       const fetchedPuntos = await apiFetch<PuntoDeVentaResponse[]>(
-        "/api/puntodeventa",
+        "/api/comedores/puntos-de-venta",
         {},
         token,
       );

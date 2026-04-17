@@ -2,7 +2,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { Header } from "@/components/header";
@@ -31,8 +30,9 @@ import { CreateProveedorRequest } from "@/models/dto/proveedor/CreateProveedorRe
 import { AgregarPuntoDeVentaRequest } from "@/models/dto/proveedor/AgregarPuntoDeVentaRequest";
 import { NuevoProveedorModal } from "@/components/nuevo-proveedor-modal";
 import { AgregarPuntoDeVentaModal } from "@/components/agregar-punto-de-venta-modal";
-import { ArrowLeft, Pencil, Plus } from "lucide-react";
+import { Pencil, Plus } from "lucide-react";
 import { MediosPagoDict, MedioPago } from "@/models/enums/MedioPago";
+import { BackButton } from "@/components/back-button";
 
 export default function ProveedoresPage() {
   const router = useRouter();
@@ -46,9 +46,6 @@ export default function ProveedoresPage() {
   const [editarProveedor, setEditarProveedor] = useState<ProveedorResponse | null>(null);
   const [editForm, setEditForm] = useState<{ nombre: string; taxId: string; formaDePagoPredeterminada: MedioPago | "" }>({ nombre: "", taxId: "", formaDePagoPredeterminada: "" });
   const [editSubmitting, setEditSubmitting] = useState(false);
-
-  const backHref = session?.rol === "ADMIN" ? "/" : "/contabilidad";
-  const backLabel = session?.rol === "ADMIN" ? "Volver a Panel Administrador" : "Volver a Contabilidad";
 
   useEffect(() => {
     if (!isLoading) {
@@ -138,12 +135,9 @@ export default function ProveedoresPage() {
       <Header />
       <main className="mx-auto max-w-4xl px-6 py-10">
         <div className="mb-6">
-          <Button variant="ghost" size="sm" asChild className="gap-2 text-gray-500 hover:text-gray-800">
-            <Link href={backHref}>
-              <ArrowLeft className="h-4 w-4" />
-              {backLabel}
-            </Link>
-          </Button>
+          <BackButton
+            fallbackHref={session?.rol === "ADMIN" ? "/" : "/contabilidad/catalogo"}
+          />
         </div>
 
         <Card className="border-0 shadow-md rounded-xl">

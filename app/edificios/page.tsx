@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Header } from "@/components/header";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -16,7 +15,8 @@ import { useToast } from "@/hooks/use-toast";
 import { ApiError } from "@/models/dto/ApiError";
 import { EdificioResponse } from "@/models/dto/edificio/EdificioResponse";
 import { ComedorResponse } from "@/models/dto/comedor/ComedorResponse";
-import { ArrowLeft, Building, Pencil, Plus } from "lucide-react";
+import { Building, Pencil, Plus } from "lucide-react";
+import { BackButton } from "@/components/back-button";
 
 export default function EdificiosPage() {
   const router = useRouter();
@@ -41,15 +41,17 @@ export default function EdificiosPage() {
   useEffect(() => {
     if (!isLoading) {
       if (!session) router.replace("/login");
-      else if (session.rol !== "ADMIN") router.replace("/");
+      else if (session.rol !== "ADMIN" && session.rol !== "CONTABILIDAD")
+        router.replace("/");
     }
   }, [session, isLoading, router]);
 
   useEffect(() => {
-    if (!session || session.rol !== "ADMIN") return;
+    if (!session || (session.rol !== "ADMIN" && session.rol !== "CONTABILIDAD"))
+      return;
     Promise.all([
-      apiFetch<EdificioResponse[]>("/api/edificios-evento", {}, token || ""),
-      apiFetch<ComedorResponse[]>("/api/comedor", {}, token || ""),
+      apiFetch<EdificioResponse[]>("/api/eventos/edificios", {}, token || ""),
+      apiFetch<ComedorResponse[]>("/api/comedores", {}, token || ""),
     ])
       .then(([edificiosData, comedoresData]) => {
         setEdificios(edificiosData.sort((a, b) => a.nombre.localeCompare(b.nombre)));
@@ -74,7 +76,7 @@ export default function EdificiosPage() {
     setSubmitting(true);
     try {
       const created = await apiFetch<EdificioResponse>(
-        "/api/edificios-evento",
+        "/api/eventos/edificios",
         { method: "POST", body: JSON.stringify({ nombre: nombre.trim(), comedorId: Number(comedorId) }) },
         token || "",
       );
@@ -102,7 +104,7 @@ export default function EdificiosPage() {
     setEditSubmitting(true);
     try {
       const updated = await apiFetch<EdificioResponse>(
-        `/api/edificios-evento/${editarEdificio.id}`,
+        `/api/eventos/edificios/${editarEdificio.id}`,
         { method: "PATCH", body: JSON.stringify({ nombre: editNombre.trim(), comedorId: Number(editComedorId) }) },
         token || "",
       );
@@ -124,16 +126,17 @@ export default function EdificiosPage() {
     );
   }
 
-  if (!session || session.rol !== "ADMIN") return null;
+  if (!session || (session.rol !== "ADMIN" && session.rol !== "CONTABILIDAD"))
+    return null;
 
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
       <main className="mx-auto max-w-4xl px-6 py-10">
         <div className="mb-6">
-          <Button variant="ghost" size="sm" asChild className="gap-2 text-gray-500 hover:text-gray-800">
-            <Link href="/"><ArrowLeft className="h-4 w-4" />Volver a Menu Administrador</Link>
-          </Button>
+          <BackButton
+            fallbackHref={session?.rol === "ADMIN" ? "/" : "/contabilidad/catalogo"}
+          />
         </div>
 
         <Card className="overflow-hidden rounded-xl border border-gray-200 shadow-sm">

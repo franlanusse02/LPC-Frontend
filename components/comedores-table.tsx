@@ -112,7 +112,7 @@ function NuevoComedorModal({
         sociedadId: Number(sociedadId),
       };
       const response = await apiFetch<ComedorResponse>(
-        "/api/comedor",
+        "/api/comedores",
         {
           method: "POST",
           body: JSON.stringify(payload),
@@ -285,7 +285,7 @@ function EditarComedorModal({
     setSociedadError(null);
     try {
       const response = await apiFetch<ComedorResponse>(
-        `/api/comedor/${comedor.id}`,
+        `/api/comedores/${comedor.id}`,
         { method: "PATCH", body: JSON.stringify({ nombre: nombre.trim(), sociedadId: Number(sociedadId) }) },
         token || "",
       );

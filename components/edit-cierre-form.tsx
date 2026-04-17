@@ -200,8 +200,8 @@ export function EditCierreForm({
         await Promise.all(
           pendingAnulaciones.map(({ id, motivo }) =>
             apiFetch(
-              `/api/movimiento/${id}/anular`,
-              { method: "POST", body: JSON.stringify({ motivo }) },
+              `/api/movimientos/${id}`,
+              { method: "DELETE", body: JSON.stringify({ motivo }) },
               token,
             ),
           ),
@@ -210,7 +210,7 @@ export function EditCierreForm({
 
       // 2. PATCH cierre fields
       await apiFetch<CierreCajaResponse>(
-        `/api/cierre/${cierre.id}`,
+        `/api/cierres/${cierre.id}`,
         {
           method: "PATCH",
           body: JSON.stringify({
@@ -228,7 +228,7 @@ export function EditCierreForm({
       if (validNewLines.length > 0) {
         const createPromises = validNewLines.map((line) =>
           apiFetch<MovimientoResponse>(
-            "/api/movimiento",
+            "/api/movimientos",
             {
               method: "POST",
               body: JSON.stringify({

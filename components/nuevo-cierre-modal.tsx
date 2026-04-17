@@ -117,7 +117,7 @@ export function NuevoCierreModal({
     setLoading(true);
     try {
       const cierreResponse = await apiFetch<CierreCajaResponse>(
-        "/api/cierre",
+        "/api/cierres",
         {
           method: "POST",
           body: JSON.stringify({ puntoVentaId, fechaOperacion, totalPlatosVendidos, comentarios: comentario }),
@@ -127,7 +127,7 @@ export function NuevoCierreModal({
 
       const movimientoPromises = validLines.map((line) =>
         apiFetch<MovimientoResponse>(
-          "/api/movimiento",
+          "/api/movimientos",
           {
             method: "POST",
             body: JSON.stringify({ cierreCajaId: cierreResponse.id, medioPago: line.medioPago, monto: Number(line.monto) }),

@@ -176,8 +176,8 @@ export function NuevoEventoModal({ open, onClose, token, comedores, onConfirm }:
     setSalas([]);
 
     Promise.all([
-      apiFetch<TipoEventoResponse[]>(`/api/tipos-evento/activos?comedorId=${comedorId}`, {}, token),
-      apiFetch<EdificioResponse[]>(`/api/edificios-evento/activos?comedorId=${comedorId}`, {}, token),
+      apiFetch<TipoEventoResponse[]>(`/api/eventos/tipos/activos?comedorId=${comedorId}`, {}, token),
+      apiFetch<EdificioResponse[]>(`/api/eventos/edificios/activos?comedorId=${comedorId}`, {}, token),
     ])
       .then(([tipos, edificiosData]) => {
         if (cancelled) return;
@@ -213,7 +213,7 @@ export function NuevoEventoModal({ open, onClose, token, comedores, onConfirm }:
     setLoadingSalas(true);
     setSalaId("");
 
-    apiFetch<SalaResponse[]>(`/api/salas-evento/activos?edificioId=${edificioId}`, {}, token)
+    apiFetch<SalaResponse[]>(`/api/eventos/salas/activos?edificioId=${edificioId}`, {}, token)
       .then((salasData) => {
         if (cancelled) return;
         setSalas(salasData.sort((a, b) => a.nombre.localeCompare(b.nombre)));
@@ -531,6 +531,9 @@ export function NuevoEventoModal({ open, onClose, token, comedores, onConfirm }:
                     </FormField>
                     <FormField label="Concepto">
                       <Input value={concepto} onChange={(event) => setConcepto(event.target.value)} placeholder="Descripcion del evento" className="bg-card" />
+                    </FormField>
+                    <FormField label={selectedTipoPrecio !== null ? "Cantidad de personas *" : "Cantidad de personas"}>
+                      <Input type="number" min="1" step="1" value={cantidadPersonas} onChange={(event) => setCantidadPersonas(event.target.value)} placeholder="0" className="bg-card" />
                     </FormField>
                     {renderTotalField(requiresManualTotal ? "Monto *" : "Monto")}
                     <FormField label="Tipo de factura">

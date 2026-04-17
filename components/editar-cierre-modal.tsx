@@ -140,13 +140,13 @@ export function EditarCierreModal({
       if (pendingAnulaciones.length > 0) {
         await Promise.all(
           pendingAnulaciones.map(({ id, motivo }) =>
-            apiFetch(`/api/movimiento/${id}/anular`, { method: "POST", body: JSON.stringify({ motivo }) }, token),
+            apiFetch(`/api/movimientos/${id}`, { method: "DELETE", body: JSON.stringify({ motivo }) }, token),
           ),
         );
       }
 
       await apiFetch<CierreCajaResponse>(
-        `/api/cierre/${cierre.id}`,
+        `/api/cierres/${cierre.id}`,
         {
           method: "PATCH",
           body: JSON.stringify({ puntoDeVentaId: puntoVentaId, fechaOperacion, totalPlatosVendidos, comedorId: Number(comedor), comentarios: comentario }),
@@ -158,7 +158,7 @@ export function EditarCierreModal({
         await Promise.all(
           validNewLines.map((line) =>
             apiFetch<MovimientoResponse>(
-              "/api/movimiento",
+              "/api/movimientos",
               { method: "POST", body: JSON.stringify({ cierreCajaId: cierre.id, medioPago: line.medioPago, monto: Number(line.monto) }) },
               token,
             ),
