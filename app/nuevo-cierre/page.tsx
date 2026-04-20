@@ -30,12 +30,12 @@ export default function NuevoCierrePage() {
     async function fetchData() {
       if (!token) return;
       const fetchedComedores = await apiFetch<ComedorResponse[]>(
-        "/api/comedor",
+        "/api/comedores",
         {},
         token,
       );
       const fetchedPuntos = await apiFetch<PuntoDeVentaResponse[]>(
-        "/api/puntodeventa",
+        "/api/comedores/puntos-de-venta",
         {},
         token,
       );
@@ -68,7 +68,7 @@ export default function NuevoCierrePage() {
             asChild
             className="gap-2 text-gray-500 hover:text-gray-800"
           >
-            <Link href="/cierres">
+            <Link href="/encargado">
               <ArrowLeft className="h-4 w-4" />
               Volver al Menu de Encargado
             </Link>

@@ -45,7 +45,7 @@ export function EditCierreForm({
   cierre,
 }: EditCierreFormProps) {
   const router = useRouter();
-  const { session, logout } = useAuth();
+  const { session } = useAuth();
   const { toast } = useToast();
 
   const initialComedorId = cierre.comedor
@@ -200,8 +200,8 @@ export function EditCierreForm({
         await Promise.all(
           pendingAnulaciones.map(({ id, motivo }) =>
             apiFetch(
-              `/api/movimiento/${id}/anular`,
-              { method: "POST", body: JSON.stringify({ motivo }) },
+              `/api/movimientos/${id}`,
+              { method: "DELETE", body: JSON.stringify({ motivo }) },
               token,
             ),
           ),
@@ -210,7 +210,7 @@ export function EditCierreForm({
 
       // 2. PATCH cierre fields
       await apiFetch<CierreCajaResponse>(
-        `/api/cierre/${cierre.id}`,
+        `/api/cierres/${cierre.id}`,
         {
           method: "PATCH",
           body: JSON.stringify({
@@ -228,7 +228,7 @@ export function EditCierreForm({
       if (validNewLines.length > 0) {
         const createPromises = validNewLines.map((line) =>
           apiFetch<MovimientoResponse>(
-            "/api/movimiento",
+            "/api/movimientos",
             {
               method: "POST",
               body: JSON.stringify({
@@ -249,17 +249,7 @@ export function EditCierreForm({
       });
       router.push("/contabilidad");
     } catch (err) {
-      if (ApiError.isUnauthorized(err)) {
-        toast({
-          variant: "destructive",
-          title: "Sesión expirada",
-          description:
-            "Tu sesión ha expirado. Por favor, inicia sesión nuevamente.",
-        });
-        logout();
-        router.replace("/login");
-        return;
-      }
+      if (ApiError.isUnauthorized(err)) return; // handled centrally by AuthProvider
 
       const errorMessage =
         err instanceof ApiError

@@ -38,7 +38,7 @@ export function NuevoCierreForm({
   puntosDeVenta: PuntoDeVentaResponse[];
 }) {
   const router = useRouter();
-  const { session, logout } = useAuth();
+  const { session } = useAuth();
   const { toast } = useToast();
 
   const [fechaOperacion, setFechaOperacion] = useState(getTodayDate());
@@ -100,7 +100,7 @@ export function NuevoCierreForm({
       (line) => line.medioPago && line.monto && Number(line.monto) > 0,
     );
 
-    if (validLines.length != lines.length) {
+    if (validLines.length !== lines.length) {
       toast({
         variant: "destructive",
         title: "Campos invalidos",
@@ -114,7 +114,7 @@ export function NuevoCierreForm({
     try {
       // 1. Create the cierre
       const cierreResponse = await apiFetch<CierreCajaResponse>(
-        "/api/cierre",
+        "/api/cierres",
         {
           method: "POST",
           body: JSON.stringify({
@@ -130,7 +130,7 @@ export function NuevoCierreForm({
       // 2. Create movimientos for each valid payment line
       const movimientoPromises = validLines.map((line) =>
         apiFetch<MovimientoResponse>(
-          "/api/movimiento",
+          "/api/movimientos",
           {
             method: "POST",
             body: JSON.stringify({
@@ -155,17 +155,7 @@ export function NuevoCierreForm({
       });
       router.push("/");
     } catch (err) {
-      if (ApiError.isUnauthorized(err)) {
-        toast({
-          variant: "destructive",
-          title: "Sesión expirada",
-          description:
-            "Tu sesión ha expirado. Por favor, inicia sesión nuevamente.",
-        });
-        logout();
-        router.replace("/login");
-        return;
-      }
+      if (ApiError.isUnauthorized(err)) return; // handled centrally by AuthProvider
 
       const errorMessage =
         err instanceof ApiError

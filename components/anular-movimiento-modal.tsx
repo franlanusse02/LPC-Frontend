@@ -60,7 +60,7 @@ export function AnularMovimientoModal({
                 <AlertTriangle className="h-5 w-5" />
               </span>
               <DialogTitle className="text-lg font-bold text-gray-900">
-                Anular Linea
+                Anular Linea 
               </DialogTitle>
             </div>
 

@@ -6,6 +6,7 @@ import {
   ChevronUp,
   ChevronDown,
   SlidersHorizontal,
+  Pencil,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,6 +34,7 @@ export interface UsuarioTableProps {
   usuarios: UsuarioResponse[];
   loading: boolean;
   onCreated: (usuario: UsuarioResponse) => void;
+  onUpdated?: (usuario: UsuarioResponse) => void;
   modalOpen: boolean;
   setModalOpen: (open: boolean) => void;
 }
@@ -317,17 +319,121 @@ function NuevoUsuarioModal({
   );
 }
 
+// ── Edit Modal ────────────────────────────────────────────────────────────────
+
+function EditarUsuarioModal({
+  open,
+  onClose,
+  usuario,
+  onUpdated,
+}: {
+  open: boolean;
+  onClose: () => void;
+  usuario: UsuarioResponse;
+  onUpdated: (usuario: UsuarioResponse) => void;
+}) {
+  const [nombre, setNombre] = useState(usuario.nombre);
+  const [rol, setRol] = useState<Rol>(usuario.rol as Rol);
+  const [saving, setSaving] = useState(false);
+  const [errors, setErrors] = useState<{ nombre?: string; rol?: string }>({});
+  const { token } = useAuth();
+  const { toast } = useToast();
+
+  const handleClose = () => {
+    setNombre(usuario.nombre);
+    setRol(usuario.rol as Rol);
+    setErrors({});
+    onClose();
+  };
+
+  const handleGuardar = async () => {
+    const next: typeof errors = {};
+    if (!nombre.trim()) next.nombre = "El nombre es obligatorio.";
+    if (!rol) next.rol = "Seleccioná un rol.";
+    setErrors(next);
+    if (Object.keys(next).length > 0) return;
+
+    setSaving(true);
+    try {
+      const response = await apiFetch<UsuarioResponse>(
+        `/api/usuarios/${usuario.cuil}`,
+        { method: "PATCH", body: JSON.stringify({ nombre: nombre.trim(), rol }) },
+        token || "",
+      );
+      onUpdated(response);
+      onClose();
+    } catch (err) {
+      const msg = err instanceof ApiError ? err.message : "Error de red. Intentá de nuevo.";
+      toast({ variant: "destructive", title: "Error", description: msg });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={handleClose} />
+      <div className="relative z-10 w-full max-w-sm rounded-xl border border-gray-200 bg-white shadow-xl">
+        <div className="border-b px-6 py-4">
+          <h2 className="text-base font-semibold text-gray-800">Editar Usuario</h2>
+          <p className="text-xs text-gray-500 mt-0.5 font-mono">{usuario.cuil}</p>
+        </div>
+        <div className="px-6 py-5 space-y-4">
+          <div className="space-y-1.5">
+            <label className="text-xs font-medium uppercase tracking-wide text-gray-500">Nombre</label>
+            <Input
+              autoFocus
+              value={nombre}
+              onChange={(e) => { setNombre(e.target.value); setErrors((p) => ({ ...p, nombre: undefined })); }}
+              placeholder="Ej: Juan Pérez"
+              className={cn("h-9 text-sm bg-gray-50 border-gray-200", errors.nombre && "border-red-400 focus-visible:ring-red-300")}
+            />
+            {errors.nombre && <p className="text-xs text-red-500">{errors.nombre}</p>}
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-xs font-medium uppercase tracking-wide text-gray-500">Rol</label>
+            <Select value={rol} onValueChange={(val) => { setRol(val as Rol); setErrors((p) => ({ ...p, rol: undefined })); }}>
+              <SelectTrigger className={cn("h-9 text-sm bg-gray-50 border-gray-200", errors.rol && "border-red-400 focus-visible:ring-red-300")}>
+                <SelectValue placeholder="Seleccioná un rol" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ADMIN">Admin</SelectItem>
+                <SelectItem value="ENCARGADO">Encargado</SelectItem>
+                <SelectItem value="CONTABILIDAD">Contabilidad</SelectItem>
+              </SelectContent>
+            </Select>
+            {errors.rol && <p className="text-xs text-red-500">{errors.rol}</p>}
+          </div>
+        </div>
+        <div className="flex justify-end gap-2 border-t px-6 py-4">
+          <Button variant="outline" size="sm" onClick={handleClose} disabled={saving} className="border-gray-200 text-gray-600 hover:bg-gray-50">
+            Cancelar
+          </Button>
+          <Button size="sm" onClick={handleGuardar} disabled={saving} className="gap-1.5">
+            {saving ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" /> : null}
+            Guardar
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Main component ────────────────────────────────────────────────────────────
 
 export function UsuarioTable({
   usuarios,
   loading,
   onCreated,
+  onUpdated,
   modalOpen,
   setModalOpen,
 }: UsuarioTableProps) {
   const [sortKey, setSortKey] = useState<SortKey>("nombre");
   const [sortDir, setSortDir] = useState<SortDir>("asc");
+  const [editTarget, setEditTarget] = useState<UsuarioResponse | null>(null);
 
   const handleSort = (key: SortKey) => {
     if (key === sortKey) {
@@ -365,6 +471,15 @@ export function UsuarioTable({
         onCreated={onCreated}
       />
 
+      {editTarget && (
+        <EditarUsuarioModal
+          open={!!editTarget}
+          onClose={() => setEditTarget(null)}
+          usuario={editTarget}
+          onUpdated={(updated) => { onUpdated?.(updated); setEditTarget(null); }}
+        />
+      )}
+
       {loading ? (
         <div className="flex justify-center py-16">
           <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent" />
@@ -390,6 +505,7 @@ export function UsuarioTable({
                   {sortableTh("CUIL", "cuil", "w-36")}
                   {sortableTh("Nombre", "nombre")}
                   {sortableTh("Rol", "rol", "w-36")}
+                  <th className="px-4 py-3 w-12" />
                 </tr>
               </thead>
               <tbody>
@@ -406,6 +522,16 @@ export function UsuarioTable({
                     </td>
                     <td className="px-4 py-4">
                       <RolBadge rol={usuario.rol as Rol} />
+                    </td>
+                    <td className="px-4 py-4 text-right">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setEditTarget(usuario)}
+                        className="h-7 w-7 p-0 text-gray-400 hover:text-gray-700"
+                      >
+                        <Pencil className="h-3.5 w-3.5" />
+                      </Button>
                     </td>
                   </tr>
                 ))}

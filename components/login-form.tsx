@@ -54,6 +54,7 @@ export function LoginForm() {
         token: auth.token,
         rol: auth.rol,
         nombre: auth.nombre,
+        cuil: auth.cuil,
       });
 
       router.replace("/");

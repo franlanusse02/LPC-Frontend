@@ -6,6 +6,7 @@ import {
   ChevronUp,
   ChevronDown,
   SlidersHorizontal,
+  Pencil,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,7 +27,7 @@ import { useAuth } from "@/lib/auth-context";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
-type SortKey = "id" | "nombre" | "comedorId" | "activo";
+type SortKey = "id" | "nombre" | "comedorId";
 type SortDir = "asc" | "desc";
 
 export interface PuntoDeVentaTableProps {
@@ -34,6 +35,7 @@ export interface PuntoDeVentaTableProps {
   comedores: ComedorResponse[];
   loading: boolean;
   onCreated: (punto: PuntoDeVentaResponse) => void;
+  onUpdated?: (punto: PuntoDeVentaResponse) => void;
   modalOpen: boolean;
   setModalOpen: (open: boolean) => void;
 }
@@ -101,7 +103,7 @@ function NuevoPuntoDeVentaModal({
     setErrors({});
     try {
       const response = await apiFetch<PuntoDeVentaResponse>(
-        "/api/puntodeventa",
+        "/api/comedores/puntos-de-venta",
         {
           method: "POST",
           body: JSON.stringify({
@@ -231,6 +233,97 @@ function NuevoPuntoDeVentaModal({
   );
 }
 
+// ── Edit Modal ────────────────────────────────────────────────────────────────
+
+function EditarPuntoDeVentaModal({
+  open,
+  onClose,
+  punto,
+  comedores,
+  onUpdated,
+}: {
+  open: boolean;
+  onClose: () => void;
+  punto: PuntoDeVentaResponse;
+  comedores: ComedorResponse[];
+  onUpdated: (punto: PuntoDeVentaResponse) => void;
+}) {
+  const [nombre, setNombre] = useState(punto.nombre);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { token } = useAuth();
+  const { toast } = useToast();
+
+  const handleClose = () => {
+    setNombre(punto.nombre);
+    setError(null);
+    onClose();
+  };
+
+  const handleGuardar = async () => {
+    if (!nombre.trim()) {
+      setError("El nombre es obligatorio.");
+      return;
+    }
+    setSaving(true);
+    setError(null);
+    try {
+      const response = await apiFetch<PuntoDeVentaResponse>(
+        `/api/comedores/puntos-de-venta/${punto.id}`,
+        { method: "PATCH", body: JSON.stringify({ nombre: nombre.trim() }) },
+        token || "",
+      );
+      onUpdated(response);
+      onClose();
+    } catch (err) {
+      const msg = err instanceof ApiError ? err.message : "Error de red. Intentá de nuevo.";
+      setError(msg);
+      toast({ variant: "destructive", title: "Error", description: msg });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const comedorNombre = comedores.find((c) => c.id === punto.comedorId)?.nombre ?? `ID ${punto.comedorId}`;
+
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={handleClose} />
+      <div className="relative z-10 w-full max-w-sm rounded-xl border border-gray-200 bg-white shadow-xl">
+        <div className="border-b px-6 py-4">
+          <h2 className="text-base font-semibold text-gray-800">Editar Punto de Venta</h2>
+          <p className="text-xs text-gray-500 mt-0.5">Comedor: {comedorNombre}</p>
+        </div>
+        <div className="px-6 py-5 space-y-4">
+          <div className="space-y-1.5">
+            <label className="text-xs font-medium uppercase tracking-wide text-gray-500">Nombre</label>
+            <Input
+              autoFocus
+              value={nombre}
+              onChange={(e) => { setNombre(e.target.value); setError(null); }}
+              onKeyDown={(e) => e.key === "Enter" && handleGuardar()}
+              placeholder="Ej: Punto Central"
+              className={cn("h-9 text-sm bg-gray-50 border-gray-200", error && "border-red-400 focus-visible:ring-red-300")}
+            />
+            {error && <p className="text-xs text-red-500">{error}</p>}
+          </div>
+        </div>
+        <div className="flex justify-end gap-2 border-t px-6 py-4">
+          <Button variant="outline" size="sm" onClick={handleClose} disabled={saving} className="border-gray-200 text-gray-600 hover:bg-gray-50">
+            Cancelar
+          </Button>
+          <Button size="sm" onClick={handleGuardar} disabled={saving} className="gap-1.5">
+            {saving ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" /> : null}
+            Guardar
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Main component ────────────────────────────────────────────────────────────
 
 export function PuntoDeVentaTable({
@@ -238,11 +331,13 @@ export function PuntoDeVentaTable({
   comedores,
   loading,
   onCreated,
+  onUpdated,
   modalOpen,
   setModalOpen,
 }: PuntoDeVentaTableProps) {
   const [sortKey, setSortKey] = useState<SortKey>("id");
   const [sortDir, setSortDir] = useState<SortDir>("asc");
+  const [editTarget, setEditTarget] = useState<PuntoDeVentaResponse | null>(null);
 
   const comedorMap = new Map(comedores.map((c) => [c.id, c.nombre]));
 
@@ -256,10 +351,10 @@ export function PuntoDeVentaTable({
   };
 
   const sorted = [...puntosDeVenta].sort((a, b) => {
-    let av: string | number = a[sortKey] ?? "";
-    let bv: string | number = b[sortKey] ?? "";
-    if (typeof av === "boolean") av = av ? 1 : 0;
-    if (typeof bv === "boolean") bv = bv ? 1 : 0;
+    let av: string | number =
+      sortKey === "id" ? a.id : sortKey === "nombre" ? a.nombre : a.comedorId;
+    let bv: string | number =
+      sortKey === "id" ? b.id : sortKey === "nombre" ? b.nombre : b.comedorId;
     if (av < bv) return sortDir === "asc" ? -1 : 1;
     if (av > bv) return sortDir === "asc" ? 1 : -1;
     return 0;
@@ -287,6 +382,16 @@ export function PuntoDeVentaTable({
         comedores={comedores}
       />
 
+      {editTarget && (
+        <EditarPuntoDeVentaModal
+          open={!!editTarget}
+          onClose={() => setEditTarget(null)}
+          punto={editTarget}
+          comedores={comedores}
+          onUpdated={(updated) => { onUpdated?.(updated); setEditTarget(null); }}
+        />
+      )}
+
       {loading ? (
         <div className="flex justify-center py-16">
           <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent" />
@@ -312,7 +417,8 @@ export function PuntoDeVentaTable({
                   {sortableTh("ID", "id", "w-20")}
                   {sortableTh("Nombre", "nombre")}
                   {sortableTh("Comedor", "comedorId")}
-                  {sortableTh("Activo", "activo", "text-center")}
+                  <th className="px-4 py-3 text-center">Activo</th>
+                  <th className="px-4 py-3 w-12" />
                 </tr>
               </thead>
               <tbody>
@@ -338,6 +444,16 @@ export function PuntoDeVentaTable({
                       <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-semibold text-emerald-700">
                         Activo
                       </span>
+                    </td>
+                    <td className="px-4 py-4 text-right">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setEditTarget(punto)}
+                        className="h-7 w-7 p-0 text-gray-400 hover:text-gray-700"
+                      >
+                        <Pencil className="h-3.5 w-3.5" />
+                      </Button>
                     </td>
                   </tr>
                 ))}

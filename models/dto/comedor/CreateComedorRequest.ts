@@ -1,3 +1,4 @@
 export type CreateComedorRequest = {
-    nombre: string;
-}
+  nombre: string;
+  sociedadId: number;
+};
