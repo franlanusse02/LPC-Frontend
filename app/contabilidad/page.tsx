@@ -33,6 +33,7 @@ import { EstadoFacturaLabel } from "@/models/enums/EstadoFactura";
 import { buildExportFilename, exportRowsToXlsx, formatIsoDateForFilename } from "@/lib/export-xlsx";
 import { ChevronDown, ChevronUp, Download, FileSpreadsheet, LibraryBig, Search, SlidersHorizontal, X } from "lucide-react";
 import { Combobox } from "@/components/ui/combobox";
+import { DatePickerInput } from "@/components/date-picker-input";
 import { EventoResponse } from "@/models/dto/evento/EventoResponse";
 import { EstadoEventoLabel } from "@/models/enums/EstadoEvento";
 import { EventoSortDir, EventoSortKey, EventoStatusFilter, EventosTable } from "@/components/eventos-table";
@@ -1042,10 +1043,10 @@ export default function ContabilidadPage() {
             </div>
             <div className="flex flex-wrap items-center gap-2">
               <div className="flex items-center gap-1">
-                <Input type="date" value={dateDesde} onChange={(e) => setDateDesde(e.target.value)}
+                <DatePickerInput value={dateDesde} onChange={setDateDesde}
                   className="h-8 w-36 text-sm bg-gray-50 border-gray-200" />
                 <span className="text-xs text-gray-400">—</span>
-                <Input type="date" value={dateHasta} onChange={(e) => setDateHasta(e.target.value)}
+                <DatePickerInput value={dateHasta} onChange={setDateHasta}
                   className="h-8 w-36 text-sm bg-gray-50 border-gray-200" />
               </div>
               {sociedadOptions.length > 0 && (

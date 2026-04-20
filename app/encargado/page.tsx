@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { Header } from "@/components/header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { apiFetch } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
@@ -32,6 +31,8 @@ import { ConsumidorResponse } from "@/models/dto/consumos/ConsumidorResponse";
 import { ProductoResponse } from "@/models/dto/consumos/ProductoResponse";
 import { CreateConsumoRequest } from "@/models/dto/consumos/CreateConsumoRequest";
 import { buildConsumoListItem, ConsumoListItem, enrichConsumos } from "@/lib/consumos";
+import { DatePickerInput } from "@/components/date-picker-input";
+import { Combobox } from "@/components/ui/combobox";
 
 type View = "cierres" | "compras" | "eventos" | "consumos";
 
@@ -241,7 +242,7 @@ export default function EncargadoPage() {
 
   useEffect(() => {
     if (!session) return;
-    apiFetch<DetailedCierreCajaResponse[]>("/api/cierres", {}, session.token)
+    apiFetch<DetailedCierreCajaResponse[]>("/api/cierres/mine", {}, session.token)
       .then(setCierres)
       .finally(() => setLoadingCierres(false));
     apiFetch<FacturaProveedorResponse[]>("/api/facturas/proveedor/mis-facturas", {}, session.token)
@@ -400,18 +401,21 @@ export default function EncargadoPage() {
             </div>
             <div className="flex flex-wrap items-center gap-2">
               <div className="flex items-center gap-1">
-                <Input type="date" value={dateDesde} onChange={(e) => setDateDesde(e.target.value)}
+                <DatePickerInput value={dateDesde} onChange={setDateDesde}
                   className="h-8 w-36 text-sm bg-gray-50 border-gray-200" />
                 <span className="text-xs text-gray-400">—</span>
-                <Input type="date" value={dateHasta} onChange={(e) => setDateHasta(e.target.value)}
+                <DatePickerInput value={dateHasta} onChange={setDateHasta}
                   className="h-8 w-36 text-sm bg-gray-50 border-gray-200" />
               </div>
               {comedorOptions.length > 1 && (
-                <select value={comedorFilter} onChange={(e) => setComedorFilter(e.target.value)}
-                  className="h-8 rounded-md border border-gray-200 bg-gray-50 px-2 text-sm text-gray-600">
-                  <option value="">Todos los comedores</option>
-                  {comedorOptions.map((n) => <option key={n} value={n}>{n}</option>)}
-                </select>
+                <Combobox
+                  options={comedorOptions.map((n) => ({ value: n, label: n }))}
+                  value={comedorFilter}
+                  onChange={setComedorFilter}
+                  placeholder="Todos los comedores"
+                  searchPlaceholder="Buscar comedor..."
+                  className="h-8 w-auto min-w-48 text-sm bg-gray-50 border-gray-200"
+                />
               )}
             </div>
           </CardHeader>
