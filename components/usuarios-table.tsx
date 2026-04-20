@@ -332,34 +332,62 @@ function EditarUsuarioModal({
   usuario: UsuarioResponse;
   onUpdated: (usuario: UsuarioResponse) => void;
 }) {
+  const [cuil, setCuil] = useState(String(usuario.cuil));
   const [nombre, setNombre] = useState(usuario.nombre);
   const [rol, setRol] = useState<Rol>(usuario.rol as Rol);
+  const [password, setPassword] = useState("");
   const [saving, setSaving] = useState(false);
-  const [errors, setErrors] = useState<{ nombre?: string; rol?: string }>({});
+  const [errors, setErrors] = useState<{ cuil?: string; nombre?: string; rol?: string; password?: string }>({});
   const { token } = useAuth();
   const { toast } = useToast();
 
   const handleClose = () => {
+    setCuil(String(usuario.cuil));
     setNombre(usuario.nombre);
     setRol(usuario.rol as Rol);
+    setPassword("");
     setErrors({});
     onClose();
   };
 
   const handleGuardar = async () => {
     const next: typeof errors = {};
+    if (!cuil.trim()) {
+      next.cuil = "El CUIL es obligatorio.";
+    } else if (!/^\d{11}$/.test(cuil.trim())) {
+      next.cuil = "El CUIL debe tener exactamente 11 dígitos.";
+    }
     if (!nombre.trim()) next.nombre = "El nombre es obligatorio.";
     if (!rol) next.rol = "Seleccioná un rol.";
+    if (password.length > 0) {
+      if (!password.trim()) {
+        next.password = "La contraseña no puede estar vacía.";
+      } else if (password.length < 6) {
+        next.password = "La contraseña debe tener al menos 6 caracteres.";
+      }
+    }
+
     setErrors(next);
     if (Object.keys(next).length > 0) return;
 
     setSaving(true);
     try {
+      const body: { cuil: number; nombre: string; rol: Rol; password?: string } = {
+        cuil: Number(cuil.trim()),
+        nombre: nombre.trim(),
+        rol,
+      };
+
+      if (password.length > 0) {
+        body.password = password;
+      }
+
       const response = await apiFetch<UsuarioResponse>(
         `/api/usuarios/${usuario.cuil}`,
-        { method: "PATCH", body: JSON.stringify({ nombre: nombre.trim(), rol }) },
+        { method: "PATCH", body: JSON.stringify(body) },
         token || "",
       );
+
       onUpdated(response);
       onClose();
     } catch (err) {
@@ -382,9 +410,28 @@ function EditarUsuarioModal({
         </div>
         <div className="px-6 py-5 space-y-4">
           <div className="space-y-1.5">
-            <label className="text-xs font-medium uppercase tracking-wide text-gray-500">Nombre</label>
+            <label className="text-xs font-medium uppercase tracking-wide text-gray-500">CUIL</label>
             <Input
               autoFocus
+              value={cuil}
+              onChange={(e) => {
+                const value = e.target.value.replace(/\D/g, "").slice(0, 11);
+                setCuil(value);
+                setErrors((p) => ({ ...p, cuil: undefined }));
+              }}
+              placeholder="Ej: 20123456789"
+              inputMode="numeric"
+              className={cn("h-9 text-sm bg-gray-50 border-gray-200 font-mono tracking-wider", errors.cuil && "border-red-400 focus-visible:ring-red-300")}
+            />
+            {errors.cuil ? (
+              <p className="text-xs text-red-500">{errors.cuil}</p>
+            ) : (
+              <p className="text-xs text-gray-400">{cuil.length}/11 dígitos</p>
+            )}
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-xs font-medium uppercase tracking-wide text-gray-500">Nombre</label>
+            <Input
               value={nombre}
               onChange={(e) => { setNombre(e.target.value); setErrors((p) => ({ ...p, nombre: undefined })); }}
               placeholder="Ej: Juan Pérez"
@@ -405,6 +452,21 @@ function EditarUsuarioModal({
               </SelectContent>
             </Select>
             {errors.rol && <p className="text-xs text-red-500">{errors.rol}</p>}
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-xs font-medium uppercase tracking-wide text-gray-500">Nueva contraseña</label>
+            <Input
+              type="password"
+              value={password}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                setErrors((p) => ({ ...p, password: undefined }));
+              }}
+              onKeyDown={(e) => e.key === "Enter" && handleGuardar()}
+              placeholder="Dejar vacía para no cambiarla"
+              className={cn("h-9 text-sm bg-gray-50 border-gray-200", errors.password && "border-red-400 focus-visible:ring-red-300")}
+            />
+            {errors.password && <p className="text-xs text-red-500">{errors.password}</p>}
           </div>
         </div>
         <div className="flex justify-end gap-2 border-t px-6 py-4">
