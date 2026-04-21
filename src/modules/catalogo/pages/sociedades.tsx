@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { DataTable, SortableTh } from "@/components/data-table";
 import { useApi } from "@/hooks/useApi";
-import type { SociedadResponse } from "../types/SociedadResponse";
+import type { SociedadResponse } from "@/domain/dto/sociedad/SociedadResponse";
 
 type SortKey = "nombre" | "direccion" | "cuit";
 

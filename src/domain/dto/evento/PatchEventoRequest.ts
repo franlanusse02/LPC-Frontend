@@ -1,5 +1,5 @@
-import { EstadoEvento } from "@/models/enums/EstadoEvento";
-import { MedioPago } from "@/models/enums/MedioPago";
+import type { EstadoEvento } from "@/domain/enums/EstadoEvento";
+import type { MedioPago } from "@/domain/enums/MedioPago";
 
 export type PatchEventoRequest = {
   comedorId?: number | null;

@@ -1,5 +1,5 @@
-import { EstadoAsignacion } from "@/models/enums/EstadoAsignacion";
-import { EstadoFila } from "@/models/enums/EstadoFila";
+import type { EstadoAsignacion } from "@/domain/enums/EstadoAsignacion";
+import type { EstadoFila } from "@/domain/enums/EstadoFila";
 
 export type ImportRowProveedorResponse = {
   id: number;

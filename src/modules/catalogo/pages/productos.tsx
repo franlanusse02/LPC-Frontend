@@ -10,7 +10,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { DataTable, SortableTh } from "@/components/data-table";
 import { useApi } from "@/hooks/useApi";
 import { ConfirmarAnulacion } from "../components/ConfirmarAnulacion";
-import type { ComedorResponse } from "../types/ComedorResponse";
+import type { ComedorResponse } from "@/domain/dto/comedor/ComedorResponse";
 
 type SortKey = "nombre" | "comedor" | "precio";
 

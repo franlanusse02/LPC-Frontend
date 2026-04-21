@@ -2,7 +2,7 @@ import { cn, fmtCurrency } from "@/lib/utils";
 import { Ban } from "lucide-react";
 import { useState } from "react";
 import { SortIcon } from "@/components/data-table";
-import type { MovimientoResponse } from "../types/MovimientoResponse";
+import type { MovimientoResponse } from "@/domain/dto/movimiento/MovimientoResponse";
 
 export function MovimientoRow({ mov }: { mov: MovimientoResponse }) {
   const isAnulado = !!mov.anulacionId;

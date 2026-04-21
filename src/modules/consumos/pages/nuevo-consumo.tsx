@@ -19,10 +19,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { ConsumidorResponse } from "@/modules/catalogo/types/ConsumidorResponse";
-import type { PuntoDeVentaResponse } from "@/modules/catalogo/types/PuntoDeVentaResponse";
-import type { ProductoResponse } from "@/modules/catalogo/types/ProductoResponse";
-import type { CreateConsumoRequest } from "../types/CreateConsumoRequest";
+import type { ConsumidorResponse } from "@/domain/dto/consumo/ConsumidorResponse";
+import type { PuntoDeVentaResponse } from "@/domain/dto/pto-venta/PuntoDeVentaResponse";
+import type { ProductoResponse } from "@/domain/dto/consumo/ProductoResponse";
+import type { CreateConsumoRequest } from "@/domain/dto/consumo/CreateConsumoRequest";
 
 export default function NuevoConsumoPage() {
   const navigate = useNavigate();

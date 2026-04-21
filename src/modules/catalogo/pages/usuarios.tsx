@@ -16,7 +16,7 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 import { DataTable, SortableTh } from "@/components/data-table";
 import { useApi } from "@/hooks/useApi";
-import type { UsuarioResponse } from "@/modules/identity/types/UsuarioResponse";
+import type { UsuarioResponse } from "@/domain/dto/auth/UsuarioResponse";
 import type { UserRole } from "@/domain/enums/UserRole";
 
 type SortKey = "cuil" | "nombre" | "rol";

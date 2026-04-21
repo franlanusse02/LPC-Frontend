@@ -11,7 +11,7 @@ import { useTableState } from "@/hooks/useTableState";
 import type { EventoResponse } from "@/domain/dto/evento/EventoResponse";
 import type { EstadoEvento } from "@/domain/enums/EstadoEvento";
 import { EstadoEventoLabel } from "@/domain/enums/EstadoEvento";
-import type { ComedorResponse } from "@/modules/catalogo/types/ComedorResponse";
+import type { ComedorResponse } from "@/domain/dto/comedor/ComedorResponse";
 
 const ESTADO_STYLES: Record<EstadoEvento, { bg: string; text: string }> = {
   SOLICITADO: { bg: "bg-amber-100", text: "text-amber-700" },

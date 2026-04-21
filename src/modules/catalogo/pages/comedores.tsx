@@ -15,8 +15,8 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 import { DataTable, SortableTh } from "@/components/data-table";
 import { useApi } from "@/hooks/useApi";
-import type { ComedorResponse } from "../types/ComedorResponse";
-import type { SociedadResponse } from "../types/SociedadResponse";
+import type { ComedorResponse } from "@/domain/dto/comedor/ComedorResponse";
+import type { SociedadResponse } from "@/domain/dto/sociedad/SociedadResponse";
 
 type SortKey = "nombre" | "sociedad";
 

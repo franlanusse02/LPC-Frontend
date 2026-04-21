@@ -8,10 +8,10 @@ import { useNavigate } from "react-router-dom";
 import { DataTable, SortableTh } from "@/components/data-table";
 import { ConsumosStatusFilter } from "../components/filters/ConsumosStatusFilter";
 import { useTableState } from "@/hooks/useTableState";
-import type { ConsumoResponse } from "../types/ConsumoResponse";
-import type { ConsumidorResponse } from "@/modules/catalogo/types/ConsumidorResponse";
-import type { PuntoDeVentaResponse } from "@/modules/catalogo/types/PuntoDeVentaResponse";
-import type { ComedorResponse } from "@/modules/catalogo/types/ComedorResponse";
+import type { ConsumoResponse } from "@/domain/dto/consumo/ConsumoResponse";
+import type { ConsumidorResponse } from "@/domain/dto/consumo/ConsumidorResponse";
+import type { PuntoDeVentaResponse } from "@/domain/dto/pto-venta/PuntoDeVentaResponse";
+import type { ComedorResponse } from "@/domain/dto/comedor/ComedorResponse";
 
 export default function ConsumosEncargado() {
   const navigate = useNavigate();

@@ -1,7 +1,7 @@
-import { UsuarioResponse } from "../auth/UsuarioResponse";
-import { ComedorResponse } from "../comedor/ComedorResponse";
-import { MovimientoResponse } from "../movimiento/MovimientoResponse";
-import { PuntoDeVentaResponse } from "../pto-venta/PuntoDeVentaResponse";
+import type { UsuarioResponse } from "@/domain/dto/auth/UsuarioResponse";
+import type { ComedorResponse } from "@/domain/dto/comedor/ComedorResponse";
+import type { MovimientoResponse } from "@/domain/dto/movimiento/MovimientoResponse";
+import type { PuntoDeVentaResponse } from "@/domain/dto/pto-venta/PuntoDeVentaResponse";
 
 export type CierreCajaResponse = {
   id: number;

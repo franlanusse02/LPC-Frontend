@@ -12,7 +12,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { AlertTriangle } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import type { ConsumoResponse } from "../types/ConsumoResponse";
+import type { ConsumoResponse } from "@/domain/dto/consumo/ConsumoResponse";
 
 interface AnularConsumoModalProps {
   open: boolean;

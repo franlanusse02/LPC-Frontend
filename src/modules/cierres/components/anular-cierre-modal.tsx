@@ -12,7 +12,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { AlertTriangle } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import type { DetailedCierreCajaResponse } from "@/modules/cierres/types/CierreCajaResponse";
+import type { DetailedCierreCajaResponse } from "@/domain/dto/cierre-caja/CierreCajaResponse";
 
 interface AnularModalProps {
   open: boolean;

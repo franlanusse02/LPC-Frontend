@@ -1,4 +1,4 @@
-import {
+import type {
   PuntoDeVentaResponse,
   PuntoDeVentaDetailedResponse,
 } from "../pto-venta/PuntoDeVentaResponse";

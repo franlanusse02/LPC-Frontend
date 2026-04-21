@@ -12,8 +12,8 @@ import {
 } from "lucide-react";
 import { Fragment, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import type { DetailedCierreCajaResponse } from "../types/CierreCajaResponse";
-import type { MovimientoResponse } from "../types/MovimientoResponse";
+import type { DetailedCierreCajaResponse } from "@/domain/dto/cierre-caja/CierreCajaResponse";
+import type { MovimientoResponse } from "@/domain/dto/movimiento/MovimientoResponse";
 import { DataTable, SortableTh } from "@/components/data-table";
 import { MovimientoRow, AnuladosGroup } from "../components/MovimientoRow";
 import { CierresStatusFilter } from "../components/filters/CierresStatusFilter";

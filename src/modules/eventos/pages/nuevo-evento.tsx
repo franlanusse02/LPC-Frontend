@@ -14,8 +14,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { ComedorResponse } from "@/modules/catalogo/types/ComedorResponse";
-import type { TipoEventoResponse } from "@/modules/catalogo/types/TipoEventoResponse";
+import type { ComedorResponse } from "@/domain/dto/comedor/ComedorResponse";
+import type { TipoEventoResponse } from "@/domain/dto/tipo-evento/TipoEventoResponse";
 import type { CreateEventoRequest } from "@/domain/dto/evento/CreateEventoRequest";
 
 export default function NuevoEventoPage() {

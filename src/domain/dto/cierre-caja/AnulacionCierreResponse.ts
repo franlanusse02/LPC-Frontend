@@ -1,4 +1,4 @@
-import { UsuarioResponse } from "../auth/UsuarioResponse";
+import type { UsuarioResponse } from "../auth/UsuarioResponse";
 
 export type AnulacionCierreResponse ={
     id: number;

@@ -17,19 +17,14 @@ import { ConsumosStatusFilter } from "../components/filters/ConsumosStatusFilter
 import { AnularConsumoModal } from "../components/AnularConsumoModal";
 import { toast } from "sonner";
 import { useTableState } from "@/hooks/useTableState";
-import { StatCard } from "@/modules/cierres/components/cierre-stat";
-import type { ConsumoResponse } from "../types/ConsumoResponse";
-import type { ConsumidorResponse } from "@/modules/catalogo/types/ConsumidorResponse";
-import type { PuntoDeVentaResponse } from "@/modules/catalogo/types/PuntoDeVentaResponse";
-import type { ComedorResponse } from "@/modules/catalogo/types/ComedorResponse";
 
-type AgrupadosResponse = {
-  fecha: string;
-  puntosDeVenta: string[];
-  total: number;
-  cantidadConsumos: number;
-  cantidadConsumidores: number;
-};
+import { StatCard } from "@/modules/cierres/components/cierre-stat";
+import type { ConsumidorResponse } from "@/domain/dto/consumo/ConsumidorResponse";
+import type { PuntoDeVentaResponse } from "@/domain/dto/pto-venta/PuntoDeVentaResponse";
+import type { ComedorResponse } from "@/domain/dto/comedor/ComedorResponse";
+
+import type { ConsumoResponse } from "@/domain/dto/consumo/ConsumoResponse";
+import type { AgrupadosResponse } from "@/domain/dto/consumo/AgrupadosResponse";
 
 export default function ConsumosContabilidad() {
   const navigate = useNavigate();

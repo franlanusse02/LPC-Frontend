@@ -1,4 +1,4 @@
-import { CierreCajaResponse } from "../cierre-caja/CierreCajaResponse";
+import type { CierreCajaResponse } from "../cierre-caja/CierreCajaResponse";
 
 export type PuntoDeVentaResponse = {
   id: number;

@@ -1,5 +1,5 @@
-import { EstadoFactura } from "@/models/enums/EstadoFactura";
-import { MedioPago } from "@/models/enums/MedioPago";
+import type { EstadoFactura } from "@/domain/enums/EstadoFactura";
+import type { MedioPago } from "@/domain/enums/MedioPago";
 
 export type FacturaProveedorResponse = {
     id: number;

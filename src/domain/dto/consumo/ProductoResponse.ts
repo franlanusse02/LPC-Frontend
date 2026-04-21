@@ -3,4 +3,5 @@ export type ProductoResponse = {
   nombre: string;
   precio: number;
   comedorId: number;
+  activo: boolean;
 };

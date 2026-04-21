@@ -4,7 +4,7 @@ import { ArrowLeft, Plus, ChevronDown, ChevronUp } from "lucide-react";
 import { toast } from "sonner";
 import { useApi } from "@/hooks/useApi";
 import { fmtCurrency } from "@/lib/utils";
-import type { DetailedCierreCajaResponse } from "../types/CierreCajaResponse";
+import type { DetailedCierreCajaResponse } from "@/domain/dto/cierre-caja/CierreCajaResponse";
 import {
   PaymentLineRow,
   type PaymentLine,
@@ -62,7 +62,7 @@ export default function EditarCierrePage() {
   const [anularModalLine, setAnularModalLine] = useState<{
     index: number;
     line: PaymentLine;
-  } | null>(null);;
+  } | null>(null);
 
   useEffect(() => {
     if (!id) return;
@@ -153,8 +153,9 @@ export default function EditarCierrePage() {
   const getLineModalData = (line: PaymentLine) => ({
     movimientoId: line.id || 0,
     metodoPago:
-      Object.entries(MediosPagoDict).find(([, v]) => v === line.medioPago)?.[0] ||
-      line.medioPago,
+      Object.entries(MediosPagoDict).find(
+        ([, v]) => v === line.medioPago,
+      )?.[0] || line.medioPago,
     monto: Number(line.monto),
     puntoVenta: cierre?.puntoDeVenta.nombre || "",
   });

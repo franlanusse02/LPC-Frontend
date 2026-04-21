@@ -1,4 +1,4 @@
-import { EstadoJob } from "@/models/enums/EstadoJob";
+import type { EstadoJob } from "@/domain/enums/EstadoJob";
 
 export type ProveedorImportJobResponse = {
   id: number;

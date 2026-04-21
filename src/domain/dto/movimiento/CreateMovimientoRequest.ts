@@ -1,4 +1,4 @@
-import { MedioPago } from "@/models/enums/MedioPago";
+import type { MedioPago } from "@/domain/enums/MedioPago";
 
 export type CreateMovimientoRequest = {
     monto: number;

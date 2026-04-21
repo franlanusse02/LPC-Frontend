@@ -9,7 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { fmtCurrency } from "@/lib/utils";
-import type { ProductoResponse } from "@/modules/catalogo/types/ProductoResponse";
+import type { ProductoResponse } from "@/domain/dto/consumo/ProductoResponse";
 
 export interface ProductoLine {
   productoId: string;

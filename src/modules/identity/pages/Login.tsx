@@ -1,4 +1,4 @@
-import type { LoginResponse } from "@/types/identity/LoginResponse";
+import type { LoginResponse } from "@/domain/dto/auth/LoginResponse";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState, type FormEvent } from "react";
 import { useAuth } from "@/hooks/useAuth";

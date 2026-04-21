@@ -1,7 +1,7 @@
-import { EstadoAsignacion } from "@/models/enums/EstadoAsignacion";
-import { EstadoFactura } from "@/models/enums/EstadoFactura";
-import { EstadoFila } from "@/models/enums/EstadoFila";
-import { MedioPago } from "@/models/enums/MedioPago";
+import type { EstadoAsignacion } from "@/domain/enums/EstadoAsignacion";
+import type { EstadoFactura } from "@/domain/enums/EstadoFactura";
+import type { EstadoFila } from "@/domain/enums/EstadoFila";
+import type { MedioPago } from "@/domain/enums/MedioPago";
 
 export type ImportRowFacturaResponse = {
   id: number;
