@@ -1,0 +1,153 @@
+import type { LoginResponse } from "@/types/identity/LoginResponse";
+import { useNavigate } from "react-router-dom";
+import { useEffect, useState, type FormEvent } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import { BASE_URL } from "@/hooks/useApi";
+
+import { Brand } from "@/components/header";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
+
+const CUIL_LENGTH = 11;
+
+export default function LoginPage() {
+  const { session, isLoading, login } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!isLoading && session) {
+      navigate("/", { replace: true });
+    }
+  }, [isLoading, session, navigate]);
+
+  const [usuario, setUsuario] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
+    try {
+      const normalizedUsuario = usuario.replace(/\D/g, "");
+
+      if (normalizedUsuario.length !== CUIL_LENGTH) {
+        throw new Error("El CUIL debe tener 11 dígitos");
+      }
+
+      const cuil = Number(normalizedUsuario);
+
+      if (!Number.isFinite(cuil) || cuil === 0) {
+        throw new Error("Ingresa un CUIL válido");
+      }
+
+      // Login is a public endpoint — plain fetch, no auth header needed
+      const res = await fetch(`${BASE_URL}/usuarios/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cuil, password }),
+      });
+
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(text || "Error al iniciar sesión");
+      }
+
+      const auth = (await res.json()) as LoginResponse;
+
+      login({
+        token: auth.token,
+        rol: auth.rol,
+        nombre: auth.nombre,
+      });
+
+      navigate("/", { replace: true });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error al iniciar sesión");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+      </div>
+    );
+  }
+
+  if (session) return null;
+
+  return (
+    <div className="flex min-h-screen flex-col items-center justify-center">
+      <Card className="w-full max-w-md border-0 shadow-lg">
+        <CardContent className="p-10">
+          <div className="mb-10 flex justify-center">
+            <Brand greet={false} />
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-2">
+              <Label className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
+                CUIL
+              </Label>
+              <Input
+                type="text"
+                value={usuario}
+                onChange={(e) =>
+                  setUsuario(
+                    e.target.value.replace(/\D/g, "").slice(0, CUIL_LENGTH),
+                  )
+                }
+                autoComplete="username"
+                inputMode="numeric"
+                maxLength={CUIL_LENGTH}
+                placeholder="XXXXXXXXXXX"
+                className="bg-muted"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
+                Contraseña
+              </Label>
+              <Input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                autoComplete="current-password"
+                className="bg-muted"
+              />
+            </div>
+
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full text-sm font-bold uppercase tracking-wide"
+              size="lg"
+            >
+              {loading ? (
+                <>
+                  <Spinner className="mr-2" />
+                  Ingresando...
+                </>
+              ) : (
+                "Ingresar"
+              )}
+            </Button>
+
+            {error && (
+              <p className="text-center text-sm text-destructive">{error}</p>
+            )}
+          </form>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}

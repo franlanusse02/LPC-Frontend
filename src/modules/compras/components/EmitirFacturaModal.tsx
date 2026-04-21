@@ -1,0 +1,127 @@
+import { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
+import { Send } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import type { FacturaProveedorResponse } from "@/domain/dto/compra/FacturaProveedorResponse";
+
+interface EmitirFacturaModalProps {
+  open: boolean;
+  onClose: () => void;
+  factura: FacturaProveedorResponse | null;
+  onConfirm: (
+    facturaId: number,
+    fechaEmision: string,
+    fechaPago: string | null,
+  ) => Promise<void>;
+}
+
+export function EmitirFacturaModal({
+  open,
+  onClose,
+  factura,
+  onConfirm,
+}: EmitirFacturaModalProps) {
+  const [loading, setLoading] = useState(false);
+  const [fechaEmision, setFechaEmision] = useState(
+    new Date().toISOString().split("T")[0],
+  );
+  const [fechaPago, setFechaPago] = useState("");
+
+  const handleConfirm = async () => {
+    if (!factura || !fechaEmision) return;
+    setLoading(true);
+    try {
+      await onConfirm(factura.id, fechaEmision, fechaPago || null);
+      onClose();
+      setFechaEmision(new Date().toISOString().split("T")[0]);
+      setFechaPago("");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
+      <DialogContent className="sm:max-w-md shadow-xl border-0 p-0 overflow-hidden">
+        <div className="h-1.5 w-full bg-blue-500" />
+
+        <div className="px-6 pt-5 pb-6 space-y-5">
+          <DialogHeader className="space-y-3">
+            <div className="flex items-center gap-3">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-500">
+                <Send className="h-5 w-5" />
+              </span>
+              <DialogTitle className="text-lg font-bold text-gray-900">
+                Emitir factura
+              </DialogTitle>
+            </div>
+
+            <DialogDescription className="text-sm text-gray-500 leading-relaxed">
+              Emitiendo factura{" "}
+              <strong className="text-gray-700">#{factura?.numero}</strong>.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-2">
+            <label className="text-[10px] font-bold uppercase tracking-wide text-gray-500">
+              Fecha de emisi\u00f3n *
+            </label>
+            <Input
+              type="date"
+              value={fechaEmision}
+              onChange={(e) => setFechaEmision(e.target.value)}
+              max={new Date().toISOString().split("T")[0]}
+              className="bg-card"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-[10px] font-bold uppercase tracking-wide text-gray-500">
+              Fecha de pago (opcional)
+            </label>
+            <Input
+              type="date"
+              value={fechaPago}
+              onChange={(e) => setFechaPago(e.target.value)}
+              className="bg-card"
+            />
+          </div>
+
+          <DialogFooter className="flex-row justify-end gap-2 pt-2">
+            <Button
+              variant="outline"
+              onClick={onClose}
+              disabled={loading}
+              className="rounded-lg border-gray-200 text-gray-600 hover:bg-gray-50"
+            >
+              Cancelar
+            </Button>
+            <Button
+              onClick={handleConfirm}
+              disabled={loading || !fechaEmision}
+              className="rounded-lg font-semibold bg-blue-500 hover:bg-blue-600 text-white"
+            >
+              {loading ? (
+                <>
+                  <Spinner className="mr-2 h-4 w-4" />
+                  Emitiendo...
+                </>
+              ) : (
+                "Emitir"
+              )}
+            </Button>
+          </DialogFooter>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
