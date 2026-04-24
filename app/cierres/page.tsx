@@ -17,6 +17,10 @@ export default function CierresPage() {
   const { session, isLoading } = useAuth();
   const [cierres, setCierres] = useState<DetailedCierreCajaResponse[]>([]);
   const [loadingCierres, setLoadingCierres] = useState(true);
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "anulado">("active");
+  const [sortKey, setSortKey] = useState<"fechaOperacion" | "comedor" | "creadoPor" | "puntoDeVenta" | "totalPlatosVendidos" | "montoTotal">("fechaOperacion");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
 
   useEffect(() => {
     if (!isLoading) {
@@ -55,7 +59,28 @@ export default function CierresPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="p-0">
-            <CierresTable cierres={cierres} loading={loadingCierres} readonly />
+            <CierresTable
+              cierres={cierres}
+              displayedCierres={cierres}
+              loading={loadingCierres}
+              readonly
+              search={search}
+              onSearchChange={setSearch}
+              statusFilter={statusFilter}
+              onStatusFilterChange={setStatusFilter}
+              sortKey={sortKey}
+              sortDir={sortDir}
+              onSort={(key) => {
+                if (key === sortKey) setSortDir((dir) => (dir === "asc" ? "desc" : "asc"));
+                else { setSortKey(key); setSortDir("asc"); }
+              }}
+              comedorFilter=""
+              onComedorFilterChange={() => {}}
+              onClearFilters={() => {
+                setSearch("");
+                setStatusFilter("active");
+              }}
+            />
           </CardContent>
         </Card>
       </main>

@@ -16,7 +16,7 @@ import { ProveedorResponse } from "@/models/dto/proveedor/ProveedorResponse";
 import { ComedorResponse } from "@/models/dto/comedor/ComedorResponse";
 import { CreateFacturaProveedorRequest } from "@/models/dto/compra/CreateFacturaProveedorRequest";
 import { CierresTable } from "@/components/cierres-table";
-import { FacturasTable } from "@/components/facturas-table";
+import { FacturaSortDir, FacturaSortKey, FacturaStatusFilter, FacturasTable } from "@/components/facturas-table";
 import { EventosTable, EventoSortKey, EventoSortDir, EventoStatusFilter } from "@/components/eventos-table";
 import { ConsumosTable, ConsumoSortDir, ConsumoSortKey, ConsumoStatusFilter } from "@/components/consumos-table";
 import { NuevaFacturaModal } from "@/components/nueva-factura-modal";
@@ -33,6 +33,7 @@ import { CreateConsumoRequest } from "@/models/dto/consumos/CreateConsumoRequest
 import { buildConsumoListItem, ConsumoListItem, enrichConsumos } from "@/lib/consumos";
 import { DatePickerInput } from "@/components/date-picker-input";
 import { Combobox } from "@/components/ui/combobox";
+import { facturaTienePuntoDeVentaComedor } from "@/lib/facturas";
 
 type View = "cierres" | "compras" | "eventos" | "consumos";
 
@@ -47,6 +48,7 @@ export default function EncargadoPage() {
   const [dateDesde, setDateDesde] = useState("");
   const [dateHasta, setDateHasta] = useState("");
   const [comedorFilter, setComedorFilter] = useState("");
+  const [puntoDeVentaFilter, setPuntoDeVentaFilter] = useState("");
 
   // cierres
   const [cierres, setCierres] = useState<DetailedCierreCajaResponse[]>([]);
@@ -64,6 +66,10 @@ export default function EncargadoPage() {
   const [puntosDeVenta, setPuntosDeVenta] = useState<PuntoDeVentaResponse[]>([]);
   const [nuevaFacturaOpen, setNuevaFacturaOpen] = useState(false);
   const [nuevoCierreOpen, setNuevoCierreOpen] = useState(false);
+  const [facturaSearch, setFacturaSearch] = useState("");
+  const [facturaStatusFilter, setFacturaStatusFilter] = useState<FacturaStatusFilter>("all");
+  const [facturaSortKey, setFacturaSortKey] = useState<FacturaSortKey>("fechaFactura");
+  const [facturaSortDir, setFacturaSortDir] = useState<FacturaSortDir>("desc");
 
   // eventos
   const [eventos, setEventos] = useState<EventoResponse[]>([]);
@@ -98,6 +104,28 @@ export default function EncargadoPage() {
     [comedores],
   );
 
+  const proveedorNameById = useMemo(
+    () => Object.fromEntries(proveedores.map((proveedor) => [proveedor.id, proveedor.nombre])),
+    [proveedores],
+  );
+
+  const puntoDeVentaNameById = useMemo(
+    () => Object.fromEntries(puntosDeVenta.map((puntoDeVenta) => [puntoDeVenta.id, puntoDeVenta.nombre])),
+    [puntosDeVenta],
+  );
+
+  const puntoDeVentaOptions = useMemo(() => {
+    let list = [...puntosDeVenta];
+    if (comedorIdFilter !== null) list = list.filter((puntoDeVenta) => puntoDeVenta.comedorId === comedorIdFilter);
+    return list.sort((left, right) => left.nombre.localeCompare(right.nombre));
+  }, [puntosDeVenta, comedorIdFilter]);
+
+  useEffect(() => {
+    if (puntoDeVentaFilter && !puntoDeVentaOptions.some((puntoDeVenta) => String(puntoDeVenta.id) === puntoDeVentaFilter)) {
+      setPuntoDeVentaFilter("");
+    }
+  }, [puntoDeVentaFilter, puntoDeVentaOptions]);
+
   const displayedEventos = useMemo(() => {
     let list = [...eventos];
     if (eventoStatusFilter !== "all") list = list.filter((e) => e.estado === eventoStatusFilter);
@@ -128,6 +156,7 @@ export default function EncargadoPage() {
     if (consumoStatusFilter === "active") list = list.filter((item) => !item.anulado);
     if (consumoStatusFilter === "anulado") list = list.filter((item) => item.anulado);
     if (comedorFilter) list = list.filter((item) => item.comedorNombre === comedorFilter);
+    if (puntoDeVentaFilter) list = list.filter((item) => String(item.PuntoDeVentaId) === puntoDeVentaFilter);
     if (dateDesde) list = list.filter((item) => item.fecha >= dateDesde);
     if (dateHasta) list = list.filter((item) => item.fecha <= dateHasta);
     if (consumoSearch.trim()) {
@@ -162,6 +191,7 @@ export default function EncargadoPage() {
     consumos,
     dateDesde,
     dateHasta,
+    puntoDeVentaFilter,
   ]);
 
   const comedorOptions = useMemo(
@@ -177,6 +207,7 @@ export default function EncargadoPage() {
     if (statusFilter === "active") list = list.filter((c) => c.anulacionId === null);
     if (statusFilter === "anulado") list = list.filter((c) => c.anulacionId !== null);
     if (comedorFilter) list = list.filter((c) => c.comedor.nombre === comedorFilter);
+    if (puntoDeVentaFilter) list = list.filter((c) => String(c.puntoDeVenta.id) === puntoDeVentaFilter);
     if (dateDesde) list = list.filter((c) => c.fechaOperacion >= dateDesde);
     if (dateHasta) list = list.filter((c) => c.fechaOperacion <= dateHasta);
     if (search.trim()) {
@@ -203,11 +234,58 @@ export default function EncargadoPage() {
       return 0;
     });
     return list;
-  }, [cierres, statusFilter, comedorFilter, dateDesde, dateHasta, search, sortKey, sortDir]);
+  }, [cierres, statusFilter, comedorFilter, dateDesde, dateHasta, puntoDeVentaFilter, search, sortKey, sortDir]);
+
+  const displayedFacturas = useMemo(() => {
+    let list = [...facturas];
+    if (dateDesde) list = list.filter((factura) => factura.fechaFactura >= dateDesde);
+    if (dateHasta) list = list.filter((factura) => factura.fechaFactura <= dateHasta);
+    if (comedorIdFilter !== null) list = list.filter((factura) => factura.comedorId === comedorIdFilter);
+    if (puntoDeVentaFilter) {
+      list = list.filter((factura) =>
+        facturaTienePuntoDeVentaComedor(factura.puntoDeVentaComedor, puntoDeVentaFilter),
+      );
+    }
+    if (facturaStatusFilter !== "all") list = list.filter((factura) => factura.estado === facturaStatusFilter);
+    if (facturaSearch.trim()) {
+      const query = facturaSearch.trim().toLowerCase();
+      list = list.filter((factura) =>
+        factura.numero.toLowerCase().includes(query) ||
+        (proveedorNameById[factura.proveedorId] ?? "").toLowerCase().includes(query),
+      );
+    }
+    list.sort((left, right) => {
+      let leftValue: string | number = "";
+      let rightValue: string | number = "";
+      if (facturaSortKey === "fechaFactura") { leftValue = left.fechaFactura; rightValue = right.fechaFactura; }
+      if (facturaSortKey === "monto") { leftValue = left.monto; rightValue = right.monto; }
+      if (facturaSortKey === "proveedor") {
+        leftValue = proveedorNameById[left.proveedorId] ?? "";
+        rightValue = proveedorNameById[right.proveedorId] ?? "";
+      }
+      if (facturaSortKey === "estado") { leftValue = left.estado; rightValue = right.estado; }
+      if (leftValue < rightValue) return facturaSortDir === "asc" ? -1 : 1;
+      if (leftValue > rightValue) return facturaSortDir === "asc" ? 1 : -1;
+      return 0;
+    });
+    return list;
+  }, [
+    comedorIdFilter,
+    dateDesde,
+    dateHasta,
+    facturaSearch,
+    facturaSortDir,
+    facturaSortKey,
+    facturaStatusFilter,
+    facturas,
+    puntoDeVentaFilter,
+    proveedorNameById,
+  ]);
 
   const clearFilters = () => {
-    setDateDesde(""); setDateHasta(""); setComedorFilter("");
+    setDateDesde(""); setDateHasta(""); setComedorFilter(""); setPuntoDeVentaFilter("");
     setSearch(""); setStatusFilter("active");
+    setFacturaSearch(""); setFacturaStatusFilter("all");
     setEventoSearch(""); setEventoStatusFilter("all");
     setConsumoSearch(""); setConsumoStatusFilter("active");
   };
@@ -411,10 +489,26 @@ export default function EncargadoPage() {
                 <Combobox
                   options={comedorOptions.map((n) => ({ value: n, label: n }))}
                   value={comedorFilter}
-                  onChange={setComedorFilter}
+                  onChange={(value) => {
+                    setComedorFilter(value);
+                    setPuntoDeVentaFilter("");
+                  }}
                   placeholder="Todos los comedores"
                   searchPlaceholder="Buscar comedor..."
                   className="h-8 w-auto min-w-48 text-sm bg-gray-50 border-gray-200"
+                />
+              )}
+              {puntoDeVentaOptions.length > 0 && (
+                <Combobox
+                  options={puntoDeVentaOptions.map((puntoDeVenta) => ({
+                    value: String(puntoDeVenta.id),
+                    label: puntoDeVenta.nombre,
+                  }))}
+                  value={puntoDeVentaFilter}
+                  onChange={setPuntoDeVentaFilter}
+                  placeholder="Todos los puntos de venta"
+                  searchPlaceholder="Buscar punto de venta..."
+                  className="h-8 w-auto min-w-56 text-sm bg-gray-50 border-gray-200"
                 />
               )}
             </div>
@@ -445,13 +539,27 @@ export default function EncargadoPage() {
             {view === "compras" && (
               <FacturasTable
                 facturas={facturas}
+                displayedFacturas={displayedFacturas}
                 proveedores={proveedores}
                 loading={loadingFacturas}
+                comedorNameById={comedorNameById}
+                puntoDeVentaNameById={puntoDeVentaNameById}
                 readonly
                 dateDesde={dateDesde}
                 dateHasta={dateHasta}
                 comedorIdFilter={comedorIdFilter}
+                search={facturaSearch}
+                onSearchChange={setFacturaSearch}
+                statusFilter={facturaStatusFilter}
+                onStatusFilterChange={setFacturaStatusFilter}
+                sortKey={facturaSortKey}
+                sortDir={facturaSortDir}
+                onSort={(key) => {
+                  if (key === facturaSortKey) setFacturaSortDir((dir) => (dir === "asc" ? "desc" : "asc"));
+                  else { setFacturaSortKey(key); setFacturaSortDir("asc"); }
+                }}
                 onNuevaFactura={() => setNuevaFacturaOpen(true)}
+                extraActiveFilters={Boolean(puntoDeVentaFilter)}
                 onClearFilters={clearFilters}
               />
             )}

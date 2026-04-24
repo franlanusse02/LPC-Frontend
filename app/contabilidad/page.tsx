@@ -52,6 +52,7 @@ import { PatchConsumoRequest } from "@/models/dto/consumos/PatchConsumoRequest";
 import { buildConsumoListItem, ConsumoListItem, enrichConsumos } from "@/lib/consumos";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { facturaTienePuntoDeVentaComedor } from "@/lib/facturas";
 
 type View = "cierres" | "compras" | "eventos" | "consumos";
 type ConsumoViewMode = "grouped" | "detailed";
@@ -102,6 +103,17 @@ const formatSummaryNames = (items: string[], limit = 2) => {
   return `${items.slice(0, limit).join(", ")} +${items.length - limit}`;
 };
 
+const formatFacturaDistribucion = (
+  distribucion: Record<string, number>,
+  puntoDeVentaNameById: Record<number, string>,
+) =>
+  Object.entries(distribucion ?? {})
+    .sort(([leftId], [rightId]) => Number(leftId) - Number(rightId))
+    .map(([puntoDeVentaId, porcentaje]) =>
+      `${puntoDeVentaNameById[Number(puntoDeVentaId)] ?? `Punto ${puntoDeVentaId}`} ${porcentaje}%`,
+    )
+    .join(", ");
+
 export default function ContabilidadPage() {
   const router = useRouter();
   const { session, isLoading } = useAuth();
@@ -116,6 +128,7 @@ export default function ContabilidadPage() {
   const [dateHasta, setDateHasta] = useState("");
   const [comedorFilter, setComedorFilter] = useState("");
   const [sociedadFilter, setSociedadFilter] = useState("");
+  const [puntoDeVentaFilter, setPuntoDeVentaFilter] = useState("");
 
   // cierres
   const [cierres, setCierres] = useState<DetailedCierreCajaResponse[]>([]);
@@ -207,6 +220,29 @@ export default function ContabilidadPage() {
     [comedores],
   );
 
+  const puntoDeVentaNameById = useMemo(
+    () => Object.fromEntries(puntosDeVenta.map((puntoDeVenta) => [puntoDeVenta.id, puntoDeVenta.nombre])),
+    [puntosDeVenta],
+  );
+
+  const puntoDeVentaOptions = useMemo(() => {
+    let list = [...puntosDeVenta];
+    if (comedorIdFilter !== null) list = list.filter((puntoDeVenta) => puntoDeVenta.comedorId === comedorIdFilter);
+    else if (sociedadFilter) list = list.filter((puntoDeVenta) => comedorIdsDeSociedad.has(puntoDeVenta.comedorId));
+    return list.sort((left, right) => left.nombre.localeCompare(right.nombre));
+  }, [puntosDeVenta, comedorIdFilter, sociedadFilter, comedorIdsDeSociedad]);
+
+  const selectedPuntoDeVenta = useMemo(
+    () => puntosDeVenta.find((puntoDeVenta) => String(puntoDeVenta.id) === puntoDeVentaFilter) ?? null,
+    [puntosDeVenta, puntoDeVentaFilter],
+  );
+
+  useEffect(() => {
+    if (puntoDeVentaFilter && !puntoDeVentaOptions.some((puntoDeVenta) => String(puntoDeVenta.id) === puntoDeVentaFilter)) {
+      setPuntoDeVentaFilter("");
+    }
+  }, [puntoDeVentaFilter, puntoDeVentaOptions]);
+
   const comedorOptions = useMemo(
     () => [...new Set([
       ...cierres
@@ -228,6 +264,7 @@ export default function ContabilidadPage() {
     if (statusFilter === "anulado") list = list.filter((c) => c.anulacionId !== null);
     if (comedorFilter) list = list.filter((c) => c.comedor.nombre === comedorFilter);
     else if (sociedadFilter) list = list.filter((c) => comedorNamesDeSociedad.has(c.comedor.nombre));
+    if (puntoDeVentaFilter) list = list.filter((c) => String(c.puntoDeVenta.id) === puntoDeVentaFilter);
     if (dateDesde) list = list.filter((c) => c.fechaOperacion >= dateDesde);
     if (dateHasta) list = list.filter((c) => c.fechaOperacion <= dateHasta);
     if (search.trim()) {
@@ -254,7 +291,7 @@ export default function ContabilidadPage() {
       return 0;
     });
     return list;
-  }, [cierres, statusFilter, comedorFilter, sociedadFilter, comedorNamesDeSociedad, dateDesde, dateHasta, search, sortKey, sortDir]);
+  }, [cierres, statusFilter, comedorFilter, sociedadFilter, comedorNamesDeSociedad, puntoDeVentaFilter, dateDesde, dateHasta, search, sortKey, sortDir]);
 
   const montoVentas = useMemo(() => {
     let list = cierres.filter((c) => c.anulacionId === null);
@@ -262,8 +299,9 @@ export default function ContabilidadPage() {
     if (dateHasta) list = list.filter((c) => c.fechaOperacion <= dateHasta);
     if (comedorFilter) list = list.filter((c) => c.comedor.nombre === comedorFilter);
     else if (sociedadFilter) list = list.filter((c) => comedorNamesDeSociedad.has(c.comedor.nombre));
+    if (puntoDeVentaFilter) list = list.filter((c) => String(c.puntoDeVenta.id) === puntoDeVentaFilter);
     return list.reduce((s, c) => s + c.montoTotal, 0);
-  }, [cierres, dateDesde, dateHasta, comedorFilter, sociedadFilter, comedorNamesDeSociedad]);
+  }, [cierres, dateDesde, dateHasta, comedorFilter, sociedadFilter, comedorNamesDeSociedad, puntoDeVentaFilter]);
 
   const montoCompras = useMemo(() => {
     let list = facturas.filter((f) => f.estado !== "ANULADA");
@@ -271,8 +309,11 @@ export default function ContabilidadPage() {
     if (dateHasta) list = list.filter((f) => f.fechaFactura <= dateHasta);
     if (comedorIdFilter !== null) list = list.filter((f) => f.comedorId === comedorIdFilter);
     else if (sociedadFilter) list = list.filter((f) => comedorIdsDeSociedad.has(f.comedorId));
+    if (puntoDeVentaFilter) {
+      list = list.filter((f) => facturaTienePuntoDeVentaComedor(f.puntoDeVentaComedor, puntoDeVentaFilter));
+    }
     return list.reduce((s, f) => s + f.monto, 0);
-  }, [facturas, dateDesde, dateHasta, comedorIdFilter, sociedadFilter, comedorIdsDeSociedad]);
+  }, [facturas, dateDesde, dateHasta, comedorIdFilter, sociedadFilter, comedorIdsDeSociedad, puntoDeVentaFilter]);
 
   const montoEventos = useMemo(() => {
     let list = eventos.filter((e) => e.estado !== "ANULADO");
@@ -319,6 +360,7 @@ export default function ContabilidadPage() {
     if (dateHasta) list = list.filter((item) => item.fecha <= dateHasta);
     if (comedorIdFilter !== null) list = list.filter((item) => item.comedorId === comedorIdFilter);
     else if (sociedadFilter) list = list.filter((item) => item.comedorId !== null && comedorIdsDeSociedad.has(item.comedorId));
+    if (puntoDeVentaFilter) list = list.filter((item) => String(item.PuntoDeVentaId) === puntoDeVentaFilter);
     if (consumoStatusFilter === "active") list = list.filter((item) => !item.anulado);
     if (consumoStatusFilter === "anulado") list = list.filter((item) => item.anulado);
     if (consumoSearch.trim()) {
@@ -354,6 +396,7 @@ export default function ContabilidadPage() {
     consumos,
     dateDesde,
     dateHasta,
+    puntoDeVentaFilter,
     sociedadFilter,
   ]);
 
@@ -363,8 +406,9 @@ export default function ContabilidadPage() {
     if (dateHasta) list = list.filter((item) => item.fecha <= dateHasta);
     if (comedorIdFilter !== null) list = list.filter((item) => item.comedorId === comedorIdFilter);
     else if (sociedadFilter) list = list.filter((item) => item.comedorId !== null && comedorIdsDeSociedad.has(item.comedorId));
+    if (puntoDeVentaFilter) list = list.filter((item) => String(item.PuntoDeVentaId) === puntoDeVentaFilter);
     return list.reduce((sum, item) => sum + item.total, 0);
-  }, [comedores, comedorIdFilter, comedorIdsDeSociedad, consumos, dateDesde, dateHasta, sociedadFilter]);
+  }, [comedores, comedorIdFilter, comedorIdsDeSociedad, consumos, dateDesde, dateHasta, puntoDeVentaFilter, sociedadFilter]);
 
   const montoIngresos = montoVentas + montoEventos + montoConsumos;
   const montoEgresos = montoCompras;
@@ -431,6 +475,7 @@ export default function ContabilidadPage() {
     dateHasta ||
     comedorFilter ||
     sociedadFilter ||
+    puntoDeVentaFilter ||
     consumoSearch.trim() ||
     consumoStatusFilter !== "active",
   );
@@ -441,6 +486,11 @@ export default function ContabilidadPage() {
     if (dateHasta) list = list.filter((factura) => factura.fechaFactura <= dateHasta);
     if (comedorIdFilter !== null) list = list.filter((factura) => factura.comedorId === comedorIdFilter);
     else if (sociedadFilter) list = list.filter((factura) => comedorIdsDeSociedad.has(factura.comedorId));
+    if (puntoDeVentaFilter) {
+      list = list.filter((factura) =>
+        facturaTienePuntoDeVentaComedor(factura.puntoDeVentaComedor, puntoDeVentaFilter),
+      );
+    }
     if (facturaStatusFilter !== "all") list = list.filter((factura) => factura.estado === facturaStatusFilter);
     if (facturaSearch.trim()) {
       const query = facturaSearch.trim().toLowerCase();
@@ -473,13 +523,14 @@ export default function ContabilidadPage() {
     facturaSortKey,
     facturaStatusFilter,
     facturas,
+    puntoDeVentaFilter,
     proveedorNameById,
     sociedadFilter,
     comedorIdsDeSociedad,
   ]);
 
   const clearFilters = () => {
-    setDateDesde(""); setDateHasta(""); setComedorFilter(""); setSociedadFilter("");
+    setDateDesde(""); setDateHasta(""); setComedorFilter(""); setSociedadFilter(""); setPuntoDeVentaFilter("");
     setSearch(""); setStatusFilter("active");
     setFacturaSearch(""); setFacturaStatusFilter("all");
     setEventoSearch(""); setEventoStatusFilter("all");
@@ -502,6 +553,7 @@ export default function ContabilidadPage() {
         "Cierres",
         buildExportFilename("cierres", [
           comedorFilter,
+          selectedPuntoDeVenta?.nombre,
           buildDateRangePart(dateDesde, dateHasta),
           statusFilter !== "active" ? (statusFilter === "all" ? "todos" : "anulados") : null,
           buildSearchPart(search),
@@ -517,6 +569,11 @@ export default function ContabilidadPage() {
           Número: factura.numero,
           Proveedor: proveedorNameById[factura.proveedorId] ?? String(factura.proveedorId),
           Comedor: comedorNameById[factura.comedorId] ?? String(factura.comedorId),
+          "Punto de venta proveedor": factura.puntoDeVentaProveedor ?? "",
+          "Distribución puntos comedor": formatFacturaDistribucion(
+            factura.puntoDeVentaComedor,
+            puntoDeVentaNameById,
+          ),
           Monto: factura.monto,
           Estado: EstadoFacturaLabel[factura.estado],
           "Fecha emisión": factura.fechaEmision ?? "",
@@ -528,6 +585,7 @@ export default function ContabilidadPage() {
         "Compras",
         buildExportFilename("compras", [
           comedorFilter,
+          selectedPuntoDeVenta?.nombre,
           buildDateRangePart(dateDesde, dateHasta),
           facturaStatusFilter !== "all" ? EstadoFacturaLabel[facturaStatusFilter] : null,
           buildSearchPart(facturaSearch),
@@ -577,8 +635,7 @@ export default function ContabilidadPage() {
       return;
     }
 
-    exportRowsToXlsx(
-      consumoViewMode === "grouped"
+    const consumoRows: Record<string, unknown>[] = consumoViewMode === "grouped"
         ? groupedConsumos.map((item) => ({
             Fecha: item.fecha,
             Comedor: item.comedorNombre,
@@ -599,11 +656,15 @@ export default function ContabilidadPage() {
             Total: item.total,
             Estado: item.anulado ? "Anulado" : "Activo",
             Observaciones: item.observaciones ?? "",
-          })),
+          }));
+
+    exportRowsToXlsx(
+      consumoRows,
       "Consumos",
       buildExportFilename("consumos", [
         consumoViewMode === "grouped" ? "agrupado" : "detallado",
         comedorFilter,
+        selectedPuntoDeVenta?.nombre,
         buildDateRangePart(dateDesde, dateHasta),
         consumoStatusFilter !== "all" ? consumoStatusExportLabel(consumoStatusFilter) : null,
         buildSearchPart(consumoSearch),
@@ -1053,7 +1114,11 @@ export default function ContabilidadPage() {
                 <Combobox
                   options={sociedadOptions.map((s) => ({ value: String(s.id), label: s.nombre }))}
                   value={sociedadFilter}
-                  onChange={(v) => { setSociedadFilter(v); setComedorFilter(""); }}
+                  onChange={(v) => {
+                    setSociedadFilter(v);
+                    setComedorFilter("");
+                    setPuntoDeVentaFilter("");
+                  }}
                   placeholder="Todas las sociedades"
                   className="h-8 w-auto min-w-44 text-sm bg-gray-50 border-gray-200"
                 />
@@ -1061,10 +1126,26 @@ export default function ContabilidadPage() {
               <Combobox
                 options={comedorOptions.map((n) => ({ value: n, label: n }))}
                 value={comedorFilter}
-                onChange={setComedorFilter}
+                onChange={(value) => {
+                  setComedorFilter(value);
+                  setPuntoDeVentaFilter("");
+                }}
                 placeholder="Todos los comedores"
                 className="h-8 w-auto min-w-48 text-sm bg-gray-50 border-gray-200"
               />
+              {puntoDeVentaOptions.length > 0 && (
+                <Combobox
+                  options={puntoDeVentaOptions.map((puntoDeVenta) => ({
+                    value: String(puntoDeVenta.id),
+                    label: puntoDeVenta.nombre,
+                  }))}
+                  value={puntoDeVentaFilter}
+                  onChange={setPuntoDeVentaFilter}
+                  placeholder="Todos los puntos de venta"
+                  searchPlaceholder="Buscar punto de venta..."
+                  className="h-8 w-auto min-w-56 text-sm bg-gray-50 border-gray-200"
+                />
+              )}
             </div>
           </CardHeader>
 
@@ -1104,6 +1185,7 @@ export default function ContabilidadPage() {
                 proveedores={proveedores}
                 loading={loadingFacturas}
                 comedorNameById={comedorNameById}
+                puntoDeVentaNameById={puntoDeVentaNameById}
                 dateDesde={dateDesde}
                 dateHasta={dateHasta}
                 comedorIdFilter={comedorIdFilter}
@@ -1121,6 +1203,7 @@ export default function ContabilidadPage() {
                 onPagar={setPagarFactura}
                 onEditar={setEditarFactura}
                 onAnular={setAnularFactura}
+                extraActiveFilters={Boolean(puntoDeVentaFilter)}
                 onClearFilters={clearFilters}
               />
             )}

@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Dialog, DialogContent, DialogHeader,
   DialogTitle, DialogFooter,
@@ -17,6 +17,13 @@ import { FacturaProveedorResponse } from "@/models/dto/compra/FacturaProveedorRe
 import { PatchFacturaProveedorRequest } from "@/models/dto/compra/PatchFacturaProveedorRequest";
 import { ProveedorResponse } from "@/models/dto/proveedor/ProveedorResponse";
 import { ComedorResponse } from "@/models/dto/comedor/ComedorResponse";
+import { FacturaPuntosDistribucionEditor } from "@/components/factura-puntos-distribucion-editor";
+import {
+  FacturaPuntoDeVentaDistribucionRow,
+  facturaDistribucionRecordFromRows,
+  facturaDistribucionRowsFromRecord,
+  validateFacturaDistribucionRows,
+} from "@/lib/facturas";
 
 interface EditarFacturaModalProps {
   open: boolean;
@@ -36,14 +43,43 @@ export function EditarFacturaModal({
   const [fechaFactura, setFechaFactura] = useState(factura.fechaFactura);
   const [monto, setMonto] = useState(String(factura.monto));
   const [comentarios, setComentarios] = useState(factura.comentarios ?? "");
-  const [puntoDeVenta, setPuntoDeVenta] = useState(String(factura.puntoDeVenta ?? ""));
+  const [puntoDeVentaProveedor, setPuntoDeVentaProveedor] = useState(String(factura.puntoDeVentaProveedor ?? ""));
+  const [puntoDeVentaComedor, setPuntoDeVentaComedor] = useState<FacturaPuntoDeVentaDistribucionRow[]>(
+    () => facturaDistribucionRowsFromRecord(factura.puntoDeVentaComedor),
+  );
   const [fechaEmision, setFechaEmision] = useState(factura.fechaEmision ?? "");
   const [fechaPago, setFechaPago] = useState(factura.fechaPago ?? "");
 
   const selectedProveedor = proveedores.find((p) => p.id === Number(proveedorId));
-  const requiresPuntoDeVenta = selectedProveedor && selectedProveedor.puntosDeVenta.length > 0;
+  const selectedComedor = comedores.find((c) => c.id === Number(comedorId));
+  const proveedorPuntosDeVenta = selectedProveedor?.puntosDeVenta ?? [];
+  const requiresPuntoDeVenta = proveedorPuntosDeVenta.length > 0;
+  const comedorPuntosDeVenta = useMemo(
+    () => selectedComedor?.puntosDeVenta ?? [],
+    [selectedComedor],
+  );
+  const distributionError = useMemo(
+    () => validateFacturaDistribucionRows(puntoDeVentaComedor),
+    [puntoDeVentaComedor],
+  );
+  const canSubmit = proveedorId && comedorId && fechaFactura && monto &&
+    (!requiresPuntoDeVenta || puntoDeVentaProveedor) &&
+    !distributionError;
+
+  useEffect(() => {
+    setProveedorId(String(factura.proveedorId));
+    setComedorId(String(factura.comedorId));
+    setFechaFactura(factura.fechaFactura);
+    setMonto(String(factura.monto));
+    setComentarios(factura.comentarios ?? "");
+    setPuntoDeVentaProveedor(String(factura.puntoDeVentaProveedor ?? ""));
+    setPuntoDeVentaComedor(facturaDistribucionRowsFromRecord(factura.puntoDeVentaComedor));
+    setFechaEmision(factura.fechaEmision ?? "");
+    setFechaPago(factura.fechaPago ?? "");
+  }, [factura, open]);
 
   const handleConfirm = async () => {
+    if (!canSubmit) return;
     setLoading(true);
     try {
       await onConfirm(factura.id, {
@@ -52,9 +88,10 @@ export function EditarFacturaModal({
         fechaFactura,
         monto: Number(monto),
         comentarios,
-        puntoDeVenta: puntoDeVenta ? Number(puntoDeVenta) : null as any,
-        fechaEmision: fechaEmision || null as any,
-        fechaPago: fechaPago || null as any,
+        puntoDeVentaProveedor: puntoDeVentaProveedor ? Number(puntoDeVentaProveedor) : null,
+        puntoDeVentaComedor: facturaDistribucionRecordFromRows(puntoDeVentaComedor),
+        fechaEmision: fechaEmision || null,
+        fechaPago: fechaPago || null,
       });
       onClose();
     } finally {
@@ -86,7 +123,10 @@ export function EditarFacturaModal({
               <Combobox
                 options={proveedorOptions}
                 value={proveedorId}
-                onChange={(v) => { setProveedorId(v); setPuntoDeVenta(""); }}
+                onChange={(value) => {
+                  setProveedorId(value);
+                  setPuntoDeVentaProveedor("");
+                }}
                 placeholder="Seleccionar proveedor..."
                 searchPlaceholder="Buscar proveedor..."
               />
@@ -95,7 +135,10 @@ export function EditarFacturaModal({
               <Combobox
                 options={comedorOptions}
                 value={comedorId}
-                onChange={setComedorId}
+                onChange={(value) => {
+                  setComedorId(value);
+                  setPuntoDeVentaComedor([]);
+                }}
                 placeholder="Seleccionar comedor..."
                 searchPlaceholder="Buscar comedor..."
               />
@@ -110,15 +153,23 @@ export function EditarFacturaModal({
             </FormField>
             {requiresPuntoDeVenta && (
               <FormField label="Punto de venta *">
-                <select value={puntoDeVenta} onChange={(e) => setPuntoDeVenta(e.target.value)}
+                <select
+                  value={puntoDeVentaProveedor}
+                  onChange={(e) => setPuntoDeVentaProveedor(e.target.value)}
                   className="h-9 w-full rounded-md border border-gray-200 bg-card px-2 text-sm">
                   <option value="">Seleccionar...</option>
-                  {selectedProveedor.puntosDeVenta.map((pv) => (
+                  {proveedorPuntosDeVenta.map((pv) => (
                     <option key={pv} value={pv}>{pv}</option>
                   ))}
                 </select>
               </FormField>
             )}
+            <FacturaPuntosDistribucionEditor
+              rows={puntoDeVentaComedor}
+              puntosDeVenta={comedorPuntosDeVenta}
+              onChange={setPuntoDeVentaComedor}
+              error={distributionError}
+            />
             {factura.estado === "PENDIENTE" && (
               <FormField label="Fecha emisión">
                 <DatePickerInput value={fechaEmision}
@@ -143,7 +194,7 @@ export function EditarFacturaModal({
               className="rounded-lg border-gray-200 text-gray-600 hover:bg-gray-50">
               Cancelar
             </Button>
-            <Button onClick={handleConfirm} disabled={loading}
+            <Button onClick={handleConfirm} disabled={loading || !canSubmit}
               className="rounded-lg font-semibold bg-amber-400 hover:bg-amber-500 text-white">
               {loading ? <><Spinner className="mr-2 h-4 w-4" />Guardando...</> : "Guardar cambios"}
             </Button>

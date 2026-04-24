@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useMemo, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import {
   ChevronDown, ChevronUp, ChevronsUpDown,
   MoreHorizontal, Ban, Pencil, Search, X,
@@ -50,6 +50,7 @@ export interface FacturasTableProps {
   readonly?: boolean;
   displayedFacturas?: FacturaProveedorResponse[];
   comedorNameById?: Record<number, string>;
+  puntoDeVentaNameById?: Record<number, string>;
   dateDesde: string;
   dateHasta: string;
   comedorIdFilter: number | null;
@@ -65,6 +66,7 @@ export interface FacturasTableProps {
   onPagar?: (factura: FacturaProveedorResponse) => void;
   onEditar?: (factura: FacturaProveedorResponse) => void;
   onAnular?: (factura: FacturaProveedorResponse) => void;
+  extraActiveFilters?: boolean;
   onClearFilters: () => void;
 }
 
@@ -75,10 +77,85 @@ function SortIcon({ col, sortKey, sortDir }: { col: FacturaSortKey; sortKey: Fac
     : <ChevronDown className="ml-1 inline h-3 w-3 text-primary" />;
 }
 
+function DetailField({ label, value }: { label: string; value: string | null | undefined }) {
+  return (
+    <div className="flex flex-col gap-0.5">
+      <span className="text-xs font-medium uppercase tracking-wide text-gray-400">{label}</span>
+      <span className="text-sm text-gray-700">
+        {value && value.trim() !== "" ? value : "—"}
+      </span>
+    </div>
+  );
+}
+
+function getPuntoDeVentaLabel(
+  puntoDeVentaId: string,
+  puntoDeVentaNameById?: Record<number, string>,
+) {
+  return puntoDeVentaNameById?.[Number(puntoDeVentaId)] ?? `Punto ${puntoDeVentaId}`;
+}
+
+function FacturaDetail({
+  factura,
+  puntoDeVentaNameById,
+}: {
+  factura: FacturaProveedorResponse;
+  puntoDeVentaNameById?: Record<number, string>;
+}) {
+  const distribucion = Object.entries(
+    factura.puntoDeVentaComedor ?? {},
+  ).sort(([leftId], [rightId]) => Number(leftId) - Number(rightId));
+
+  return (
+    <div className="space-y-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <DetailField
+          label="Punto de venta proveedor"
+          value={
+            factura.puntoDeVentaProveedor !== null
+              ? String(factura.puntoDeVentaProveedor)
+              : null
+          }
+        />
+        <DetailField label="Número operación" value={factura.numeroOperacion} />
+        <DetailField label="Medio de pago" value={factura.medioPago} />
+      </div>
+
+      <div className="space-y-2">
+        <div>
+          <span className="text-xs font-medium uppercase tracking-wide text-gray-400">
+            Distribución comedor
+          </span>
+        </div>
+        {distribucion.length === 0 ? (
+          <p className="text-sm text-gray-500">Sin puntos de venta asociados.</p>
+        ) : (
+          <div className="grid gap-2 sm:grid-cols-2">
+            {distribucion.map(([puntoDeVentaId, porcentaje]) => (
+              <div
+                key={puntoDeVentaId}
+                className="flex items-center justify-between rounded-lg border border-gray-200 bg-gray-50 px-3 py-2"
+              >
+                <span className="text-sm text-gray-700">
+                  {getPuntoDeVentaLabel(puntoDeVentaId, puntoDeVentaNameById)}
+                </span>
+                <span className="text-sm font-semibold text-gray-900">
+                  {porcentaje}%
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export function FacturasTable({
   facturas, proveedores, loading, readonly = false,
   displayedFacturas,
   comedorNameById,
+  puntoDeVentaNameById,
   dateDesde, dateHasta, comedorIdFilter,
   search,
   onSearchChange,
@@ -88,11 +165,13 @@ export function FacturasTable({
   sortDir,
   onSort,
   onNuevaFactura, onEmitir, onPagar, onEditar, onAnular, onClearFilters,
+  extraActiveFilters = false,
 }: FacturasTableProps) {
   const [localSearch, setLocalSearch] = useState("");
   const [localStatusFilter, setLocalStatusFilter] = useState<FacturaStatusFilter>("all");
   const [localSortKey, setLocalSortKey] = useState<FacturaSortKey>("fechaFactura");
   const [localSortDir, setLocalSortDir] = useState<FacturaSortDir>("desc");
+  const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
 
   const activeSearch = search ?? localSearch;
   const activeStatusFilter = statusFilter ?? localStatusFilter;
@@ -146,7 +225,22 @@ export function FacturasTable({
     proveedorMap,
   ]);
 
-  const hasActiveFilters = activeSearch || activeStatusFilter !== "all" || dateDesde || dateHasta || comedorIdFilter;
+  const hasActiveFilters = Boolean(
+    activeSearch ||
+    activeStatusFilter !== "all" ||
+    dateDesde ||
+    dateHasta ||
+    comedorIdFilter !== null ||
+    extraActiveFilters,
+  );
+
+  const toggleRow = (id: number) => {
+    setExpandedRows((prev) => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
 
   const handleSort = (key: FacturaSortKey) => {
     if (onSort) {
@@ -234,6 +328,7 @@ export function FacturasTable({
             <table className="w-full table-auto border-collapse text-sm">
               <thead>
                 <tr className="bg-gray-100/80 text-left text-xs uppercase text-gray-500 tracking-wider">
+                  <th className="px-4 py-3 w-8" />
                   {sortableTh("Fecha", "fechaFactura")}
                   <th className="px-4 py-3">Número</th>
                   {sortableTh("Proveedor", "proveedor")}
@@ -246,63 +341,113 @@ export function FacturasTable({
               </thead>
               <tbody>
                 {displayed.map((factura) => {
+                  const isExpanded = expandedRows.has(factura.id);
                   const isAnulada = factura.estado === "ANULADA";
                   const isPagada = factura.estado === "PAGADA";
                   const hasActions = !readonly && !isAnulada && !isPagada;
+                  const detailColSpan = readonly ? 8 : 9;
 
                   return (
-                    <tr key={factura.id}
-                      className={cn("border-b transition-colors",
-                        isAnulada ? "bg-red-50/30 text-gray-400" : "hover:bg-gray-50/80"
-                      )}>
-                      <td className="px-4 py-4 font-medium whitespace-nowrap">{factura.fechaFactura}</td>
-                      <td className="px-4 py-4 font-mono text-xs">{factura.numero}</td>
-                      <td className="px-4 py-4">{proveedorMap[factura.proveedorId] ?? factura.proveedorId}</td>
-                      <td className="px-4 py-4">{comedorNameById?.[factura.comedorId] ?? factura.comedorId}</td>
-                      <td className="px-4 py-4 text-right font-mono">{formatCurrency(factura.monto)}</td>
-                      <td className="px-4 py-4 text-center">{estadoBadge(factura.estado)}</td>
-                      <td className="px-4 py-4 text-gray-500 whitespace-nowrap">
-                        {factura.fechaPago ?? <span className="text-gray-300">—</span>}
-                      </td>
-                      {!readonly && (
-                        <td className="px-4 py-4">
-                          {hasActions ? (
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="icon"
-                                  className="h-8 w-8 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100"
-                                  aria-label="Acciones">
-                                  <MoreHorizontal className="h-4 w-4" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end" className="w-44 rounded-xl shadow-lg border-gray-100">
-                                {factura.estado === "PENDIENTE" && (
-                                  <DropdownMenuItem onClick={() => onEmitir?.(factura)}
-                                    className="gap-2.5 cursor-pointer rounded-lg text-blue-600 focus:text-blue-700 focus:bg-blue-50">
-                                    <Send className="h-4 w-4" />Emitir
-                                  </DropdownMenuItem>
-                                )}
-                                {factura.estado === "EMITIDA" && (
-                                  <DropdownMenuItem onClick={() => onPagar?.(factura)}
-                                    className="gap-2.5 cursor-pointer rounded-lg text-emerald-600 focus:text-emerald-700 focus:bg-emerald-50">
-                                    <CircleDollarSign className="h-4 w-4" />Pagar
-                                  </DropdownMenuItem>
-                                )}
-                                <DropdownMenuItem onClick={() => onEditar?.(factura)}
-                                  className="gap-2.5 cursor-pointer rounded-lg text-gray-700 focus:text-gray-900">
-                                  <Pencil className="h-4 w-4 text-gray-400" />Editar
-                                </DropdownMenuItem>
-                                <DropdownMenuSeparator className="my-1" />
-                                <DropdownMenuItem onClick={() => onAnular?.(factura)}
-                                  className="gap-2.5 cursor-pointer rounded-lg text-red-600 focus:text-red-700 focus:bg-red-50">
-                                  <Ban className="h-4 w-4" />Anular
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          ) : null}
+                    <Fragment key={factura.id}>
+                      <tr
+                        className={cn(
+                          "border-b transition-colors",
+                          isAnulada ? "bg-red-50/30 text-gray-400" : "hover:bg-gray-50/80",
+                        )}
+                      >
+                        <td
+                          className="px-4 py-4 cursor-pointer text-gray-400 hover:text-gray-600"
+                          onClick={() => toggleRow(factura.id)}
+                        >
+                          {isExpanded
+                            ? <ChevronUp className="h-4 w-4" />
+                            : <ChevronDown className="h-4 w-4" />}
                         </td>
+                        <td
+                          className="px-4 py-4 cursor-pointer font-medium whitespace-nowrap"
+                          onClick={() => toggleRow(factura.id)}
+                        >
+                          {factura.fechaFactura}
+                        </td>
+                        <td
+                          className="px-4 py-4 cursor-pointer font-mono text-xs"
+                          onClick={() => toggleRow(factura.id)}
+                        >
+                          {factura.numero}
+                        </td>
+                        <td className="px-4 py-4 cursor-pointer" onClick={() => toggleRow(factura.id)}>
+                          {proveedorMap[factura.proveedorId] ?? factura.proveedorId}
+                        </td>
+                        <td className="px-4 py-4 cursor-pointer" onClick={() => toggleRow(factura.id)}>
+                          {comedorNameById?.[factura.comedorId] ?? factura.comedorId}
+                        </td>
+                        <td
+                          className="px-4 py-4 cursor-pointer text-right font-mono"
+                          onClick={() => toggleRow(factura.id)}
+                        >
+                          {formatCurrency(factura.monto)}
+                        </td>
+                        <td className="px-4 py-4 cursor-pointer text-center" onClick={() => toggleRow(factura.id)}>
+                          {estadoBadge(factura.estado)}
+                        </td>
+                        <td
+                          className="px-4 py-4 cursor-pointer text-gray-500 whitespace-nowrap"
+                          onClick={() => toggleRow(factura.id)}
+                        >
+                          {factura.fechaPago ?? <span className="text-gray-300">—</span>}
+                        </td>
+                        {!readonly && (
+                          <td className="px-4 py-4">
+                            {hasActions ? (
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" size="icon"
+                                    className="h-8 w-8 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100"
+                                    aria-label="Acciones">
+                                    <MoreHorizontal className="h-4 w-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end" className="w-44 rounded-xl shadow-lg border-gray-100">
+                                  {factura.estado === "PENDIENTE" && (
+                                    <DropdownMenuItem onClick={() => onEmitir?.(factura)}
+                                      className="gap-2.5 cursor-pointer rounded-lg text-blue-600 focus:text-blue-700 focus:bg-blue-50">
+                                      <Send className="h-4 w-4" />Emitir
+                                    </DropdownMenuItem>
+                                  )}
+                                  {factura.estado === "EMITIDA" && (
+                                    <DropdownMenuItem onClick={() => onPagar?.(factura)}
+                                      className="gap-2.5 cursor-pointer rounded-lg text-emerald-600 focus:text-emerald-700 focus:bg-emerald-50">
+                                      <CircleDollarSign className="h-4 w-4" />Pagar
+                                    </DropdownMenuItem>
+                                  )}
+                                  <DropdownMenuItem onClick={() => onEditar?.(factura)}
+                                    className="gap-2.5 cursor-pointer rounded-lg text-gray-700 focus:text-gray-900">
+                                    <Pencil className="h-4 w-4 text-gray-400" />Editar
+                                  </DropdownMenuItem>
+                                  <DropdownMenuSeparator className="my-1" />
+                                  <DropdownMenuItem onClick={() => onAnular?.(factura)}
+                                    className="gap-2.5 cursor-pointer rounded-lg text-red-600 focus:text-red-700 focus:bg-red-50">
+                                    <Ban className="h-4 w-4" />Anular
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            ) : null}
+                          </td>
+                        )}
+                      </tr>
+                      {isExpanded && (
+                        <tr className="bg-gray-50/60">
+                          <td colSpan={detailColSpan} className="px-8 py-5">
+                            <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+                              <FacturaDetail
+                                factura={factura}
+                                puntoDeVentaNameById={puntoDeVentaNameById}
+                              />
+                            </div>
+                          </td>
+                        </tr>
                       )}
-                    </tr>
+                    </Fragment>
                   );
                 })}
               </tbody>
