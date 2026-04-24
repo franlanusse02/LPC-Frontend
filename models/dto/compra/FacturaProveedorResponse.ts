@@ -6,7 +6,8 @@ export type FacturaProveedorResponse = {
     numero: string;
     proveedorId: number;
     comedorId: number;
-    puntoDeVenta: number | null;
+    puntoDeVentaProveedor: number | null;
+    puntoDeVentaComedor: Record<string, number>;
     fechaFactura: string;
     fechaEmision: string | null;
     fechaPago: string | null;

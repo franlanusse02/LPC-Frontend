@@ -7,7 +7,8 @@ export type CreateFacturaProveedorRequest = {
   fechaFactura: string;
   monto: number;
   comentarios?: string;
-  puntoDeVenta?: number | null;
+  puntoDeVentaProveedor?: number | null;
+  puntoDeVentaComedor: Record<string, number>;
   numeroOperacion?: string;
   medioPago?: MedioPago | null;
   bancoId?: number | null;

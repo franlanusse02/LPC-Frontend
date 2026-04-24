@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Dialog, DialogContent, DialogHeader,
   DialogTitle, DialogFooter,
@@ -18,6 +18,12 @@ import { ProveedorResponse } from "@/models/dto/proveedor/ProveedorResponse";
 import { ComedorResponse } from "@/models/dto/comedor/ComedorResponse";
 import { CreateFacturaProveedorRequest } from "@/models/dto/compra/CreateFacturaProveedorRequest";
 import { MedioPago, MediosPagoDict } from "@/models/enums/MedioPago";
+import { FacturaPuntosDistribucionEditor } from "@/components/factura-puntos-distribucion-editor";
+import {
+  FacturaPuntoDeVentaDistribucionRow,
+  facturaDistribucionRecordFromRows,
+  validateFacturaDistribucionRows,
+} from "@/lib/facturas";
 
 interface NuevaFacturaModalProps {
   open: boolean;
@@ -37,11 +43,22 @@ export function NuevaFacturaModal({
   const [numero, setNumero] = useState("");
   const [monto, setMonto] = useState("");
   const [comentarios, setComentarios] = useState("");
-  const [puntoDeVenta, setPuntoDeVenta] = useState("");
+  const [puntoDeVentaProveedor, setPuntoDeVentaProveedor] = useState("");
+  const [puntoDeVentaComedor, setPuntoDeVentaComedor] = useState<FacturaPuntoDeVentaDistribucionRow[]>([]);
   const [medioPago, setMedioPago] = useState<MedioPago | "">("");
 
   const selectedProveedor = proveedores.find((p) => p.id === Number(proveedorId));
-  const requiresPuntoDeVenta = selectedProveedor && selectedProveedor.puntosDeVenta.length > 0;
+  const selectedComedor = comedores.find((c) => c.id === Number(comedorId));
+  const proveedorPuntosDeVenta = selectedProveedor?.puntosDeVenta ?? [];
+  const requiresPuntoDeVenta = proveedorPuntosDeVenta.length > 0;
+  const comedorPuntosDeVenta = useMemo(
+    () => selectedComedor?.puntosDeVenta ?? [],
+    [selectedComedor],
+  );
+  const distributionError = useMemo(
+    () => validateFacturaDistribucionRows(puntoDeVentaComedor),
+    [puntoDeVentaComedor],
+  );
 
   useEffect(() => {
     if (selectedProveedor?.formaDePagoPredeterminada) {
@@ -49,11 +66,12 @@ export function NuevaFacturaModal({
     } else {
       setMedioPago("");
     }
-    setPuntoDeVenta("");
+    setPuntoDeVentaProveedor("");
   }, [proveedorId]);
 
   const canSubmit = proveedorId && comedorId && fechaFactura && numero && monto &&
-    (!requiresPuntoDeVenta || puntoDeVenta);
+    (!requiresPuntoDeVenta || puntoDeVentaProveedor) &&
+    !distributionError;
 
   const handleConfirm = async () => {
     if (!canSubmit) return;
@@ -66,12 +84,14 @@ export function NuevaFacturaModal({
         numero,
         monto: Number(monto),
         comentarios,
-        puntoDeVenta: puntoDeVenta ? Number(puntoDeVenta) : null as any,
+        puntoDeVentaProveedor: puntoDeVentaProveedor ? Number(puntoDeVentaProveedor) : null,
+        puntoDeVentaComedor: facturaDistribucionRecordFromRows(puntoDeVentaComedor),
         medioPago: medioPago || null,
       });
       onClose();
       setProveedorId(""); setComedorId(""); setFechaFactura("");
-      setNumero(""); setMonto(""); setComentarios(""); setPuntoDeVenta(""); setMedioPago("");
+      setNumero(""); setMonto(""); setComentarios("");
+      setPuntoDeVentaProveedor(""); setPuntoDeVentaComedor([]); setMedioPago("");
     } finally {
       setLoading(false);
     }
@@ -110,7 +130,10 @@ export function NuevaFacturaModal({
               <Combobox
                 options={comedorOptions}
                 value={comedorId}
-                onChange={setComedorId}
+                onChange={(value) => {
+                  setComedorId(value);
+                  setPuntoDeVentaComedor([]);
+                }}
                 placeholder="Seleccionar comedor..."
                 searchPlaceholder="Buscar comedor..."
               />
@@ -147,15 +170,23 @@ export function NuevaFacturaModal({
             </FormField>
             {requiresPuntoDeVenta && (
               <FormField label="Punto de venta *">
-                <select value={puntoDeVenta} onChange={(e) => setPuntoDeVenta(e.target.value)}
+                <select
+                  value={puntoDeVentaProveedor}
+                  onChange={(e) => setPuntoDeVentaProveedor(e.target.value)}
                   className="h-9 w-full rounded-md border border-gray-200 bg-card px-2 text-sm text-gray-700">
                   <option value="">Seleccionar...</option>
-                  {selectedProveedor.puntosDeVenta.map((pv) => (
+                  {proveedorPuntosDeVenta.map((pv) => (
                     <option key={pv} value={pv}>{pv}</option>
                   ))}
                 </select>
               </FormField>
             )}
+            <FacturaPuntosDistribucionEditor
+              rows={puntoDeVentaComedor}
+              puntosDeVenta={comedorPuntosDeVenta}
+              onChange={setPuntoDeVentaComedor}
+              error={distributionError}
+            />
             <FormField label="Comentarios" className="col-span-2">
               <Input type="text" value={comentarios}
                 onChange={(e) => setComentarios(e.target.value)}
