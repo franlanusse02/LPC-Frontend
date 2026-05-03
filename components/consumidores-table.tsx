@@ -85,7 +85,7 @@ function ConsumidorModal({
     initialConsumidor ? String(initialConsumidor.comedorId) : "",
   );
   const [taxId, setTaxId] = useState(
-    initialConsumidor ? String(initialConsumidor.taxId) : "",
+    initialConsumidor?.taxId != null ? String(initialConsumidor.taxId) : "",
   );
   const [posicion, setPosicion] = useState(initialConsumidor?.posicion ?? "");
   const [saving, setSaving] = useState(false);
@@ -99,7 +99,7 @@ function ConsumidorModal({
     if (!open) return;
     setNombre(initialConsumidor?.nombre ?? "");
     setComedorId(initialConsumidor ? String(initialConsumidor.comedorId) : "");
-    setTaxId(initialConsumidor ? String(initialConsumidor.taxId) : "");
+    setTaxId(initialConsumidor?.taxId != null ? String(initialConsumidor.taxId) : "");
     setPosicion(initialConsumidor?.posicion ?? "");
     setErrors({});
   }, [initialConsumidor, open]);
@@ -107,7 +107,7 @@ function ConsumidorModal({
   const reset = () => {
     setNombre(initialConsumidor?.nombre ?? "");
     setComedorId(initialConsumidor ? String(initialConsumidor.comedorId) : "");
-    setTaxId(initialConsumidor ? String(initialConsumidor.taxId) : "");
+    setTaxId(initialConsumidor?.taxId != null ? String(initialConsumidor.taxId) : "");
     setPosicion(initialConsumidor?.posicion ?? "");
     setErrors({});
   };
@@ -125,9 +125,7 @@ function ConsumidorModal({
     if (!comedorId) {
       next.comedorId = "Seleccioná un comedor.";
     }
-    if (!taxId.trim()) {
-      next.taxId = "Ingresá un DNI.";
-    }
+    // taxId is optional — no required validation
     setErrors(next);
     return Object.keys(next).length === 0;
   };
@@ -142,7 +140,7 @@ function ConsumidorModal({
       await onSubmit(initialConsumidor?.id ?? null, {
         nombre: nombre.trim(),
         comedorId: Number(comedorId),
-        taxId: Number(taxId),
+        taxId: taxId.trim() ? Number(taxId) : null,
         posicion: posicion.trim() || undefined,
       });
       handleClose();
@@ -214,7 +212,7 @@ function ConsumidorModal({
 
           <div className="space-y-1.5">
             <label className="text-xs font-medium uppercase tracking-wide text-gray-500">
-              DNI
+              DNI (opcional)
             </label>
             <Input
               value={taxId}
@@ -383,7 +381,7 @@ export function ConsumidoresTable({
       if (!query) return true;
       return (
         consumidor.nombre.toLowerCase().includes(query) ||
-        String(consumidor.taxId).includes(query) ||
+        String(consumidor.taxId ?? "").includes(query) ||
         (consumidor.posicion ?? "").toLowerCase().includes(query) ||
         (comedorNameById[consumidor.comedorId] ?? "")
           .toLowerCase()
@@ -408,8 +406,8 @@ export function ConsumidoresTable({
         rightValue = comedorNameById[right.comedorId] ?? "";
       }
       if (sortKey === "taxId") {
-        leftValue = left.taxId;
-        rightValue = right.taxId;
+        leftValue = left.taxId ?? 0;
+        rightValue = right.taxId ?? 0;
       }
 
       if (leftValue < rightValue) return sortDir === "asc" ? -1 : 1;
@@ -610,7 +608,7 @@ export function ConsumidoresTable({
                   <td className="px-4 py-4">
                     {comedorNameById[consumidor.comedorId] ?? consumidor.comedorId}
                   </td>
-                  <td className="px-4 py-4">{consumidor.taxId}</td>
+                  <td className="px-4 py-4">{consumidor.taxId ?? <span className="text-gray-300">—</span>}</td>
                   <td className="px-4 py-4">{consumidor.posicion ?? "—"}</td>
                   <td className="px-4 py-4">
                     <div className="flex justify-end gap-1">

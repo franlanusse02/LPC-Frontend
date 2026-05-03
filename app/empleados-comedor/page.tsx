@@ -36,8 +36,8 @@ export default function EmpleadosComedorPage() {
   const [comedorFilter, setComedorFilter] = useState("");
 
   const [editarEmpleado, setEditarEmpleado] = useState<EmpleadoComedorResponse | null>(null);
-  const [editForm, setEditForm] = useState<{ comedorId: string; nombre: string; email: string }>({
-    comedorId: "", nombre: "", email: "",
+  const [editForm, setEditForm] = useState<{ comedorId: string; nombre: string; email: string; taxId: string }>({
+    comedorId: "", nombre: "", email: "", taxId: "",
   });
   const [editSubmitting, setEditSubmitting] = useState(false);
 
@@ -104,6 +104,7 @@ export default function EmpleadosComedorPage() {
       comedorId: String(e.comedorId),
       nombre: e.nombre,
       email: e.email ?? "",
+      taxId: e.taxId != null ? String(e.taxId) : "",
     });
   };
 
@@ -116,6 +117,7 @@ export default function EmpleadosComedorPage() {
         comedorId: Number(editForm.comedorId),
         nombre: editForm.nombre.trim(),
         email: editForm.email.trim() || null,
+        taxId: editForm.taxId.trim() ? Number(editForm.taxId) : null,
       };
       const updated = await apiFetch<EmpleadoComedorResponse>(
         `/api/comedores/empleados/${editarEmpleado.id}`,
@@ -200,6 +202,7 @@ export default function EmpleadosComedorPage() {
                     <tr className="bg-gray-100/80 text-left text-xs uppercase text-gray-500 tracking-wider">
                       <th className="px-4 py-3">Nombre</th>
                       <th className="px-4 py-3">Comedor</th>
+                      <th className="px-4 py-3">DNI</th>
                       <th className="px-4 py-3">Email</th>
                       <th className="px-4 py-3 w-10" />
                       <th className="px-4 py-3 w-10" />
@@ -211,6 +214,9 @@ export default function EmpleadosComedorPage() {
                         <td className="px-4 py-4 font-medium text-gray-800">{emp.nombre}</td>
                         <td className="px-4 py-4 text-gray-600">
                           {comedorNameById[emp.comedorId] ?? <span className="text-gray-300">—</span>}
+                        </td>
+                        <td className={cn("px-4 py-4 text-sm", emp.taxId != null ? "text-gray-600" : "text-gray-300")}>
+                          {emp.taxId ?? "—"}
                         </td>
                         <td className={cn("px-4 py-4 text-sm", emp.email ? "text-gray-600" : "text-gray-300")}>
                           {emp.email ?? "—"}
@@ -287,6 +293,15 @@ export default function EmpleadosComedorPage() {
                 value={editForm.email}
                 onChange={(e) => setEditForm((p) => ({ ...p, email: e.target.value }))}
                 placeholder="correo@empresa.com"
+              />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="ee-taxId">DNI (opcional)</Label>
+              <Input
+                id="ee-taxId"
+                value={editForm.taxId}
+                onChange={(e) => setEditForm((p) => ({ ...p, taxId: e.target.value.replace(/\D/g, "") }))}
+                placeholder="20123456789"
               />
             </div>
             <Button
