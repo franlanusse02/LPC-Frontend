@@ -1,34 +1,22 @@
+import { MedioPago } from "@/models/enums/MedioPago";
+
 export type CreateEventoRequest = {
-  comedorId: number;
+  puntoDeVentaId: number;
   tipoEventoId: number;
   fechaEvento: string;
-  montoTotal: number | null;
-  solicitante: string | null;
-  cantidadPersonas: number | null;
-
-  edificioId: number | null;
-  salaId: number | null;
-  funcionario: string | null;
-  centroCosto: string | null;
-  oficina: string | null;
-  responsable: string | null;
-  empresa: string | null;
-  destinatarioFactura: string | null;
-
-  // UDESA
-  area: string | null;
-
-  // Compartido: UDESA (nro pedido), BBVA (nro orden), TECHINT (nro pedido)
-  numeroOrden: string | null;
-
-  // BBVA
+  solicitanteId: number | null;
   emailSolicitante: string | null;
-  lugar: string | null;
-  medioPago: string | null;
+  funcionarioId: number | null;
+  responsableId: number | null;
+  cantidadPersonas: number | null;
+  montoTotal: number | null;
   numeroOperacion: string | null;
-
-  // TECHINT
-  concepto: string | null;
+  centroCosto: string | null;
+  razonSocial: string | null;
+  medioPago: MedioPago | null;
+  destinatarioFacturacion: string | null;
   tipoComprobante: string | null;
   numeroComprobante: string | null;
+  observaciones: string | null;
+  retenciones: number | null;
 };

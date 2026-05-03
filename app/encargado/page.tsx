@@ -133,7 +133,7 @@ export default function EncargadoPage() {
       const q = eventoSearch.trim().toLowerCase();
       list = list.filter((e) =>
         (comedorNameById[e.comedorId] ?? "").toLowerCase().includes(q) ||
-        (e.solicitante ?? "").toLowerCase().includes(q) ||
+        (e.solicitanteNombre ?? "").toLowerCase().includes(q) ||
         e.fechaEvento.includes(q),
       );
     }
@@ -630,6 +630,7 @@ export default function EncargadoPage() {
         open={nuevoEventoOpen}
         onClose={() => setNuevoEventoOpen(false)}
         token={session.token}
+        puntosDeVenta={puntosDeVenta}
         comedores={comedores}
         onConfirm={handleNuevoEvento}
       />

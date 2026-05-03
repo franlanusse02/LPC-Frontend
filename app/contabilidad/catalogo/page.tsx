@@ -12,6 +12,7 @@ import {
   Truck,
   Utensils,
   UsersRound,
+  Users,
 } from "lucide-react";
 import { Header } from "@/components/header";
 import {
@@ -182,6 +183,18 @@ export default function CatalogoPage() {
               </div>
               <span className="text-center text-sm font-medium leading-tight text-gray-700">
                 Salas Eventos
+              </span>
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => router.push("/empleados-comedor")}
+              className={tileClass}
+            >
+              <div className="flex h-8 w-8 items-center justify-center rounded-md bg-gray-100">
+                <Users className="h-4 w-4 text-gray-600" />
+              </div>
+              <span className="text-center text-sm font-medium leading-tight text-gray-700">
+                Empleados
               </span>
             </Button>
           </CardContent>

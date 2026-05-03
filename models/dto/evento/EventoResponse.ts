@@ -3,6 +3,7 @@ import { MedioPago } from "@/models/enums/MedioPago";
 
 export type EventoResponse = {
   id: number;
+  puntoDeVentaId: number | null;
   comedorId: number;
   tipoEventoId: number | null;
   tipoEventoNombre: string | null;
@@ -14,40 +15,24 @@ export type EventoResponse = {
   precioUnitario: number | null;
   montoTotal: number | null;
 
-  // Campos comunes
-  solicitante: string | null;
+  solicitanteId: number | null;
+  solicitanteNombre: string | null;
   emailSolicitante: string | null;
-  funcionario: string | null;
-  responsable: string | null;
+  funcionarioId: number | null;
+  funcionarioNombre: string | null;
+  responsableId: number | null;
+  responsableNombre: string | null;
   cantidadPersonas: number | null;
 
-  edificioId: number | null;
-  edificioNombre: string | null;
-  salaId: number | null;
-  salaNombre: string | null;
   centroCosto: string | null;
-  oficina: string | null;
-  empresa: string | null;
-  destinatarioFactura: string | null;
-
-  // UDESA
-  area: string | null;
-
-  // BBVA
-  lugar: string | null;
+  razonSocial: string | null;
+  destinatarioFacturacion: string | null;
   numeroOperacion: string | null;
-
-  // Compartido: UDESA (nro pedido), BBVA (nro orden), TECHINT (nro pedido)
-  numeroOrden: string | null;
-
-  // TECHINT
-  concepto: string | null;
   tipoComprobante: string | null;
   numeroComprobante: string | null;
   observaciones: string | null;
   retenciones: number | null;
 
-  // Factura PDF adjunta
   facturaPdfObjectKey: string | null;
   facturaPdfNombreArchivo: string | null;
   facturaPdfContentType: string | null;

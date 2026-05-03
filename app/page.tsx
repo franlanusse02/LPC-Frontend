@@ -26,6 +26,7 @@ import {
   DoorOpen,
   Package2,
   UsersRound,
+  Users,
 } from "lucide-react";
 
 export default function HomePage() {
@@ -208,26 +209,14 @@ export default function HomePage() {
             </Button>
             <Button
               variant="outline"
-              onClick={() => router.push("/edificios")}
+              onClick={() => router.push("/empleados-comedor")}
               className={configButtonClass}
             >
               <div className="flex h-8 w-8 items-center justify-center rounded-md bg-gray-100">
-                <Building className="h-4 w-4 text-gray-600" />
+                <Users className="h-4 w-4 text-gray-600" />
               </div>
               <span className="text-center text-xs font-medium leading-tight text-gray-700">
-                Edificios Eventos
-              </span>
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => router.push("/salas")}
-              className={configButtonClass}
-            >
-              <div className="flex h-8 w-8 items-center justify-center rounded-md bg-gray-100">
-                <DoorOpen className="h-4 w-4 text-gray-600" />
-              </div>
-              <span className="text-center text-xs font-medium leading-tight text-gray-700">
-                Salas Eventos
+                Empleados
               </span>
             </Button>
           </CardContent>

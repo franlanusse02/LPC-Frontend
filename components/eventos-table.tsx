@@ -104,27 +104,22 @@ function EventoDetail({ evento, comedorName }: { evento: EventoResponse; comedor
     <div className="grid grid-cols-2 gap-x-8 gap-y-3 sm:grid-cols-3 lg:grid-cols-4">
       <DetailField label="Comedor" value={comedorName} />
       <DetailField label="Tipo de evento" value={evento.tipoEventoNombre} />
-      <DetailField label="Solicitante" value={evento.solicitante} />
+      <DetailField label="Solicitante" value={evento.solicitanteNombre} />
+      <DetailField label="Funcionario" value={evento.funcionarioNombre} />
+      <DetailField label="Responsable" value={evento.responsableNombre} />
       <DetailField label="Cantidad personas" value={evento.cantidadPersonas} />
       <DetailField label="Precio unitario" value={evento.precioUnitario !== null ? formatCurrency(evento.precioUnitario) : null} />
       <DetailField label="Monto total" value={evento.montoTotal !== null ? formatCurrency(evento.montoTotal) : null} />
+      <DetailField label="Retenciones" value={evento.retenciones !== null ? formatCurrency(evento.retenciones) : null} />
       <DetailField label="Centro de costo" value={evento.centroCosto} />
-      <DetailField label="Edificio" value={evento.edificioNombre} />
-      <DetailField label="Sala" value={evento.salaNombre} />
-      <DetailField label="Funcionario" value={evento.funcionario} />
-      <DetailField label="Oficina" value={evento.oficina} />
-      <DetailField label="Responsable" value={evento.responsable} />
-      <DetailField label="Empresa" value={evento.empresa} />
-      <DetailField label="Dest. facturación" value={evento.destinatarioFactura} />
-      <DetailField label="Área" value={evento.area} />
+      <DetailField label="Razón social" value={evento.razonSocial} />
+      <DetailField label="Dest. facturación" value={evento.destinatarioFacturacion} />
       <DetailField label="Email solicitante" value={evento.emailSolicitante} />
-      <DetailField label="Lugar" value={evento.lugar} />
       <DetailField label="Medio de pago" value={evento.medioPago} />
       <DetailField label="Nro. operación" value={evento.numeroOperacion} />
-      <DetailField label="Nro. orden / pedido" value={evento.numeroOrden} />
-      <DetailField label="Concepto" value={evento.concepto} />
       <DetailField label="Tipo comprobante" value={evento.tipoComprobante} />
       <DetailField label="Nro. comprobante" value={evento.numeroComprobante} />
+      <DetailField label="Observaciones" value={evento.observaciones} />
       {evento.facturaPdfNombreArchivo && (
         <div className="flex flex-col gap-0.5">
           <span className="text-xs font-medium uppercase tracking-wide text-gray-400">Factura PDF</span>
@@ -322,7 +317,7 @@ export function EventosTable({
                           {evento.tipoEventoNombre ?? <span className="text-gray-300">—</span>}
                         </td>
                         <td className="px-4 py-4 cursor-pointer" onClick={() => toggleRow(evento.id)}>
-                          {evento.solicitante ?? <span className="text-gray-300">—</span>}
+                          {evento.solicitanteNombre ?? <span className="text-gray-300">—</span>}
                         </td>
                         <td className="px-4 py-4 text-center cursor-pointer" onClick={() => toggleRow(evento.id)}>
                           {evento.cantidadPersonas ?? <span className="text-gray-300">—</span>}
