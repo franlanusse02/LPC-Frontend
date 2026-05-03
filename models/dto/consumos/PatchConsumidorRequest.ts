@@ -1,6 +1,6 @@
 export type PatchConsumidorRequest = {
   comedorId?: number;
   nombre?: string;
-  taxId?: number;
+  taxId?: number | null;
   posicion?: string;
 };

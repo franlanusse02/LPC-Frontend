@@ -26,12 +26,14 @@ export function NuevoEmpleadoComedorModal({ open, onClose, comedores, onConfirm 
   const [comedorId, setComedorId] = useState("");
   const [nombre, setNombre] = useState("");
   const [email, setEmail] = useState("");
+  const [taxId, setTaxId] = useState("");
 
   useEffect(() => {
     if (!open) {
       setComedorId("");
       setNombre("");
       setEmail("");
+      setTaxId("");
     }
   }, [open]);
 
@@ -45,6 +47,7 @@ export function NuevoEmpleadoComedorModal({ open, onClose, comedores, onConfirm 
         comedorId: Number(comedorId),
         nombre: nombre.trim(),
         email: email.trim() || null,
+        taxId: taxId.trim() ? Number(taxId) : null,
       });
       onClose();
     } finally {
@@ -96,6 +99,15 @@ export function NuevoEmpleadoComedorModal({ open, onClose, comedores, onConfirm 
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="correo@empresa.com"
+              className="bg-card"
+            />
+          </FormField>
+
+          <FormField label="DNI (opcional)">
+            <Input
+              value={taxId}
+              onChange={(e) => setTaxId(e.target.value.replace(/\D/g, ""))}
+              placeholder="20123456789"
               className="bg-card"
             />
           </FormField>
