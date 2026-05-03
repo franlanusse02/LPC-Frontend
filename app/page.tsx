@@ -216,7 +216,7 @@ export default function HomePage() {
                 <Users className="h-4 w-4 text-gray-600" />
               </div>
               <span className="text-center text-xs font-medium leading-tight text-gray-700">
-                Empleados
+                Empleados Comedor
               </span>
             </Button>
           </CardContent>
