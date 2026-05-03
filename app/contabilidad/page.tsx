@@ -335,7 +335,7 @@ export default function ContabilidadPage() {
       const q = eventoSearch.trim().toLowerCase();
       list = list.filter((e) =>
         (comedorNameById[e.comedorId] ?? "").toLowerCase().includes(q) ||
-        (e.solicitante ?? "").toLowerCase().includes(q) ||
+        (e.solicitanteNombre ?? "").toLowerCase().includes(q) ||
         (e.tipoEventoNombre ?? "").toLowerCase().includes(q) ||
         e.fechaEvento.includes(q),
       );
@@ -601,27 +601,22 @@ export default function ContabilidadPage() {
           Comedor: comedorNameById[e.comedorId] ?? String(e.comedorId),
           "Tipo de evento": e.tipoEventoNombre ?? "",
           "Precio unitario": e.precioUnitario ?? "",
-          Solicitante: e.solicitante ?? "",
+          Solicitante: e.solicitanteNombre ?? "",
+          Funcionario: e.funcionarioNombre ?? "",
+          Responsable: e.responsableNombre ?? "",
           "Cantidad personas": e.cantidadPersonas ?? "",
           "Monto total": e.montoTotal ?? "",
+          Retenciones: e.retenciones ?? "",
           Estado: EstadoEventoLabel[e.estado],
           "Centro de costo": e.centroCosto ?? "",
-          Edificio: e.edificioNombre ?? "",
-          Sala: e.salaNombre ?? "",
-          Funcionario: e.funcionario ?? "",
-          Oficina: e.oficina ?? "",
-          Responsable: e.responsable ?? "",
-          Empresa: e.empresa ?? "",
-          "Dest. facturación": e.destinatarioFactura ?? "",
-          Área: e.area ?? "",
+          "Razón social": e.razonSocial ?? "",
+          "Dest. facturación": e.destinatarioFacturacion ?? "",
           "Email solicitante": e.emailSolicitante ?? "",
-          Lugar: e.lugar ?? "",
           "Medio de pago": e.medioPago ?? "",
           "Nro. operación": e.numeroOperacion ?? "",
-          "Nro. orden/pedido": e.numeroOrden ?? "",
-          Concepto: e.concepto ?? "",
           "Tipo comprobante": e.tipoComprobante ?? "",
           "Nro. comprobante": e.numeroComprobante ?? "",
+          Observaciones: e.observaciones ?? "",
           "Factura PDF": e.facturaPdfNombreArchivo ?? "",
         })),
         "Eventos",

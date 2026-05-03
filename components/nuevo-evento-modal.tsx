@@ -14,14 +14,14 @@ import { FormField } from "./form-field";
 import { DatePickerInput } from "./date-picker-input";
 import { Combobox } from "@/components/ui/combobox";
 import { ComedorResponse } from "@/models/dto/comedor/ComedorResponse";
+import { PuntoDeVentaResponse } from "@/models/dto/pto-venta/PuntoDeVentaResponse";
+import { EmpleadoComedorResponse } from "@/models/dto/empleado/EmpleadoComedorResponse";
 import { CreateEventoRequest } from "@/models/dto/evento/CreateEventoRequest";
 import { MedioPago, MediosPagoDict } from "@/models/enums/MedioPago";
 import { apiFetch } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import { ApiError } from "@/models/dto/ApiError";
 import { TipoEventoResponse } from "@/models/dto/tipo-evento/TipoEventoResponse";
-import { EdificioResponse } from "@/models/dto/edificio/EdificioResponse";
-import { SalaResponse } from "@/models/dto/sala/SalaResponse";
 
 type TipoComedor = "galicia" | "udesa" | "bbva" | "techint";
 
@@ -53,68 +53,67 @@ interface NuevoEventoModalProps {
   open: boolean;
   onClose: () => void;
   token: string;
+  puntosDeVenta: PuntoDeVentaResponse[];
   comedores: ComedorResponse[];
   onConfirm: (req: CreateEventoRequest) => Promise<void>;
 }
 
-export function NuevoEventoModal({ open, onClose, token, comedores, onConfirm }: NuevoEventoModalProps) {
+export function NuevoEventoModal({ open, onClose, token, puntosDeVenta, comedores, onConfirm }: NuevoEventoModalProps) {
   const { toast } = useToast();
 
   const [loading, setLoading] = useState(false);
   const [loadingTipos, setLoadingTipos] = useState(false);
-  const [loadingEdificios, setLoadingEdificios] = useState(false);
-  const [loadingSalas, setLoadingSalas] = useState(false);
+  const [loadingEmpleados, setLoadingEmpleados] = useState(false);
 
   const [tiposEvento, setTiposEvento] = useState<TipoEventoResponse[]>([]);
-  const [edificios, setEdificios] = useState<EdificioResponse[]>([]);
-  const [salas, setSalas] = useState<SalaResponse[]>([]);
+  const [empleados, setEmpleados] = useState<EmpleadoComedorResponse[]>([]);
 
   const [comedorId, setComedorId] = useState("");
+  const [puntoDeVentaId, setPuntoDeVentaId] = useState("");
   const [tipoEventoId, setTipoEventoId] = useState("");
-  const [edificioId, setEdificioId] = useState("");
-  const [salaId, setSalaId] = useState("");
+  const [solicitanteId, setSolicitanteId] = useState("");
+  const [funcionarioId, setFuncionarioId] = useState("");
+  const [responsableId, setResponsableId] = useState("");
 
   const [fechaEvento, setFechaEvento] = useState("");
-  const [solicitante, setSolicitante] = useState("");
   const [cantidadPersonas, setCantidadPersonas] = useState("");
   const [montoTotal, setMontoTotal] = useState("");
 
-  const [funcionario, setFuncionario] = useState("");
   const [centroCosto, setCentroCosto] = useState("");
-  const [oficina, setOficina] = useState("");
-  const [responsable, setResponsable] = useState("");
-  const [empresa, setEmpresa] = useState("");
-  const [destinatarioFactura, setDestinatarioFactura] = useState("");
-  const [area, setArea] = useState("");
-  const [numeroOrden, setNumeroOrden] = useState("");
+  const [razonSocial, setRazonSocial] = useState("");
+  const [destinatarioFacturacion, setDestinatarioFacturacion] = useState("");
   const [emailSolicitante, setEmailSolicitante] = useState("");
-  const [lugar, setLugar] = useState("");
   const [medioPago, setMedioPago] = useState<MedioPago | "">("");
   const [numeroOperacion, setNumeroOperacion] = useState("");
-  const [concepto, setConcepto] = useState("");
   const [tipoComprobante, setTipoComprobante] = useState("");
   const [numeroComprobante, setNumeroComprobante] = useState("");
+  const [observaciones, setObservaciones] = useState("");
+  const [retenciones, setRetenciones] = useState("");
 
-  const selectedComedor = comedores.find((c) => String(c.id) === comedorId);
-  const selectedTipoEvento = tiposEvento.find((tipo) => String(tipo.id) === tipoEventoId);
+  const selectedComedor = comedorId ? comedores.find((c) => String(c.id) === comedorId) : null;
   const tipoComedor = selectedComedor ? detectTipoComedor(selectedComedor.nombre) : null;
+
+  const selectedTipoEvento = tiposEvento.find((t) => String(t.id) === tipoEventoId);
   const selectedTipoPrecio = selectedTipoEvento?.precio ?? null;
 
   const tipoOptions = useMemo(
-    () => tiposEvento.map((tipo) => ({ value: String(tipo.id), label: tipo.nombre })),
+    () => tiposEvento.map((t) => ({ value: String(t.id), label: t.nombre })),
     [tiposEvento],
   );
-  const edificioOptions = useMemo(
-    () => edificios.map((edificio) => ({ value: String(edificio.id), label: edificio.nombre })),
-    [edificios],
+  const empleadoOptions = useMemo(
+    () => empleados.map((e) => ({ value: String(e.id), label: e.nombre })),
+    [empleados],
   );
-  const salaOptions = useMemo(
-    () => salas.map((sala) => ({ value: String(sala.id), label: sala.nombre })),
-    [salas],
+  const comedorOptions = useMemo(
+    () => comedores.map((c) => ({ value: String(c.id), label: c.nombre })),
+    [comedores],
   );
-
-  const showEdificio = !!selectedComedor && (loadingEdificios || edificioOptions.length > 0 || !!edificioId);
-  const showSala = !!edificioId && (loadingSalas || salaOptions.length > 0 || !!salaId);
+  const pdvOptions = useMemo(
+    () => puntosDeVenta
+      .filter((p) => !comedorId || p.comedorId === Number(comedorId))
+      .map((p) => ({ value: String(p.id), label: p.nombre })),
+    [puntosDeVenta, comedorId],
+  );
 
   const cantidadPersonasValue = cantidadPersonas.trim() ? Number(cantidadPersonas) : null;
   const calculatedMontoTotal = selectedTipoPrecio !== null && cantidadPersonasValue !== null
@@ -126,75 +125,71 @@ export function NuevoEventoModal({ open, onClose, token, comedores, onConfirm }:
     if (open) return;
     setLoading(false);
     setLoadingTipos(false);
-    setLoadingEdificios(false);
-    setLoadingSalas(false);
+    setLoadingEmpleados(false);
     setTiposEvento([]);
-    setEdificios([]);
-    setSalas([]);
+    setEmpleados([]);
     setComedorId("");
+    setPuntoDeVentaId("");
     setTipoEventoId("");
-    setEdificioId("");
-    setSalaId("");
+    setSolicitanteId("");
+    setFuncionarioId("");
+    setResponsableId("");
     setFechaEvento("");
-    setSolicitante("");
     setCantidadPersonas("");
     setMontoTotal("");
-    setFuncionario("");
     setCentroCosto("");
-    setOficina("");
-    setResponsable("");
-    setEmpresa("");
-    setDestinatarioFactura("");
-    setArea("");
-    setNumeroOrden("");
+    setRazonSocial("");
+    setDestinatarioFacturacion("");
     setEmailSolicitante("");
-    setLugar("");
     setMedioPago("");
     setNumeroOperacion("");
-    setConcepto("");
     setTipoComprobante("");
     setNumeroComprobante("");
+    setObservaciones("");
+    setRetenciones("");
   }, [open]);
 
   useEffect(() => {
     if (!open || !token || !comedorId) {
       setTiposEvento([]);
-      setEdificios([]);
-      setSalas([]);
+      setEmpleados([]);
+      setPuntoDeVentaId("");
       setTipoEventoId("");
-      setEdificioId("");
-      setSalaId("");
+      setSolicitanteId("");
+      setFuncionarioId("");
+      setResponsableId("");
       return;
     }
 
     let cancelled = false;
     setLoadingTipos(true);
-    setLoadingEdificios(true);
+    setLoadingEmpleados(true);
+    setPuntoDeVentaId("");
     setTipoEventoId("");
-    setEdificioId("");
-    setSalaId("");
-    setSalas([]);
+    setSolicitanteId("");
+    setFuncionarioId("");
+    setResponsableId("");
 
     Promise.all([
       apiFetch<TipoEventoResponse[]>(`/api/eventos/tipos/activos?comedorId=${comedorId}`, {}, token),
-      apiFetch<EdificioResponse[]>(`/api/eventos/edificios/activos?comedorId=${comedorId}`, {}, token),
+      apiFetch<EmpleadoComedorResponse[]>(`/api/comedores/empleados?comedorId=${comedorId}`, {}, token),
     ])
-      .then(([tipos, edificiosData]) => {
+      .then(([tipos, empleadosData]) => {
         if (cancelled) return;
         setTiposEvento(tipos.sort((a, b) => a.nombre.localeCompare(b.nombre)));
-        setEdificios(edificiosData.sort((a, b) => a.nombre.localeCompare(b.nombre)));
+        setEmpleados(empleadosData.filter((e) => e.activo).sort((a, b) => a.nombre.localeCompare(b.nombre)));
       })
       .catch((error) => {
         if (cancelled) return;
         const description = error instanceof ApiError ? error.message : "No se pudieron cargar los catalogos del comedor.";
         toast({ variant: "destructive", title: "Error", description });
         setTiposEvento([]);
-        setEdificios([]);
+        setEmpleados([]);
       })
       .finally(() => {
         if (cancelled) return;
         setLoadingTipos(false);
-        setLoadingEdificios(false);
+        setLoadingEmpleados(false);
       });
 
     return () => {
@@ -203,72 +198,28 @@ export function NuevoEventoModal({ open, onClose, token, comedores, onConfirm }:
   }, [open, token, comedorId, toast]);
 
   useEffect(() => {
-    if (!open || !token || !edificioId) {
-      setSalas([]);
-      setSalaId("");
+    if (pdvOptions.length === 1) {
+      setPuntoDeVentaId(pdvOptions[0].value);
       return;
     }
-
-    let cancelled = false;
-    setLoadingSalas(true);
-    setSalaId("");
-
-    apiFetch<SalaResponse[]>(`/api/eventos/salas/activos?edificioId=${edificioId}`, {}, token)
-      .then((salasData) => {
-        if (cancelled) return;
-        setSalas(salasData.sort((a, b) => a.nombre.localeCompare(b.nombre)));
-      })
-      .catch((error) => {
-        if (cancelled) return;
-        const description = error instanceof ApiError ? error.message : "No se pudieron cargar las salas del edificio.";
-        toast({ variant: "destructive", title: "Error", description });
-        setSalas([]);
-      })
-      .finally(() => {
-        if (cancelled) return;
-        setLoadingSalas(false);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [open, token, edificioId, toast]);
+    if (puntoDeVentaId && !pdvOptions.some((o) => o.value === puntoDeVentaId)) {
+      setPuntoDeVentaId("");
+    }
+  }, [pdvOptions, puntoDeVentaId]);
 
   useEffect(() => {
     if (tipoOptions.length === 1) {
       setTipoEventoId(tipoOptions[0].value);
       return;
     }
-    if (tipoEventoId && !tipoOptions.some((option) => option.value === tipoEventoId)) {
+    if (tipoEventoId && !tipoOptions.some((o) => o.value === tipoEventoId)) {
       setTipoEventoId("");
     }
   }, [tipoOptions, tipoEventoId]);
 
-  useEffect(() => {
-    if (edificioOptions.length === 1) {
-      setEdificioId(edificioOptions[0].value);
-      return;
-    }
-    if (edificioId && !edificioOptions.some((option) => option.value === edificioId)) {
-      setEdificioId("");
-    }
-  }, [edificioOptions, edificioId]);
-
-  useEffect(() => {
-    if (salaOptions.length === 1) {
-      setSalaId(salaOptions[0].value);
-      return;
-    }
-    if (salaId && !salaOptions.some((option) => option.value === salaId)) {
-      setSalaId("");
-    }
-  }, [salaOptions, salaId]);
-
-  const canSubmit = !!comedorId
+  const canSubmit = !!puntoDeVentaId
     && !!tipoEventoId
     && !!fechaEvento
-    && (!showEdificio || !!edificioId)
-    && (!showSala || !!salaId)
     && (requiresManualTotal ? montoTotal.trim() !== "" : cantidadPersonas.trim() !== "" && calculatedMontoTotal !== null);
 
   const n = (value: string): number | null => {
@@ -287,29 +238,24 @@ export function NuevoEventoModal({ open, onClose, token, comedores, onConfirm }:
     setLoading(true);
     try {
       await onConfirm({
-        comedorId: Number(comedorId),
+        puntoDeVentaId: Number(puntoDeVentaId),
         tipoEventoId: Number(tipoEventoId),
         fechaEvento,
-        montoTotal: finalMontoTotal,
-        solicitante: s(solicitante),
+        solicitanteId: solicitanteId ? Number(solicitanteId) : null,
+        funcionarioId: funcionarioId ? Number(funcionarioId) : null,
+        responsableId: responsableId ? Number(responsableId) : null,
         cantidadPersonas: n(cantidadPersonas),
-        edificioId: edificioId ? Number(edificioId) : null,
-        salaId: salaId ? Number(salaId) : null,
-        funcionario: s(funcionario),
-        centroCosto: s(centroCosto),
-        oficina: s(oficina),
-        responsable: s(responsable),
-        empresa: s(empresa),
-        destinatarioFactura: s(destinatarioFactura),
-        area: s(area),
-        numeroOrden: s(numeroOrden),
+        montoTotal: finalMontoTotal,
         emailSolicitante: s(emailSolicitante),
-        lugar: s(lugar),
+        centroCosto: s(centroCosto),
+        razonSocial: s(razonSocial),
         medioPago: medioPago || null,
         numeroOperacion: s(numeroOperacion),
-        concepto: s(concepto),
+        destinatarioFacturacion: s(destinatarioFacturacion),
         tipoComprobante: s(tipoComprobante),
         numeroComprobante: s(numeroComprobante),
+        observaciones: s(observaciones),
+        retenciones: n(retenciones),
       });
       onClose();
     } finally {
@@ -317,7 +263,6 @@ export function NuevoEventoModal({ open, onClose, token, comedores, onConfirm }:
     }
   };
 
-  const comedorOptions = comedores.map((comedor) => ({ value: String(comedor.id), label: comedor.nombre }));
   const totalDisplayValue = requiresManualTotal
     ? montoTotal
     : calculatedMontoTotal !== null
@@ -334,6 +279,51 @@ export function NuevoEventoModal({ open, onClose, token, comedores, onConfirm }:
         className="bg-card"
         readOnly={!requiresManualTotal}
         disabled={!requiresManualTotal}
+      />
+    </FormField>
+  );
+
+  const renderSolicitanteField = () => (
+    <FormField label="Solicitante">
+      <Combobox
+        options={empleadoOptions}
+        value={solicitanteId}
+        onChange={setSolicitanteId}
+        placeholder={loadingEmpleados ? "Cargando..." : "Seleccionar solicitante..."}
+        searchPlaceholder="Buscar empleado..."
+        emptyText="No hay empleados activos para este comedor."
+        disabled={loadingEmpleados}
+        className="bg-card"
+      />
+    </FormField>
+  );
+
+  const renderFuncionarioField = () => (
+    <FormField label="Funcionario">
+      <Combobox
+        options={empleadoOptions}
+        value={funcionarioId}
+        onChange={setFuncionarioId}
+        placeholder={loadingEmpleados ? "Cargando..." : "Seleccionar funcionario..."}
+        searchPlaceholder="Buscar empleado..."
+        emptyText="No hay empleados activos para este comedor."
+        disabled={loadingEmpleados}
+        className="bg-card"
+      />
+    </FormField>
+  );
+
+  const renderResponsableField = () => (
+    <FormField label="Responsable">
+      <Combobox
+        options={empleadoOptions}
+        value={responsableId}
+        onChange={setResponsableId}
+        placeholder={loadingEmpleados ? "Cargando..." : "Seleccionar responsable..."}
+        searchPlaceholder="Buscar empleado..."
+        emptyText="No hay empleados activos para este comedor."
+        disabled={loadingEmpleados}
+        className="bg-card"
       />
     </FormField>
   );
@@ -364,7 +354,21 @@ export function NuevoEventoModal({ open, onClose, token, comedores, onConfirm }:
             />
           </FormField>
 
-          {selectedComedor && (
+          {comedorId && (
+            <FormField label="Punto de venta *">
+              <Combobox
+                options={pdvOptions}
+                value={puntoDeVentaId}
+                onChange={setPuntoDeVentaId}
+                placeholder="Seleccionar punto de venta..."
+                searchPlaceholder="Buscar punto de venta..."
+                emptyText="No hay puntos de venta para este comedor."
+                disabled={pdvOptions.length <= 1 && !puntoDeVentaId}
+              />
+            </FormField>
+          )}
+
+          {puntoDeVentaId && (
             <>
               <FormField label="Tipo de evento *">
                 <Combobox
@@ -403,62 +407,23 @@ export function NuevoEventoModal({ open, onClose, token, comedores, onConfirm }:
                   <DatePickerInput value={fechaEvento} onChange={setFechaEvento} className="bg-card" />
                 </FormField>
 
-                {showEdificio && (
-                  <FormField label="Edificio *">
-                    <Combobox
-                      options={edificioOptions}
-                      value={edificioId}
-                      onChange={setEdificioId}
-                      placeholder={loadingEdificios ? "Cargando edificios..." : "Seleccionar edificio..."}
-                      searchPlaceholder="Buscar edificio..."
-                      emptyText="No hay edificios activos para este comedor."
-                      disabled={loadingEdificios || edificioOptions.length <= 1}
-                      className="bg-card"
-                    />
-                  </FormField>
-                )}
-
-                {showSala && (
-                  <FormField label="Sala *">
-                    <Combobox
-                      options={salaOptions}
-                      value={salaId}
-                      onChange={setSalaId}
-                      placeholder={loadingSalas ? "Cargando salas..." : "Seleccionar sala..."}
-                      searchPlaceholder="Buscar sala..."
-                      emptyText="No hay salas activas para este edificio."
-                      disabled={loadingSalas || salaOptions.length <= 1}
-                      className="bg-card"
-                    />
-                  </FormField>
-                )}
-
                 {tipoComedor === "galicia" && (
                   <>
-                    <FormField label="Solicitante">
-                      <Input value={solicitante} onChange={(event) => setSolicitante(event.target.value)} placeholder="Nombre" className="bg-card" />
-                    </FormField>
+                    {renderSolicitanteField()}
                     <FormField label={selectedTipoPrecio !== null ? "Cantidad de personas *" : "Cantidad de personas"}>
-                      <Input type="number" value={cantidadPersonas} onChange={(event) => setCantidadPersonas(event.target.value)} placeholder="0" className="bg-card" />
+                      <Input type="number" value={cantidadPersonas} onChange={(e) => setCantidadPersonas(e.target.value)} placeholder="0" className="bg-card" />
                     </FormField>
-                    <FormField label="Funcionario">
-                      <Input value={funcionario} onChange={(event) => setFuncionario(event.target.value)} placeholder="Nombre" className="bg-card" />
-                    </FormField>
+                    {renderFuncionarioField()}
                     {renderTotalField(requiresManualTotal ? "Total *" : "Total")}
                     <FormField label="Centro de costo">
-                      <Input value={centroCosto} onChange={(event) => setCentroCosto(event.target.value)} placeholder="Ej: CC-001" className="bg-card" />
+                      <Input value={centroCosto} onChange={(e) => setCentroCosto(e.target.value)} placeholder="Ej: CC-001" className="bg-card" />
                     </FormField>
-                    <FormField label="Oficina">
-                      <Input value={oficina} onChange={(event) => setOficina(event.target.value)} placeholder="Ej: Piso 4" className="bg-card" />
+                    {renderResponsableField()}
+                    <FormField label="Razón social">
+                      <Input value={razonSocial} onChange={(e) => setRazonSocial(e.target.value)} placeholder="Razón social" className="bg-card" />
                     </FormField>
-                    <FormField label="Responsable">
-                      <Input value={responsable} onChange={(event) => setResponsable(event.target.value)} placeholder="Nombre" className="bg-card" />
-                    </FormField>
-                    <FormField label="Empresa">
-                      <Input value={empresa} onChange={(event) => setEmpresa(event.target.value)} placeholder="Razon social" className="bg-card" />
-                    </FormField>
-                    <FormField label="Destinatario facturacion" className="col-span-2">
-                      <Input value={destinatarioFactura} onChange={(event) => setDestinatarioFactura(event.target.value)} placeholder="Nombre o razon social" className="bg-card" />
+                    <FormField label="Destinatario facturación" className="col-span-2">
+                      <Input value={destinatarioFacturacion} onChange={(e) => setDestinatarioFacturacion(e.target.value)} placeholder="Nombre o razón social" className="bg-card" />
                     </FormField>
                   </>
                 )}
@@ -466,37 +431,24 @@ export function NuevoEventoModal({ open, onClose, token, comedores, onConfirm }:
                 {tipoComedor === "udesa" && (
                   <>
                     <FormField label="Centro de costo">
-                      <Input value={centroCosto} onChange={(event) => setCentroCosto(event.target.value)} placeholder="Ej: CC-001" className="bg-card" />
+                      <Input value={centroCosto} onChange={(e) => setCentroCosto(e.target.value)} placeholder="Ej: CC-001" className="bg-card" />
                     </FormField>
-                    <FormField label="Area">
-                      <Input value={area} onChange={(event) => setArea(event.target.value)} placeholder="Ej: Rectorado" className="bg-card" />
-                    </FormField>
-                    <FormField label="Solicitante">
-                      <Input value={solicitante} onChange={(event) => setSolicitante(event.target.value)} placeholder="Nombre" className="bg-card" />
-                    </FormField>
+                    {renderSolicitanteField()}
                     <FormField label={selectedTipoPrecio !== null ? "Cantidad de personas *" : "Cantidad de personas"}>
-                      <Input type="number" value={cantidadPersonas} onChange={(event) => setCantidadPersonas(event.target.value)} placeholder="0" className="bg-card" />
+                      <Input type="number" value={cantidadPersonas} onChange={(e) => setCantidadPersonas(e.target.value)} placeholder="0" className="bg-card" />
                     </FormField>
                     {renderTotalField(requiresManualTotal ? "Total *" : "Total")}
-                    <FormField label="Numero de pedido">
-                      <Input value={numeroOrden} onChange={(event) => setNumeroOrden(event.target.value)} placeholder="Ej: PED-0001" className="bg-card" />
-                    </FormField>
                   </>
                 )}
 
                 {tipoComedor === "bbva" && (
                   <>
-                    <FormField label="Solicitante">
-                      <Input value={solicitante} onChange={(event) => setSolicitante(event.target.value)} placeholder="Nombre" className="bg-card" />
-                    </FormField>
+                    {renderSolicitanteField()}
                     <FormField label="Email solicitante">
-                      <Input type="email" value={emailSolicitante} onChange={(event) => setEmailSolicitante(event.target.value)} placeholder="correo@bbva.com" className="bg-card" />
+                      <Input type="email" value={emailSolicitante} onChange={(e) => setEmailSolicitante(e.target.value)} placeholder="correo@bbva.com" className="bg-card" />
                     </FormField>
                     <FormField label={selectedTipoPrecio !== null ? "Cantidad de personas *" : "Cantidad de personas"}>
-                      <Input type="number" value={cantidadPersonas} onChange={(event) => setCantidadPersonas(event.target.value)} placeholder="0" className="bg-card" />
-                    </FormField>
-                    <FormField label="Lugar">
-                      <Input value={lugar} onChange={(event) => setLugar(event.target.value)} placeholder="Ej: Sala A" className="bg-card" />
+                      <Input type="number" value={cantidadPersonas} onChange={(e) => setCantidadPersonas(e.target.value)} placeholder="0" className="bg-card" />
                     </FormField>
                     {renderTotalField(requiresManualTotal ? "Total *" : "Total")}
                     <FormField label="Medio de pago">
@@ -513,27 +465,15 @@ export function NuevoEventoModal({ open, onClose, token, comedores, onConfirm }:
                       </Select>
                     </FormField>
                     <FormField label="Numero de operacion">
-                      <Input value={numeroOperacion} onChange={(event) => setNumeroOperacion(event.target.value)} placeholder="Ej: OP-123456" className="bg-card" />
-                    </FormField>
-                    <FormField label="Numero de orden">
-                      <Input value={numeroOrden} onChange={(event) => setNumeroOrden(event.target.value)} placeholder="Ej: ORD-0001" className="bg-card" />
+                      <Input value={numeroOperacion} onChange={(e) => setNumeroOperacion(e.target.value)} placeholder="Ej: OP-123456" className="bg-card" />
                     </FormField>
                   </>
                 )}
 
                 {tipoComedor === "techint" && (
                   <>
-                    <FormField label="Numero de pedido">
-                      <Input value={numeroOrden} onChange={(event) => setNumeroOrden(event.target.value)} placeholder="Ej: PED-0001" className="bg-card" />
-                    </FormField>
-                    <FormField label="Empresa">
-                      <Input value={empresa} onChange={(event) => setEmpresa(event.target.value)} placeholder="Razon social" className="bg-card" />
-                    </FormField>
-                    <FormField label="Concepto">
-                      <Input value={concepto} onChange={(event) => setConcepto(event.target.value)} placeholder="Descripcion del evento" className="bg-card" />
-                    </FormField>
                     <FormField label={selectedTipoPrecio !== null ? "Cantidad de personas *" : "Cantidad de personas"}>
-                      <Input type="number" min="1" step="1" value={cantidadPersonas} onChange={(event) => setCantidadPersonas(event.target.value)} placeholder="0" className="bg-card" />
+                      <Input type="number" min="1" step="1" value={cantidadPersonas} onChange={(e) => setCantidadPersonas(e.target.value)} placeholder="0" className="bg-card" />
                     </FormField>
                     {renderTotalField(requiresManualTotal ? "Monto *" : "Monto")}
                     <FormField label="Tipo de factura">
@@ -550,7 +490,7 @@ export function NuevoEventoModal({ open, onClose, token, comedores, onConfirm }:
                       </Select>
                     </FormField>
                     <FormField label="Numero de factura">
-                      <Input value={numeroComprobante} onChange={(event) => setNumeroComprobante(event.target.value)} placeholder="Ej: 0001-00001234" className="bg-card" />
+                      <Input value={numeroComprobante} onChange={(e) => setNumeroComprobante(e.target.value)} placeholder="Ej: 0001-00001234" className="bg-card" />
                     </FormField>
                   </>
                 )}
