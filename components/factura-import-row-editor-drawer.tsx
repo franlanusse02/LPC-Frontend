@@ -31,6 +31,7 @@ type FacturaImportRowEditorDrawerProps = {
   comedores: ComedorResponse[];
   bancos: BancoResponse[];
   isMine: boolean;
+  jobClosed?: boolean;
   submitting: boolean;
   onSave: (payload: PatchImportRowFacturaRequest) => Promise<void>;
   onRevalidate: () => Promise<void>;
@@ -74,6 +75,7 @@ export function FacturaImportRowEditorDrawer({
   comedores,
   bancos,
   isMine,
+  jobClosed = false,
   submitting,
   onSave,
   onRevalidate,
@@ -113,17 +115,17 @@ export function FacturaImportRowEditorDrawer({
     event.preventDefault();
     const payload: PatchImportRowFacturaRequest = {
       version: row.version,
-      proveedorId: form.proveedorId ? Number(form.proveedorId) : undefined,
-      comedorId: form.comedorId ? Number(form.comedorId) : undefined,
-      bancoId: form.bancoId ? Number(form.bancoId) : undefined,
-      medioPago: form.medioPago ? (form.medioPago as MedioPago) : undefined,
-      fechaCarga: form.fechaCarga || undefined,
-      fechaEmision: form.fechaEmision || undefined,
-      fechaPago: form.fechaPago || undefined,
-      fechaFactura: form.fechaFactura || undefined,
-      numeroFactura: form.numeroFactura || undefined,
-      monto: form.monto ? Number(form.monto) : undefined,
-      numeroOperacion: form.numeroOperacion || undefined,
+      proveedorId: form.proveedorId ? Number(form.proveedorId) : null,
+      comedorId: form.comedorId ? Number(form.comedorId) : null,
+      bancoId: form.bancoId ? Number(form.bancoId) : null,
+      medioPago: form.medioPago ? (form.medioPago as MedioPago) : null,
+      fechaCarga: form.fechaCarga || null,
+      fechaEmision: form.fechaEmision || null,
+      fechaPago: form.fechaPago || null,
+      fechaFactura: form.fechaFactura || null,
+      numeroFactura: form.numeroFactura.trim() || null,
+      monto: form.monto ? Number(form.monto) : null,
+      numeroOperacion: form.numeroOperacion.trim() || null,
     };
     await onSave(payload);
   };
@@ -176,7 +178,7 @@ export function FacturaImportRowEditorDrawer({
                 <select
                   value={form.proveedorId}
                   onChange={(event) => setForm((prev) => ({ ...prev, proveedorId: event.target.value }))}
-                  disabled={!isMine}
+                  disabled={!isMine || jobClosed}
                   className="h-10 w-full rounded-md border border-gray-200 bg-white px-3 text-sm disabled:bg-gray-100"
                 >
                   <option value="">Seleccionar proveedor</option>
@@ -193,7 +195,7 @@ export function FacturaImportRowEditorDrawer({
                 <select
                   value={form.comedorId}
                   onChange={(event) => setForm((prev) => ({ ...prev, comedorId: event.target.value }))}
-                  disabled={!isMine}
+                  disabled={!isMine || jobClosed}
                   className="h-10 w-full rounded-md border border-gray-200 bg-white px-3 text-sm disabled:bg-gray-100"
                 >
                   <option value="">Seleccionar comedor</option>
@@ -210,7 +212,7 @@ export function FacturaImportRowEditorDrawer({
                 <select
                   value={form.bancoId}
                   onChange={(event) => setForm((prev) => ({ ...prev, bancoId: event.target.value }))}
-                  disabled={!isMine}
+                  disabled={!isMine || jobClosed}
                   className="h-10 w-full rounded-md border border-gray-200 bg-white px-3 text-sm disabled:bg-gray-100"
                 >
                   <option value="">Seleccionar banco</option>
@@ -227,7 +229,7 @@ export function FacturaImportRowEditorDrawer({
                 <select
                   value={form.medioPago}
                   onChange={(event) => setForm((prev) => ({ ...prev, medioPago: event.target.value }))}
-                  disabled={!isMine}
+                  disabled={!isMine || jobClosed}
                   className="h-10 w-full rounded-md border border-gray-200 bg-white px-3 text-sm disabled:bg-gray-100"
                 >
                   <option value="">Seleccionar medio</option>
@@ -244,7 +246,7 @@ export function FacturaImportRowEditorDrawer({
                 <DatePickerInput
                   value={form.fechaCarga}
                   onChange={(value) => setForm((prev) => ({ ...prev, fechaCarga: value }))}
-                  disabled={!isMine}
+                  disabled={!isMine || jobClosed}
                 />
               </div>
 
@@ -253,7 +255,7 @@ export function FacturaImportRowEditorDrawer({
                 <DatePickerInput
                   value={form.fechaFactura}
                   onChange={(value) => setForm((prev) => ({ ...prev, fechaFactura: value }))}
-                  disabled={!isMine}
+                  disabled={!isMine || jobClosed}
                 />
               </div>
 
@@ -262,7 +264,7 @@ export function FacturaImportRowEditorDrawer({
                 <DatePickerInput
                   value={form.fechaEmision}
                   onChange={(value) => setForm((prev) => ({ ...prev, fechaEmision: value }))}
-                  disabled={!isMine}
+                  disabled={!isMine || jobClosed}
                 />
               </div>
 
@@ -271,7 +273,7 @@ export function FacturaImportRowEditorDrawer({
                 <DatePickerInput
                   value={form.fechaPago}
                   onChange={(value) => setForm((prev) => ({ ...prev, fechaPago: value }))}
-                  disabled={!isMine}
+                  disabled={!isMine || jobClosed}
                 />
               </div>
 
@@ -280,7 +282,7 @@ export function FacturaImportRowEditorDrawer({
                 <Input
                   value={form.numeroFactura}
                   onChange={(event) => setForm((prev) => ({ ...prev, numeroFactura: event.target.value }))}
-                  disabled={!isMine}
+                  disabled={!isMine || jobClosed}
                 />
               </div>
 
@@ -291,7 +293,7 @@ export function FacturaImportRowEditorDrawer({
                   step="0.01"
                   value={form.monto}
                   onChange={(event) => setForm((prev) => ({ ...prev, monto: event.target.value }))}
-                  disabled={!isMine}
+                  disabled={!isMine || jobClosed}
                 />
               </div>
 
@@ -305,7 +307,7 @@ export function FacturaImportRowEditorDrawer({
               </div>
             </div>
 
-            {isMine && (
+            {isMine && !jobClosed && (
               <Button type="submit" className="w-full" disabled={submitting}>
                 {submitting ? "Guardando..." : "Guardar cambios"}
               </Button>
@@ -313,7 +315,7 @@ export function FacturaImportRowEditorDrawer({
           </form>
         </div>
 
-        {isMine && (
+        {isMine && !jobClosed && (
           <DrawerFooter className="border-t border-gray-200 bg-white">
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
               <Button variant="outline" onClick={onRevalidate} disabled={submitting}>

@@ -13,7 +13,7 @@ import { FileSpreadsheet, Upload } from "lucide-react";
 type UploadImportDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  tipo: "facturas" | "proveedores";
+  tipo: "facturas" | "proveedores" | "consumidores" | "empleados-comedor";
   submitting: boolean;
   onSubmit: (file: File) => Promise<void>;
 };

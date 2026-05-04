@@ -9,6 +9,7 @@ import { LockKeyhole, Pencil, UserPlus2 } from "lucide-react";
 type ProveedorImportRowsTableProps = {
   rows: ImportRowProveedorResponse[];
   loading: boolean;
+  jobClosed?: boolean;
   currentUserId?: string | number | null;
   onTake: (row: ImportRowProveedorResponse) => void;
   onOpen: (row: ImportRowProveedorResponse) => void;
@@ -17,6 +18,7 @@ type ProveedorImportRowsTableProps = {
 export function ProveedorImportRowsTable({
   rows,
   loading,
+  jobClosed = false,
   currentUserId,
   onTake,
   onOpen,
@@ -55,7 +57,7 @@ export function ProveedorImportRowsTable({
         <tbody>
           {rows.map((row) => {
             const isMine = row.asignadoAId != null && String(row.asignadoAId) === String(currentUserId);
-            const canTake = row.estadoAsignacion === "SIN_ASIGNAR" && row.estado !== "APPLIED";
+            const canTake = !jobClosed && row.estadoAsignacion === "SIN_ASIGNAR" && row.estado !== "APPLIED";
 
             return (
               <tr key={row.id} className="border-b align-top transition-colors hover:bg-gray-50/80">
@@ -88,8 +90,8 @@ export function ProveedorImportRowsTable({
                       onClick={() => onOpen(row)}
                       className="gap-2 border-gray-200 text-xs"
                     >
-                      {isMine ? <Pencil className="h-3.5 w-3.5" /> : <LockKeyhole className="h-3.5 w-3.5" />}
-                      {isMine ? "Editar" : "Ver"}
+                      {isMine && !jobClosed ? <Pencil className="h-3.5 w-3.5" /> : <LockKeyhole className="h-3.5 w-3.5" />}
+                      {isMine && !jobClosed ? "Editar" : "Ver"}
                     </Button>
                     {canTake && (
                       <Button size="sm" onClick={() => onTake(row)} className="gap-2 text-xs">

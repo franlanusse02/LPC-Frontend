@@ -1,1 +1,1 @@
-export type EstadoJob = "PENDIENTE" | "PROCESANDO" | "COMPLETADO";
+export type EstadoJob = "PENDIENTE" | "PROCESANDO" | "COMPLETADO" | "CANCELADO";

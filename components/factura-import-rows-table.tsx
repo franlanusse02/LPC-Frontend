@@ -9,6 +9,7 @@ import { LockKeyhole, Pencil, UserPlus2 } from "lucide-react";
 type FacturaImportRowsTableProps = {
   rows: ImportRowFacturaResponse[];
   loading: boolean;
+  jobClosed?: boolean;
   currentUserId?: string | number | null;
   onTake: (row: ImportRowFacturaResponse) => void;
   onOpen: (row: ImportRowFacturaResponse) => void;
@@ -26,6 +27,7 @@ const formatAmount = (amount: number | null) =>
 export function FacturaImportRowsTable({
   rows,
   loading,
+  jobClosed = false,
   currentUserId,
   onTake,
   onOpen,
@@ -68,7 +70,7 @@ export function FacturaImportRowsTable({
         <tbody>
           {rows.map((row) => {
             const isMine = row.asignadoAId != null && String(row.asignadoAId) === String(currentUserId);
-            const canTake = row.estadoAsignacion === "SIN_ASIGNAR" && row.estado !== "APPLIED";
+            const canTake = !jobClosed && row.estadoAsignacion === "SIN_ASIGNAR" && row.estado !== "APPLIED";
 
             return (
               <tr key={row.id} className="border-b align-top transition-colors hover:bg-gray-50/80">
@@ -105,8 +107,8 @@ export function FacturaImportRowsTable({
                       onClick={() => onOpen(row)}
                       className="gap-2 border-gray-200 text-xs"
                     >
-                      {isMine ? <Pencil className="h-3.5 w-3.5" /> : <LockKeyhole className="h-3.5 w-3.5" />}
-                      {isMine ? "Editar" : "Ver"}
+                      {isMine && !jobClosed ? <Pencil className="h-3.5 w-3.5" /> : <LockKeyhole className="h-3.5 w-3.5" />}
+                      {isMine && !jobClosed ? "Editar" : "Ver"}
                     </Button>
                     {canTake && (
                       <Button
