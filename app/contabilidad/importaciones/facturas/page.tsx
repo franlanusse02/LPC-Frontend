@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ArrowLeft, RefreshCw, Search } from "lucide-react";
+import { ArrowLeft, Ban, RefreshCw, Search } from "lucide-react";
 import { Header } from "@/components/header";
 import { FacturaImportRowEditorDrawer } from "@/components/factura-import-row-editor-drawer";
 import { FacturaImportRowsTable } from "@/components/factura-import-rows-table";
@@ -122,6 +122,7 @@ function FacturaImportJobDetailContent() {
   );
 
   const currentUserId = session?.cuil ?? null;
+  const jobClosed = job?.estado === "CANCELADO";
 
   const filteredRows = useMemo(() => {
     return rows.filter((row) => {
@@ -153,6 +154,7 @@ function FacturaImportJobDetailContent() {
     const rowToRelease = selectedRow;
     const shouldRelease =
       releaseOnClose &&
+      !jobClosed &&
       rowToRelease != null &&
       rowToRelease.estadoAsignacion === "ASIGNADA" &&
       rowToRelease.asignadoAId != null &&
@@ -257,6 +259,30 @@ function FacturaImportJobDetailContent() {
       setJob(updatedJob);
       await fetchJobAndRows();
       toast({ title: "Filas aplicadas", description: "Se aplicaron las filas listas del job." });
+    } catch (error) {
+      await handleError(error);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleCancelJob = async () => {
+    const confirmed = window.confirm(
+      "Este import se va a cerrar. Las filas ya aplicadas permanecerán en el sistema y las pendientes ya no podrán resolverse. ¿Querés continuar?"
+    );
+    if (!confirmed) return;
+
+    setSubmitting(true);
+    try {
+      const updatedJob = await apiFetch<FacturaImportJobResponse>(
+        `/api/import/facturas/jobs/${jobId}/cancel`,
+        { method: "POST" },
+        token || "",
+      );
+      setJob(updatedJob);
+      closeDrawer(false);
+      await fetchJobAndRows();
+      toast({ title: "Import cancelado", description: "El job quedó cerrado para nuevas acciones." });
     } catch (error) {
       await handleError(error);
     } finally {
@@ -373,7 +399,18 @@ function FacturaImportJobDetailContent() {
                   <RefreshCw className="h-4 w-4" />
                   Refrescar
                 </Button>
-                <Button onClick={() => void handleApplyReady()} disabled={submitting || loadingJob || loadingRows}>
+                {job?.estado !== "COMPLETADO" && job?.estado !== "CANCELADO" && (
+                  <Button
+                    variant="outline"
+                    onClick={() => void handleCancelJob()}
+                    disabled={submitting || loadingJob || loadingRows}
+                    className="gap-2 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
+                  >
+                    <Ban className="h-4 w-4" />
+                    Cancelar import
+                  </Button>
+                )}
+                <Button onClick={() => void handleApplyReady()} disabled={submitting || loadingJob || loadingRows || jobClosed}>
                   Aplicar listas
                 </Button>
               </div>
@@ -454,6 +491,7 @@ function FacturaImportJobDetailContent() {
             <FacturaImportRowsTable
               rows={filteredRows}
               loading={loadingRows || loadingCatalogs}
+              jobClosed={jobClosed}
               currentUserId={currentUserId}
               onTake={(row) => void handleTake(row)}
               onOpen={(row) => {
@@ -479,6 +517,7 @@ function FacturaImportJobDetailContent() {
         comedores={comedores}
         bancos={bancos}
         isMine={Boolean(isMine)}
+        jobClosed={jobClosed}
         submitting={submitting}
         onSave={handleSave}
         onRevalidate={() =>
