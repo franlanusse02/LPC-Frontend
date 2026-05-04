@@ -14,12 +14,14 @@ import { apiFetch } from "@/lib/api";
 import { useAuth } from "@/lib/auth-context";
 import { useToast } from "@/hooks/use-toast";
 import { ApiError } from "@/models/dto/ApiError";
+import { ConsumidorImportJobResponse } from "@/models/dto/imports/consumidores/ImportJobResponse";
+import { EmpleadoImportJobResponse } from "@/models/dto/imports/empleados/ImportJobResponse";
 import { FacturaImportJobResponse } from "@/models/dto/imports/facturas/ImportJobResponse";
 import { ProveedorImportJobResponse } from "@/models/dto/imports/proveedores/ImportJobResponse";
 import { EstadoJob } from "@/models/enums/EstadoJob";
-import { ArrowLeft, Search, Upload } from "lucide-react";
+import { ArrowLeft, Ban, Search, Upload } from "lucide-react";
 
-type ImportTab = "facturas" | "proveedores";
+type ImportTab = "facturas" | "proveedores" | "consumidores" | "empleados-comedor";
 
 export default function ImportacionesHubPage() {
   const router = useRouter();
@@ -29,6 +31,8 @@ export default function ImportacionesHubPage() {
   const [activeTab, setActiveTab] = useState<ImportTab>("facturas");
   const [facturaJobs, setFacturaJobs] = useState<FacturaImportJobResponse[]>([]);
   const [proveedorJobs, setProveedorJobs] = useState<ProveedorImportJobResponse[]>([]);
+  const [consumidorJobs, setConsumidorJobs] = useState<ConsumidorImportJobResponse[]>([]);
+  const [empleadoJobs, setEmpleadoJobs] = useState<EmpleadoImportJobResponse[]>([]);
   const [loadingJobs, setLoadingJobs] = useState(true);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<EstadoJob | "all">("all");
@@ -58,12 +62,16 @@ export default function ImportacionesHubPage() {
 
   const fetchJobs = async () => {
     try {
-      const [facturasData, proveedoresData] = await Promise.all([
+      const [facturasData, proveedoresData, consumidoresData, empleadosData] = await Promise.all([
         apiFetch<FacturaImportJobResponse[]>("/api/import/facturas/jobs", {}, token || ""),
         apiFetch<ProveedorImportJobResponse[]>("/api/import/proveedores/jobs", {}, token || ""),
+        apiFetch<ConsumidorImportJobResponse[]>("/api/import/consumidores/jobs", {}, token || ""),
+        apiFetch<EmpleadoImportJobResponse[]>("/api/import/empleados-comedor/jobs", {}, token || ""),
       ]);
       setFacturaJobs(facturasData);
       setProveedorJobs(proveedoresData);
+      setConsumidorJobs(consumidoresData);
+      setEmpleadoJobs(empleadosData);
     } catch (error) {
       handleError(error);
     } finally {
@@ -95,36 +103,89 @@ export default function ImportacionesHubPage() {
     [proveedorJobs, search, statusFilter]
   );
 
+  const filteredConsumidorJobs = useMemo(
+    () =>
+      consumidorJobs.filter((job) => {
+        const matchesSearch =
+          !search.trim() ||
+          (job.nombreArchivo ?? "").toLowerCase().includes(search.trim().toLowerCase());
+        const matchesStatus = statusFilter === "all" || job.estado === statusFilter;
+        return matchesSearch && matchesStatus;
+      }),
+    [consumidorJobs, search, statusFilter]
+  );
+
+  const filteredEmpleadoJobs = useMemo(
+    () =>
+      empleadoJobs.filter((job) => {
+        const matchesSearch =
+          !search.trim() ||
+          (job.nombreArchivo ?? "").toLowerCase().includes(search.trim().toLowerCase());
+        const matchesStatus = statusFilter === "all" || job.estado === statusFilter;
+        return matchesSearch && matchesStatus;
+      }),
+    [empleadoJobs, search, statusFilter]
+  );
+
   const handleUpload = async (file: File) => {
     setUploading(true);
     try {
       const formData = new FormData();
       formData.append("file", file);
 
-      if (activeTab === "facturas") {
-        const job = await apiFetch<FacturaImportJobResponse>(
-          "/api/import/facturas",
-          { method: "POST", body: formData },
-          token || ""
-        );
-        setUploadOpen(false);
-        toast({ title: "Import creado", description: "El archivo se procesó correctamente." });
-        router.push(`/contabilidad/importaciones/facturas?jobId=${job.id}`);
-        return;
-      }
+      const uploadConfig = {
+        facturas: {
+          endpoint: "/api/import/facturas",
+          redirect: (jobId: number) => `/contabilidad/importaciones/facturas?jobId=${jobId}`,
+        },
+        proveedores: {
+          endpoint: "/api/import/proveedores",
+          redirect: (jobId: number) => `/contabilidad/importaciones/proveedores?jobId=${jobId}`,
+        },
+        consumidores: {
+          endpoint: "/api/import/consumidores",
+          redirect: (jobId: number) => `/contabilidad/importaciones/consumidores?jobId=${jobId}`,
+        },
+        "empleados-comedor": {
+          endpoint: "/api/import/empleados-comedor",
+          redirect: (jobId: number) => `/contabilidad/importaciones/empleados-comedor?jobId=${jobId}`,
+        },
+      }[activeTab];
 
-      const job = await apiFetch<ProveedorImportJobResponse>(
-        "/api/import/proveedores",
+      const job = await apiFetch<{ id: number }>(
+        uploadConfig.endpoint,
         { method: "POST", body: formData },
         token || ""
       );
       setUploadOpen(false);
       toast({ title: "Import creado", description: "El archivo se procesó correctamente." });
-      router.push(`/contabilidad/importaciones/proveedores?jobId=${job.id}`);
+      router.push(uploadConfig.redirect(job.id));
     } catch (error) {
       handleError(error);
     } finally {
       setUploading(false);
+    }
+  };
+
+  const handleCancelJob = async (jobId: number) => {
+    const confirmed = window.confirm(
+      "Este import se va a cerrar. Las filas ya aplicadas permanecerán en el sistema y las pendientes ya no podrán resolverse. ¿Querés continuar?"
+    );
+    if (!confirmed) return;
+
+    try {
+      const endpoint = {
+        facturas: `/api/import/facturas/jobs/${jobId}/cancel`,
+        proveedores: `/api/import/proveedores/jobs/${jobId}/cancel`,
+        consumidores: `/api/import/consumidores/jobs/${jobId}/cancel`,
+        "empleados-comedor": `/api/import/empleados-comedor/jobs/${jobId}/cancel`,
+      }[activeTab];
+
+      await apiFetch(endpoint, { method: "POST" }, token || "");
+      toast({ title: "Import cancelado", description: "El job quedó cerrado para nuevas acciones." });
+      await fetchJobs();
+    } catch (error) {
+      handleError(error);
     }
   };
 
@@ -173,6 +234,8 @@ export default function ImportacionesHubPage() {
                 <TabsList>
                   <TabsTrigger value="facturas">Facturas</TabsTrigger>
                   <TabsTrigger value="proveedores">Proveedores</TabsTrigger>
+                  <TabsTrigger value="consumidores">Consumidores</TabsTrigger>
+                  <TabsTrigger value="empleados-comedor">Empleados</TabsTrigger>
                 </TabsList>
 
                 <div className="flex flex-col gap-2 sm:flex-row">
@@ -194,6 +257,7 @@ export default function ImportacionesHubPage() {
                     <option value="PENDIENTE">Pendiente</option>
                     <option value="PROCESANDO">Procesando</option>
                     <option value="COMPLETADO">Completado</option>
+                    <option value="CANCELADO">Cancelado</option>
                   </select>
                 </div>
               </div>
@@ -204,6 +268,7 @@ export default function ImportacionesHubPage() {
                   loading={loadingJobs}
                   emptyLabel="No hay imports de facturas registrados."
                   onOpenJob={(jobId) => router.push(`/contabilidad/importaciones/facturas?jobId=${jobId}`)}
+                  onCancelJob={(jobId) => void handleCancelJob(jobId)}
                 />
               </TabsContent>
 
@@ -213,6 +278,27 @@ export default function ImportacionesHubPage() {
                   loading={loadingJobs}
                   emptyLabel="No hay imports de proveedores registrados."
                   onOpenJob={(jobId) => router.push(`/contabilidad/importaciones/proveedores?jobId=${jobId}`)}
+                  onCancelJob={(jobId) => void handleCancelJob(jobId)}
+                />
+              </TabsContent>
+
+              <TabsContent value="consumidores">
+                <ImportJobsTable
+                  jobs={filteredConsumidorJobs}
+                  loading={loadingJobs}
+                  emptyLabel="No hay imports de consumidores registrados."
+                  onOpenJob={(jobId) => router.push(`/contabilidad/importaciones/consumidores?jobId=${jobId}`)}
+                  onCancelJob={(jobId) => void handleCancelJob(jobId)}
+                />
+              </TabsContent>
+
+              <TabsContent value="empleados-comedor">
+                <ImportJobsTable
+                  jobs={filteredEmpleadoJobs}
+                  loading={loadingJobs}
+                  emptyLabel="No hay imports de empleados registrados."
+                  onOpenJob={(jobId) => router.push(`/contabilidad/importaciones/empleados-comedor?jobId=${jobId}`)}
+                  onCancelJob={(jobId) => void handleCancelJob(jobId)}
                 />
               </TabsContent>
             </Tabs>

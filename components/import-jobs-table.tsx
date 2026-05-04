@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { JobStatusBadge } from "@/components/job-status-badge";
 import { EstadoJob } from "@/models/enums/EstadoJob";
-import { Eye, FileSpreadsheet } from "lucide-react";
+import { Ban, Eye, FileSpreadsheet } from "lucide-react";
 
 type ImportJobLike = {
   id: number;
@@ -22,6 +22,7 @@ type ImportJobsTableProps<T extends ImportJobLike> = {
   loading: boolean;
   emptyLabel: string;
   onOpenJob: (jobId: number) => void;
+  onCancelJob?: (jobId: number) => void;
 };
 
 export function ImportJobsTable<T extends ImportJobLike>({
@@ -29,6 +30,7 @@ export function ImportJobsTable<T extends ImportJobLike>({
   loading,
   emptyLabel,
   onOpenJob,
+  onCancelJob,
 }: ImportJobsTableProps<T>) {
   if (loading) {
     return (
@@ -60,7 +62,7 @@ export function ImportJobsTable<T extends ImportJobLike>({
             <th className="px-4 py-3 text-center">Conflicto</th>
             <th className="px-4 py-3 text-center">Inválidas</th>
             <th className="px-4 py-3 text-center">Aplicadas</th>
-            <th className="px-4 py-3 w-12" />
+            <th className="px-4 py-3 w-40" />
           </tr>
         </thead>
         <tbody>
@@ -81,15 +83,28 @@ export function ImportJobsTable<T extends ImportJobLike>({
               <td className="px-4 py-4 text-center font-mono text-orange-700">{job.filasInvalidas}</td>
               <td className="px-4 py-4 text-center font-mono text-sky-700">{job.filasAplicadas}</td>
               <td className="px-4 py-4">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => onOpenJob(job.id)}
-                  className="gap-2 border-gray-200 text-xs"
-                >
-                  <Eye className="h-3.5 w-3.5" />
-                  Ver
-                </Button>
+                <div className="flex flex-col gap-2 sm:flex-row">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => onOpenJob(job.id)}
+                    className="gap-2 border-gray-200 text-xs"
+                  >
+                    <Eye className="h-3.5 w-3.5" />
+                    Ver
+                  </Button>
+                  {onCancelJob && job.estado !== "COMPLETADO" && job.estado !== "CANCELADO" && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => onCancelJob(job.id)}
+                      className="gap-2 border-red-200 text-xs text-red-600 hover:bg-red-50 hover:text-red-700"
+                    >
+                      <Ban className="h-3.5 w-3.5" />
+                      Cancelar
+                    </Button>
+                  )}
+                </div>
               </td>
             </tr>
           ))}

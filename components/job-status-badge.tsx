@@ -2,7 +2,7 @@
 
 import { Badge } from "@/components/ui/badge";
 import { EstadoJob } from "@/models/enums/EstadoJob";
-import { CheckCircle2, Clock3, LoaderCircle } from "lucide-react";
+import { Ban, CheckCircle2, Clock3, LoaderCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const statusMap: Record<
@@ -23,6 +23,11 @@ const statusMap: Record<
     label: "Completado",
     className: "bg-emerald-100 text-emerald-700 border-emerald-200",
     icon: CheckCircle2,
+  },
+  CANCELADO: {
+    label: "Cancelado",
+    className: "bg-gray-200 text-gray-700 border-gray-300",
+    icon: Ban,
   },
 };
 

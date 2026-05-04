@@ -25,6 +25,7 @@ type ProveedorImportRowEditorDrawerProps = {
   onOpenChange: (open: boolean) => void;
   row: ImportRowProveedorResponse | null;
   isMine: boolean;
+  jobClosed?: boolean;
   submitting: boolean;
   onSave: (payload: PatchImportRowProveedorRequest) => Promise<void>;
   onRevalidate: () => Promise<void>;
@@ -51,6 +52,7 @@ export function ProveedorImportRowEditorDrawer({
   onOpenChange,
   row,
   isMine,
+  jobClosed = false,
   submitting,
   onSave,
   onRevalidate,
@@ -78,10 +80,10 @@ export function ProveedorImportRowEditorDrawer({
     event.preventDefault();
     const payload: PatchImportRowProveedorRequest = {
       version: row.version,
-      nombre: form.nombre || undefined,
-      taxId: form.taxId || undefined,
-      formaDePagoPredeterminada: form.formaDePagoPredeterminada || undefined,
-      puntosDeVenta: form.puntosDeVenta || undefined,
+      nombre: form.nombre.trim() || null,
+      taxId: form.taxId.trim() || null,
+      formaDePagoPredeterminada: form.formaDePagoPredeterminada || null,
+      puntosDeVenta: form.puntosDeVenta.trim() || null,
     };
     await onSave(payload);
   };
@@ -119,7 +121,7 @@ export function ProveedorImportRowEditorDrawer({
               <Input
                 value={form.nombre}
                 onChange={(event) => setForm((prev) => ({ ...prev, nombre: event.target.value }))}
-                disabled={!isMine}
+                disabled={!isMine || jobClosed}
               />
             </div>
 
@@ -128,7 +130,7 @@ export function ProveedorImportRowEditorDrawer({
               <Input
                 value={form.taxId}
                 onChange={(event) => setForm((prev) => ({ ...prev, taxId: event.target.value }))}
-                disabled={!isMine}
+                disabled={!isMine || jobClosed}
               />
             </div>
 
@@ -139,7 +141,7 @@ export function ProveedorImportRowEditorDrawer({
                 onValueChange={(v) =>
                   setForm((prev) => ({ ...prev, formaDePagoPredeterminada: v === "__none__" ? "" : v }))
                 }
-                disabled={!isMine}
+                disabled={!isMine || jobClosed}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Sin predeterminado" />
@@ -158,12 +160,12 @@ export function ProveedorImportRowEditorDrawer({
               <Input
                 value={form.puntosDeVenta}
                 onChange={(event) => setForm((prev) => ({ ...prev, puntosDeVenta: event.target.value }))}
-                disabled={!isMine}
+                disabled={!isMine || jobClosed}
                 placeholder="Ej: 1001, 1002"
               />
             </div>
 
-            {isMine && (
+            {isMine && !jobClosed && (
               <Button type="submit" className="w-full" disabled={submitting}>
                 {submitting ? "Guardando..." : "Guardar cambios"}
               </Button>
@@ -171,7 +173,7 @@ export function ProveedorImportRowEditorDrawer({
           </form>
         </div>
 
-        {isMine && (
+        {isMine && !jobClosed && (
           <DrawerFooter className="border-t border-gray-200 bg-white">
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
               <Button variant="outline" onClick={onRevalidate} disabled={submitting}>
