@@ -14,11 +14,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { FacturaPuntoDeVentaMonto } from "@/models/dto/compra/FacturaPuntoDeVentaMonto";
 import { FacturaProveedorResponse } from "@/models/dto/compra/FacturaProveedorResponse";
 import { ProveedorResponse } from "@/models/dto/proveedor/ProveedorResponse";
 import { EstadoFactura } from "@/models/enums/EstadoFactura";
 
-export type FacturaSortKey = "fechaFactura" | "monto" | "proveedor" | "estado";
+export type FacturaSortKey = "fechaFactura" | "monto" | "proveedor" | "creadoPor" | "estado";
 export type FacturaSortDir = "asc" | "desc";
 export type FacturaStatusFilter = "all" | EstadoFactura;
 
@@ -66,6 +67,7 @@ export interface FacturasTableProps {
   onPagar?: (factura: FacturaProveedorResponse) => void;
   onEditar?: (factura: FacturaProveedorResponse) => void;
   onAnular?: (factura: FacturaProveedorResponse) => void;
+  showCreadoPor?: boolean;
   extraActiveFilters?: boolean;
   onClearFilters: () => void;
 }
@@ -98,13 +100,15 @@ function getPuntoDeVentaLabel(
 function FacturaDetail({
   factura,
   puntoDeVentaNameById,
+  showCreadoPor = false,
 }: {
   factura: FacturaProveedorResponse;
   puntoDeVentaNameById?: Record<number, string>;
+  showCreadoPor?: boolean;
 }) {
-  const distribucion = Object.entries(
-    factura.puntoDeVentaComedor ?? {},
-  ).sort(([leftId], [rightId]) => Number(leftId) - Number(rightId));
+  const distribucion = [...(factura.puntoDeVentaComedor ?? [])].sort(
+    (left, right) => left.puntoDeVentaId - right.puntoDeVentaId,
+  );
 
   return (
     <div className="space-y-4">
@@ -119,6 +123,9 @@ function FacturaDetail({
         />
         <DetailField label="Número operación" value={factura.numeroOperacion} />
         <DetailField label="Medio de pago" value={factura.medioPago} />
+        {showCreadoPor && (
+          <DetailField label="Creado por" value={factura.creadoPorNombre} />
+        )}
       </div>
 
       <div className="space-y-2">
@@ -131,16 +138,16 @@ function FacturaDetail({
           <p className="text-sm text-gray-500">Sin puntos de venta asociados.</p>
         ) : (
           <div className="grid gap-2 sm:grid-cols-2">
-            {distribucion.map(([puntoDeVentaId, porcentaje]) => (
+            {distribucion.map((item: FacturaPuntoDeVentaMonto) => (
               <div
-                key={puntoDeVentaId}
+                key={item.puntoDeVentaId}
                 className="flex items-center justify-between rounded-lg border border-gray-200 bg-gray-50 px-3 py-2"
               >
                 <span className="text-sm text-gray-700">
-                  {getPuntoDeVentaLabel(puntoDeVentaId, puntoDeVentaNameById)}
+                  {getPuntoDeVentaLabel(String(item.puntoDeVentaId), puntoDeVentaNameById)}
                 </span>
                 <span className="text-sm font-semibold text-gray-900">
-                  {porcentaje}%
+                  {formatCurrency(item.monto)}
                 </span>
               </div>
             ))}
@@ -165,6 +172,7 @@ export function FacturasTable({
   sortDir,
   onSort,
   onNuevaFactura, onEmitir, onPagar, onEditar, onAnular, onClearFilters,
+  showCreadoPor = false,
   extraActiveFilters = false,
 }: FacturasTableProps) {
   const [localSearch, setLocalSearch] = useState("");
@@ -197,7 +205,8 @@ export function FacturasTable({
       const q = activeSearch.trim().toLowerCase();
       list = list.filter((f) =>
         f.numero.toLowerCase().includes(q) ||
-        (proveedorMap[f.proveedorId] ?? "").toLowerCase().includes(q)
+        (proveedorMap[f.proveedorId] ?? "").toLowerCase().includes(q) ||
+        (f.creadoPorNombre ?? "").toLowerCase().includes(q)
       );
     }
     list.sort((a, b) => {
@@ -206,6 +215,7 @@ export function FacturasTable({
       if (activeSortKey === "fechaFactura") { av = a.fechaFactura; bv = b.fechaFactura; }
       if (activeSortKey === "monto") { av = a.monto; bv = b.monto; }
       if (activeSortKey === "proveedor") { av = proveedorMap[a.proveedorId] ?? ""; bv = proveedorMap[b.proveedorId] ?? ""; }
+      if (activeSortKey === "creadoPor") { av = a.creadoPorNombre ?? ""; bv = b.creadoPorNombre ?? ""; }
       if (activeSortKey === "estado") { av = a.estado; bv = b.estado; }
       if (av < bv) return activeSortDir === "asc" ? -1 : 1;
       if (av > bv) return activeSortDir === "asc" ? 1 : -1;
@@ -266,7 +276,7 @@ export function FacturasTable({
         <div className="relative">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400 pointer-events-none" />
           <Input value={activeSearch} onChange={(e) => setSearchValue(e.target.value)}
-            placeholder="Buscar número o proveedor..."
+            placeholder={showCreadoPor ? "Buscar número, proveedor o creado por..." : "Buscar número o proveedor..."}
             className="pl-8 h-8 w-52 text-sm bg-gray-50 border-gray-200" />
           {activeSearch && (
             <button onClick={() => setSearchValue("")}
@@ -332,6 +342,7 @@ export function FacturasTable({
                   {sortableTh("Fecha", "fechaFactura")}
                   <th className="px-4 py-3">Número</th>
                   {sortableTh("Proveedor", "proveedor")}
+                  {showCreadoPor && sortableTh("Creado por", "creadoPor")}
                   <th className="px-4 py-3">Comedor</th>
                   {sortableTh("Monto", "monto", "text-right")}
                   {sortableTh("Estado", "estado", "text-center")}
@@ -345,7 +356,7 @@ export function FacturasTable({
                   const isAnulada = factura.estado === "ANULADA";
                   const isPagada = factura.estado === "PAGADA";
                   const hasActions = !readonly && !isAnulada && !isPagada;
-                  const detailColSpan = readonly ? 8 : 9;
+                  const detailColSpan = (readonly ? 8 : 9) + (showCreadoPor ? 1 : 0);
 
                   return (
                     <Fragment key={factura.id}>
@@ -378,6 +389,11 @@ export function FacturasTable({
                         <td className="px-4 py-4 cursor-pointer" onClick={() => toggleRow(factura.id)}>
                           {proveedorMap[factura.proveedorId] ?? factura.proveedorId}
                         </td>
+                        {showCreadoPor && (
+                          <td className="px-4 py-4 cursor-pointer" onClick={() => toggleRow(factura.id)}>
+                            {factura.creadoPorNombre ?? <span className="text-gray-300">—</span>}
+                          </td>
+                        )}
                         <td className="px-4 py-4 cursor-pointer" onClick={() => toggleRow(factura.id)}>
                           {comedorNameById?.[factura.comedorId] ?? factura.comedorId}
                         </td>
@@ -442,6 +458,7 @@ export function FacturasTable({
                               <FacturaDetail
                                 factura={factura}
                                 puntoDeVentaNameById={puntoDeVentaNameById}
+                                showCreadoPor={showCreadoPor}
                               />
                             </div>
                           </td>

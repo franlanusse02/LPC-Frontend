@@ -7,6 +7,7 @@ import { Combobox } from "@/components/ui/combobox";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import {
+  autoAdjustFacturaDistribucionRows,
   FacturaPuntoDeVentaDistribucionRow,
   facturaDistribucionTotal,
   rebalanceFacturaDistribucionRows,
@@ -17,17 +18,31 @@ interface FacturaPuntosDistribucionEditorProps {
   rows: FacturaPuntoDeVentaDistribucionRow[];
   puntosDeVenta: PuntoDeVentaResponse[];
   onChange: (rows: FacturaPuntoDeVentaDistribucionRow[]) => void;
+  facturaMonto: string | number;
   error?: string | null;
 }
+
+const formatCurrency = (amount: number) =>
+  new Intl.NumberFormat("es-CL", {
+    style: "currency",
+    currency: "ARS",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  }).format(amount);
 
 export function FacturaPuntosDistribucionEditor({
   rows,
   puntosDeVenta,
   onChange,
+  facturaMonto,
   error,
 }: FacturaPuntosDistribucionEditorProps) {
   const total = facturaDistribucionTotal(rows);
   const isAddDisabled = puntosDeVenta.length === 0 || rows.length >= puntosDeVenta.length;
+  const montoFactura = Number(typeof facturaMonto === "string" ? facturaMonto.replace(",", ".") : facturaMonto);
+  const totalMatchesFactura = Number.isFinite(montoFactura) && montoFactura > 0
+    ? Math.round(total * 100) === Math.round(montoFactura * 100)
+    : false;
 
   const baseOptions = useMemo(() => {
     const byId = new Map(
@@ -66,30 +81,33 @@ export function FacturaPuntosDistribucionEditor({
     field: keyof FacturaPuntoDeVentaDistribucionRow,
     value: string,
   ) => {
-    const nextValue =
-      field === "porcentaje"
-        ? value.replace(/[^\d]/g, "")
-        : value;
+    if (field === "monto") {
+      onChange(autoAdjustFacturaDistribucionRows(rows, facturaMonto, index, value));
+      return;
+    }
 
     onChange(
       rows.map((row, rowIndex) =>
-        rowIndex === index ? { ...row, [field]: nextValue } : row,
+        rowIndex === index ? { ...row, [field]: value } : row,
       ),
     );
   };
 
   const addRow = () => {
     if (isAddDisabled) return;
-    onChange(rebalanceFacturaDistribucionRows([
-      ...rows,
-      { puntoDeVentaId: "", porcentaje: "" },
-    ]));
+    onChange(
+      rebalanceFacturaDistribucionRows(
+        [...rows, { puntoDeVentaId: "", monto: "" }],
+        facturaMonto,
+      ),
+    );
   };
 
   const removeRow = (index: number) => {
     onChange(
       rebalanceFacturaDistribucionRows(
         rows.filter((_, rowIndex) => rowIndex !== index),
+        facturaMonto,
       ),
     );
   };
@@ -102,25 +120,25 @@ export function FacturaPuntosDistribucionEditor({
             Distribución puntos de venta comedor *
           </h3>
           <p className="text-xs text-gray-500">
-            Asigná el porcentaje por punto de venta del comedor. El total debe sumar 100%.
+            Asigná el monto por punto de venta del comedor. La suma debe coincidir con el monto total.
           </p>
         </div>
         <span
           className={cn(
             "rounded-full px-2.5 py-1 text-xs font-semibold",
-            total === 100
+            totalMatchesFactura
               ? "bg-emerald-100 text-emerald-700"
               : "bg-amber-100 text-amber-700",
           )}
         >
-          Total {total}%
+          Total {formatCurrency(total)}
         </span>
       </div>
 
       <div className="mt-4 space-y-3">
         {rows.length === 0 ? (
           <div className="rounded-lg border border-dashed border-gray-300 bg-white px-4 py-5 text-sm text-gray-500">
-            No hay puntos cargados. Agregá al menos una fila para distribuir el 100%.
+            No hay puntos cargados. Agregá al menos una fila para distribuir el monto total.
           </div>
         ) : (
           rows.map((row, index) => (
@@ -144,16 +162,17 @@ export function FacturaPuntosDistribucionEditor({
               />
               <div className="relative">
                 <Input
-                  type="text"
-                  inputMode="numeric"
-                  pattern="[0-9]*"
-                  value={row.porcentaje}
-                  onChange={(event) => updateRow(index, "porcentaje", event.target.value)}
-                  placeholder="0"
+                  type="number"
+                  inputMode="decimal"
+                  step="0.01"
+                  min="0"
+                  value={row.monto}
+                  onChange={(event) => updateRow(index, "monto", event.target.value)}
+                  placeholder="0.00"
                   className="bg-white pr-8"
                 />
                 <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-400">
-                  %
+                  ARS
                 </span>
               </div>
               <Button
@@ -189,7 +208,7 @@ export function FacturaPuntosDistribucionEditor({
           <p className="text-xs text-gray-500">
             {rows.length >= puntosDeVenta.length && puntosDeVenta.length > 0
               ? "Ya agregaste todos los puntos disponibles."
-              : "Cada punto debe aparecer una sola vez."}
+              : `Cada punto debe aparecer una sola vez. Objetivo ${Number.isFinite(montoFactura) && montoFactura > 0 ? formatCurrency(montoFactura) : "—"}.`}
           </p>
         )}
       </div>

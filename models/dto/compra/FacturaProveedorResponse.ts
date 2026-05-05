@@ -1,5 +1,6 @@
 import { EstadoFactura } from "@/models/enums/EstadoFactura";
 import { MedioPago } from "@/models/enums/MedioPago";
+import { FacturaPuntoDeVentaMonto } from "@/models/dto/compra/FacturaPuntoDeVentaMonto";
 
 export type FacturaProveedorResponse = {
     id: number;
@@ -7,7 +8,7 @@ export type FacturaProveedorResponse = {
     proveedorId: number;
     comedorId: number;
     puntoDeVentaProveedor: number | null;
-    puntoDeVentaComedor: Record<string, number>;
+    puntoDeVentaComedor: FacturaPuntoDeVentaMonto[];
     fechaFactura: string;
     fechaEmision: string | null;
     fechaPago: string | null;
@@ -19,6 +20,7 @@ export type FacturaProveedorResponse = {
     bancoNombre: string | null;
     bancoSociedadId: number | null;
     creadoPorId: number;
+    creadoPorNombre: string;
     estado: EstadoFactura;
     creadoEn: string;
     anulacionId: number | null;

@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { ApiError } from "@/models/dto/ApiError";
 import { DetailedCierreCajaResponse } from "@/models/dto/cierre-caja/CierreCajaResponse";
+import { FacturaPuntoDeVentaMonto } from "@/models/dto/compra/FacturaPuntoDeVentaMonto";
 import { FacturaProveedorResponse } from "@/models/dto/compra/FacturaProveedorResponse";
 import { ProveedorResponse } from "@/models/dto/proveedor/ProveedorResponse";
 import { ComedorResponse } from "@/models/dto/comedor/ComedorResponse";
@@ -104,13 +105,13 @@ const formatSummaryNames = (items: string[], limit = 2) => {
 };
 
 const formatFacturaDistribucion = (
-  distribucion: Record<string, number>,
+  distribucion: FacturaPuntoDeVentaMonto[],
   puntoDeVentaNameById: Record<number, string>,
 ) =>
-  Object.entries(distribucion ?? {})
-    .sort(([leftId], [rightId]) => Number(leftId) - Number(rightId))
-    .map(([puntoDeVentaId, porcentaje]) =>
-      `${puntoDeVentaNameById[Number(puntoDeVentaId)] ?? `Punto ${puntoDeVentaId}`} ${porcentaje}%`,
+  [...(distribucion ?? [])]
+    .sort((left, right) => left.puntoDeVentaId - right.puntoDeVentaId)
+    .map((item) =>
+      `${puntoDeVentaNameById[item.puntoDeVentaId] ?? `Punto ${item.puntoDeVentaId}`} ${formatCurrency(item.monto)}`,
     )
     .join(", ");
 
@@ -496,7 +497,8 @@ export default function ContabilidadPage() {
       const query = facturaSearch.trim().toLowerCase();
       list = list.filter((factura) =>
         factura.numero.toLowerCase().includes(query) ||
-        (proveedorNameById[factura.proveedorId] ?? "").toLowerCase().includes(query),
+        (proveedorNameById[factura.proveedorId] ?? "").toLowerCase().includes(query) ||
+        (factura.creadoPorNombre ?? "").toLowerCase().includes(query),
       );
     }
     list.sort((left, right) => {
@@ -507,6 +509,10 @@ export default function ContabilidadPage() {
       if (facturaSortKey === "proveedor") {
         leftValue = proveedorNameById[left.proveedorId] ?? "";
         rightValue = proveedorNameById[right.proveedorId] ?? "";
+      }
+      if (facturaSortKey === "creadoPor") {
+        leftValue = left.creadoPorNombre ?? "";
+        rightValue = right.creadoPorNombre ?? "";
       }
       if (facturaSortKey === "estado") { leftValue = left.estado; rightValue = right.estado; }
       if (leftValue < rightValue) return facturaSortDir === "asc" ? -1 : 1;
@@ -568,6 +574,7 @@ export default function ContabilidadPage() {
           "Fecha factura": factura.fechaFactura,
           Número: factura.numero,
           Proveedor: proveedorNameById[factura.proveedorId] ?? String(factura.proveedorId),
+          "Creado por": factura.creadoPorNombre ?? "",
           Comedor: comedorNameById[factura.comedorId] ?? String(factura.comedorId),
           "Punto de venta proveedor": factura.puntoDeVentaProveedor ?? "",
           "Distribución puntos comedor": formatFacturaDistribucion(
@@ -1190,6 +1197,7 @@ export default function ContabilidadPage() {
                 onStatusFilterChange={setFacturaStatusFilter}
                 sortKey={facturaSortKey}
                 sortDir={facturaSortDir}
+                showCreadoPor
                 onSort={(key) => {
                   if (key === facturaSortKey) setFacturaSortDir((direction) => (direction === "asc" ? "desc" : "asc"));
                   else { setFacturaSortKey(key); setFacturaSortDir("asc"); }
