@@ -20,8 +20,9 @@ import { ComedorResponse } from "@/models/dto/comedor/ComedorResponse";
 import { FacturaPuntosDistribucionEditor } from "@/components/factura-puntos-distribucion-editor";
 import {
   FacturaPuntoDeVentaDistribucionRow,
-  facturaDistribucionRecordFromRows,
-  facturaDistribucionRowsFromRecord,
+  facturaDistribucionItemsFromRows,
+  facturaDistribucionRowsFromItems,
+  syncFacturaDistribucionRowsToMonto,
   validateFacturaDistribucionRows,
 } from "@/lib/facturas";
 
@@ -45,7 +46,7 @@ export function EditarFacturaModal({
   const [comentarios, setComentarios] = useState(factura.comentarios ?? "");
   const [puntoDeVentaProveedor, setPuntoDeVentaProveedor] = useState(String(factura.puntoDeVentaProveedor ?? ""));
   const [puntoDeVentaComedor, setPuntoDeVentaComedor] = useState<FacturaPuntoDeVentaDistribucionRow[]>(
-    () => facturaDistribucionRowsFromRecord(factura.puntoDeVentaComedor),
+    () => facturaDistribucionRowsFromItems(factura.puntoDeVentaComedor),
   );
   const [fechaEmision, setFechaEmision] = useState(factura.fechaEmision ?? "");
   const [fechaPago, setFechaPago] = useState(factura.fechaPago ?? "");
@@ -59,8 +60,8 @@ export function EditarFacturaModal({
     [selectedComedor],
   );
   const distributionError = useMemo(
-    () => validateFacturaDistribucionRows(puntoDeVentaComedor),
-    [puntoDeVentaComedor],
+    () => validateFacturaDistribucionRows(puntoDeVentaComedor, monto),
+    [monto, puntoDeVentaComedor],
   );
   const canSubmit = proveedorId && comedorId && fechaFactura && monto &&
     (!requiresPuntoDeVenta || puntoDeVentaProveedor) &&
@@ -73,10 +74,16 @@ export function EditarFacturaModal({
     setMonto(String(factura.monto));
     setComentarios(factura.comentarios ?? "");
     setPuntoDeVentaProveedor(String(factura.puntoDeVentaProveedor ?? ""));
-    setPuntoDeVentaComedor(facturaDistribucionRowsFromRecord(factura.puntoDeVentaComedor));
+    setPuntoDeVentaComedor(facturaDistribucionRowsFromItems(factura.puntoDeVentaComedor));
     setFechaEmision(factura.fechaEmision ?? "");
     setFechaPago(factura.fechaPago ?? "");
   }, [factura, open]);
+
+  useEffect(() => {
+    setPuntoDeVentaComedor((previousRows) =>
+      syncFacturaDistribucionRowsToMonto(previousRows, monto),
+    );
+  }, [monto]);
 
   const handleConfirm = async () => {
     if (!canSubmit) return;
@@ -89,7 +96,7 @@ export function EditarFacturaModal({
         monto: Number(monto),
         comentarios,
         puntoDeVentaProveedor: puntoDeVentaProveedor ? Number(puntoDeVentaProveedor) : null,
-        puntoDeVentaComedor: facturaDistribucionRecordFromRows(puntoDeVentaComedor),
+        puntoDeVentaComedor: facturaDistribucionItemsFromRows(puntoDeVentaComedor),
         fechaEmision: fechaEmision || null,
         fechaPago: fechaPago || null,
       });
@@ -168,6 +175,7 @@ export function EditarFacturaModal({
               rows={puntoDeVentaComedor}
               puntosDeVenta={comedorPuntosDeVenta}
               onChange={setPuntoDeVentaComedor}
+              facturaMonto={monto}
               error={distributionError}
             />
             {factura.estado === "PENDIENTE" && (

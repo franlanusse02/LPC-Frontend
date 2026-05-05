@@ -21,7 +21,8 @@ import { MedioPago, MediosPagoDict } from "@/models/enums/MedioPago";
 import { FacturaPuntosDistribucionEditor } from "@/components/factura-puntos-distribucion-editor";
 import {
   FacturaPuntoDeVentaDistribucionRow,
-  facturaDistribucionRecordFromRows,
+  facturaDistribucionItemsFromRows,
+  syncFacturaDistribucionRowsToMonto,
   validateFacturaDistribucionRows,
 } from "@/lib/facturas";
 
@@ -56,8 +57,8 @@ export function NuevaFacturaModal({
     [selectedComedor],
   );
   const distributionError = useMemo(
-    () => validateFacturaDistribucionRows(puntoDeVentaComedor),
-    [puntoDeVentaComedor],
+    () => validateFacturaDistribucionRows(puntoDeVentaComedor, monto),
+    [monto, puntoDeVentaComedor],
   );
 
   useEffect(() => {
@@ -68,6 +69,12 @@ export function NuevaFacturaModal({
     }
     setPuntoDeVentaProveedor("");
   }, [proveedorId]);
+
+  useEffect(() => {
+    setPuntoDeVentaComedor((previousRows) =>
+      syncFacturaDistribucionRowsToMonto(previousRows, monto),
+    );
+  }, [monto]);
 
   const canSubmit = proveedorId && comedorId && fechaFactura && numero && monto &&
     (!requiresPuntoDeVenta || puntoDeVentaProveedor) &&
@@ -85,7 +92,7 @@ export function NuevaFacturaModal({
         monto: Number(monto),
         comentarios,
         puntoDeVentaProveedor: puntoDeVentaProveedor ? Number(puntoDeVentaProveedor) : null,
-        puntoDeVentaComedor: facturaDistribucionRecordFromRows(puntoDeVentaComedor),
+        puntoDeVentaComedor: facturaDistribucionItemsFromRows(puntoDeVentaComedor),
         medioPago: medioPago || null,
       });
       onClose();
@@ -185,6 +192,7 @@ export function NuevaFacturaModal({
               rows={puntoDeVentaComedor}
               puntosDeVenta={comedorPuntosDeVenta}
               onChange={setPuntoDeVentaComedor}
+              facturaMonto={monto}
               error={distributionError}
             />
             <FormField label="Comentarios" className="col-span-2">
