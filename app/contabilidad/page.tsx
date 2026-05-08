@@ -73,6 +73,21 @@ type GroupedConsumoItem = {
 const formatCurrency = (n: number) =>
   new Intl.NumberFormat("es-CL", { style: "currency", currency: "ARS", minimumFractionDigits: 0 }).format(n);
 
+const formatDateInput = (date: Date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
+const getCurrentMonthRange = () => {
+  const now = new Date();
+  return {
+    dateDesde: formatDateInput(new Date(now.getFullYear(), now.getMonth(), 1)),
+    dateHasta: formatDateInput(new Date(now.getFullYear(), now.getMonth() + 1, 0)),
+  };
+};
+
 const buildDateRangePart = (dateDesde: string, dateHasta: string) => {
   if (dateDesde && dateHasta) {
     return `from_${formatIsoDateForFilename(dateDesde)}_to_${formatIsoDateForFilename(dateHasta)}`;
@@ -115,6 +130,9 @@ const formatFacturaDistribucion = (
     )
     .join(", ");
 
+const getFacturaFechaCarga = (factura: FacturaProveedorResponse) =>
+  factura.creadoEn ? factura.creadoEn.slice(0, 10) : "";
+
 export default function ContabilidadPage() {
   const router = useRouter();
   const { session, isLoading } = useAuth();
@@ -125,8 +143,8 @@ export default function ContabilidadPage() {
   const [egresosExpanded, setEgresosExpanded] = useState(false);
 
   // shared filters
-  const [dateDesde, setDateDesde] = useState("");
-  const [dateHasta, setDateHasta] = useState("");
+  const [dateDesde, setDateDesde] = useState(() => getCurrentMonthRange().dateDesde);
+  const [dateHasta, setDateHasta] = useState(() => getCurrentMonthRange().dateHasta);
   const [comedorFilter, setComedorFilter] = useState("");
   const [sociedadFilter, setSociedadFilter] = useState("");
   const [puntoDeVentaFilter, setPuntoDeVentaFilter] = useState("");
@@ -157,7 +175,7 @@ export default function ContabilidadPage() {
   const [anularFactura, setAnularFactura] = useState<FacturaProveedorResponse | null>(null);
   const [facturaSearch, setFacturaSearch] = useState("");
   const [facturaStatusFilter, setFacturaStatusFilter] = useState<FacturaStatusFilter>("all");
-  const [facturaSortKey, setFacturaSortKey] = useState<FacturaSortKey>("fechaFactura");
+  const [facturaSortKey, setFacturaSortKey] = useState<FacturaSortKey>("fechaCarga");
   const [facturaSortDir, setFacturaSortDir] = useState<FacturaSortDir>("desc");
 
   // eventos
@@ -306,8 +324,8 @@ export default function ContabilidadPage() {
 
   const montoCompras = useMemo(() => {
     let list = facturas.filter((f) => f.estado !== "ANULADA");
-    if (dateDesde) list = list.filter((f) => f.fechaFactura >= dateDesde);
-    if (dateHasta) list = list.filter((f) => f.fechaFactura <= dateHasta);
+    if (dateDesde) list = list.filter((f) => getFacturaFechaCarga(f) >= dateDesde);
+    if (dateHasta) list = list.filter((f) => getFacturaFechaCarga(f) <= dateHasta);
     if (comedorIdFilter !== null) list = list.filter((f) => f.comedorId === comedorIdFilter);
     else if (sociedadFilter) list = list.filter((f) => comedorIdsDeSociedad.has(f.comedorId));
     if (puntoDeVentaFilter) {
@@ -483,8 +501,8 @@ export default function ContabilidadPage() {
 
   const displayedFacturas = useMemo(() => {
     let list = [...facturas];
-    if (dateDesde) list = list.filter((factura) => factura.fechaFactura >= dateDesde);
-    if (dateHasta) list = list.filter((factura) => factura.fechaFactura <= dateHasta);
+    if (dateDesde) list = list.filter((factura) => getFacturaFechaCarga(factura) >= dateDesde);
+    if (dateHasta) list = list.filter((factura) => getFacturaFechaCarga(factura) <= dateHasta);
     if (comedorIdFilter !== null) list = list.filter((factura) => factura.comedorId === comedorIdFilter);
     else if (sociedadFilter) list = list.filter((factura) => comedorIdsDeSociedad.has(factura.comedorId));
     if (puntoDeVentaFilter) {
@@ -504,7 +522,7 @@ export default function ContabilidadPage() {
     list.sort((left, right) => {
       let leftValue: string | number = "";
       let rightValue: string | number = "";
-      if (facturaSortKey === "fechaFactura") { leftValue = left.fechaFactura; rightValue = right.fechaFactura; }
+      if (facturaSortKey === "fechaCarga") { leftValue = getFacturaFechaCarga(left); rightValue = getFacturaFechaCarga(right); }
       if (facturaSortKey === "monto") { leftValue = left.monto; rightValue = right.monto; }
       if (facturaSortKey === "proveedor") {
         leftValue = proveedorNameById[left.proveedorId] ?? "";
@@ -536,7 +554,10 @@ export default function ContabilidadPage() {
   ]);
 
   const clearFilters = () => {
-    setDateDesde(""); setDateHasta(""); setComedorFilter(""); setSociedadFilter(""); setPuntoDeVentaFilter("");
+    const currentMonthRange = getCurrentMonthRange();
+    setDateDesde(currentMonthRange.dateDesde);
+    setDateHasta(currentMonthRange.dateHasta);
+    setComedorFilter(""); setSociedadFilter(""); setPuntoDeVentaFilter("");
     setSearch(""); setStatusFilter("active");
     setFacturaSearch(""); setFacturaStatusFilter("all");
     setEventoSearch(""); setEventoStatusFilter("all");
@@ -571,6 +592,7 @@ export default function ContabilidadPage() {
     if (view === "compras") {
       exportRowsToXlsx(
         displayedFacturas.map((factura) => ({
+          "Fecha carga": getFacturaFechaCarga(factura),
           "Fecha factura": factura.fechaFactura,
           Número: factura.numero,
           Proveedor: proveedorNameById[factura.proveedorId] ?? String(factura.proveedorId),
