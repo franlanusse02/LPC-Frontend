@@ -37,6 +37,9 @@ import { facturaTienePuntoDeVentaComedor } from "@/lib/facturas";
 
 type View = "cierres" | "compras" | "eventos" | "consumos";
 
+const getFacturaFechaCarga = (factura: FacturaProveedorResponse) =>
+  factura.creadoEn ? factura.creadoEn.slice(0, 10) : "";
+
 export default function EncargadoPage() {
   const router = useRouter();
   const { session, isLoading } = useAuth();
@@ -68,7 +71,7 @@ export default function EncargadoPage() {
   const [nuevoCierreOpen, setNuevoCierreOpen] = useState(false);
   const [facturaSearch, setFacturaSearch] = useState("");
   const [facturaStatusFilter, setFacturaStatusFilter] = useState<FacturaStatusFilter>("all");
-  const [facturaSortKey, setFacturaSortKey] = useState<FacturaSortKey>("fechaFactura");
+  const [facturaSortKey, setFacturaSortKey] = useState<FacturaSortKey>("fechaCarga");
   const [facturaSortDir, setFacturaSortDir] = useState<FacturaSortDir>("desc");
 
   // eventos
@@ -238,8 +241,8 @@ export default function EncargadoPage() {
 
   const displayedFacturas = useMemo(() => {
     let list = [...facturas];
-    if (dateDesde) list = list.filter((factura) => factura.fechaFactura >= dateDesde);
-    if (dateHasta) list = list.filter((factura) => factura.fechaFactura <= dateHasta);
+    if (dateDesde) list = list.filter((factura) => getFacturaFechaCarga(factura) >= dateDesde);
+    if (dateHasta) list = list.filter((factura) => getFacturaFechaCarga(factura) <= dateHasta);
     if (comedorIdFilter !== null) list = list.filter((factura) => factura.comedorId === comedorIdFilter);
     if (puntoDeVentaFilter) {
       list = list.filter((factura) =>
@@ -257,7 +260,7 @@ export default function EncargadoPage() {
     list.sort((left, right) => {
       let leftValue: string | number = "";
       let rightValue: string | number = "";
-      if (facturaSortKey === "fechaFactura") { leftValue = left.fechaFactura; rightValue = right.fechaFactura; }
+      if (facturaSortKey === "fechaCarga") { leftValue = getFacturaFechaCarga(left); rightValue = getFacturaFechaCarga(right); }
       if (facturaSortKey === "monto") { leftValue = left.monto; rightValue = right.monto; }
       if (facturaSortKey === "proveedor") {
         leftValue = proveedorNameById[left.proveedorId] ?? "";

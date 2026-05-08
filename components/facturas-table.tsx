@@ -19,7 +19,7 @@ import { FacturaProveedorResponse } from "@/models/dto/compra/FacturaProveedorRe
 import { ProveedorResponse } from "@/models/dto/proveedor/ProveedorResponse";
 import { EstadoFactura } from "@/models/enums/EstadoFactura";
 
-export type FacturaSortKey = "fechaFactura" | "monto" | "proveedor" | "creadoPor" | "estado";
+export type FacturaSortKey = "fechaCarga" | "monto" | "proveedor" | "creadoPor" | "estado";
 export type FacturaSortDir = "asc" | "desc";
 export type FacturaStatusFilter = "all" | EstadoFactura;
 
@@ -33,6 +33,9 @@ const statusLabel: Record<FacturaStatusFilter, string> = {
 
 const formatCurrency = (amount: number) =>
   new Intl.NumberFormat("es-CL", { style: "currency", currency: "ARS", minimumFractionDigits: 0 }).format(amount);
+
+const getFacturaFechaCarga = (factura: FacturaProveedorResponse) =>
+  factura.creadoEn ? factura.creadoEn.slice(0, 10) : "";
 
 function estadoBadge(estado: EstadoFactura) {
   const base = "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold";
@@ -177,7 +180,7 @@ export function FacturasTable({
 }: FacturasTableProps) {
   const [localSearch, setLocalSearch] = useState("");
   const [localStatusFilter, setLocalStatusFilter] = useState<FacturaStatusFilter>("all");
-  const [localSortKey, setLocalSortKey] = useState<FacturaSortKey>("fechaFactura");
+  const [localSortKey, setLocalSortKey] = useState<FacturaSortKey>("fechaCarga");
   const [localSortDir, setLocalSortDir] = useState<FacturaSortDir>("desc");
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
 
@@ -197,8 +200,8 @@ export function FacturasTable({
     if (displayedFacturas) return displayedFacturas;
 
     let list = [...facturas];
-    if (dateDesde) list = list.filter((f) => f.fechaFactura >= dateDesde);
-    if (dateHasta) list = list.filter((f) => f.fechaFactura <= dateHasta);
+    if (dateDesde) list = list.filter((f) => getFacturaFechaCarga(f) >= dateDesde);
+    if (dateHasta) list = list.filter((f) => getFacturaFechaCarga(f) <= dateHasta);
     if (comedorIdFilter !== null) list = list.filter((f) => f.comedorId === comedorIdFilter);
     if (activeStatusFilter !== "all") list = list.filter((f) => f.estado === activeStatusFilter);
     if (activeSearch.trim()) {
@@ -212,7 +215,7 @@ export function FacturasTable({
     list.sort((a, b) => {
       let av: string | number = "";
       let bv: string | number = "";
-      if (activeSortKey === "fechaFactura") { av = a.fechaFactura; bv = b.fechaFactura; }
+      if (activeSortKey === "fechaCarga") { av = getFacturaFechaCarga(a); bv = getFacturaFechaCarga(b); }
       if (activeSortKey === "monto") { av = a.monto; bv = b.monto; }
       if (activeSortKey === "proveedor") { av = proveedorMap[a.proveedorId] ?? ""; bv = proveedorMap[b.proveedorId] ?? ""; }
       if (activeSortKey === "creadoPor") { av = a.creadoPorNombre ?? ""; bv = b.creadoPorNombre ?? ""; }
@@ -339,14 +342,16 @@ export function FacturasTable({
               <thead>
                 <tr className="bg-gray-100/80 text-left text-xs uppercase text-gray-500 tracking-wider">
                   <th className="px-4 py-3 w-8" />
-                  {sortableTh("Fecha", "fechaFactura")}
+                  {sortableTh("Fecha", "fechaCarga")}
                   <th className="px-4 py-3">Número</th>
                   {sortableTh("Proveedor", "proveedor")}
                   {showCreadoPor && sortableTh("Creado por", "creadoPor")}
                   <th className="px-4 py-3">Comedor</th>
                   {sortableTh("Monto", "monto", "text-right")}
                   {sortableTh("Estado", "estado", "text-center")}
-                  <th className="px-4 py-3 whitespace-nowrap">Fecha Pago</th>
+                  <th className="px-4 py-3 whitespace-nowrap">Fecha factura</th>
+                  <th className="px-4 py-3 whitespace-nowrap">Fecha emisión</th>
+                  <th className="px-4 py-3 whitespace-nowrap">Fecha pago</th>
                   {!readonly && <th className="px-4 py-3 w-12" />}
                 </tr>
               </thead>
@@ -356,7 +361,7 @@ export function FacturasTable({
                   const isAnulada = factura.estado === "ANULADA";
                   const isPagada = factura.estado === "PAGADA";
                   const hasActions = !readonly && !isAnulada && !isPagada;
-                  const detailColSpan = (readonly ? 8 : 9) + (showCreadoPor ? 1 : 0);
+                  const detailColSpan = (readonly ? 10 : 11) + (showCreadoPor ? 1 : 0);
 
                   return (
                     <Fragment key={factura.id}>
@@ -378,7 +383,7 @@ export function FacturasTable({
                           className="px-4 py-4 cursor-pointer font-medium whitespace-nowrap"
                           onClick={() => toggleRow(factura.id)}
                         >
-                          {factura.fechaFactura}
+                          {getFacturaFechaCarga(factura)}
                         </td>
                         <td
                           className="px-4 py-4 cursor-pointer font-mono text-xs"
@@ -405,6 +410,18 @@ export function FacturasTable({
                         </td>
                         <td className="px-4 py-4 cursor-pointer text-center" onClick={() => toggleRow(factura.id)}>
                           {estadoBadge(factura.estado)}
+                        </td>
+                        <td
+                          className="px-4 py-4 cursor-pointer text-gray-500 whitespace-nowrap"
+                          onClick={() => toggleRow(factura.id)}
+                        >
+                          {factura.fechaFactura ?? <span className="text-gray-300">—</span>}
+                        </td>
+                        <td
+                          className="px-4 py-4 cursor-pointer text-gray-500 whitespace-nowrap"
+                          onClick={() => toggleRow(factura.id)}
+                        >
+                          {factura.fechaEmision ?? <span className="text-gray-300">—</span>}
                         </td>
                         <td
                           className="px-4 py-4 cursor-pointer text-gray-500 whitespace-nowrap"
