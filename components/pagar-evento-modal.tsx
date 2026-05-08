@@ -22,7 +22,7 @@ import { MedioPago, MediosPagoDict } from "@/models/enums/MedioPago";
 export interface PagarEventoPayload {
   fechaPago: string | null;
   medioPago: MedioPago | null;
-  numeroOperacion: string | null;
+  numeroOperacion: string;
 }
 
 interface PagarEventoModalProps {
@@ -51,13 +51,14 @@ export function PagarEventoModal({
   }, [open, evento]);
 
   const handleConfirm = async () => {
-    if (!fechaPago) return;
+    const numeroOperacionValue = numeroOperacion.trim();
+    if (!fechaPago || !numeroOperacionValue) return;
     setLoading(true);
     try {
       await onConfirm(evento.id, {
         fechaPago: fechaPago || null,
         medioPago: medioPago || null,
-        numeroOperacion: numeroOperacion.trim() || null,
+        numeroOperacion: numeroOperacionValue,
       });
       onClose();
     } finally {
@@ -106,7 +107,7 @@ export function PagarEventoModal({
               </Select>
             </FormField>
 
-            <FormField label="Número de operación" className="col-span-2">
+            <FormField label="Número de operación *" className="col-span-2">
               <Input
                 value={numeroOperacion}
                 onChange={(event) => setNumeroOperacion(event.target.value)}
@@ -127,7 +128,7 @@ export function PagarEventoModal({
             </Button>
             <Button
               onClick={handleConfirm}
-              disabled={loading || !fechaPago}
+              disabled={loading || !fechaPago || !numeroOperacion.trim()}
               className="rounded-lg font-semibold bg-emerald-500 hover:bg-emerald-600 text-white"
             >
               {loading ? <><Spinner className="mr-2 h-4 w-4" />Guardando...</> : "Confirmar pago"}
