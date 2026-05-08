@@ -265,7 +265,7 @@ export function FacturasTable({
   };
 
   const sortableTh = (label: string, key: FacturaSortKey, className?: string) => (
-    <th className={cn("px-4 py-3 cursor-pointer select-none whitespace-nowrap hover:text-gray-700 transition-colors", className)}
+    <th className={cn("px-3 py-3 cursor-pointer select-none leading-tight hover:text-gray-700 transition-colors", className)}
       onClick={() => handleSort(key)}>
       {label}<SortIcon col={key} sortKey={activeSortKey} sortDir={activeSortDir} />
     </th>
@@ -337,22 +337,22 @@ export function FacturasTable({
               )}
             </p>
           </div>
-          <div className="overflow-x-auto">
-            <table className="w-full table-auto border-collapse text-sm">
+          <div className="overflow-x-hidden">
+            <table className="w-full table-fixed border-collapse text-[12px] xl:text-[13px]">
               <thead>
-                <tr className="bg-gray-100/80 text-left text-xs uppercase text-gray-500 tracking-wider">
-                  <th className="px-4 py-3 w-8" />
-                  {sortableTh("Fecha", "fechaCarga")}
-                  <th className="px-4 py-3">Número</th>
-                  {sortableTh("Proveedor", "proveedor")}
-                  {showCreadoPor && sortableTh("Creado por", "creadoPor")}
-                  <th className="px-4 py-3">Comedor</th>
-                  {sortableTh("Monto", "monto", "text-right")}
-                  {sortableTh("Estado", "estado", "text-center")}
-                  <th className="px-4 py-3 whitespace-nowrap">Fecha factura</th>
-                  <th className="px-4 py-3 whitespace-nowrap">Fecha emisión</th>
-                  <th className="px-4 py-3 whitespace-nowrap">Fecha pago</th>
-                  {!readonly && <th className="px-4 py-3 w-12" />}
+                <tr className="bg-gray-100/80 text-left text-[11px] uppercase text-gray-500 tracking-wide xl:text-xs">
+                  <th className="px-3 py-3 w-8" />
+                  {sortableTh("Fecha", "fechaCarga", "w-[7%] whitespace-nowrap")}
+                  <th className="px-3 py-3 w-[8%] whitespace-nowrap">Número</th>
+                  {sortableTh("Proveedor", "proveedor", "w-[17%]")}
+                  {showCreadoPor && sortableTh("Creado por", "creadoPor", "w-[10%]")}
+                  <th className="px-3 py-3 w-[8%]">Comedor</th>
+                  {sortableTh("Monto", "monto", "w-[10%] text-right whitespace-nowrap")}
+                  {sortableTh("Estado", "estado", "w-[8%] text-center")}
+                  <th className="px-3 py-3 w-[9%] leading-tight">Fecha factura</th>
+                  <th className="px-3 py-3 w-[8%] leading-tight">Fecha emisión</th>
+                  <th className="px-3 py-3 w-[8%] leading-tight">Fecha pago</th>
+                  {!readonly && <th className="px-3 py-3 w-10" />}
                 </tr>
               </thead>
               <tbody>
@@ -372,7 +372,7 @@ export function FacturasTable({
                         )}
                       >
                         <td
-                          className="px-4 py-4 cursor-pointer text-gray-400 hover:text-gray-600"
+                          className="px-3 py-4 cursor-pointer text-gray-400 hover:text-gray-600 align-top"
                           onClick={() => toggleRow(factura.id)}
                         >
                           {isExpanded
@@ -380,57 +380,57 @@ export function FacturasTable({
                             : <ChevronDown className="h-4 w-4" />}
                         </td>
                         <td
-                          className="px-4 py-4 cursor-pointer font-medium whitespace-nowrap"
+                          className="px-3 py-4 cursor-pointer font-medium whitespace-nowrap align-top"
                           onClick={() => toggleRow(factura.id)}
                         >
                           {getFacturaFechaCarga(factura)}
                         </td>
                         <td
-                          className="px-4 py-4 cursor-pointer font-mono text-xs"
+                          className="px-3 py-4 cursor-pointer font-mono text-xs whitespace-nowrap align-top"
                           onClick={() => toggleRow(factura.id)}
                         >
                           {factura.numero}
                         </td>
-                        <td className="px-4 py-4 cursor-pointer" onClick={() => toggleRow(factura.id)}>
+                        <td className="px-3 py-4 cursor-pointer break-words align-top" onClick={() => toggleRow(factura.id)}>
                           {proveedorMap[factura.proveedorId] ?? factura.proveedorId}
                         </td>
                         {showCreadoPor && (
-                          <td className="px-4 py-4 cursor-pointer" onClick={() => toggleRow(factura.id)}>
+                          <td className="px-3 py-4 cursor-pointer break-words align-top" onClick={() => toggleRow(factura.id)}>
                             {factura.creadoPorNombre ?? <span className="text-gray-300">—</span>}
                           </td>
                         )}
-                        <td className="px-4 py-4 cursor-pointer" onClick={() => toggleRow(factura.id)}>
+                        <td className="px-3 py-4 cursor-pointer align-top" onClick={() => toggleRow(factura.id)}>
                           {comedorNameById?.[factura.comedorId] ?? factura.comedorId}
                         </td>
                         <td
-                          className="px-4 py-4 cursor-pointer text-right font-mono"
+                          className="px-3 py-4 cursor-pointer text-right font-mono whitespace-nowrap align-top"
                           onClick={() => toggleRow(factura.id)}
                         >
                           {formatCurrency(factura.monto)}
                         </td>
-                        <td className="px-4 py-4 cursor-pointer text-center" onClick={() => toggleRow(factura.id)}>
+                        <td className="px-3 py-4 cursor-pointer text-center align-top" onClick={() => toggleRow(factura.id)}>
                           {estadoBadge(factura.estado)}
                         </td>
                         <td
-                          className="px-4 py-4 cursor-pointer text-gray-500 whitespace-nowrap"
+                          className="px-3 py-4 cursor-pointer text-gray-500 whitespace-nowrap align-top"
                           onClick={() => toggleRow(factura.id)}
                         >
                           {factura.fechaFactura ?? <span className="text-gray-300">—</span>}
                         </td>
                         <td
-                          className="px-4 py-4 cursor-pointer text-gray-500 whitespace-nowrap"
+                          className="px-3 py-4 cursor-pointer text-gray-500 whitespace-nowrap align-top"
                           onClick={() => toggleRow(factura.id)}
                         >
                           {factura.fechaEmision ?? <span className="text-gray-300">—</span>}
                         </td>
                         <td
-                          className="px-4 py-4 cursor-pointer text-gray-500 whitespace-nowrap"
+                          className="px-3 py-4 cursor-pointer text-gray-500 whitespace-nowrap align-top"
                           onClick={() => toggleRow(factura.id)}
                         >
                           {factura.fechaPago ?? <span className="text-gray-300">—</span>}
                         </td>
                         {!readonly && (
-                          <td className="px-4 py-4">
+                          <td className="px-3 py-4 align-top">
                             {hasActions ? (
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
