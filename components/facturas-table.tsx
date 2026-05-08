@@ -352,7 +352,8 @@ export function FacturasTable({
                   <th className="px-3 py-3 w-[9%] leading-tight">Fecha factura</th>
                   <th className="px-3 py-3 w-[8%] leading-tight">Fecha emisión</th>
                   <th className="px-3 py-3 w-[8%] leading-tight">Fecha pago</th>
-                  {!readonly && <th className="px-3 py-3 w-10" />}
+                  <th className="px-3 py-3 w-[9%] leading-tight">Nro. operación</th>
+                  {!readonly && <th className="px-4 py-3 w-12" />}
                 </tr>
               </thead>
               <tbody>
@@ -361,7 +362,7 @@ export function FacturasTable({
                   const isAnulada = factura.estado === "ANULADA";
                   const isPagada = factura.estado === "PAGADA";
                   const hasActions = !readonly && !isAnulada && !isPagada;
-                  const detailColSpan = (readonly ? 10 : 11) + (showCreadoPor ? 1 : 0);
+                  const detailColSpan = (readonly ? 11 : 12) + (showCreadoPor ? 1 : 0);
 
                   return (
                     <Fragment key={factura.id}>
@@ -429,13 +430,19 @@ export function FacturasTable({
                         >
                           {factura.fechaPago ?? <span className="text-gray-300">—</span>}
                         </td>
+                        <td
+                          className="px-3 py-4 cursor-pointer text-gray-500 whitespace-nowrap align-top"
+                          onClick={() => toggleRow(factura.id)}
+                        >
+                          {factura.numeroOperacion ?? <span className="text-gray-300">—</span>}
+                        </td>
                         {!readonly && (
-                          <td className="px-3 py-4 align-top">
+                          <td className="px-4 py-4 align-top text-center">
                             {hasActions ? (
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                   <Button variant="ghost" size="icon"
-                                    className="h-8 w-8 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100"
+                                    className="mx-auto h-8 w-8 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100"
                                     aria-label="Acciones">
                                     <MoreHorizontal className="h-4 w-4" />
                                   </Button>
