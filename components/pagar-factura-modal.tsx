@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Dialog, DialogContent, DialogHeader,
   DialogTitle, DialogFooter, DialogDescription,
@@ -11,6 +11,12 @@ import { Spinner } from "@/components/ui/spinner";
 import { CircleDollarSign } from "lucide-react";
 import { FormField } from "./form-field";
 import { DatePickerInput } from "./date-picker-input";
+import { Input } from "@/components/ui/input";
+
+export interface PagarFacturaPayload {
+  fechaPago: string | null;
+  numeroOperacion: string;
+}
 
 interface PagarFacturaModalProps {
   open: boolean;
@@ -18,19 +24,32 @@ interface PagarFacturaModalProps {
   facturaId: number;
   numeroFactura: string;
   currentFechaPago: string | null;
-  onConfirm: (facturaId: number, fechaPago: string | null) => Promise<void>;
+  currentNumeroOperacion: string | null;
+  onConfirm: (facturaId: number, payload: PagarFacturaPayload) => Promise<void>;
 }
 
 export function PagarFacturaModal({
-  open, onClose, facturaId, numeroFactura, currentFechaPago, onConfirm,
+  open, onClose, facturaId, numeroFactura, currentFechaPago, currentNumeroOperacion, onConfirm,
 }: PagarFacturaModalProps) {
   const [loading, setLoading] = useState(false);
-  const [fechaPago, setFechaPago] = useState(currentFechaPago ?? "");
+  const [fechaPago, setFechaPago] = useState("");
+  const [numeroOperacion, setNumeroOperacion] = useState("");
+
+  useEffect(() => {
+    if (!open) return;
+    setFechaPago(currentFechaPago ?? "");
+    setNumeroOperacion(currentNumeroOperacion ?? "");
+  }, [open, currentFechaPago, currentNumeroOperacion]);
 
   const handleConfirm = async () => {
+    const numeroOperacionValue = numeroOperacion.trim();
+    if (!fechaPago || !numeroOperacionValue) return;
     setLoading(true);
     try {
-      await onConfirm(facturaId, fechaPago || null);
+      await onConfirm(facturaId, {
+        fechaPago: fechaPago || null,
+        numeroOperacion: numeroOperacionValue,
+      });
       onClose();
     } finally {
       setLoading(false);
@@ -60,12 +79,20 @@ export function PagarFacturaModal({
             <DatePickerInput value={fechaPago}
               onChange={setFechaPago} className="bg-card" />
           </FormField>
+          <FormField label="Número de operación *">
+            <Input
+              value={numeroOperacion}
+              onChange={(event) => setNumeroOperacion(event.target.value)}
+              placeholder="Ej: OP-123456"
+              className="bg-card"
+            />
+          </FormField>
           <DialogFooter className="flex-row justify-end gap-2 pt-2">
             <Button variant="outline" onClick={onClose} disabled={loading}
               className="rounded-lg border-gray-200 text-gray-600 hover:bg-gray-50">
               Cancelar
             </Button>
-            <Button onClick={handleConfirm} disabled={loading || !fechaPago}
+            <Button onClick={handleConfirm} disabled={loading || !fechaPago || !numeroOperacion.trim()}
               className="rounded-lg font-semibold bg-emerald-500 hover:bg-emerald-600 text-white">
               {loading ? <><Spinner className="mr-2 h-4 w-4" />Registrando...</> : "Confirmar pago"}
             </Button>

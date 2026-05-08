@@ -26,8 +26,8 @@ import { EditarCierreModal } from "@/components/editar-cierre-modal";
 import { CierresTable } from "@/components/cierres-table";
 import { FacturaSortDir, FacturaSortKey, FacturaStatusFilter, FacturasTable } from "@/components/facturas-table";
 import { NuevaFacturaModal } from "@/components/nueva-factura-modal";
-import { EmitirFacturaModal } from "@/components/emitir-factura-modal";
-import { PagarFacturaModal } from "@/components/pagar-factura-modal";
+import { EmitirFacturaModal, EmitirFacturaPayload } from "@/components/emitir-factura-modal";
+import { PagarFacturaModal, PagarFacturaPayload } from "@/components/pagar-factura-modal";
 import { EditarFacturaModal } from "@/components/editar-factura-modal";
 import { AnularFacturaModal } from "@/components/anular-factura-modal";
 import { EstadoFacturaLabel } from "@/models/enums/EstadoFactura";
@@ -796,21 +796,21 @@ export default function ContabilidadPage() {
     } catch (err) { handleError(err); throw err; }
   };
 
-  const handleEmitir = async (facturaId: number, fechaEmision: string, fechaPago: string | null) => {
+  const handleEmitir = async (facturaId: number, payload: EmitirFacturaPayload) => {
     if (!session) return;
     try {
       const updated = await apiFetch<FacturaProveedorResponse>(`/api/facturas/proveedor/${facturaId}/emitir`,
-        { method: "PATCH", body: JSON.stringify({ fechaEmision, fechaPago }) }, session.token);
+        { method: "PATCH", body: JSON.stringify(payload) }, session.token);
       setFacturas((prev) => prev.map((f) => f.id === facturaId ? updated : f));
       toast({ title: "Factura emitida" });
     } catch (err) { handleError(err); throw err; }
   };
 
-  const handlePagar = async (facturaId: number, fechaPago: string | null) => {
+  const handlePagar = async (facturaId: number, payload: PagarFacturaPayload) => {
     if (!session) return;
     try {
       const updated = await apiFetch<FacturaProveedorResponse>(`/api/facturas/proveedor/${facturaId}/pagar`,
-        { method: "PATCH", body: JSON.stringify({ fechaPago }) }, session.token);
+        { method: "PATCH", body: JSON.stringify(payload) }, session.token);
       setFacturas((prev) => prev.map((f) => f.id === facturaId ? updated : f));
       toast({ title: "Pago registrado" });
     } catch (err) { handleError(err); throw err; }
@@ -1451,12 +1451,16 @@ export default function ContabilidadPage() {
 
       {emitirFactura && (
         <EmitirFacturaModal open={!!emitirFactura} onClose={() => setEmitirFactura(null)}
-          facturaId={emitirFactura.id} numeroFactura={emitirFactura.numero} onConfirm={handleEmitir} />
+          facturaId={emitirFactura.id} numeroFactura={emitirFactura.numero}
+          currentNumeroOperacion={emitirFactura.numeroOperacion}
+          onConfirm={handleEmitir} />
       )}
       {pagarFactura && (
         <PagarFacturaModal open={!!pagarFactura} onClose={() => setPagarFactura(null)}
           facturaId={pagarFactura.id} numeroFactura={pagarFactura.numero}
-          currentFechaPago={pagarFactura.fechaPago} onConfirm={handlePagar} />
+          currentFechaPago={pagarFactura.fechaPago}
+          currentNumeroOperacion={pagarFactura.numeroOperacion}
+          onConfirm={handlePagar} />
       )}
       {editarFactura && (
         <EditarFacturaModal open={!!editarFactura} onClose={() => setEditarFactura(null)}
