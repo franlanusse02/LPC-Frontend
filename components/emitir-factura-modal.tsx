@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Dialog, DialogContent, DialogHeader,
   DialogTitle, DialogFooter, DialogDescription,
@@ -10,32 +10,50 @@ import { Spinner } from "@/components/ui/spinner";
 import { Send } from "lucide-react";
 import { FormField } from "./form-field";
 import { DatePickerInput } from "./date-picker-input";
+import { Input } from "@/components/ui/input";
+
+export interface EmitirFacturaPayload {
+  fechaEmision: string;
+  fechaPago: string | null;
+  numeroOperacion: string | null;
+}
 
 interface EmitirFacturaModalProps {
   open: boolean;
   onClose: () => void;
   facturaId: number;
   numeroFactura: string;
-  onConfirm: (facturaId: number, fechaEmision: string, fechaPago: string | null) => Promise<void>;
+  currentNumeroOperacion: string | null;
+  onConfirm: (facturaId: number, payload: EmitirFacturaPayload) => Promise<void>;
 }
 
 export function EmitirFacturaModal({
-  open, onClose, facturaId, numeroFactura, onConfirm,
+  open, onClose, facturaId, numeroFactura, currentNumeroOperacion, onConfirm,
 }: EmitirFacturaModalProps) {
   const [loading, setLoading] = useState(false);
-  const [fechaEmision, setFechaEmision] = useState(() => new Date().toISOString().split("T")[0]);
+  const [fechaEmision, setFechaEmision] = useState("");
   const [fechaPago, setFechaPago] = useState("");
+  const [numeroOperacion, setNumeroOperacion] = useState("");
+
+  useEffect(() => {
+    if (!open) return;
+    setFechaEmision(new Date().toISOString().split("T")[0]);
+    setFechaPago("");
+    setNumeroOperacion(currentNumeroOperacion ?? "");
+  }, [open, currentNumeroOperacion]);
 
   const handleConfirm = async () => {
     if (!fechaEmision) return;
     setLoading(true);
     try {
-      await onConfirm(facturaId, fechaEmision, fechaPago || null);
+      await onConfirm(facturaId, {
+        fechaEmision,
+        fechaPago: fechaPago || null,
+        numeroOperacion: numeroOperacion.trim() || null,
+      });
       onClose();
     } finally {
       setLoading(false);
-      setFechaEmision("");
-      setFechaPago("");
     }
   };
 
@@ -64,6 +82,14 @@ export function EmitirFacturaModal({
           <FormField label="Fecha de pago (opcional)">
             <DatePickerInput value={fechaPago}
               onChange={setFechaPago} className="bg-card" />
+          </FormField>
+          <FormField label="Número de operación">
+            <Input
+              value={numeroOperacion}
+              onChange={(event) => setNumeroOperacion(event.target.value)}
+              placeholder="Ej: OP-123456"
+              className="bg-card"
+            />
           </FormField>
           <DialogFooter className="flex-row justify-end gap-2 pt-2">
             <Button variant="outline" onClick={onClose} disabled={loading}
