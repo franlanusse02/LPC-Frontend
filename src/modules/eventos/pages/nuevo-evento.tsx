@@ -62,8 +62,6 @@ export default function NuevoEventoPage() {
         solicitante: solicitante || null,
         cantidadPersonas: cantidadPersonas ? Number(cantidadPersonas) : null,
         montoTotal: montoTotal ? Number(montoTotal) : null,
-        edificioId: null,
-        salaId: null,
         funcionario: null,
         centroCosto: null,
         oficina: null,

@@ -97,8 +97,6 @@ function EventoDetail({
         }
       />
       <DetailField label="Centro de costo" value={evento.centroCosto} />
-      <DetailField label="Edificio" value={evento.edificioNombre} />
-      <DetailField label="Sala" value={evento.salaNombre} />
       <DetailField label="Funcionario" value={evento.funcionario} />
       <DetailField label="Oficina" value={evento.oficina} />
       <DetailField label="Responsable" value={evento.responsable} />

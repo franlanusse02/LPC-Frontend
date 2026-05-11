@@ -6,8 +6,6 @@ export type CreateEventoRequest = {
   solicitante: string | null;
   cantidadPersonas: number | null;
 
-  edificioId: number | null;
-  salaId: number | null;
   funcionario: string | null;
   centroCosto: string | null;
   oficina: string | null;

@@ -24,8 +24,6 @@ export type PatchEventoRequest = {
   lugar?: string | null;
   area?: string | null;
   oficina?: string | null;
-  edificioId?: number | null;
-  salaId?: number | null;
   destinatarioFactura?: string | null;
   tipoComprobante?: string | null;
   numeroComprobante?: string | null;

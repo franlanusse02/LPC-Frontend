@@ -21,10 +21,6 @@ export type EventoResponse = {
   responsable: string | null;
   cantidadPersonas: number | null;
 
-  edificioId: number | null;
-  edificioNombre: string | null;
-  salaId: number | null;
-  salaNombre: string | null;
   centroCosto: string | null;
   oficina: string | null;
   empresa: string | null;

@@ -24,8 +24,6 @@ import ConsumidoresPage from "./modules/catalogo/pages/consumidores";
 import ProveedoresPage from "./modules/catalogo/pages/proveedores";
 import BancosPage from "./modules/catalogo/pages/bancos";
 import TiposEventoPage from "./modules/catalogo/pages/tipos-eventos";
-import EdificiosPage from "./modules/catalogo/pages/edificios";
-import SalasPage from "./modules/catalogo/pages/salas";
 import SociedadesPage from "./modules/catalogo/pages/sociedades";
 import ComprasEncargado from "./modules/compras/pages/ComprasEncargado";
 import NuevaFacturaPage from "./modules/compras/pages/nueva-factura";
@@ -146,8 +144,6 @@ export default function App() {
                   path="/catalogo/tipos-eventos"
                   element={<TiposEventoPage />}
                 />
-                <Route path="/catalogo/edificios" element={<EdificiosPage />} />
-                <Route path="/catalogo/salas" element={<SalasPage />} />
               </Route>
             </Route>
           </Route>

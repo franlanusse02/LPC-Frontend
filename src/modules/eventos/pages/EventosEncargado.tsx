@@ -41,8 +41,6 @@ function EventoDetail({ evento, comedorName }: { evento: EventoResponse; comedor
       <DetailField label="Precio unitario" value={evento.precioUnitario !== null ? fmtCurrency(evento.precioUnitario!) : null} />
       <DetailField label="Monto total" value={evento.montoTotal !== null ? fmtCurrency(evento.montoTotal!) : null} />
       <DetailField label="Centro de costo" value={evento.centroCosto} />
-      <DetailField label="Edificio" value={evento.edificioNombre} />
-      <DetailField label="Sala" value={evento.salaNombre} />
       <DetailField label="Funcionario" value={evento.funcionario} />
       <DetailField label="Oficina" value={evento.oficina} />
       <DetailField label="Responsable" value={evento.responsable} />
