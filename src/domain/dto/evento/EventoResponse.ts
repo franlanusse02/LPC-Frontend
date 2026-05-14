@@ -3,55 +3,38 @@ import type { MedioPago } from "@/domain/enums/MedioPago";
 
 export type EventoResponse = {
   id: number;
+  puntoDeVentaId: number;
   comedorId: number;
-  tipoEventoId: number | null;
-  tipoEventoNombre: string | null;
-  fechaEvento: string;
+  tipoEventoId: number;
+  tipoEventoNombre: string;
   estado: EstadoEvento;
-  medioPago: MedioPago | null;
-  fechaEmision: string | null;
-  fechaPago: string | null;
-  precioUnitario: number | null;
-  montoTotal: number | null;
-
-  // Campos comunes
-  solicitante: string | null;
-  emailSolicitante: string | null;
-  funcionario: string | null;
-  responsable: string | null;
-  cantidadPersonas: number | null;
-
-  centroCosto: string | null;
-  oficina: string | null;
-  empresa: string | null;
-  destinatarioFactura: string | null;
-
-  // UDESA
-  area: string | null;
-
-  // BBVA
-  lugar: string | null;
-  numeroOperacion: string | null;
-
-  // Compartido: UDESA (nro pedido), BBVA (nro orden), TECHINT (nro pedido)
-  numeroOrden: string | null;
-
-  // TECHINT
-  concepto: string | null;
-  tipoComprobante: string | null;
-  numeroComprobante: string | null;
-  observaciones: string | null;
-  retenciones: number | null;
-
-  // Factura PDF adjunta
-  facturaPdfObjectKey: string | null;
-  facturaPdfNombreArchivo: string | null;
-  facturaPdfContentType: string | null;
-  facturaPdfByteSize: number | null;
-  facturaPdfSubidoEn: string | null;
-
+  medioPago: MedioPago;
+  fechaEvento: string;
+  fechaEmision: string;
+  fechaPago: string;
+  solicitanteId: number;
+  emailSolicitante: string;
+  funcionarioId: number;
+  funcionarioNombre: string;
+  responsableId: number;
+  responsabeNombre: string;
+  cantidadPersonas: number;
+  precioUnitario: number;
+  montoTotal: number;
+  numeroOperacion: string;
+  razonSocial: string;
+  destinatarioFacturacion: string;
+  tipoComprobante: string;
+  numeroComprobante: string;
+  observaciones: string;
+  retenciones: number;
+  facturaPdfObjectKey: string;
+  facturaPdfNombreArchivo: string;
+  facturaPdfContentType: string;
+  facturaPdfByteSize: number;
+  facturaPdfSubidoEn: string;
   creadoEn: string;
-  actualizadoEn: string | null;
-  creadoPorId: number | null;
-  anulacionId: number | null;
+  actualizadoEn: string;
+  creadoPorId: number;
+  anulacionId: number;
 };

@@ -4,4 +4,5 @@ export type TipoEventoResponse = {
   precio: number | null;
   comedorId: number;
   activo: boolean;
+  sapId: string;
 };

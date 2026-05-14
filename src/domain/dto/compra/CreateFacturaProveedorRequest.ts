@@ -1,4 +1,5 @@
 import type { MedioPago } from "@/domain/enums/MedioPago";
+import type { FacturaPuntoDeVentaMontoRequest } from "@/domain/dto/compra/FacturaPuntoDeVentaMontoRequest";
 
 export type CreateFacturaProveedorRequest = {
   numero: string;
@@ -7,7 +8,8 @@ export type CreateFacturaProveedorRequest = {
   fechaFactura: string;
   monto: number;
   comentarios?: string;
-  puntoDeVenta?: number | null;
+  puntoDeVentaProveedor?: number | null;
+  puntoDeVentaComedor: FacturaPuntoDeVentaMontoRequest[];
   numeroOperacion?: string;
   medioPago?: MedioPago | null;
   bancoId?: number | null;

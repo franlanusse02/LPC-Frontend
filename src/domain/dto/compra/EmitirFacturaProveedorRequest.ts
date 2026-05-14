@@ -1,4 +1,5 @@
 export type EmitirFacturaProveedorRequest = {
     fechaEmision: string;
-    fechaPago: string;
+    fechaPago?: string;
+    numeroOperacion?: string;
 };
