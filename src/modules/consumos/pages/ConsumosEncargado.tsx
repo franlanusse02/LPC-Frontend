@@ -77,14 +77,14 @@ export default function ConsumosEncargado() {
   };
 
   return (
-    <div className="px-18 py-8">
-      <div className="max-w-3/4 mx-auto">
+    <div className="px-4 sm:px-8 lg:px-18 py-8">
+      <div className="max-w-7xl mx-auto">
         <Button variant="ghost" onClick={() => navigate("/encargado")}>
           <ArrowLeft className="h-4 w-4" />
           Volver
         </Button>
       </div>
-      <Card className="mx-auto max-w-3/4 py-6 border-0 shadow-md rounded-xl">
+      <Card className="mx-auto max-w-7xl py-6 border-0 shadow-md rounded-xl">
         <CardHeader className="border-b px-6 py-4">
           <div className="w-full flex flex-row justify-between">
             <CardTitle className="text-xl font-bold text-gray-800">

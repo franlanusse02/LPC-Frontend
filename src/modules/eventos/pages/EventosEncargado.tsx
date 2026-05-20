@@ -36,21 +36,15 @@ function EventoDetail({ evento, comedorName }: { evento: EventoResponse; comedor
     <div className="grid grid-cols-2 gap-x-8 gap-y-3 sm:grid-cols-3 lg:grid-cols-4">
       <DetailField label="Comedor" value={comedorName} />
       <DetailField label="Tipo de evento" value={evento.tipoEventoNombre} />
-      <DetailField label="Solicitante" value={evento.solicitante} />
+      <DetailField label="Solicitante" value={evento.solicitanteNombre} />
       <DetailField label="Cantidad personas" value={evento.cantidadPersonas} />
       <DetailField label="Precio unitario" value={evento.precioUnitario !== null ? fmtCurrency(evento.precioUnitario!) : null} />
       <DetailField label="Monto total" value={evento.montoTotal !== null ? fmtCurrency(evento.montoTotal!) : null} />
       <DetailField label="Centro de costo" value={evento.centroCosto} />
-      <DetailField label="Funcionario" value={evento.funcionario} />
-      <DetailField label="Oficina" value={evento.oficina} />
-      <DetailField label="Responsable" value={evento.responsable} />
-      <DetailField label="Empresa" value={evento.empresa} />
-      <DetailField label="Dest. facturación" value={evento.destinatarioFactura} />
-      <DetailField label="Área" value={evento.area} />
+      <DetailField label="Funcionario" value={evento.funcionarioNombre} />
+      <DetailField label="Responsable" value={evento.responsableNombre} />
+      <DetailField label="Dest. facturación" value={evento.destinatarioFacturacion} />
       <DetailField label="Email solicitante" value={evento.emailSolicitante} />
-      <DetailField label="Lugar" value={evento.lugar} />
-      <DetailField label="Nro. orden / pedido" value={evento.numeroOrden} />
-      <DetailField label="Concepto" value={evento.concepto} />
       <DetailField label="Observaciones" value={evento.observaciones} />
     </div>
   );
@@ -81,7 +75,7 @@ export default function EventosEncargado() {
     searchFields: (e) => [
       comedorNameById[e.comedorId] ?? "",
       e.tipoEventoNombre ?? "",
-      e.solicitante ?? "",
+      e.solicitanteNombre ?? "",
       e.fechaEvento,
     ],
     statusField: "estado",
@@ -98,14 +92,14 @@ export default function EventosEncargado() {
   const sortProps = { sortKey: sort.key, sortDir: sort.dir, onSort: sort.handleSort };
 
   return (
-    <div className="px-18 py-8">
-      <div className="max-w-2/3 mx-auto">
+    <div className="px-4 sm:px-8 lg:px-18 py-8">
+      <div className="max-w-7xl mx-auto">
         <Button variant="ghost" onClick={() => navigate("/encargado")}>
           <ArrowLeft className="h-4 w-4" />
           Volver
         </Button>
       </div>
-      <Card className="mx-auto max-w-2/3 py-6 border-0 shadow-md rounded-xl">
+      <Card className="mx-auto max-w-7xl py-6 border-0 shadow-md rounded-xl">
         <CardHeader className="border-b px-6 py-4">
           <div className="w-full flex flex-row justify-between">
             <CardTitle className="text-xl font-bold text-gray-800">Tus Eventos</CardTitle>
@@ -180,7 +174,7 @@ export default function EventosEncargado() {
                           {evento.tipoEventoNombre ?? <span className="text-gray-300">—</span>}
                         </td>
                         <td className="px-4 py-4 cursor-pointer" onClick={() => expansion.toggleRow(evento.id)}>
-                          {evento.solicitante ?? <span className="text-gray-300">—</span>}
+                          {evento.solicitanteNombre ?? <span className="text-gray-300">—</span>}
                         </td>
                         <td className="px-4 py-4 text-right font-mono cursor-pointer" onClick={() => expansion.toggleRow(evento.id)}>
                           {evento.cantidadPersonas?.toLocaleString("es-AR") ?? <span className="text-gray-300">—</span>}

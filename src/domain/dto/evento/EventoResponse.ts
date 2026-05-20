@@ -17,11 +17,14 @@ export type EventoResponse = {
   funcionarioId: number;
   funcionarioNombre: string;
   responsableId: number;
-  responsabeNombre: string;
+  responsableNombre: string;
+  solicitanteNombre: string;
   cantidadPersonas: number;
   precioUnitario: number;
   montoTotal: number;
   numeroOperacion: string;
+  centroCosto: string;
+  partida: string;
   razonSocial: string;
   destinatarioFacturacion: string;
   tipoComprobante: string;

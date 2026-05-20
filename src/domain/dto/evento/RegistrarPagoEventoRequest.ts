@@ -4,3 +4,4 @@ export type RegistrarPagoEventoRequest = {
   fechaPago: string;
   medioPago: MedioPago;
   numeroOperacion: string;
+};

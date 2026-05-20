@@ -33,10 +33,12 @@ export async function fetchWithAuth(
     return new Response(null, { status: 401, statusText: "Unauthorized" });
   }
 
+  const isFormData = options.body instanceof FormData;
+
   const response = await fetch(`${baseUrl}${path}`, {
     ...options,
     headers: {
-      "Content-Type": "application/json",
+      ...(isFormData ? {} : { "Content-Type": "application/json" }),
       ...options.headers,
       Authorization: `Bearer ${session.token}`,
     },

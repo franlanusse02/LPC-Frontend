@@ -84,14 +84,14 @@ export default function BancosPage() {
   const sociedadMap = new Map(sociedades.map((s) => [s.id, s.nombre]));
 
   return (
-    <div className="px-18 py-8">
-      <div className="max-w-2/3 mx-auto">
+    <div className="px-4 sm:px-8 lg:px-18 py-8">
+      <div className="max-w-7xl mx-auto">
         <Button variant="ghost" onClick={() => navigate(-1)}>
           <ArrowLeft className="h-4 w-4" /> Volver
         </Button>
       </div>
 
-      <Card className="mx-auto max-w-2/3 border-0 shadow-md mt-4">
+      <Card className="mx-auto max-w-7xl border-0 shadow-md mt-4">
         <CardHeader className="border-b px-6 py-4">
           <div className="flex flex-row justify-between w-full">
             <CardTitle className="tracking-wide">

@@ -3,12 +3,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useApi } from "@/hooks/useApi";
 import { cn, fmtCurrency } from "@/lib/utils";
 import { ArrowLeft, Ban, ChevronDown, ChevronUp, Plus } from "lucide-react";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { DataTable, SortableTh } from "@/components/data-table";
 import { FacturasStatusFilter } from "../components/filters/FacturasStatusFilter";
 import { useTableState } from "@/hooks/useTableState";
 import type { FacturaProveedorResponse } from "@/domain/dto/compra/FacturaProveedorResponse";
+import type { ComedorResponse } from "@/domain/dto/comedor/ComedorResponse";
 
 const ESTADO_STYLES: Record<
   string,
@@ -25,12 +26,26 @@ export default function ComprasEncargado() {
   const { get } = useApi();
 
   const [facturas, setFacturas] = useState<FacturaProveedorResponse[]>([]);
+  const [comedores, setComedores] = useState<ComedorResponse[]>([]);
 
   useEffect(() => {
-    get("/facturas/proveedor/mis-facturas")
-      .then((r) => r.json())
-      .then((data) => setFacturas(Array.isArray(data) ? data : []));
+    Promise.all([get("/facturas/proveedor/mis-facturas"), get("/comedores")]).then(
+      ([facturasRes, comedoresRes]) => {
+        facturasRes.json().then((data) => setFacturas(Array.isArray(data) ? data : []));
+        comedoresRes.json().then(setComedores);
+      },
+    );
   }, [get]);
+
+  const posNameById = useMemo(() => {
+    const map: Record<number, string> = {};
+    for (const c of comedores) {
+      for (const pv of c.puntosDeVenta ?? []) {
+        map[pv.id] = pv.nombre;
+      }
+    }
+    return map;
+  }, [comedores]);
 
   const { displayed, sort, expansion, filters } = useTableState(facturas, {
     searchFields: (f) => [
@@ -51,14 +66,14 @@ export default function ComprasEncargado() {
   const sortProps = { sortKey: sort.key, sortDir: sort.dir, onSort: sort.handleSort };
 
   return (
-    <div className="px-18 py-8">
-      <div className="max-w-2/3 mx-auto">
+    <div className="px-4 sm:px-8 lg:px-18 py-8">
+      <div className="max-w-7xl mx-auto">
         <Button variant="ghost" onClick={() => navigate("/encargado")}>
           <ArrowLeft className="h-4 w-4" />
           Volver
         </Button>
       </div>
-      <Card className="mx-auto max-w-2/3 py-6 border-0 shadow-md rounded-xl">
+      <Card className="mx-auto max-w-7xl py-6 border-0 shadow-md rounded-xl">
         <CardHeader className="border-b px-6 py-4">
           <div className="w-full flex flex-row justify-between">
             <CardTitle className="text-xl font-bold text-gray-800">
@@ -117,6 +132,7 @@ export default function ComprasEncargado() {
                    const isExpanded = expansion.expandedRows.has(factura.id);
                    const isAnulada = factura.estado === "ANULADA";
                    const styles = ESTADO_STYLES[factura.estado];
+                   const posSplits = factura.puntoDeVentaComedor ?? [];
 
                    return (
                      <Fragment key={factura.id}>
@@ -209,23 +225,13 @@ export default function ComprasEncargado() {
                                  <thead>
                                    <tr className="bg-gray-100 text-left text-xs uppercase text-gray-500 tracking-wider">
                                      <th className="px-4 py-2.5">N° Factura</th>
-                                     <th className="px-4 py-2.5">
-                                       Fecha Factura
-                                     </th>
-                                     <th className="px-4 py-2.5">
-                                       Fecha Emisi\u00f3n
-                                     </th>
+                                     <th className="px-4 py-2.5">Fecha Factura</th>
+                                     <th className="px-4 py-2.5">Fecha Emisión</th>
                                      <th className="px-4 py-2.5">Fecha Pago</th>
-                                     <th className="px-4 py-2.5">
-                                       N\u00ba Operaci\u00f3n
-                                     </th>
-                                     <th className="px-4 py-2.5 text-right">
-                                       Monto
-                                     </th>
+                                     <th className="px-4 py-2.5">Nº Operación</th>
+                                     <th className="px-4 py-2.5 text-right">Monto</th>
                                      <th className="px-4 py-2.5">Banco</th>
-                                     <th className="px-4 py-2.5">
-                                       Medio de Pago
-                                     </th>
+                                     <th className="px-4 py-2.5">Medio de Pago</th>
                                    </tr>
                                  </thead>
                                  <tbody>
@@ -237,37 +243,52 @@ export default function ComprasEncargado() {
                                        {factura.fechaFactura}
                                      </td>
                                      <td className="px-4 py-2.5 text-gray-600 whitespace-nowrap">
-                                       {factura.fechaEmision || (
-                                         <span className="text-gray-300">—</span>
-                                       )}
+                                       {factura.fechaEmision || <span className="text-gray-300">—</span>}
                                      </td>
                                      <td className="px-4 py-2.5 text-gray-600 whitespace-nowrap">
-                                       {factura.fechaPago || (
-                                         <span className="text-gray-300">—</span>
-                                       )}
+                                       {factura.fechaPago || <span className="text-gray-300">—</span>}
                                      </td>
                                      <td className="px-4 py-2.5 text-gray-600">
-                                       {factura.numeroOperacion || (
-                                         <span className="text-gray-300">—</span>
-                                       )}
+                                       {factura.numeroOperacion || <span className="text-gray-300">—</span>}
                                      </td>
                                      <td className="px-4 py-2.5 text-right font-mono">
                                        {fmtCurrency(factura.monto)}
                                      </td>
                                      <td className="px-4 py-2.5 text-gray-600">
-                                       {factura.bancoNombre || (
-                                         <span className="text-gray-300">—</span>
-                                       )}
+                                       {factura.bancoNombre || <span className="text-gray-300">—</span>}
                                      </td>
                                      <td className="px-4 py-2.5 text-gray-600">
-                                       {factura.medioPago || (
-                                         <span className="text-gray-300">—</span>
-                                       )}
+                                       {factura.medioPago || <span className="text-gray-300">—</span>}
                                      </td>
                                    </tr>
                                  </tbody>
                                </table>
                              </div>
+
+                             {posSplits.length > 0 && (
+                               <div className="mt-3 rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+                                 <table className="w-full text-sm">
+                                   <thead>
+                                     <tr className="bg-gray-100 text-left text-xs uppercase text-gray-500 tracking-wider">
+                                       <th className="px-4 py-2.5">Punto de Venta</th>
+                                       <th className="px-4 py-2.5 text-right">Monto</th>
+                                     </tr>
+                                   </thead>
+                                   <tbody className="divide-y divide-gray-100">
+                                     {posSplits.map((split) => (
+                                       <tr key={split.puntoDeVentaId} className="hover:bg-white transition-colors">
+                                         <td className="px-4 py-2.5 text-gray-700">
+                                           {posNameById[split.puntoDeVentaId] ?? `Punto de venta #${split.puntoDeVentaId}`}
+                                         </td>
+                                         <td className="px-4 py-2.5 text-right font-mono text-gray-700">
+                                           {fmtCurrency(split.monto)}
+                                         </td>
+                                       </tr>
+                                     ))}
+                                   </tbody>
+                                 </table>
+                               </div>
+                             )}
                            </td>
                          </tr>
                        )}

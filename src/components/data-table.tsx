@@ -85,6 +85,7 @@ export interface DataTableProps {
   displayedCount: number;
   toolbarLeft?: ReactNode;
   toolbarRight?: ReactNode;
+  selectionToolbar?: ReactNode;
   columns: ReactNode;
   rows: ReactNode;
 }
@@ -93,17 +94,22 @@ export function DataTable({
   displayedCount,
   toolbarLeft,
   toolbarRight,
+  selectionToolbar,
   columns,
   rows,
 }: DataTableProps) {
   return (
     <>
-      {(toolbarLeft || toolbarRight) && (
+      {selectionToolbar ? (
+        <div className="flex flex-wrap items-center gap-2 px-6 py-3 border-b bg-blue-50/60">
+          {selectionToolbar}
+        </div>
+      ) : (toolbarLeft || toolbarRight) ? (
         <div className="flex flex-wrap items-center gap-2 px-6 py-4 border-b">
           {toolbarLeft}
           {toolbarRight && <div className="ml-auto">{toolbarRight}</div>}
         </div>
-      )}
+      ) : null}
 
       {displayedCount === 0 ? (
         <div className="flex flex-col items-center gap-2 py-16 text-gray-400">

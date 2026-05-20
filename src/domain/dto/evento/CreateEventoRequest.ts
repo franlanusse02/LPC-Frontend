@@ -9,12 +9,12 @@ export type CreateEventoRequest = {
   funcionarioId?: number | null;
   responsableId?: number | null;
   cantidadPersonas?: number | null;
-  montoTotal: number;
+  montoTotal?: number | null;
   numeroOperacion?: string | null;
   centroCosto?: string | null;
   partida?: string | null;
   razonSocial?: string | null;
-  MedioPago?: MedioPago | null;
+  medioPago?: MedioPago | null;
   destinatarioFacturacion?: string | null;
   tipoComprobante?: string | null;
   numeroComprobante?: string | null;

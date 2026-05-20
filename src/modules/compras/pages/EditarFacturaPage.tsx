@@ -63,7 +63,7 @@ export default function EditarFacturaPage() {
     setMonto(String(factura.monto));
     setComentarios(factura.comentarios ?? "");
     setPuntoDeVenta(
-      factura.puntoDeVenta != null ? String(factura.puntoDeVenta) : "",
+      factura.puntoDeVentaProveedor != null ? String(factura.puntoDeVentaProveedor) : "",
     );
     setNumeroOperacion(factura.numeroOperacion ?? "");
     setMedioPago(factura.medioPago ?? "");
@@ -80,7 +80,7 @@ export default function EditarFacturaPage() {
         fechaFactura,
         monto: Number(monto),
         comentarios: comentarios || undefined,
-        puntoDeVenta: puntoDeVenta ? Number(puntoDeVenta) : null,
+        puntoDeVentaProveedor: puntoDeVenta ? Number(puntoDeVenta) : null,
         numeroOperacion: numeroOperacion || undefined,
         medioPago: medioPago || null,
       };

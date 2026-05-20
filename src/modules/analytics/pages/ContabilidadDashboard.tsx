@@ -1,3 +1,4 @@
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Card,
@@ -19,16 +20,62 @@ import {
   Truck,
   Landmark,
   Tag,
+  FileSpreadsheet,
 } from "lucide-react";
 import TotalesContabilidad from "@/modules/analytics/components/totales";
+import {
+  ListFilters,
+  defaultFilters,
+  type ListFilterState,
+} from "@/components/ListFilters";
+import { useApi } from "@/hooks/useApi";
+import type { ComedorResponse } from "@/domain/dto/comedor/ComedorResponse";
+import type { SociedadResponse } from "@/domain/dto/sociedad/SociedadResponse";
 
 export default function ContabilidadDashboard() {
   const navigate = useNavigate();
+  const { get } = useApi();
+
+  const [comedores, setComedores] = useState<ComedorResponse[]>([]);
+  const [sociedades, setSociedades] = useState<SociedadResponse[]>([]);
+  const [filters, setFilters] = useState<ListFilterState>(defaultFilters);
+
+  useEffect(() => {
+    Promise.all([get("/comedores"), get("/sociedades")]).then(
+      ([comedoresRes, sociedadesRes]) => {
+        comedoresRes.json().then(setComedores);
+        sociedadesRes.json().then(setSociedades);
+      },
+    );
+  }, [get]);
+
+  const analyticsFilters = useMemo(
+    () => ({
+      fechaInicio: filters.desde || undefined,
+      fechaFin: filters.hasta || undefined,
+      comedorId: filters.comedorId || undefined,
+      sociedadId: filters.sociedadId || undefined,
+      puntoDeVentaId: filters.puntoDeVentaId || undefined,
+    }),
+    [filters],
+  );
 
   return (
     <div>
-      <TotalesContabilidad />
-      <main className="mx-auto max-w-1/2 py-10 space-y-6">
+      <TotalesContabilidad filters={analyticsFilters} />
+
+      <div className="mx-auto max-w-4xl px-6 pt-4 pb-2">
+        <div className="rounded-xl bg-white px-5 py-4 shadow-sm">
+          <ListFilters
+            filters={filters}
+            onChange={setFilters}
+            comedores={comedores}
+            sociedades={sociedades}
+          />
+        </div>
+      </div>
+
+      <main className="mx-auto max-w-4xl px-6 py-6 space-y-6">
         <Card className="border border-gray-200 shadow-sm">
           <CardHeader className="border-b px-6 py-4">
             <CardTitle className="text-lg font-semibold text-gray-800">
@@ -174,6 +221,18 @@ export default function ContabilidadDashboard() {
               </div>
               <span className="text-xs font-medium text-gray-700 text-center leading-tight">
                 Tipos de Evento
+              </span>
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => navigate("/contabilidad/importar")}
+              className="flex flex-col items-center justify-center gap-2 h-20 px-3 rounded-lg border-gray-200 hover:bg-gray-50 hover:border-gray-300"
+            >
+              <div className="flex items-center justify-center w-8 h-8 rounded-md bg-gray-100">
+                <FileSpreadsheet className="h-4 w-4 text-gray-600" />
+              </div>
+              <span className="text-xs font-medium text-gray-700 text-center leading-tight">
+                Importar Excel
               </span>
             </Button>
           </CardContent>

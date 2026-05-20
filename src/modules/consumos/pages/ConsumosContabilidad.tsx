@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useApi } from "@/hooks/useApi";
 import { cn, fmtCurrency } from "@/lib/utils";
-import { ArrowLeft, Ban, MoreHorizontal } from "lucide-react";
+import { ArrowLeft, Ban, Download, MoreHorizontal } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { DataTable, FilterPills, SortableTh } from "@/components/data-table";
@@ -17,18 +17,28 @@ import { ConsumosStatusFilter } from "../components/filters/ConsumosStatusFilter
 import { AnularConsumoModal } from "../components/AnularConsumoModal";
 import { toast } from "sonner";
 import { useTableState } from "@/hooks/useTableState";
+import { useRowSelection } from "@/hooks/useRowSelection";
+import { BulkActionModal } from "@/components/BulkActionModal";
+import { handleBulkResponse } from "@/lib/bulk-utils";
+import { exportToXlsx, type ExportColumn } from "@/lib/exportXlsx";
+import type { BulkActionResponse } from "@/domain/dto/shared/BulkActionResponse";
 
 import { StatCard } from "@/modules/cierres/components/cierre-stat";
 import type { ConsumidorResponse } from "@/domain/dto/consumo/ConsumidorResponse";
 import type { PuntoDeVentaResponse } from "@/domain/dto/pto-venta/PuntoDeVentaResponse";
 import type { ComedorResponse } from "@/domain/dto/comedor/ComedorResponse";
+import {
+  ListFilters,
+  defaultFilters,
+  type ListFilterState,
+} from "@/components/ListFilters";
 
 import type { ConsumoResponse } from "@/domain/dto/consumo/ConsumoResponse";
 import type { AgrupadosResponse } from "@/domain/dto/consumo/AgrupadosResponse";
 
 export default function ConsumosContabilidad() {
   const navigate = useNavigate();
-  const { get, del } = useApi();
+  const { get, post, del } = useApi();
 
   const [consumos, setConsumos] = useState<ConsumoResponse[]>([]);
   const [consumidores, setConsumidores] = useState<ConsumidorResponse[]>([]);
@@ -42,8 +52,7 @@ export default function ConsumosContabilidad() {
   const [viewMode, setViewMode] = useState<"detailed" | "grouped">("detailed");
   const [agrupados, setAgrupados] = useState<AgrupadosResponse[]>([]);
 
-  const [dateDesde, setDateDesde] = useState("");
-  const [dateHasta, setDateHasta] = useState("");
+  const [listFilters, setListFilters] = useState<ListFilterState>(defaultFilters);
 
   useEffect(() => {
     Promise.all([
@@ -84,10 +93,17 @@ export default function ConsumosContabilidad() {
 
   const consumosAfterDateFilter = useMemo(() => {
     let list = [...consumos];
-    if (dateDesde) list = list.filter((c) => c.fecha >= dateDesde);
-    if (dateHasta) list = list.filter((c) => c.fecha <= dateHasta);
+    if (listFilters.desde) list = list.filter((c) => c.fecha >= listFilters.desde);
+    if (listFilters.hasta) list = list.filter((c) => c.fecha <= listFilters.hasta);
+    if (listFilters.comedorId) {
+      const cId = Number(listFilters.comedorId);
+      list = list.filter((c) => {
+        const cons = consumidorById[c.consumidorId];
+        return cons?.comedorId === cId;
+      });
+    }
     return list;
-  }, [consumos, dateDesde, dateHasta]);
+  }, [consumos, listFilters, consumidorById]);
 
   const { displayed, sort, filters } = useTableState(consumosAfterDateFilter, {
     searchFields: (c) => [
@@ -106,10 +122,10 @@ export default function ConsumosContabilidad() {
 
   const groupedAfterDateFilter = useMemo(() => {
     let list = [...agrupados];
-    if (dateDesde) list = list.filter((a) => a.fecha >= dateDesde);
-    if (dateHasta) list = list.filter((a) => a.fecha <= dateHasta);
+    if (listFilters.desde) list = list.filter((a) => a.fecha >= listFilters.desde);
+    if (listFilters.hasta) list = list.filter((a) => a.fecha <= listFilters.hasta);
     return list;
-  }, [agrupados, dateDesde, dateHasta]);
+  }, [agrupados, listFilters.desde, listFilters.hasta]);
 
   const { displayed: groupedDisplayed, sort: groupedSort } = useTableState(
     groupedAfterDateFilter,
@@ -143,6 +159,59 @@ export default function ConsumosContabilidad() {
     onSort: sort.handleSort,
   };
 
+  const selection = useRowSelection();
+
+  const [bulkAnularOpen, setBulkAnularOpen] = useState(false);
+  const [bulkMotivo, setBulkMotivo] = useState("");
+
+  const selectedConsumos = displayed.filter((c) => selection.selected.has(c.id));
+  const allAnulable = selectedConsumos.length > 0 && selectedConsumos.every((c) => c.anulacion === null);
+
+  const selectableIds = displayed.filter((c) => c.anulacion === null).map((c) => c.id);
+
+  const refetchConsumos = () => {
+    get("/consumos")
+      .then((r) => r.json())
+      .then((data) => setConsumos(Array.isArray(data) ? data : []));
+  };
+
+  const handleBulkAnular = async () => {
+    const res = await post("/consumos/bulk/anular", {
+      ids: [...selection.selected],
+      motivo: bulkMotivo,
+    }).then((r) => r.json() as Promise<BulkActionResponse>);
+    handleBulkResponse(res, "Anulación");
+    selection.clear();
+    refetchConsumos();
+    setBulkMotivo("");
+  };
+
+  const exportColumns: ExportColumn<ConsumoResponse>[] = [
+    { key: "id", header: "ID" },
+    { key: (c) => { const cons = consumidorById[c.consumidorId]; return cons ? (comedorNameById[cons.comedorId] ?? cons.comedorId) : "—"; }, header: "Comedor" },
+    { key: (c) => puntoDeVentaNameById[c.PuntoDeVentaId] ?? c.PuntoDeVentaId, header: "Punto de Venta" },
+    { key: (c) => consumidorById[c.consumidorId]?.nombre ?? c.consumidorId, header: "Consumidor" },
+    { key: "fecha", header: "Fecha" },
+    { key: "total", header: "Total" },
+    { key: (c) => c.anulacion ? "Anulado" : "Activo", header: "Estado" },
+    { key: "observaciones", header: "Observaciones" },
+    { key: (c) => c.productos.map((p) => `${p.producto.nombre} x${p.cantidad}`).join(", "), header: "Productos" },
+    { key: "creadoEn", header: "Creado en" },
+    { key: "actualizadoEn", header: "Actualizado en" },
+  ];
+
+  const handleExport = () => {
+    const data = selection.count > 0
+      ? displayed.filter((c) => selection.selected.has(c.id))
+      : displayed;
+    const segments = ["consumos"];
+    if (filters.status !== "all") segments.push(filters.status);
+    if (listFilters.comedorId) segments.push(`comedor-${listFilters.comedorId}`);
+    if (listFilters.desde) segments.push(`desde-${listFilters.desde}`);
+    if (listFilters.hasta) segments.push(`hasta-${listFilters.hasta}`);
+    exportToXlsx({ data, columns: exportColumns, filename: segments.join("-") });
+  };
+
   const groupedSortProps = {
     sortKey: groupedSort.key,
     sortDir: groupedSort.dir,
@@ -160,15 +229,15 @@ export default function ConsumosContabilidad() {
   const isFiltered = displayed.length !== consumos.length;
 
   return (
-    <div className="px-18 py-8">
-      <div className="max-w-3/4 mx-auto">
+    <div className="px-4 sm:px-8 lg:px-18 py-8">
+      <div className="max-w-7xl mx-auto">
         <Button variant="ghost" onClick={() => navigate("/contabilidad")}>
           <ArrowLeft className="h-4 w-4" />
           Volver
         </Button>
       </div>
 
-      <div className="mx-auto max-w-3/4 grid grid-cols-2 gap-4 sm:grid-cols-5 pb-4">
+      <div className="mx-auto max-w-7xl grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5 pb-4">
         <StatCard label="Total consumos" value={consumos.length} />
         <StatCard label="Activos" value={totalActivos} accent="emerald" />
         <StatCard label="Anulados" value={totalAnulados} accent="red" />
@@ -180,29 +249,15 @@ export default function ConsumosContabilidad() {
         />
       </div>
 
-      <Card className="mx-auto max-w-3/4 py-6 border-0 shadow-md rounded-xl">
+      <Card className="mx-auto max-w-7xl py-6 border-0 shadow-md rounded-xl">
         <CardHeader className="border-b px-6 py-4">
           <div className="flex flex-row justify-between">
             <CardTitle className="text-xl font-bold text-gray-800">
               Consumos
             </CardTitle>
           </div>
-          <div className="flex flex-wrap items-center gap-2 pt-3">
-            <div className="flex items-center gap-1">
-              <Input
-                type="date"
-                value={dateDesde}
-                onChange={(e) => setDateDesde(e.target.value)}
-                className="h-8 w-36 text-sm bg-gray-50 border-gray-200"
-              />
-              <span className="text-xs text-gray-400">—</span>
-              <Input
-                type="date"
-                value={dateHasta}
-                onChange={(e) => setDateHasta(e.target.value)}
-                className="h-8 w-36 text-sm bg-gray-50 border-gray-200"
-              />
-            </div>
+          <div className="pt-3">
+            <ListFilters filters={listFilters} onChange={setListFilters} comedores={comedores} showSociedad={false} />
           </div>
         </CardHeader>
         <CardContent className="p-0">
@@ -211,6 +266,33 @@ export default function ConsumosContabilidad() {
               viewMode === "detailed"
                 ? displayed.length
                 : groupedDisplayed.length
+            }
+            selectionToolbar={
+              viewMode === "detailed" && selection.count > 0 ? (
+                <div className="flex items-center gap-3">
+                  <span className="text-sm font-medium">
+                    {selection.count} seleccionado{selection.count !== 1 ? "s" : ""}
+                  </span>
+                  {allAnulable && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="text-red-600 border-red-200 hover:bg-red-50"
+                      onClick={() => setBulkAnularOpen(true)}
+                    >
+                      <Ban className="size-4 mr-1.5" />
+                      Anular
+                    </Button>
+                  )}
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={selection.clear}
+                  >
+                    Deseleccionar
+                  </Button>
+                </div>
+              ) : undefined
             }
             toolbarLeft={
               <div className="flex flex-wrap items-center gap-2">
@@ -239,9 +321,28 @@ export default function ConsumosContabilidad() {
                 )}
               </div>
             }
+            toolbarRight={
+              viewMode === "detailed" ? (
+                <Button variant="outline" size="sm" onClick={handleExport}>
+                  <Download className="size-4 mr-1.5" />
+                  {selection.count > 0 ? `Exportar (${selection.count})` : "Exportar Excel"}
+                </Button>
+              ) : undefined
+            }
             columns={
               viewMode === "detailed" ? (
                 <>
+                  <th className="px-4 py-3 w-10">
+                    <input
+                      type="checkbox"
+                      className="rounded border-gray-300"
+                      checked={selection.isAllSelected(selectableIds)}
+                      ref={(el) => {
+                        if (el) el.indeterminate = selection.isSomeSelected() && !selection.isAllSelected(selectableIds);
+                      }}
+                      onChange={() => selection.toggleAll(selectableIds)}
+                    />
+                  </th>
                   <SortableTh label="Fecha" col="fecha" {...sortProps} />
                   <th className="px-4 py-3">Comedor</th>
                   <th className="px-4 py-3">Punto de Venta</th>
@@ -304,6 +405,15 @@ export default function ConsumosContabilidad() {
                             : "hover:bg-gray-50/80",
                         )}
                       >
+                        <td className="px-4 py-4">
+                          <input
+                            type="checkbox"
+                            className="rounded border-gray-300"
+                            disabled={isAnulado}
+                            checked={selection.selected.has(consumo.id)}
+                            onChange={() => selection.toggle(consumo.id)}
+                          />
+                        </td>
                         <td className="px-4 py-4 font-medium whitespace-nowrap">
                           {consumo.fecha}
                         </td>
@@ -437,6 +547,27 @@ export default function ConsumosContabilidad() {
         }
         onConfirm={handleAnular}
       />
+
+      <BulkActionModal
+        open={bulkAnularOpen}
+        onClose={() => { setBulkAnularOpen(false); setBulkMotivo(""); }}
+        title="Anular consumos"
+        description="Se anularán"
+        confirmLabel="Anular"
+        confirmColor="red"
+        count={selection.count}
+        onConfirm={handleBulkAnular}
+        canConfirm={bulkMotivo.trim().length > 0}
+      >
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Motivo de anulación</label>
+          <Input
+            value={bulkMotivo}
+            onChange={(e) => setBulkMotivo(e.target.value)}
+            placeholder="Ingrese el motivo..."
+          />
+        </div>
+      </BulkActionModal>
     </div>
   );
 }

@@ -1,9 +1,9 @@
 import type { MedioPago } from "@/domain/enums/MedioPago";
-import type { FacturaProveedorMontoRequest } from "@/domain/dto/compra/FacturaProveedorMontoRequest";
+import type { FacturaPuntoDeVentaMontoRequest } from "@/domain/dto/compra/FacturaPuntoDeVentaMontoRequest";
 
 export type PatchFacturaProveedorRequest = {
     puntoDeVentaProveedor?: number | null;
-    puntoDeVentaComedor?: FacturaProveedorMontoRequest[];
+    puntoDeVentaComedor?: FacturaPuntoDeVentaMontoRequest[];
     comedorId?: number;
     fechaFactura?: string;
     numeroFactura?: string;

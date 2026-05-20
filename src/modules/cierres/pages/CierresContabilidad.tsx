@@ -7,10 +7,11 @@ import {
   Ban,
   ChevronDown,
   ChevronUp,
+  Download,
   MoreHorizontal,
   Pencil,
 } from "lucide-react";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { DetailedCierreCajaResponse } from "@/domain/dto/cierre-caja/CierreCajaResponse";
 import type { MovimientoResponse } from "@/domain/dto/movimiento/MovimientoResponse";
@@ -24,27 +25,49 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
 import { AnularCierreModal } from "@/modules/cierres/components/anular-cierre-modal";
 import { useTableState } from "@/hooks/useTableState";
+import { useRowSelection } from "@/hooks/useRowSelection";
+import { BulkActionModal } from "@/components/BulkActionModal";
+import { handleBulkResponse } from "@/lib/bulk-utils";
 import { StatCard } from "../components/cierre-stat";
+import { ListFilters, defaultFilters, type ListFilterState } from "@/components/ListFilters";
+import type { BulkActionResponse } from "@/domain/dto/shared/BulkActionResponse";
+import { exportToXlsx, type ExportColumn } from "@/lib/exportXlsx";
+import type { ComedorResponse } from "@/domain/dto/comedor/ComedorResponse";
 
 export default function CierresContabilidad() {
   const navigate = useNavigate();
-  const { get, del } = useApi();
+  const { get, post, del } = useApi();
 
   const [cierres, setCierres] = useState<DetailedCierreCajaResponse[]>([]);
+  const [comedores, setComedores] = useState<ComedorResponse[]>([]);
+  const [listFilters, setListFilters] = useState<ListFilterState>(defaultFilters);
 
   const [anularCierreModalOpen, setAnularCierreModalOpen] = useState(false);
   const [selectedCierre, setSelectedCierre] =
     useState<DetailedCierreCajaResponse | null>(null);
 
   useEffect(() => {
-    get("/cierres")
-      .then((r) => r.json())
-      .then(setCierres);
+    Promise.all([get("/cierres"), get("/comedores")]).then(
+      ([cierresRes, comedoresRes]) => {
+        cierresRes.json().then(setCierres);
+        comedoresRes.json().then(setComedores);
+      },
+    );
   }, [get]);
 
-  const { displayed, sort, expansion, filters } = useTableState(cierres, {
+  const cierresAfterFilters = useMemo(() => {
+    let list = cierres;
+    if (listFilters.desde) list = list.filter((c) => c.fechaOperacion >= listFilters.desde);
+    if (listFilters.hasta) list = list.filter((c) => c.fechaOperacion <= listFilters.hasta);
+    if (listFilters.comedorId) list = list.filter((c) => c.comedor.id === Number(listFilters.comedorId));
+    if (listFilters.puntoDeVentaId) list = list.filter((c) => c.puntoDeVenta.id === Number(listFilters.puntoDeVentaId));
+    return list;
+  }, [cierres, listFilters]);
+
+  const { displayed, sort, expansion, filters } = useTableState(cierresAfterFilters, {
     searchFields: (c) => [
       c.comedor.nombre,
       c.puntoDeVenta.nombre,
@@ -86,6 +109,60 @@ export default function CierresContabilidad() {
     onSort: sort.handleSort,
   };
 
+  const selection = useRowSelection();
+
+  const [bulkAnular, setBulkAnular] = useState(false);
+  const [bulkMotivo, setBulkMotivo] = useState("");
+
+  const selectedCierres = displayed.filter((c) => selection.selected.has(c.id));
+  const allAnulable = selectedCierres.length > 0 && selectedCierres.every((c) => !c.anulacionId);
+
+  const selectableIds = displayed.filter((c) => !c.anulacionId).map((c) => c.id);
+
+  const refetchCierres = () => {
+    get("/cierres").then((r) => r.json()).then(setCierres);
+  };
+
+  const handleBulkAnular = async () => {
+    const res = await post("/cierres/bulk/anular", {
+      ids: [...selection.selected],
+      motivo: bulkMotivo,
+    }).then((r) => r.json() as Promise<BulkActionResponse>);
+    handleBulkResponse(res, "Anulación");
+    selection.clear();
+    refetchCierres();
+    setBulkMotivo("");
+  };
+
+  const exportColumns: ExportColumn<DetailedCierreCajaResponse>[] = [
+    { key: "id", header: "ID" },
+    { key: (c) => c.comedor.nombre, header: "Comedor" },
+    { key: (c) => c.puntoDeVenta.nombre, header: "Punto de Venta" },
+    { key: (c) => c.creadoPor.nombre, header: "Creado por" },
+    { key: "fechaOperacion", header: "Fecha Operación" },
+    { key: "totalPlatosVendidos", header: "Platos Vendidos" },
+    { key: "montoTotal", header: "Monto Total" },
+    { key: (c) => c.anulacionId ? "Anulado" : "Activo", header: "Estado" },
+    { key: "comentarios", header: "Comentarios" },
+    { key: (c) => c.movimientos?.length ?? 0, header: "Movimientos" },
+    { key: "createdAt", header: "Creado en" },
+  ];
+
+  const handleExport = () => {
+    const data = selection.count > 0
+      ? displayed.filter((c) => selection.selected.has(c.id))
+      : displayed;
+    const segments = ["cierres"];
+    if (filters.status !== "all") segments.push(filters.status);
+    if (listFilters.comedorId) {
+      const name = comedores.find((c) => c.id === Number(listFilters.comedorId))?.nombre;
+      if (name) segments.push(name.toLowerCase().replace(/\s+/g, "-"));
+    }
+    if (listFilters.desde) segments.push(`desde-${listFilters.desde}`);
+    if (listFilters.hasta) segments.push(`hasta-${listFilters.hasta}`);
+    exportToXlsx({ data, columns: exportColumns, filename: segments.join("-") });
+  };
+
   const totalActivos = cierres.filter((c) => !c.anulacionId).length;
   const totalAnulados = cierres.filter((c) => !!c.anulacionId).length;
   const montoTotal = cierres
@@ -97,15 +174,15 @@ export default function CierresContabilidad() {
   const isFiltered = displayed.length !== cierres.length;
 
   return (
-    <div className="px-18 py-8">
-      <div className="max-w-2/3 mx-auto">
+    <div className="px-4 sm:px-8 lg:px-18 py-8">
+      <div className="max-w-7xl mx-auto">
         <Button variant="ghost" onClick={() => navigate("/contabilidad")}>
           <ArrowLeft className="h-4 w-4" />
           Volver
         </Button>
       </div>
 
-      <div className="mx-auto max-w-2/3 grid grid-cols-2 gap-4 sm:grid-cols-5 pb-4">
+      <div className="mx-auto max-w-7xl grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5 pb-4">
         <StatCard label="Total cierres" value={cierres.length} />
         <StatCard label="Activos" value={totalActivos} accent="emerald" />
         <StatCard label="Anulados" value={totalAnulados} accent="red" />
@@ -117,17 +194,42 @@ export default function CierresContabilidad() {
         />
       </div>
 
-      <Card className="mx-auto max-w-2/3 py-6 border-0 shadow-md rounded-xl">
+      <Card className="mx-auto max-w-7xl py-6 border-0 shadow-md rounded-xl">
         <CardHeader className="border-b px-6 py-4">
           <div className="flex flex-row justify-between">
             <CardTitle className="text-xl font-bold text-gray-800">
               Cierres
             </CardTitle>
           </div>
+          <div className="pt-3">
+            <ListFilters
+              filters={listFilters}
+              onChange={setListFilters}
+              comedores={comedores}
+              showSociedad={false}
+            />
+          </div>
         </CardHeader>
         <CardContent className="p-0">
           <DataTable
             displayedCount={displayed.length}
+            selectionToolbar={
+              selection.count > 0 ? (
+                <div className="flex items-center gap-3">
+                  <span className="text-sm font-medium text-blue-700">
+                    {selection.count} seleccionado{selection.count !== 1 ? "s" : ""}
+                  </span>
+                  {allAnulable && (
+                    <Button size="sm" variant="outline" className="gap-1.5 text-red-600 border-red-200 hover:bg-red-50" onClick={() => setBulkAnular(true)}>
+                      <Ban className="h-3.5 w-3.5" /> Anular
+                    </Button>
+                  )}
+                  <Button size="sm" variant="ghost" className="text-gray-500 text-xs" onClick={selection.clear}>
+                    Deseleccionar
+                  </Button>
+                </div>
+              ) : undefined
+            }
             toolbarLeft={
               <div className="flex flex-wrap items-center gap-2">
                 <CierresStatusFilter
@@ -136,8 +238,22 @@ export default function CierresContabilidad() {
                 />
               </div>
             }
+            toolbarRight={
+              <Button variant="outline" size="sm" onClick={handleExport}>
+                <Download className="size-4 mr-1.5" />
+                {selection.count > 0 ? `Exportar (${selection.count})` : "Exportar Excel"}
+              </Button>
+            }
             columns={
               <>
+                <th className="px-4 py-3 w-8">
+                  <input
+                    type="checkbox"
+                    checked={selection.isAllSelected(selectableIds)}
+                    onChange={() => selection.toggleAll(selectableIds)}
+                    className="h-4 w-4 rounded border-gray-300"
+                  />
+                </th>
                 <th className="px-4 py-3 w-8" />
                 <SortableTh label="Fecha" col="fechaOperacion" {...sortProps} />
                 <SortableTh label="Comedor" col="comedor" {...sortProps} />
@@ -184,8 +300,18 @@ export default function CierresContabilidad() {
                           isAnulado
                             ? "bg-red-50/30 text-gray-400"
                             : "hover:bg-gray-50/80",
+                          selection.selected.has(cierre.id) && "bg-blue-50/40",
                         )}
                       >
+                        <td className="px-4 py-4" onClick={(e) => e.stopPropagation()}>
+                          <input
+                            type="checkbox"
+                            checked={selection.selected.has(cierre.id)}
+                            onChange={() => selection.toggle(cierre.id)}
+                            disabled={isAnulado}
+                            className="h-4 w-4 rounded border-gray-300 disabled:opacity-30"
+                          />
+                        </td>
                         <td
                           className="px-4 py-4 cursor-pointer text-gray-400 hover:text-gray-600"
                           onClick={() => expansion.toggleRow(cierre.id)}
@@ -298,7 +424,7 @@ export default function CierresContabilidad() {
 
                       {isExpanded && (
                         <tr className="bg-gray-50/60">
-                          <td colSpan={10} className="px-8 py-4">
+                          <td colSpan={11} className="px-8 py-4">
                             {movimientos.length === 0 ? (
                               <p className="text-sm italic text-gray-400">
                                 Sin movimientos registrados
@@ -355,6 +481,23 @@ export default function CierresContabilidad() {
         cierre={selectedCierre}
         onConfirm={handleAnularCierre}
       />
+
+      <BulkActionModal
+        open={bulkAnular}
+        onClose={() => setBulkAnular(false)}
+        title="Anular cierres"
+        description="Se anularán"
+        confirmLabel="Anular"
+        confirmColor="red"
+        count={selection.count}
+        canConfirm={!!bulkMotivo.trim()}
+        onConfirm={handleBulkAnular}
+      >
+        <div className="space-y-1">
+          <label className="text-xs font-medium text-gray-500">Motivo *</label>
+          <Input value={bulkMotivo} onChange={(e) => setBulkMotivo(e.target.value)} className="bg-card" placeholder="Motivo de anulación" />
+        </div>
+      </BulkActionModal>
     </div>
   );
 }

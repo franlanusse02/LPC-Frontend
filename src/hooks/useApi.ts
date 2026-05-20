@@ -49,5 +49,16 @@ export function useApi() {
     [],
   );
 
-  return { get, post, put, patch, del };
+  const postFile = useCallback(
+    (path: string, formData: FormData, options?: RequestInit) =>
+      fetchWithAuth(path, {
+        baseUrl: BASE_URL,
+        method: "POST",
+        body: formData,
+        ...options,
+      }),
+    [],
+  );
+
+  return { get, post, put, patch, del, postFile };
 }

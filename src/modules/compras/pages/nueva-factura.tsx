@@ -1,6 +1,6 @@
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { MediosPagoDict } from "@/domain/enums/MedioPago";
 import { useApi } from "@/hooks/useApi";
@@ -15,10 +15,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Combobox } from "@/components/ui/combobox";
+import { cn, fmtCurrency } from "@/lib/utils";
 import type { CreateFacturaProveedorRequest } from "@/domain/dto/compra/CreateFacturaProveedorRequest";
 import type { ProveedorResponse } from "@/domain/dto/proveedor/ProveedorResponse";
 import type { ComedorResponse } from "@/domain/dto/comedor/ComedorResponse";
 import type { MedioPago } from "@/domain/enums/MedioPago";
+
+type PosLinea = { puntoDeVentaId: string; monto: string };
 
 export default function NuevaFacturaPage() {
   const navigate = useNavigate();
@@ -34,9 +38,9 @@ export default function NuevaFacturaPage() {
   const [numero, setNumero] = useState("");
   const [monto, setMonto] = useState("");
   const [comentarios, setComentarios] = useState("");
-  const [puntoDeVenta, setPuntoDeVenta] = useState("");
   const [medioPago, setMedioPago] = useState<MedioPago | "">("");
   const [loading, setLoading] = useState(false);
+  const [posLineas, setPosLineas] = useState<PosLinea[]>([]);
 
   useEffect(() => {
     Promise.all([get("/proveedores"), get("/comedores")]).then(
@@ -50,8 +54,20 @@ export default function NuevaFacturaPage() {
   const selectedProveedor = proveedores.find(
     (p) => p.id === Number(proveedorId),
   );
-  const requiresPuntoDeVenta =
+  const requiresPuntoDeVentaProveedor =
     selectedProveedor && selectedProveedor.puntosDeVenta.length > 0;
+
+  const selectedComedor = comedores.find((c) => c.id === Number(comedorId));
+  const comedorPosOptions = useMemo(
+    () =>
+      (selectedComedor?.puntosDeVenta ?? []).map((pv) => ({
+        value: String(pv.id),
+        label: pv.nombre,
+      })),
+    [selectedComedor],
+  );
+
+  const [puntoDeVentaProveedor, setPuntoDeVentaProveedor] = useState("");
 
   useEffect(() => {
     if (selectedProveedor?.formaDePagoPredeterminada) {
@@ -59,8 +75,16 @@ export default function NuevaFacturaPage() {
     } else {
       setMedioPago("");
     }
-    setPuntoDeVenta("");
+    setPuntoDeVentaProveedor("");
   }, [proveedorId, selectedProveedor]);
+
+  useEffect(() => {
+    setPosLineas([]);
+  }, [comedorId]);
+
+  const posSum = posLineas.reduce((s, l) => s + (Number(l.monto) || 0), 0);
+  const montoNum = Number(monto) || 0;
+  const posMismatch = posLineas.length > 0 && montoNum > 0 && Math.abs(posSum - montoNum) > 0.01;
 
   const canSubmit =
     proveedorId &&
@@ -68,7 +92,23 @@ export default function NuevaFacturaPage() {
     fechaFactura &&
     numero &&
     monto &&
-    (!requiresPuntoDeVenta || puntoDeVenta);
+    (!requiresPuntoDeVentaProveedor || puntoDeVentaProveedor) &&
+    (posLineas.length === 0 || posLineas.every((l) => l.puntoDeVentaId && Number(l.monto) > 0)) &&
+    !posMismatch;
+
+  const addPosLinea = () => {
+    setPosLineas((prev) => [...prev, { puntoDeVentaId: "", monto: "" }]);
+  };
+
+  const updatePosLinea = (idx: number, field: keyof PosLinea, value: string) => {
+    setPosLineas((prev) =>
+      prev.map((l, i) => (i === idx ? { ...l, [field]: value } : l)),
+    );
+  };
+
+  const removePosLinea = (idx: number) => {
+    setPosLineas((prev) => prev.filter((_, i) => i !== idx));
+  };
 
   const handleSubmit = async () => {
     if (!canSubmit) return;
@@ -82,7 +122,13 @@ export default function NuevaFacturaPage() {
         fechaFactura,
         monto: Number(monto),
         comentarios: comentarios || undefined,
-        puntoDeVenta: puntoDeVenta ? Number(puntoDeVenta) : undefined,
+        puntoDeVentaProveedor: puntoDeVentaProveedor
+          ? Number(puntoDeVentaProveedor)
+          : undefined,
+        puntoDeVentaComedor: posLineas.map((l) => ({
+          puntoDeVentaId: Number(l.puntoDeVentaId),
+          monto: Number(l.monto),
+        })),
         medioPago: medioPago || undefined,
       };
 
@@ -210,14 +256,14 @@ export default function NuevaFacturaPage() {
                   </Select>
                 </div>
 
-                {requiresPuntoDeVenta && (
+                {requiresPuntoDeVentaProveedor && (
                   <div className="space-y-1.5">
                     <label className="text-sm font-medium">
-                      Punto de venta *
+                      Punto de venta (proveedor) *
                     </label>
                     <Select
-                      value={puntoDeVenta}
-                      onValueChange={setPuntoDeVenta}
+                      value={puntoDeVentaProveedor}
+                      onValueChange={setPuntoDeVentaProveedor}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Seleccionar..." />
@@ -230,6 +276,104 @@ export default function NuevaFacturaPage() {
                         ))}
                       </SelectContent>
                     </Select>
+                  </div>
+                )}
+
+                {comedorId && comedorPosOptions.length > 0 && (
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <label className="text-sm font-medium">
+                        Puntos de venta (comedor)
+                      </label>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={addPosLinea}
+                        className="gap-1.5 text-xs"
+                      >
+                        <Plus className="h-3.5 w-3.5" /> Agregar
+                      </Button>
+                    </div>
+
+                    {posLineas.length === 0 && (
+                      <p className="text-xs text-gray-400">
+                        Sin split por punto de venta. Se asigna todo el monto al comedor.
+                      </p>
+                    )}
+
+                    {posLineas.map((linea, idx) => {
+                      const usedIds = posLineas
+                        .filter((_, i) => i !== idx)
+                        .map((l) => l.puntoDeVentaId);
+                      const availableOptions = comedorPosOptions.filter(
+                        (o) => !usedIds.includes(o.value),
+                      );
+
+                      return (
+                        <div key={idx} className="flex items-end gap-2">
+                          <div className="flex-1">
+                            {idx === 0 && (
+                              <span className="text-xs text-gray-500 mb-1 block">
+                                Punto de venta
+                              </span>
+                            )}
+                            <Combobox
+                              options={availableOptions}
+                              value={linea.puntoDeVentaId}
+                              onChange={(v) =>
+                                updatePosLinea(idx, "puntoDeVentaId", v)
+                              }
+                              placeholder="Seleccionar punto de venta..."
+                            />
+                          </div>
+                          <div className="w-36">
+                            {idx === 0 && (
+                              <span className="text-xs text-gray-500 mb-1 block">
+                                Monto
+                              </span>
+                            )}
+                            <Input
+                              type="number"
+                              min="0"
+                              value={linea.monto}
+                              onChange={(e) =>
+                                updatePosLinea(idx, "monto", e.target.value)
+                              }
+                              placeholder="0"
+                            />
+                          </div>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="h-9 w-9 text-gray-400 hover:text-red-500"
+                            onClick={() => removePosLinea(idx)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      );
+                    })}
+
+                    {posLineas.length > 0 && (
+                      <div
+                        className={cn(
+                          "flex items-center justify-between rounded-md border px-3 py-2 text-sm",
+                          posMismatch
+                            ? "border-amber-300 bg-amber-50 text-amber-700"
+                            : "border-gray-200 bg-gray-50 text-gray-600",
+                        )}
+                      >
+                        <span>Suma puntos de venta: {fmtCurrency(posSum)}</span>
+                        <span>Monto factura: {fmtCurrency(montoNum)}</span>
+                        {posMismatch && (
+                          <span className="text-xs font-medium">
+                            Diferencia: {fmtCurrency(Math.abs(posSum - montoNum))}
+                          </span>
+                        )}
+                      </div>
+                    )}
                   </div>
                 )}
 

@@ -35,6 +35,8 @@ import ConsumosContabilidad from "./modules/consumos/pages/ConsumosContabilidad"
 import EventosEncargado from "./modules/eventos/pages/EventosEncargado";
 import NuevoEventoPage from "./modules/eventos/pages/nuevo-evento";
 import EventosContabilidad from "./modules/eventos/pages/EventosContabilidad";
+import ImportarPage from "./modules/imports/pages/ImportarPage";
+import ImportJobPage from "./modules/imports/pages/ImportJobPage";
 
 export default function App() {
   return (
@@ -122,6 +124,14 @@ export default function App() {
                 <Route
                   path="/contabilidad/eventos"
                   element={<EventosContabilidad />}
+                />
+                <Route
+                  path="/contabilidad/importar"
+                  element={<ImportarPage />}
+                />
+                <Route
+                  path="/contabilidad/importar/:type/:jobId"
+                  element={<ImportJobPage />}
                 />
 
                 {/* Catalogo */}
