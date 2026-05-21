@@ -51,7 +51,6 @@ export default function ImportarPage() {
       const form = new FormData();
       form.append("file", file);
       const res = await postFile(importType.endpoint, form);
-      if (!res.ok) throw new Error("Error al subir archivo");
       const job = (await res.json()) as ImportJob;
       toast("Archivo subido", { description: `Job #${job.id} creado.` });
       setFile(null);
@@ -59,7 +58,7 @@ export default function ImportarPage() {
       navigate(`/contabilidad/importar/${selectedType}/${job.id}`);
     } catch (err) {
       toast("Error", {
-        description: err instanceof Error ? err.message : "No se pudo subir el archivo",
+        description: err instanceof Error ? err.message : "No se pudo subir el archivo. Verificá el formato.",
       });
     } finally {
       setUploading(false);

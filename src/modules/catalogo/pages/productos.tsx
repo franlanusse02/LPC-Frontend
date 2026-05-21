@@ -96,7 +96,7 @@ export default function ProductosPage() {
 
   const handleSave = async () => {
     if (!nombre.trim() || !comedorId || !precio || Number(precio) <= 0) {
-      toast.error("Completá todos los campos");
+      toast.error("Completá el nombre, comedor y un precio válido.");
       return;
     }
     setSaving(true);
@@ -109,7 +109,6 @@ export default function ProductosPage() {
       const res = editing
         ? await patch(`/consumos/productos/${editing.productoId}`, body)
         : await post("/consumos/productos", body);
-      if (!res.ok) throw new Error();
       const saved = await res.json();
       setProductos((prev) =>
         editing
@@ -118,8 +117,8 @@ export default function ProductosPage() {
       );
       toast.success(editing ? "Producto actualizado" : "Producto creado");
       setModalOpen(false);
-    } catch {
-      toast.error("Error al guardar");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "No se pudo guardar el producto.");
     } finally {
       setSaving(false);
     }

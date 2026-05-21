@@ -1,18 +1,18 @@
 import { useCallback } from "react";
-import { fetchWithAuth } from "@/lib/api-client";
+import { fetchOrThrow } from "@/lib/api-client";
 
 export const BASE_URL = import.meta.env.VITE_API_URL ?? "";
 
 export function useApi() {
   const get = useCallback(
     (path: string, options?: RequestInit) =>
-      fetchWithAuth(path, { baseUrl: BASE_URL, ...options }),
+      fetchOrThrow(path, { baseUrl: BASE_URL, ...options }),
     [],
   );
 
   const post = useCallback(
     (path: string, body: unknown, options?: RequestInit) =>
-      fetchWithAuth(path, {
+      fetchOrThrow(path, {
         baseUrl: BASE_URL,
         method: "POST",
         body: JSON.stringify(body),
@@ -23,7 +23,7 @@ export function useApi() {
 
   const put = useCallback(
     (path: string, body: unknown, options?: RequestInit) =>
-      fetchWithAuth(path, {
+      fetchOrThrow(path, {
         baseUrl: BASE_URL,
         method: "PUT",
         body: JSON.stringify(body),
@@ -34,7 +34,7 @@ export function useApi() {
 
   const patch = useCallback(
     (path: string, body: unknown, options?: RequestInit) =>
-      fetchWithAuth(path, {
+      fetchOrThrow(path, {
         baseUrl: BASE_URL,
         method: "PATCH",
         body: JSON.stringify(body),
@@ -45,13 +45,13 @@ export function useApi() {
 
   const del = useCallback(
     (path: string, options?: RequestInit) =>
-      fetchWithAuth(path, { baseUrl: BASE_URL, method: "DELETE", ...options }),
+      fetchOrThrow(path, { baseUrl: BASE_URL, method: "DELETE", ...options }),
     [],
   );
 
   const postFile = useCallback(
     (path: string, formData: FormData, options?: RequestInit) =>
-      fetchWithAuth(path, {
+      fetchOrThrow(path, {
         baseUrl: BASE_URL,
         method: "POST",
         body: formData,

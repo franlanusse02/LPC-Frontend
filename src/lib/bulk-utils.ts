@@ -7,8 +7,11 @@ export function handleBulkResponse(res: BulkActionResponse, action: string) {
       description: `${res.exitosas} registro${res.exitosas !== 1 ? "s" : ""} procesado${res.exitosas !== 1 ? "s" : ""}.`,
     });
   } else {
+    const detail = res.errores.length > 0
+      ? res.errores[0].mensaje + (res.errores.length > 1 ? ` (+${res.errores.length - 1} más)` : "")
+      : "";
     toast(`${action} parcial`, {
-      description: `${res.exitosas} exitosa${res.exitosas !== 1 ? "s" : ""}, ${res.fallidas} fallida${res.fallidas !== 1 ? "s" : ""}. ${res.errores.map((e) => e.mensaje).join("; ")}`,
+      description: `${res.exitosas} exitosa${res.exitosas !== 1 ? "s" : ""}, ${res.fallidas} con error.${detail ? ` ${detail}` : ""}`,
     });
   }
 }

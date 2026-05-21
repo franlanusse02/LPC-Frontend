@@ -50,3 +50,21 @@ export async function fetchWithAuth(
 
   return response;
 }
+
+export async function fetchOrThrow(
+  path: string,
+  { baseUrl = "", ...options }: FetchOptions = {},
+): Promise<Response> {
+  const res = await fetchWithAuth(path, { baseUrl, ...options });
+  if (!res.ok) {
+    let msg: string;
+    try {
+      const body = await res.json();
+      msg = body.message ?? `Error ${res.status}`;
+    } catch {
+      msg = `Error ${res.status}`;
+    }
+    throw new Error(msg);
+  }
+  return res;
+}

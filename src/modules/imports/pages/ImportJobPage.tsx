@@ -66,14 +66,13 @@ export default function ImportJobPage() {
   const handleApplyAll = async () => {
     setApplying(true);
     try {
-      const res = await post(`${basePath}/apply-ready`, {});
-      if (!res.ok) throw new Error("Error al aplicar");
+      await post(`${basePath}/apply-ready`, {});
       toast("Aplicación completada");
       fetchJob();
       fetchRows();
     } catch (err) {
       toast("Error", {
-        description: err instanceof Error ? err.message : "No se pudieron aplicar las filas",
+        description: err instanceof Error ? err.message : "No se pudieron aplicar las filas.",
       });
     } finally {
       setApplying(false);
@@ -83,14 +82,13 @@ export default function ImportJobPage() {
   const handleCancel = async () => {
     setCancelling(true);
     try {
-      const res = await post(`${basePath}/cancel`, {});
-      if (!res.ok) throw new Error("Error al cancelar");
+      await post(`${basePath}/cancel`, {});
       toast("Job cancelado");
       fetchJob();
       fetchRows();
     } catch (err) {
       toast("Error", {
-        description: err instanceof Error ? err.message : "No se pudo cancelar",
+        description: err instanceof Error ? err.message : "No se pudo cancelar la importación.",
       });
     } finally {
       setCancelling(false);
@@ -99,41 +97,38 @@ export default function ImportJobPage() {
 
   const handleApplyRow = async (rowId: number) => {
     try {
-      const res = await post(`${basePath}/rows/${rowId}/apply`, {});
-      if (!res.ok) throw new Error("Error al aplicar fila");
+      await post(`${basePath}/rows/${rowId}/apply`, {});
       toast("Fila aplicada");
       fetchJob();
       fetchRows();
     } catch (err) {
       toast("Error", {
-        description: err instanceof Error ? err.message : "No se pudo aplicar",
+        description: err instanceof Error ? err.message : "No se pudo aplicar esta fila.",
       });
     }
   };
 
   const handleDeleteRow = async (rowId: number) => {
     try {
-      const res = await del(`${basePath}/rows/${rowId}`);
-      if (!res.ok) throw new Error("Error al eliminar fila");
+      await del(`${basePath}/rows/${rowId}`);
       toast("Fila eliminada");
       fetchJob();
       fetchRows();
     } catch (err) {
       toast("Error", {
-        description: err instanceof Error ? err.message : "No se pudo eliminar",
+        description: err instanceof Error ? err.message : "No se pudo eliminar la fila.",
       });
     }
   };
 
   const handleRevalidate = async (rowId: number) => {
     try {
-      const res = await post(`${basePath}/rows/${rowId}/revalidar`, {});
-      if (!res.ok) throw new Error("Error al revalidar");
+      await post(`${basePath}/rows/${rowId}/revalidar`, {});
       toast("Fila revalidada");
       fetchRows();
     } catch (err) {
       toast("Error", {
-        description: err instanceof Error ? err.message : "No se pudo revalidar",
+        description: err instanceof Error ? err.message : "No se pudo revalidar la fila.",
       });
     }
   };
