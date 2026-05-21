@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useApi } from "@/hooks/useApi";
 import { cn, fmtCurrency } from "@/lib/utils";
+import { StatCard } from "@/modules/cierres/components/cierre-stat";
 import { ArrowLeft, Ban, ChevronDown, ChevronUp, Plus } from "lucide-react";
 import { Fragment, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -27,15 +28,27 @@ export default function ComprasEncargado() {
 
   const [facturas, setFacturas] = useState<FacturaProveedorResponse[]>([]);
   const [comedores, setComedores] = useState<ComedorResponse[]>([]);
+  const [proveedores, setProveedores] = useState<{ id: number; nombre: string }[]>([]);
 
   useEffect(() => {
-    Promise.all([get("/facturas/proveedor/mis-facturas"), get("/comedores")]).then(
-      ([facturasRes, comedoresRes]) => {
+    Promise.all([get("/facturas/proveedor/mis-facturas"), get("/comedores"), get("/proveedores")]).then(
+      ([facturasRes, comedoresRes, proveedoresRes]) => {
         facturasRes.json().then((data) => setFacturas(Array.isArray(data) ? data : []));
         comedoresRes.json().then(setComedores);
+        proveedoresRes.json().then(setProveedores);
       },
     );
   }, [get]);
+
+  const proveedorNameById = useMemo(
+    () => Object.fromEntries(proveedores.map((p) => [p.id, p.nombre])),
+    [proveedores],
+  );
+
+  const comedorNameById = useMemo(
+    () => Object.fromEntries(comedores.map((c) => [c.id, c.nombre])),
+    [comedores],
+  );
 
   const posNameById = useMemo(() => {
     const map: Record<number, string> = {};
@@ -65,6 +78,14 @@ export default function ComprasEncargado() {
 
   const sortProps = { sortKey: sort.key, sortDir: sort.dir, onSort: sort.handleSort };
 
+  const totalActivos = facturas.filter((f) => f.estado !== "ANULADA").length;
+  const totalAnulados = facturas.filter((f) => f.estado === "ANULADA").length;
+  const montoTotal = facturas
+    .filter((f) => f.estado !== "ANULADA")
+    .reduce((s, f) => s + (f.monto ?? 0), 0);
+  const montoFiltrado = displayed.reduce((s, f) => s + (f.monto ?? 0), 0);
+  const isFiltered = displayed.length !== facturas.length;
+
   return (
     <div className="px-4 sm:px-8 lg:px-18 py-8">
       <div className="max-w-7xl mx-auto">
@@ -73,6 +94,19 @@ export default function ComprasEncargado() {
           Volver
         </Button>
       </div>
+
+      <div className="mx-auto max-w-7xl grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5 pb-4">
+        <StatCard label="Total facturas" value={facturas.length} />
+        <StatCard label="Activas" value={totalActivos} accent="emerald" />
+        <StatCard label="Anuladas" value={totalAnulados} accent="red" />
+        <StatCard label="Monto total" value={fmtCurrency(montoTotal)} />
+        <StatCard
+          label={isFiltered ? "Monto filtrado" : "Monto activo"}
+          value={fmtCurrency(isFiltered ? montoFiltrado : montoTotal)}
+          accent={isFiltered ? "blue" : undefined}
+        />
+      </div>
+
       <Card className="mx-auto max-w-7xl py-6 border-0 shadow-md rounded-xl">
         <CardHeader className="border-b px-6 py-4">
           <div className="w-full flex flex-row justify-between">
@@ -170,13 +204,13 @@ export default function ComprasEncargado() {
                            className="px-4 py-4 cursor-pointer"
                            onClick={() => expansion.toggleRow(factura.id)}
                          >
-                           {factura.proveedorId}
+                           {proveedorNameById[factura.proveedorId] ?? factura.proveedorId}
                          </td>
                          <td
                            className="px-4 py-4 cursor-pointer"
                            onClick={() => expansion.toggleRow(factura.id)}
                          >
-                           {factura.comedorId}
+                           {comedorNameById[factura.comedorId] ?? factura.comedorId}
                          </td>
                          <td
                            className="px-4 py-4 text-right font-mono cursor-pointer"

@@ -54,107 +54,107 @@ export default function App() {
               <Route path="/usuarios" element={<UsuariosPage />} />
               <Route path="/sociedades" element={<SociedadesPage />} />
             </Route>
+          </Route>
 
-            {/* Encargado */}
-            <Route element={<ProtectedRoute allowOnly="ENCARGADO" />}>
-              <Route element={<RootLayout />}>
-                <Route path="/encargado" element={<EncargadoDashboard />} />
-                <Route
-                  path="/encargado/cierres"
-                  element={<CierresEncargado />}
-                />
-                <Route
-                  path="/encargado/cierres/nuevo"
-                  element={<NuevoCierrePage />}
-                />
-                <Route
-                  path="/encargado/compras"
-                  element={<ComprasEncargado />}
-                />
-                <Route
-                  path="/encargado/compras/nueva"
-                  element={<NuevaFacturaPage />}
-                />
-                <Route
-                  path="/encargado/consumos"
-                  element={<ConsumosEncargado />}
-                />
-                <Route
-                  path="/encargado/consumos/nuevo"
-                  element={<NuevoConsumoPage />}
-                />
-                <Route
-                  path="/encargado/eventos"
-                  element={<EventosEncargado />}
-                />
-                <Route
-                  path="/encargado/eventos/nuevo"
-                  element={<NuevoEventoPage />}
-                />
-              </Route>
+          {/* Encargado */}
+          <Route element={<ProtectedRoute allowOnly="ENCARGADO" />}>
+            <Route element={<RootLayout />}>
+              <Route path="/encargado" element={<EncargadoDashboard />} />
+              <Route
+                path="/encargado/cierres"
+                element={<CierresEncargado />}
+              />
+              <Route
+                path="/encargado/cierres/nuevo"
+                element={<NuevoCierrePage />}
+              />
+              <Route
+                path="/encargado/compras"
+                element={<ComprasEncargado />}
+              />
+              <Route
+                path="/encargado/compras/nueva"
+                element={<NuevaFacturaPage />}
+              />
+              <Route
+                path="/encargado/consumos"
+                element={<ConsumosEncargado />}
+              />
+              <Route
+                path="/encargado/consumos/nuevo"
+                element={<NuevoConsumoPage />}
+              />
+              <Route
+                path="/encargado/eventos"
+                element={<EventosEncargado />}
+              />
+              <Route
+                path="/encargado/eventos/nuevo"
+                element={<NuevoEventoPage />}
+              />
             </Route>
+          </Route>
 
-            {/* Contabilidad */}
-            <Route element={<ProtectedRoute allowOnly="CONTABILIDAD" />}>
-              <Route element={<RootLayout />}>
-                <Route
-                  path="/contabilidad"
-                  element={<ContabilidadDashboard />}
-                />
-                <Route
-                  path="/contabilidad/cierres"
-                  element={<CierresContabilidad />}
-                />
-                <Route
-                  path="/contabilidad/cierres/:id"
-                  element={<EditarCierrePage />}
-                />
-                <Route
-                  path="/contabilidad/compras"
-                  element={<ComprasContabilidad />}
-                />
-                <Route
-                  path="/contabilidad/compras/:id/editar"
-                  element={<EditarFacturaPage />}
-                />
-                <Route
-                  path="/contabilidad/consumos"
-                  element={<ConsumosContabilidad />}
-                />
-                <Route
-                  path="/contabilidad/eventos"
-                  element={<EventosContabilidad />}
-                />
-                <Route
-                  path="/contabilidad/importar"
-                  element={<ImportarPage />}
-                />
-                <Route
-                  path="/contabilidad/importar/:type/:jobId"
-                  element={<ImportJobPage />}
-                />
+          {/* Contabilidad */}
+          <Route element={<ProtectedRoute allowOnly="CONTABILIDAD" />}>
+            <Route element={<RootLayout />}>
+              <Route
+                path="/contabilidad"
+                element={<ContabilidadDashboard />}
+              />
+              <Route
+                path="/contabilidad/cierres"
+                element={<CierresContabilidad />}
+              />
+              <Route
+                path="/contabilidad/cierres/:id"
+                element={<EditarCierrePage />}
+              />
+              <Route
+                path="/contabilidad/compras"
+                element={<ComprasContabilidad />}
+              />
+              <Route
+                path="/contabilidad/compras/:id/editar"
+                element={<EditarFacturaPage />}
+              />
+              <Route
+                path="/contabilidad/consumos"
+                element={<ConsumosContabilidad />}
+              />
+              <Route
+                path="/contabilidad/eventos"
+                element={<EventosContabilidad />}
+              />
+              <Route
+                path="/contabilidad/importar"
+                element={<ImportarPage />}
+              />
+              <Route
+                path="/contabilidad/importar/:type/:jobId"
+                element={<ImportJobPage />}
+              />
 
-                {/* Catalogo */}
-                <Route path="/catalogo/comedores" element={<ComedoresPage />} />
-                <Route
-                  path="/catalogo/puntos-de-venta"
-                  element={<PuntosDeVentaPage />}
-                />
-                <Route path="/catalogo/productos" element={<ProductosPage />} />
-                <Route
-                  path="/catalogo/consumidores"
-                  element={<ConsumidoresPage />}
-                />
-                <Route
-                  path="/catalogo/proveedores"
-                  element={<ProveedoresPage />}
-                />
-                <Route path="/catalogo/bancos" element={<BancosPage />} />
-                <Route
-                  path="/catalogo/tipos-eventos"
-                  element={<TiposEventoPage />}
-                />
-              </Route>
+              {/* Catalogo */}
+              <Route path="/catalogo/comedores" element={<ComedoresPage />} />
+              <Route
+                path="/catalogo/puntos-de-venta"
+                element={<PuntosDeVentaPage />}
+              />
+              <Route path="/catalogo/productos" element={<ProductosPage />} />
+              <Route
+                path="/catalogo/consumidores"
+                element={<ConsumidoresPage />}
+              />
+              <Route
+                path="/catalogo/proveedores"
+                element={<ProveedoresPage />}
+              />
+              <Route path="/catalogo/bancos" element={<BancosPage />} />
+              <Route
+                path="/catalogo/tipos-eventos"
+                element={<TiposEventoPage />}
+              />
             </Route>
           </Route>
         </Routes>

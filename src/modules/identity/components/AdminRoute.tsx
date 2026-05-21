@@ -10,7 +10,7 @@ export function AdminRoute() {
   if (!session?.rol) {
     return <Navigate to="/login" replace />;
   } else if (session?.rol.toUpperCase() === "ENCARGADO") {
-    return <Navigate to="/cierres" replace />;
+    return <Navigate to="/encargado" replace />;
   } else if (session?.rol.toUpperCase() === "CONTABILIDAD") {
     return <Navigate to="/contabilidad" replace />;
   }
