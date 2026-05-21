@@ -54,8 +54,12 @@ export default function LoginPage() {
       });
 
       if (!res.ok) {
-        const text = await res.text();
-        throw new Error(text || "Error al iniciar sesión");
+        let msg = "CUIL o contraseña incorrectos";
+        try {
+          const body = await res.json();
+          if (body.message) msg = body.message;
+        } catch { /* non-JSON */ }
+        throw new Error(msg);
       }
 
       const auth = (await res.json()) as LoginResponse;

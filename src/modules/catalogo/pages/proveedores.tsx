@@ -32,19 +32,18 @@ export default function ProveedoresPage() {
   const openEdit = (p: any) => { setEditing(p); setNombre(p.nombre); setTaxId(p.taxId); setModalOpen(true); };
 
   const handleSave = async () => {
-    if (!nombre.trim() || !taxId.trim()) { toast.error("Completá todos los campos"); return; }
+    if (!nombre.trim() || !taxId.trim()) { toast.error("Completá la razón social y el CUIT."); return; }
     setSaving(true);
     try {
       const body = { nombre: nombre.trim(), taxId: taxId.trim() };
       const res = editing
         ? await patch(`/proveedores/${editing.id}`, body)
         : await post("/proveedores", body);
-      if (!res.ok) throw new Error();
       const saved = (await res.json());
       setProveedores((prev) => editing ? prev.map((p) => (p.id === saved.id ? saved : p)) : [...prev, saved]);
       toast.success(editing ? "Proveedor actualizado" : "Proveedor creado");
       setModalOpen(false);
-    } catch { toast.error("Error al guardar"); }
+    } catch (err) { toast.error(err instanceof Error ? err.message : "No se pudo guardar el proveedor."); }
     finally { setSaving(false); }
   };
 

@@ -49,7 +49,7 @@ export default function BancosPage() {
 
   const handleSave = async () => {
     if (!nombre.trim() || !sociedadId) {
-      toast.error("Completá todos los campos");
+      toast.error("Completá el nombre y la sociedad del banco.");
       return;
     }
     setSaving(true);
@@ -58,7 +58,6 @@ export default function BancosPage() {
       const res = editing
         ? await patch(`/bancos/${editing.id}`, body)
         : await post("/bancos", body);
-      if (!res.ok) throw new Error();
       const saved = await res.json();
       setBancos((prev) =>
         editing
@@ -67,8 +66,8 @@ export default function BancosPage() {
       );
       toast.success(editing ? "Banco actualizado" : "Banco creado");
       setModalOpen(false);
-    } catch {
-      toast.error("Error al guardar");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "No se pudo guardar el banco.");
     } finally {
       setSaving(false);
     }

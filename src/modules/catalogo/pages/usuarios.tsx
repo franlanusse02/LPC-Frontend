@@ -106,7 +106,7 @@ export default function UsuariosPage() {
 
   const handleSave = async () => {
     if (!nombre.trim() || !cuil.trim() || (editing ? false : !rol || !password)) {
-      toast.error("Completá CUIL y nombre");
+      toast.error("Completá el CUIL, nombre, rol y contraseña.");
       return;
     }
     setSaving(true);
@@ -122,7 +122,6 @@ export default function UsuariosPage() {
       const res = editing
         ? await patch(`/usuarios/${editing.cuil}`, body)
         : await post("/usuarios/register", body);
-      if (!res.ok) throw new Error();
       const saved = (await res.json()) as UsuarioResponse;
       setUsuarios((prev) =>
         editing
@@ -131,8 +130,8 @@ export default function UsuariosPage() {
       );
       toast.success(editing ? "Usuario actualizado" : "Usuario creado");
       setModalOpen(false);
-    } catch {
-      toast.error("Error al guardar");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "No se pudo guardar el usuario.");
     } finally {
       setSaving(false);
     }

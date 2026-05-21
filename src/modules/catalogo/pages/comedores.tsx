@@ -82,7 +82,7 @@ export default function ComedoresPage() {
 
   const handleSave = async () => {
     if (!nombre.trim() || !sociedadId) {
-      toast.error("Completá todos los campos");
+      toast.error("Completá el nombre y la sociedad del comedor.");
       return;
     }
     setSaving(true);
@@ -91,7 +91,6 @@ export default function ComedoresPage() {
       const res = editing
         ? await patch(`/comedores/${editing.id}`, body)
         : await post("/comedores", body);
-      if (!res.ok) throw new Error();
       const saved = (await res.json()) as ComedorResponse;
       setComedores((prev) =>
         editing
@@ -100,8 +99,8 @@ export default function ComedoresPage() {
       );
       toast.success(editing ? "Comedor actualizado" : "Comedor creado");
       setModalOpen(false);
-    } catch {
-      toast.error("Error al guardar");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "No se pudo guardar el comedor.");
     } finally {
       setSaving(false);
     }

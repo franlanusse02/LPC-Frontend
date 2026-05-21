@@ -68,7 +68,7 @@ export default function SociedadesPage() {
 
   const handleSave = async () => {
     if (!nombre.trim() || !direccion.trim() || !cuit.trim()) {
-      toast.error("Completá todos los campos");
+      toast.error("Completá la razón social, dirección y CUIT.");
       return;
     }
     setSaving(true);
@@ -81,15 +81,14 @@ export default function SociedadesPage() {
       const res = editing
         ? await patch(`/sociedades/${editing.id}`, body)
         : await post("/sociedades", body);
-      if (!res.ok) throw new Error();
       const saved = (await res.json()) as SociedadResponse;
       setSociedades((prev) =>
         editing ? prev.map((s) => (s.id === saved.id ? saved : s)) : [...prev, saved],
       );
       toast.success(editing ? "Sociedad actualizada" : "Sociedad creada");
       setModalOpen(false);
-    } catch {
-      toast.error("Error al guardar");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "No se pudo guardar la sociedad.");
     } finally {
       setSaving(false);
     }

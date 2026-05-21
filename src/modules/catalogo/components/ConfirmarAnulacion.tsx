@@ -43,8 +43,8 @@ export function ConfirmarAnulacion({
       toast.success("Producto desactivado");
       onSuccess?.();
       onOpenChange(false);
-    } catch {
-      toast.error("Error al desactivar");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "No se pudo desactivar el producto.");
     } finally {
       setAnulando(false);
     }

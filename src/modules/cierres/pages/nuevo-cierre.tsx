@@ -91,7 +91,7 @@ export default function NuevoCierrePage() {
   const handleSubmit = async () => {
     if (!puntoVentaId || !platosVendidos) {
       toast("Campos requeridos", {
-        description: "Completa el punto de venta y los platos vendidos.",
+        description: "Completá el punto de venta y los platos vendidos.",
       });
       return;
     }
@@ -101,7 +101,7 @@ export default function NuevoCierrePage() {
     );
     if (validLines.length !== lines.length) {
       toast("Líneas inválidas", {
-        description: "Completa todas las líneas de pago correctamente.",
+        description: "Completá todas las líneas de pago correctamente.",
       });
       return;
     }

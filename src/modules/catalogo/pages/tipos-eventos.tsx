@@ -61,7 +61,7 @@ export default function TiposEventoPage() {
 
   const handleSave = async () => {
     if (!nombre.trim() || !comedorId) {
-      toast.error("Completá todos los campos");
+      toast.error("Completá el nombre y el comedor del tipo de evento.");
       return;
     }
     setSaving(true);
@@ -74,7 +74,6 @@ export default function TiposEventoPage() {
       const res = editing
         ? await patch(`/eventos/tipos/${editing.id}`, body)
         : await post("/eventos/tipos", body);
-      if (!res.ok) throw new Error();
       const saved = await res.json();
       setTipos((prev) =>
         editing
@@ -83,8 +82,8 @@ export default function TiposEventoPage() {
       );
       toast.success(editing ? "Tipo actualizado" : "Tipo de evento creado");
       setModalOpen(false);
-    } catch {
-      toast.error("Error al guardar");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "No se pudo guardar el tipo de evento.");
     } finally {
       setSaving(false);
     }

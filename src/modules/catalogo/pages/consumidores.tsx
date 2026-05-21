@@ -83,7 +83,7 @@ export default function ConsumidoresPage() {
 
   const handleSave = async () => {
     if (!nombre.trim() || !comedorId || !taxId.trim()) {
-      toast.error("Completá todos los campos");
+      toast.error("Completá el nombre, comedor y documento del consumidor.");
       return;
     }
     setSaving(true);
@@ -97,7 +97,6 @@ export default function ConsumidoresPage() {
       const res = editing
         ? await patch(`/consumos/consumidores/${editing.id}`, body)
         : await post("/consumos/consumidores", body);
-      if (!res.ok) throw new Error();
       const saved = await res.json();
       setConsumidores((prev) =>
         editing
@@ -106,8 +105,8 @@ export default function ConsumidoresPage() {
       );
       toast.success(editing ? "Consumidor actualizado" : "Consumidor creado");
       setModalOpen(false);
-    } catch {
-      toast.error("Error al guardar");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "No se pudo guardar el consumidor.");
     } finally {
       setSaving(false);
     }
@@ -120,8 +119,8 @@ export default function ConsumidoresPage() {
       setConsumidores((prev) => prev.filter((c) => c.id !== deleteTarget.id));
       toast.success("Consumidor eliminado");
       setDeleteTarget(null);
-    } catch {
-      toast.error("Error al eliminar");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "No se pudo eliminar el consumidor.");
     }
   };
 

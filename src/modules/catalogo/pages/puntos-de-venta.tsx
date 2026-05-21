@@ -84,7 +84,7 @@ export default function PuntosDeVentaPage() {
 
   const handleSave = async () => {
     if (!nombre.trim() || !comedorId) {
-      toast.error("Completá todos los campos");
+      toast.error("Completá el nombre y el comedor del punto de venta.");
       return;
     }
     setSaving(true);
@@ -93,7 +93,6 @@ export default function PuntosDeVentaPage() {
       const res = editing
         ? await patch(`/comedores/puntos-de-venta/${editing.id}`, body)
         : await post("/comedores/puntos-de-venta", body);
-      if (!res.ok) throw new Error();
       const saved = (await res.json()) as PuntoDeVentaResponse;
       setPuntos((prev) =>
         editing
@@ -104,8 +103,8 @@ export default function PuntosDeVentaPage() {
         editing ? "Punto de venta actualizado" : "Punto de venta creado",
       );
       setModalOpen(false);
-    } catch {
-      toast.error("Error al guardar");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "No se pudo guardar el punto de venta.");
     } finally {
       setSaving(false);
     }
