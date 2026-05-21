@@ -221,7 +221,9 @@ export default function ComprasContabilidad() {
 
   const totalActivos = facturas.filter((f) => f.estado !== "ANULADA").length;
   const totalAnulados = facturas.filter((f) => f.estado === "ANULADA").length;
-  const montoTotal = facturas.reduce((s, f) => s + (f.monto ?? 0), 0);
+  const montoTotal = facturas
+    .filter((f) => f.estado !== "ANULADA")
+    .reduce((s, f) => s + (f.monto ?? 0), 0);
   const montoActivo = facturas
     .filter((f) => f.estado !== "ANULADA")
     .reduce((s, f) => s + (f.monto ?? 0), 0);
@@ -414,12 +416,12 @@ export default function ComprasContabilidad() {
                 />
                 <SortableTh
                   label="Fecha Emision"
-                  col="fechaFactura"
+                  col="fechaEmision"
                   {...sortProps}
                 />
                 <SortableTh
                   label="Fecha Pago"
-                  col="fechaFactura"
+                  col="fechaPago"
                   {...sortProps}
                 />
                 <SortableTh label="Estado" col="estado" {...sortProps} />
