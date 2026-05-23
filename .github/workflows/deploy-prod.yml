@@ -58,7 +58,7 @@ jobs:
             --exclude ".git" \
             --exclude "staging" \
             --exclude "CNAME" \
-            ./out/ "$temp_dir/"
+            ./dist/ "$temp_dir/"
 
           git -C "$temp_dir" add -A
           if git -C "$temp_dir" diff --cached --quiet; then
