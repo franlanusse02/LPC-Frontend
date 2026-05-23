@@ -1,0 +1,852 @@
+import { Fragment, useEffect, useMemo, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { MediosPagoDict } from "@/domain/enums/MedioPago";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useApi } from "@/hooks/useApi";
+import { cn, fmtCurrency } from "@/lib/utils";
+import {
+  ArrowLeft,
+  Ban,
+  CheckCircle2,
+  ChevronDown,
+  ChevronUp,
+  CircleDollarSign,
+  Download,
+  FileX2,
+  MoreHorizontal,
+  Send,
+} from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { DataTable, SortableTh } from "@/components/data-table";
+import { EventosStatusFilter } from "../components/filters/EventosStatusFilter";
+import { AnularEventoModal } from "../components/AnularEventoModal";
+import { RealizarEventoModal } from "../components/RealizarEventoModal";
+import {
+  EmitirEventoModal,
+  type EmitirEventoPayload,
+} from "../components/EmitirEventoModal";
+import {
+  CobrarEventoModal,
+  type CobrarEventoPayload,
+} from "../components/CobrarEventoModal";
+import { toast } from "sonner";
+import { useTableState } from "@/hooks/useTableState";
+import { useRowSelection } from "@/hooks/useRowSelection";
+import { BulkActionModal } from "@/components/BulkActionModal";
+import { handleBulkResponse } from "@/lib/bulk-utils";
+import { StatCard } from "@/modules/cierres/components/cierre-stat";
+import type { BulkActionResponse } from "@/domain/dto/shared/BulkActionResponse";
+import type { EventoResponse } from "@/domain/dto/evento/EventoResponse";
+import type { EstadoEvento } from "@/domain/enums/EstadoEvento";
+import { EstadoEventoLabel } from "@/domain/enums/EstadoEvento";
+import { exportToXlsx, type ExportColumn } from "@/lib/exportXlsx";
+import type { ComedorResponse } from "@/domain/dto/comedor/ComedorResponse";
+import {
+  ListFilters,
+  defaultFilters,
+  type ListFilterState,
+} from "@/components/ListFilters";
+
+const ESTADO_STYLES: Record<EstadoEvento, { bg: string; text: string }> = {
+  SOLICITADO: { bg: "bg-amber-100", text: "text-amber-700" },
+  REALIZADO: { bg: "bg-blue-100", text: "text-blue-700" },
+  FACTURA_EMITIDA: { bg: "bg-violet-100", text: "text-violet-700" },
+  COBRADO: { bg: "bg-emerald-100", text: "text-emerald-700" },
+  ANULADO: { bg: "bg-red-100", text: "text-red-600" },
+};
+
+function DetailField({
+  label,
+  value,
+}: {
+  label: string;
+  value: string | number | null | undefined;
+}) {
+  if (value === null || value === undefined || value === "") return null;
+  return (
+    <div className="flex flex-col gap-0.5">
+      <span className="text-xs font-medium uppercase tracking-wide text-gray-400">
+        {label}
+      </span>
+      <span className="text-sm text-gray-700">{value}</span>
+    </div>
+  );
+}
+
+function EventoDetail({
+  evento,
+  comedorName,
+}: {
+  evento: EventoResponse;
+  comedorName: string;
+}) {
+  return (
+    <div className="grid grid-cols-2 gap-x-8 gap-y-3 sm:grid-cols-3 lg:grid-cols-4">
+      <DetailField label="Comedor" value={comedorName} />
+      <DetailField label="Tipo de evento" value={evento.tipoEventoNombre} />
+      <DetailField label="Solicitante" value={evento.solicitanteNombre} />
+      <DetailField label="Cantidad personas" value={evento.cantidadPersonas} />
+      <DetailField
+        label="Precio unitario"
+        value={
+          evento.precioUnitario !== null
+            ? fmtCurrency(evento.precioUnitario)
+            : null
+        }
+      />
+      <DetailField
+        label="Monto total"
+        value={
+          evento.montoTotal !== null ? fmtCurrency(evento.montoTotal) : null
+        }
+      />
+      <DetailField label="Centro de costo" value={evento.centroCosto} />
+      <DetailField label="Funcionario" value={evento.funcionarioNombre} />
+      <DetailField label="Responsable" value={evento.responsableNombre} />
+      <DetailField
+        label="Dest. facturación"
+        value={evento.destinatarioFacturacion}
+      />
+      <DetailField label="Email solicitante" value={evento.emailSolicitante} />
+      <DetailField label="Medio de pago" value={evento.medioPago} />
+      <DetailField label="Nro. operación" value={evento.numeroOperacion} />
+      <DetailField label="Tipo comprobante" value={evento.tipoComprobante} />
+      <DetailField label="Nro. comprobante" value={evento.numeroComprobante} />
+      <DetailField label="Observaciones" value={evento.observaciones} />
+      <DetailField
+        label="Retenciones"
+        value={
+          evento.retenciones !== null ? fmtCurrency(evento.retenciones!) : null
+        }
+      />
+      {evento.facturaPdfNombreArchivo && (
+        <div className="flex flex-col gap-0.5">
+          <span className="text-xs font-medium uppercase tracking-wide text-gray-400">
+            Factura PDF
+          </span>
+          <span className="text-sm text-gray-700">
+            {evento.facturaPdfNombreArchivo}
+          </span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default function EventosContabilidad() {
+  const navigate = useNavigate();
+  const { get, post, patch } = useApi();
+
+  const [eventos, setEventos] = useState<EventoResponse[]>([]);
+  const [comedores, setComedores] = useState<ComedorResponse[]>([]);
+
+  const [selectedEvento, setSelectedEvento] = useState<EventoResponse | null>(
+    null,
+  );
+  const [anularOpen, setAnularOpen] = useState(false);
+  const [realizarOpen, setRealizarOpen] = useState(false);
+  const [emitirOpen, setEmitirOpen] = useState(false);
+  const [cobrarOpen, setCobrarOpen] = useState(false);
+
+  const [listFilters, setListFilters] = useState<ListFilterState>(defaultFilters);
+
+  useEffect(() => {
+    Promise.all([get("/eventos"), get("/comedores")]).then(
+      ([eventosRes, comedoresRes]) => {
+        eventosRes
+          .json()
+          .then((data) => setEventos(Array.isArray(data) ? data : []));
+        comedoresRes.json().then(setComedores);
+      },
+    );
+  }, [get]);
+
+  const comedorNameById = useMemo(
+    () => Object.fromEntries(comedores.map((c) => [c.id, c.nombre])),
+    [comedores],
+  );
+
+  const eventosAfterDateFilter = useMemo(() => {
+    let list = [...eventos];
+    if (listFilters.desde) list = list.filter((e) => e.fechaEvento >= listFilters.desde);
+    if (listFilters.hasta) list = list.filter((e) => e.fechaEvento <= listFilters.hasta);
+    if (listFilters.comedorId) list = list.filter((e) => e.comedorId === Number(listFilters.comedorId));
+    return list;
+  }, [eventos, listFilters]);
+
+  const { displayed, sort, expansion, filters } = useTableState(
+    eventosAfterDateFilter,
+    {
+      searchFields: (e) => [
+        comedorNameById[e.comedorId] ?? "",
+        e.tipoEventoNombre ?? "",
+        e.solicitanteNombre ?? "",
+        e.fechaEvento,
+        e.observaciones ?? "",
+      ],
+      statusField: "estado",
+      statusMapping: {
+        SOLICITADO: { filter: (e) => e.estado === "SOLICITADO" },
+        REALIZADO: { filter: (e) => e.estado === "REALIZADO" },
+        FACTURA_EMITIDA: { filter: (e) => e.estado === "FACTURA_EMITIDA" },
+        COBRADO: { filter: (e) => e.estado === "COBRADO" },
+        ANULADO: { filter: (e) => e.estado === "ANULADO" },
+      },
+      defaultSortKey: "fechaEvento",
+    },
+  );
+
+  const sortProps = {
+    sortKey: sort.key,
+    sortDir: sort.dir,
+    onSort: sort.handleSort,
+  };
+
+  const totalActivos = eventos.filter((e) => e.anulacionId === null).length;
+  const totalAnulados = eventos.filter((e) => e.anulacionId !== null).length;
+  const montoTotal = eventos
+    .filter((e) => e.anulacionId === null)
+    .reduce((s, e) => s + (e.montoTotal ?? 0), 0);
+  const montoFiltrado = displayed
+    .filter((e) => e.anulacionId === null)
+    .reduce((s, e) => s + (e.montoTotal ?? 0), 0);
+  const isFiltered = displayed.length !== eventos.length;
+
+  const handleAction = async (action: () => Promise<EventoResponse>) => {
+    try {
+      const updated = await action();
+      setEventos((prev) =>
+        prev.map((e) => (e.id === updated.id ? updated : e)),
+      );
+    } catch (err) {
+      toast("Error", {
+        description:
+          err instanceof Error
+            ? err.message
+            : "No se pudo completar la operación",
+      });
+      throw err;
+    }
+  };
+
+  const handleAnular = async (eventoId: number, motivo: string) => {
+    await handleAction(async () => {
+      const updated: EventoResponse = await patch(
+        `/eventos/${eventoId}/anular`,
+        { motivo },
+      ).then((r) => r.json());
+      toast("Evento anulado");
+      return updated;
+    });
+  };
+
+  const handleRealizar = async (eventoId: number) => {
+    await handleAction(async () => {
+      const updated: EventoResponse = await patch(
+        `/eventos/${eventoId}/realizar`,
+        {},
+      ).then((r) => r.json());
+      toast("Evento marcado como realizado");
+      return updated;
+    });
+  };
+
+  const handleEmitir = async (
+    eventoId: number,
+    payload: EmitirEventoPayload,
+  ) => {
+    await handleAction(async () => {
+      const updated: EventoResponse = await patch(
+        `/eventos/${eventoId}/emitir`,
+        payload,
+      ).then((r) => r.json());
+      toast("Factura de evento emitida");
+      return updated;
+    });
+  };
+
+  const handleCobrar = async (
+    eventoId: number,
+    payload: CobrarEventoPayload,
+  ) => {
+    await handleAction(async () => {
+      const updated: EventoResponse = await patch(
+        `/eventos/${eventoId}/pagado`,
+        payload,
+      ).then((r) => r.json());
+      toast("Cobro del evento registrado");
+      return updated;
+    });
+  };
+
+  const handleEliminarPdf = async (eventoId: number) => {
+    await handleAction(async () => {
+      const updated: EventoResponse = await patch(
+        `/eventos/${eventoId}/eliminar-factura-pdf`,
+        {},
+      ).then((r) => r.json());
+      toast("PDF eliminado");
+      return updated;
+    });
+  };
+
+  const openModal = (
+    evento: EventoResponse,
+    modal: "anular" | "realizar" | "emitir" | "cobrar",
+  ) => {
+    setSelectedEvento(evento);
+    if (modal === "anular") setAnularOpen(true);
+    if (modal === "realizar") setRealizarOpen(true);
+    if (modal === "emitir") setEmitirOpen(true);
+    if (modal === "cobrar") setCobrarOpen(true);
+  };
+
+  const selection = useRowSelection();
+
+  const [bulkRealizar, setBulkRealizar] = useState(false);
+  const [bulkEmitir, setBulkEmitir] = useState(false);
+  const [bulkCobrar, setBulkCobrar] = useState(false);
+  const [bulkAnular, setBulkAnular] = useState(false);
+  const [bulkMotivo, setBulkMotivo] = useState("");
+  const [bulkFechaPago, setBulkFechaPago] = useState("");
+  const [bulkMedioPago, setBulkMedioPago] = useState("");
+  const [bulkNumeroOp, setBulkNumeroOp] = useState("");
+
+  const selectedEventos = displayed.filter((e) => selection.selected.has(e.id));
+  const allSolicitado = selectedEventos.length > 0 && selectedEventos.every((e) => e.estado === "SOLICITADO");
+  const allEmitible = selectedEventos.length > 0 && selectedEventos.every((e) => e.estado === "SOLICITADO" || e.estado === "REALIZADO");
+  const allFacturaEmitida = selectedEventos.length > 0 && selectedEventos.every((e) => e.estado === "FACTURA_EMITIDA");
+  const allAnulable = selectedEventos.length > 0 && selectedEventos.every((e) => e.estado === "SOLICITADO" || e.estado === "REALIZADO" || e.estado === "FACTURA_EMITIDA");
+
+  const selectableIds = displayed
+    .filter((e) => e.estado !== "ANULADO" && e.estado !== "COBRADO")
+    .map((e) => e.id);
+
+  const refetchEventos = () => {
+    get("/eventos")
+      .then((r) => r.json())
+      .then((data) => setEventos(Array.isArray(data) ? data : []));
+  };
+
+  const handleBulkRealizar = async () => {
+    const res = await post("/eventos/bulk/realizar", { ids: [...selection.selected] })
+      .then((r) => r.json() as Promise<BulkActionResponse>);
+    handleBulkResponse(res, "Realización");
+    selection.clear();
+    refetchEventos();
+  };
+
+  const handleBulkEmitir = async () => {
+    const res = await post("/eventos/bulk/emitir", {
+      ids: [...selection.selected],
+      fechaEmision: null,
+      fechaPago: null,
+      tipoComprobante: null,
+      numeroComprobante: null,
+      adjuntarFacturaPdfRequest: null,
+    }).then((r) => r.json() as Promise<BulkActionResponse>);
+    handleBulkResponse(res, "Emisión");
+    selection.clear();
+    refetchEventos();
+  };
+
+  const handleBulkCobrar = async () => {
+    const res = await post("/eventos/bulk/cobrar", {
+      ids: [...selection.selected],
+      fechaPago: bulkFechaPago || null,
+      medioPago: bulkMedioPago || null,
+      numeroOperacion: bulkNumeroOp || null,
+    }).then((r) => r.json() as Promise<BulkActionResponse>);
+    handleBulkResponse(res, "Cobro");
+    selection.clear();
+    refetchEventos();
+    setBulkFechaPago("");
+    setBulkMedioPago("");
+    setBulkNumeroOp("");
+  };
+
+  const handleBulkAnular = async () => {
+    const res = await post("/eventos/bulk/anular", {
+      ids: [...selection.selected],
+      motivo: bulkMotivo,
+    }).then((r) => r.json() as Promise<BulkActionResponse>);
+    handleBulkResponse(res, "Anulación");
+    selection.clear();
+    refetchEventos();
+    setBulkMotivo("");
+  };
+
+  const exportColumns: ExportColumn<EventoResponse>[] = [
+    { key: "id", header: "ID" },
+    { key: (e) => comedorNameById[e.comedorId] ?? e.comedorId, header: "Comedor" },
+    { key: "tipoEventoNombre", header: "Tipo Evento" },
+    { key: "estado", header: "Estado" },
+    { key: "fechaEvento", header: "Fecha Evento" },
+    { key: "solicitanteNombre", header: "Solicitante" },
+    { key: "emailSolicitante", header: "Email Solicitante" },
+    { key: "funcionarioNombre", header: "Funcionario" },
+    { key: "responsableNombre", header: "Responsable" },
+    { key: "cantidadPersonas", header: "Personas" },
+    { key: "precioUnitario", header: "Precio Unitario" },
+    { key: "montoTotal", header: "Monto Total" },
+    { key: "medioPago", header: "Medio de Pago" },
+    { key: "centroCosto", header: "Centro de Costo" },
+    { key: "partida", header: "Partida" },
+    { key: "razonSocial", header: "Razón Social" },
+    { key: "destinatarioFacturacion", header: "Dest. Facturación" },
+    { key: "tipoComprobante", header: "Tipo Comprobante" },
+    { key: "numeroComprobante", header: "Nº Comprobante" },
+    { key: "fechaEmision", header: "Fecha Emisión" },
+    { key: "fechaPago", header: "Fecha Pago" },
+    { key: "numeroOperacion", header: "Nº Operación" },
+    { key: "retenciones", header: "Retenciones" },
+    { key: "observaciones", header: "Observaciones" },
+    { key: "creadoEn", header: "Creado en" },
+    { key: "actualizadoEn", header: "Actualizado en" },
+  ];
+
+  const handleExport = () => {
+    const data = selection.count > 0
+      ? displayed.filter((e) => selection.selected.has(e.id))
+      : displayed;
+    const segments = ["eventos"];
+    if (filters.status !== "all") segments.push(filters.status.toLowerCase());
+    if (listFilters.comedorId) segments.push(`comedor-${listFilters.comedorId}`);
+    if (listFilters.desde) segments.push(`desde-${listFilters.desde}`);
+    if (listFilters.hasta) segments.push(`hasta-${listFilters.hasta}`);
+    exportToXlsx({ data, columns: exportColumns, filename: segments.join("-") });
+  };
+
+  return (
+    <div className="px-4 sm:px-8 lg:px-18 py-8">
+      <div className="max-w-7xl mx-auto">
+        <Button variant="ghost" onClick={() => navigate("/contabilidad")}>
+          <ArrowLeft className="h-4 w-4" />
+          Volver
+        </Button>
+      </div>
+
+      <div className="mx-auto max-w-7xl grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5 pb-4">
+        <StatCard label="Total eventos" value={eventos.length} />
+        <StatCard label="Activos" value={totalActivos} accent="emerald" />
+        <StatCard label="Anulados" value={totalAnulados} accent="red" />
+        <StatCard label="Monto total" value={fmtCurrency(montoTotal)} />
+        <StatCard
+          label={isFiltered ? "Monto filtrado" : "Monto activo"}
+          value={fmtCurrency(montoFiltrado)}
+          accent={isFiltered ? "blue" : undefined}
+        />
+      </div>
+
+      <Card className="mx-auto max-w-7xl py-6 border-0 shadow-md rounded-xl">
+        <CardHeader className="border-b px-6 py-4">
+          <div className="flex flex-row justify-between">
+            <CardTitle className="text-xl font-bold text-gray-800">
+              Eventos
+            </CardTitle>
+          </div>
+          <div className="pt-3">
+            <ListFilters filters={listFilters} onChange={setListFilters} comedores={comedores} showSociedad={false} />
+          </div>
+        </CardHeader>
+        <CardContent className="p-0">
+          <DataTable
+            displayedCount={displayed.length}
+            selectionToolbar={
+              selection.count > 0 ? (
+                <div className="flex items-center gap-3">
+                  <span className="text-sm font-medium text-blue-700">
+                    {selection.count} seleccionado{selection.count !== 1 ? "s" : ""}
+                  </span>
+                  {allSolicitado && (
+                    <Button size="sm" variant="outline" className="gap-1.5" onClick={() => setBulkRealizar(true)}>
+                      <CheckCircle2 className="h-3.5 w-3.5" /> Realizar
+                    </Button>
+                  )}
+                  {allEmitible && (
+                    <Button size="sm" variant="outline" className="gap-1.5 text-blue-600 border-blue-200 hover:bg-blue-50" onClick={() => setBulkEmitir(true)}>
+                      <Send className="h-3.5 w-3.5" /> Emitir
+                    </Button>
+                  )}
+                  {allFacturaEmitida && (
+                    <Button size="sm" variant="outline" className="gap-1.5 text-emerald-600 border-emerald-200 hover:bg-emerald-50" onClick={() => setBulkCobrar(true)}>
+                      <CircleDollarSign className="h-3.5 w-3.5" /> Cobrar
+                    </Button>
+                  )}
+                  {allAnulable && (
+                    <Button size="sm" variant="outline" className="gap-1.5 text-red-600 border-red-200 hover:bg-red-50" onClick={() => setBulkAnular(true)}>
+                      <Ban className="h-3.5 w-3.5" /> Anular
+                    </Button>
+                  )}
+                  <Button size="sm" variant="ghost" className="text-gray-500 text-xs" onClick={selection.clear}>
+                    Deseleccionar
+                  </Button>
+                </div>
+              ) : undefined
+            }
+            toolbarLeft={
+              <div className="flex flex-wrap items-center gap-2">
+                <input
+                  type="text"
+                  value={filters.search}
+                  onChange={(e) => filters.setSearch(e.target.value)}
+                  placeholder="Buscar..."
+                  className="h-8 w-52 pl-3 pr-8 text-sm bg-gray-50 border border-gray-200 rounded-md"
+                />
+                <EventosStatusFilter
+                  value={filters.status as "all" | EstadoEvento}
+                  onChange={filters.setStatus}
+                />
+              </div>
+            }
+            toolbarRight={
+              <Button variant="outline" size="sm" onClick={handleExport}>
+                <Download className="size-4 mr-1.5" />
+                {selection.count > 0 ? `Exportar (${selection.count})` : "Exportar Excel"}
+              </Button>
+            }
+            columns={
+              <>
+                <th className="px-4 py-3 w-8">
+                  <input
+                    type="checkbox"
+                    checked={selection.isAllSelected(selectableIds)}
+                    onChange={() => selection.toggleAll(selectableIds)}
+                    className="h-4 w-4 rounded border-gray-300"
+                  />
+                </th>
+                <th className="px-4 py-3 w-8" />
+                <SortableTh label="Fecha" col="fechaEvento" {...sortProps} />
+                <th className="px-4 py-3">Comedor</th>
+                <th className="px-4 py-3">Tipo evento</th>
+                <th className="px-4 py-3">Solicitante</th>
+                <th className="px-4 py-3 text-right">Personas</th>
+                <SortableTh
+                  label="Monto"
+                  col="montoTotal"
+                  {...sortProps}
+                  className="text-right"
+                />
+                <th className="px-4 py-3 text-center">Estado</th>
+                <th className="px-4 py-3 w-12" />
+              </>
+            }
+            rows={
+              <>
+                {displayed.map((evento) => {
+                  const isExpanded = expansion.expandedRows.has(evento.id);
+                  const estilos = ESTADO_STYLES[evento.estado];
+                  const isAnulado = evento.estado === "ANULADO";
+                  const comedorName =
+                    comedorNameById[evento.comedorId] ??
+                    String(evento.comedorId);
+
+                  const canRealizar = evento.estado === "SOLICITADO";
+                  const canEmitir =
+                    evento.estado === "SOLICITADO" ||
+                    evento.estado === "REALIZADO";
+                  const canCobrar = evento.estado === "FACTURA_EMITIDA";
+                  const hasPdf = !!evento.facturaPdfNombreArchivo;
+                  const canEliminarPdf =
+                    hasPdf &&
+                    (evento.estado === "FACTURA_EMITIDA" ||
+                      evento.estado === "COBRADO");
+
+                  return (
+                    <Fragment key={evento.id}>
+                      <tr
+                        className={cn(
+                          "border-b transition-colors",
+                          isAnulado
+                            ? "bg-red-50/30 text-gray-400"
+                            : "hover:bg-gray-50/80",
+                          selection.selected.has(evento.id) && "bg-blue-50/40",
+                        )}
+                      >
+                        <td className="px-4 py-4" onClick={(e) => e.stopPropagation()}>
+                          <input
+                            type="checkbox"
+                            checked={selection.selected.has(evento.id)}
+                            onChange={() => selection.toggle(evento.id)}
+                            disabled={isAnulado || evento.estado === "COBRADO"}
+                            className="h-4 w-4 rounded border-gray-300 disabled:opacity-30"
+                          />
+                        </td>
+                        <td
+                          className="px-4 py-4 cursor-pointer text-gray-400 hover:text-gray-600"
+                          onClick={() => expansion.toggleRow(evento.id)}
+                        >
+                          {isExpanded ? (
+                            <ChevronUp className="h-4 w-4" />
+                          ) : (
+                            <ChevronDown className="h-4 w-4" />
+                          )}
+                        </td>
+                        <td
+                          className="px-4 py-4 font-medium whitespace-nowrap cursor-pointer"
+                          onClick={() => expansion.toggleRow(evento.id)}
+                        >
+                          {evento.fechaEvento}
+                        </td>
+                        <td
+                          className="px-4 py-4 cursor-pointer"
+                          onClick={() => expansion.toggleRow(evento.id)}
+                        >
+                          {comedorName}
+                        </td>
+                        <td
+                          className="px-4 py-4 cursor-pointer"
+                          onClick={() => expansion.toggleRow(evento.id)}
+                        >
+                          {evento.tipoEventoNombre ?? (
+                            <span className="text-gray-300">—</span>
+                          )}
+                        </td>
+                        <td
+                          className="px-4 py-4 cursor-pointer"
+                          onClick={() => expansion.toggleRow(evento.id)}
+                        >
+                          {evento.solicitanteNombre ?? (
+                            <span className="text-gray-300">—</span>
+                          )}
+                        </td>
+                        <td
+                          className="px-4 py-4 text-right font-mono cursor-pointer"
+                          onClick={() => expansion.toggleRow(evento.id)}
+                        >
+                          {evento.cantidadPersonas?.toLocaleString("es-AR") ?? (
+                            <span className="text-gray-300">—</span>
+                          )}
+                        </td>
+                        <td
+                          className="px-4 py-4 text-right font-mono cursor-pointer"
+                          onClick={() => expansion.toggleRow(evento.id)}
+                        >
+                          {evento.montoTotal !== null ? (
+                            fmtCurrency(evento.montoTotal)
+                          ) : (
+                            <span className="text-gray-300">—</span>
+                          )}
+                        </td>
+                        <td
+                          className="px-4 py-4 text-center cursor-pointer"
+                          onClick={() => expansion.toggleRow(evento.id)}
+                        >
+                          <span
+                            className={cn(
+                              "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold",
+                              estilos.bg,
+                              estilos.text,
+                            )}
+                          >
+                            {EstadoEventoLabel[evento.estado]}
+                          </span>
+                        </td>
+                        <td
+                          className="px-4 py-4"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {!isAnulado && (
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100"
+                                  aria-label="Acciones"
+                                >
+                                  <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent
+                                align="end"
+                                className="w-48 rounded-xl shadow-lg border-gray-100"
+                              >
+                                {canRealizar && (
+                                  <DropdownMenuItem
+                                    onClick={() =>
+                                      openModal(evento, "realizar")
+                                    }
+                                    className="gap-2.5 cursor-pointer rounded-lg"
+                                  >
+                                    <CheckCircle2 className="h-4 w-4" />{" "}
+                                    Realizar
+                                  </DropdownMenuItem>
+                                )}
+                                {canEmitir && (
+                                  <DropdownMenuItem
+                                    onClick={() => openModal(evento, "emitir")}
+                                    className="gap-2.5 cursor-pointer rounded-lg"
+                                  >
+                                    <Send className="h-4 w-4" /> Emitir factura
+                                  </DropdownMenuItem>
+                                )}
+                                {canCobrar && (
+                                  <DropdownMenuItem
+                                    onClick={() => openModal(evento, "cobrar")}
+                                    className="gap-2.5 cursor-pointer rounded-lg"
+                                  >
+                                    <CircleDollarSign className="h-4 w-4" />{" "}
+                                    Cobrar
+                                  </DropdownMenuItem>
+                                )}
+                                {canEliminarPdf && (
+                                  <DropdownMenuItem
+                                    onClick={() => handleEliminarPdf(evento.id)}
+                                    className="gap-2.5 cursor-pointer rounded-lg"
+                                  >
+                                    <FileX2 className="h-4 w-4" /> Eliminar PDF
+                                  </DropdownMenuItem>
+                                )}
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem
+                                  onClick={() => openModal(evento, "anular")}
+                                  className="gap-2.5 cursor-pointer rounded-lg text-red-600 focus:text-red-700 focus:bg-red-50"
+                                >
+                                  <Ban className="h-4 w-4" /> Anular
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          )}
+                        </td>
+                      </tr>
+
+                      {isExpanded && (
+                        <tr className="bg-gray-50/60">
+                          <td colSpan={10} className="px-8 py-5">
+                            <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+                              <EventoDetail
+                                evento={evento}
+                                comedorName={comedorName}
+                              />
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </Fragment>
+                  );
+                })}
+              </>
+            }
+          />
+        </CardContent>
+      </Card>
+
+      <AnularEventoModal
+        open={anularOpen}
+        onClose={() => setAnularOpen(false)}
+        evento={selectedEvento}
+        onConfirm={handleAnular}
+      />
+      <RealizarEventoModal
+        open={realizarOpen}
+        onClose={() => setRealizarOpen(false)}
+        evento={selectedEvento}
+        onConfirm={handleRealizar}
+      />
+      <EmitirEventoModal
+        open={emitirOpen}
+        onClose={() => setEmitirOpen(false)}
+        evento={selectedEvento}
+        onConfirm={handleEmitir}
+      />
+      <CobrarEventoModal
+        open={cobrarOpen}
+        onClose={() => setCobrarOpen(false)}
+        evento={selectedEvento}
+        onConfirm={handleCobrar}
+      />
+
+      <BulkActionModal
+        open={bulkRealizar}
+        onClose={() => setBulkRealizar(false)}
+        title="Realizar eventos"
+        description="Se marcarán como realizados"
+        confirmLabel="Realizar"
+        confirmColor="blue"
+        count={selection.count}
+        onConfirm={handleBulkRealizar}
+      />
+
+      <BulkActionModal
+        open={bulkEmitir}
+        onClose={() => setBulkEmitir(false)}
+        title="Emitir factura"
+        description="Se emitirá factura para"
+        confirmLabel="Emitir"
+        confirmColor="blue"
+        count={selection.count}
+        onConfirm={handleBulkEmitir}
+      />
+
+      <BulkActionModal
+        open={bulkCobrar}
+        onClose={() => setBulkCobrar(false)}
+        title="Cobrar eventos"
+        description="Se registrará el cobro de"
+        confirmLabel="Cobrar"
+        confirmColor="emerald"
+        count={selection.count}
+        onConfirm={handleBulkCobrar}
+      >
+        <div className="space-y-3">
+          <div className="space-y-1">
+            <label className="text-xs font-medium text-gray-500">Fecha pago</label>
+            <Input type="date" value={bulkFechaPago} onChange={(e) => setBulkFechaPago(e.target.value)} className="bg-card" />
+          </div>
+          <div className="space-y-1">
+            <label className="text-xs font-medium text-gray-500">Medio de pago</label>
+            <Select value={bulkMedioPago} onValueChange={setBulkMedioPago}>
+              <SelectTrigger className="bg-card">
+                <SelectValue placeholder="Seleccionar medio de pago..." />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.entries(MediosPagoDict).map(([label, value]) => (
+                  <SelectItem key={value} value={value}>
+                    {label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-1">
+            <label className="text-xs font-medium text-gray-500">Nº operación</label>
+            <Input value={bulkNumeroOp} onChange={(e) => setBulkNumeroOp(e.target.value)} className="bg-card" placeholder="Opcional" />
+          </div>
+        </div>
+      </BulkActionModal>
+
+      <BulkActionModal
+        open={bulkAnular}
+        onClose={() => setBulkAnular(false)}
+        title="Anular eventos"
+        description="Se anularán"
+        confirmLabel="Anular"
+        confirmColor="red"
+        count={selection.count}
+        canConfirm={!!bulkMotivo.trim()}
+        onConfirm={handleBulkAnular}
+      >
+        <div className="space-y-1">
+          <label className="text-xs font-medium text-gray-500">Motivo *</label>
+          <Input value={bulkMotivo} onChange={(e) => setBulkMotivo(e.target.value)} className="bg-card" placeholder="Motivo de anulación" />
+        </div>
+      </BulkActionModal>
+    </div>
+  );
+}
