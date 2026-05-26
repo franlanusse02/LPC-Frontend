@@ -54,10 +54,6 @@ const ESTADO_STYLES: Record<
   PENDIENTE: { label: "Pendiente", bg: "bg-amber-100", text: "text-amber-700" },
 };
 
-interface PageResponse<T> {
-  content: T[];
-}
-
 export default function ComprasContabilidad() {
   const navigate = useNavigate();
   const { get, post, patch, del } = useApi();
@@ -144,8 +140,8 @@ export default function ComprasContabilidad() {
     ]).then(([facturasRes, proveedoresRes, comedoresRes]) => {
       facturasRes
         .json()
-        .then((data: PageResponse<FacturaProveedorResponse>) =>
-          setFacturas(Array.isArray(data?.content) ? data.content : []),
+        .then((data: FacturaProveedorResponse[]) =>
+          setFacturas(Array.isArray(data) ? data : []),
         );
       proveedoresRes.json().then(setProveedores);
       comedoresRes.json().then(setComedores);
@@ -233,8 +229,8 @@ export default function ComprasContabilidad() {
   const refetchFacturas = () => {
     get("/facturas/proveedor")
       .then((r) => r.json())
-      .then((data: PageResponse<FacturaProveedorResponse>) =>
-        setFacturas(Array.isArray(data?.content) ? data.content : []),
+      .then((data: FacturaProveedorResponse[]) =>
+        setFacturas(Array.isArray(data) ? data : []),
       );
   };
 

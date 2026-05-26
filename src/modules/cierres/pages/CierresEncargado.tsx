@@ -19,7 +19,7 @@ export default function CierresPage() {
   const [cierres, setCierres] = useState<DetailedCierreCajaResponse[]>([]);
 
   useEffect(() => {
-    get("/cierres")
+    get("/cierres/mine")
       .then((r) => r.json())
       .then(setCierres);
   }, [get]);
