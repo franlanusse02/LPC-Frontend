@@ -162,7 +162,7 @@ export default function NuevoEventoPage() {
 
   useEffect(() => {
     if (tipoHasPrecio && cantidadPersonas) {
-      const calc = selectedTipo!.precio * Number(cantidadPersonas);
+      const calc = (selectedTipo?.precio ?? 0) * Number(cantidadPersonas);
       setMontoTotal(String(calc));
     } else if (tipoHasPrecio && !cantidadPersonas) {
       setMontoTotal("");
@@ -418,7 +418,7 @@ export default function NuevoEventoPage() {
               />
               {tipoHasPrecio && (
                 <p className="text-xs text-muted-foreground">
-                  {selectedTipo!.precio.toLocaleString("es-AR")} × {cantidadPersonas || 0} personas
+                  {(selectedTipo?.precio ?? 0).toLocaleString("es-AR")} × {cantidadPersonas || 0} personas
                 </p>
               )}
             </div>
