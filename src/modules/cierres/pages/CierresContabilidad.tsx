@@ -135,6 +135,7 @@ export default function CierresContabilidad() {
   };
 
   const exportColumns: ExportColumn<DetailedCierreCajaResponse>[] = [
+    { key: "createdAt", header: "Fecha de Carga" },
     { key: "id", header: "ID" },
     { key: (c) => c.comedor.nombre, header: "Comedor" },
     { key: (c) => c.puntoDeVenta.nombre, header: "Punto de Venta" },
@@ -145,7 +146,6 @@ export default function CierresContabilidad() {
     { key: (c) => c.anulacionId ? "Anulado" : "Activo", header: "Estado" },
     { key: "comentarios", header: "Comentarios" },
     { key: (c) => c.movimientos?.length ?? 0, header: "Movimientos" },
-    { key: "createdAt", header: "Creado en" },
   ];
 
   const handleExport = () => {

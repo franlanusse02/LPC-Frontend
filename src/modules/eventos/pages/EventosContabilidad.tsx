@@ -392,6 +392,7 @@ export default function EventosContabilidad() {
   };
 
   const exportColumns: ExportColumn<EventoResponse>[] = [
+    { key: "creadoEn", header: "Fecha de Carga" },
     { key: "id", header: "ID" },
     { key: (e) => comedorNameById[e.comedorId] ?? e.comedorId, header: "Comedor" },
     { key: "tipoEventoNombre", header: "Tipo Evento" },
@@ -416,7 +417,6 @@ export default function EventosContabilidad() {
     { key: "numeroOperacion", header: "Nº Operación" },
     { key: "retenciones", header: "Retenciones" },
     { key: "observaciones", header: "Observaciones" },
-    { key: "creadoEn", header: "Creado en" },
     { key: "actualizadoEn", header: "Actualizado en" },
   ];
 

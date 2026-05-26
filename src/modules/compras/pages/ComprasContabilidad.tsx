@@ -274,6 +274,7 @@ export default function ComprasContabilidad() {
   };
 
   const exportColumns: ExportColumn<FacturaProveedorResponse>[] = [
+    { key: "creadoEn", header: "Fecha de Carga" },
     { key: "id", header: "ID" },
     { key: "numero", header: "Nº Factura" },
     { key: (f) => proveedorNameById[f.proveedorId] ?? f.proveedorId, header: "Proveedor" },
@@ -289,7 +290,6 @@ export default function ComprasContabilidad() {
     { key: "comentarios", header: "Comentarios" },
     { key: (f) => (f.puntoDeVentaComedor ?? []).map((s) => `${posNameById[s.puntoDeVentaId] ?? `Punto de venta #${s.puntoDeVentaId}`}: $${s.monto}`).join(", "), header: "Puntos de Venta" },
     { key: "creadoPorNombre", header: "Creado por" },
-    { key: "creadoEn", header: "Creado en" },
   ];
 
   const handleExport = () => {
