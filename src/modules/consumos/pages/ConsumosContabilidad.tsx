@@ -187,6 +187,7 @@ export default function ConsumosContabilidad() {
   };
 
   const exportColumns: ExportColumn<ConsumoResponse>[] = [
+    { key: "creadoEn", header: "Fecha de Carga" },
     { key: "id", header: "ID" },
     { key: (c) => { const cons = consumidorById[c.consumidorId]; return cons ? (comedorNameById[cons.comedorId] ?? cons.comedorId) : "—"; }, header: "Comedor" },
     { key: (c) => puntoDeVentaNameById[c.PuntoDeVentaId] ?? c.PuntoDeVentaId, header: "Punto de Venta" },
@@ -196,7 +197,6 @@ export default function ConsumosContabilidad() {
     { key: (c) => c.anulacion ? "Anulado" : "Activo", header: "Estado" },
     { key: "observaciones", header: "Observaciones" },
     { key: (c) => c.productos.map((p) => `${p.producto.nombre} x${p.cantidad}`).join(", "), header: "Productos" },
-    { key: "creadoEn", header: "Creado en" },
     { key: "actualizadoEn", header: "Actualizado en" },
   ];
 
