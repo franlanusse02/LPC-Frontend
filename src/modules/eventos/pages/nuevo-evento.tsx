@@ -82,14 +82,20 @@ export default function NuevoEventoPage() {
     (t) => t.id === Number(tipoEventoId),
   );
 
+  const [funcionarios, setFuncionarios] = useState<EmpleadoComedorResponse[]>([]);
+
   useEffect(() => {
     if (!comedorId) {
       setEmpleados([]);
+      setFuncionarios([]);
       return;
     }
     get(`/comedores/empleados?comedorId=${comedorId}`)
       .then((res) => res.json())
       .then((data) => setEmpleados(Array.isArray(data) ? data : []));
+    get(`/comedores/empleados/funcionarios?comedorId=${comedorId}`)
+      .then((res) => res.json())
+      .then((data) => setFuncionarios(Array.isArray(data) ? data : []));
   }, [comedorId, get]);
 
   const empleadoOptions = useMemo(
@@ -102,6 +108,16 @@ export default function NuevoEventoPage() {
           subtitle: e.email || undefined,
         })),
     [empleados],
+  );
+
+  const funcionarioOptions = useMemo(
+    () =>
+      funcionarios.map((e) => ({
+        value: String(e.id),
+        label: e.nombre,
+        subtitle: e.email || undefined,
+      })),
+    [funcionarios],
   );
 
   const handleComedorChange = (v: string) => {
@@ -123,14 +139,15 @@ export default function NuevoEventoPage() {
       if (caseFields.partida.autoFill === "funcionario") setPartida("");
       return;
     }
-    const emp = empleados.find((e) => e.id === Number(funcionarioId));
+    const emp = funcionarios.find((e) => e.id === Number(funcionarioId))
+      ?? empleados.find((e) => e.id === Number(funcionarioId));
     if (emp) {
       if (caseFields.centroCosto.autoFill === "funcionario")
         setCentroCosto(emp.centroCosto ?? "");
       if (caseFields.partida.autoFill === "funcionario")
         setPartida(emp.partida ?? "");
     }
-  }, [funcionarioId, empleados, caseFields]);
+  }, [funcionarioId, funcionarios, empleados, caseFields]);
 
   useEffect(() => {
     if (!solicitanteId) {
@@ -141,7 +158,18 @@ export default function NuevoEventoPage() {
     if (emp) setEmailSolicitante(emp.email ?? "");
   }, [solicitanteId, empleados]);
 
-  const canSubmit = puntoDeVentaId && tipoEventoId && fechaEvento;
+  const tipoHasPrecio = selectedTipo?.precio !== null && selectedTipo?.precio !== undefined;
+
+  useEffect(() => {
+    if (tipoHasPrecio && cantidadPersonas) {
+      const calc = selectedTipo!.precio * Number(cantidadPersonas);
+      setMontoTotal(String(calc));
+    } else if (tipoHasPrecio && !cantidadPersonas) {
+      setMontoTotal("");
+    }
+  }, [cantidadPersonas, selectedTipo, tipoHasPrecio]);
+
+  const canSubmit = puntoDeVentaId && tipoEventoId && fechaEvento && cantidadPersonas;
 
   const handleSubmit = async () => {
     if (!canSubmit) return;
@@ -229,7 +257,7 @@ export default function NuevoEventoPage() {
                   t.precio !== null ? `$${t.precio.toLocaleString("es-AR")}` : undefined,
               }))}
               value={tipoEventoId}
-              onChange={setTipoEventoId}
+              onChange={(v) => { setTipoEventoId(v); setMontoTotal(""); }}
               placeholder="Seleccionar tipo de evento..."
               disabled={!comedorId}
               className="w-full"
@@ -287,7 +315,7 @@ export default function NuevoEventoPage() {
                 Funcionario{caseFields.funcionario.required ? " *" : ""}
               </label>
               <Combobox
-                options={empleadoOptions}
+                options={funcionarioOptions}
                 value={funcionarioId}
                 onChange={setFuncionarioId}
                 placeholder="Seleccionar funcionario..."
@@ -365,26 +393,34 @@ export default function NuevoEventoPage() {
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <label className="text-sm font-medium">
-                Cantidad de personas
+                Cantidad de personas *
               </label>
               <Input
                 type="number"
                 min="1"
                 value={cantidadPersonas}
                 onChange={(e) => setCantidadPersonas(e.target.value)}
-                placeholder="Opcional"
+                placeholder="Cantidad"
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-sm font-medium">Monto total</label>
+              <label className="text-sm font-medium">
+                Monto total{!tipoHasPrecio ? " *" : ""}
+              </label>
               <Input
                 type="number"
                 min="0"
                 step="0.01"
                 value={montoTotal}
                 onChange={(e) => setMontoTotal(e.target.value)}
-                placeholder="Opcional"
+                readOnly={tipoHasPrecio}
+                placeholder={tipoHasPrecio ? "Auto-calculado" : "Monto"}
               />
+              {tipoHasPrecio && (
+                <p className="text-xs text-muted-foreground">
+                  {selectedTipo!.precio.toLocaleString("es-AR")} × {cantidadPersonas || 0} personas
+                </p>
+              )}
             </div>
           </div>
 
