@@ -1,7 +1,7 @@
 import type { ComedorResponse } from "@/domain/dto/comedor/ComedorResponse";
 import type { SociedadResponse } from "@/domain/dto/sociedad/SociedadResponse";
 import { Combobox, type ComboboxOption } from "@/components/ui/combobox";
-import { Button } from "@/components/ui/button";
+import { FilterPills } from "@/components/data-table";
 import { Input } from "@/components/ui/input";
 import { useMemo } from "react";
 
@@ -70,19 +70,11 @@ export function ListFilters({
     <div className="flex flex-wrap items-center gap-2">
       <div className="flex items-center gap-1">
         {dateFieldOptions && dateFieldOptions.length > 1 && (
-          <div className="flex items-center gap-0.5">
-            {dateFieldOptions.map((opt) => (
-              <Button
-                key={opt.value}
-                variant={filters.dateField === opt.value ? "outline" : "ghost"}
-                size="xs"
-                type="button"
-                onClick={() => set({ dateField: opt.value })}
-              >
-                {opt.label}
-              </Button>
-            ))}
-          </div>
+          <FilterPills
+            options={dateFieldOptions}
+            value={filters.dateField}
+            onChange={(v) => set({ dateField: v })}
+          />
         )}
         <Input
           type="date"
