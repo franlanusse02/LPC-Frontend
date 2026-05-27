@@ -157,7 +157,7 @@ export default function EventosContabilidad() {
   const [emitirOpen, setEmitirOpen] = useState(false);
   const [cobrarOpen, setCobrarOpen] = useState(false);
 
-  const [listFilters, setListFilters] = useState<ListFilterState>(defaultFilters);
+  const [listFilters, setListFilters] = useState<ListFilterState>({ ...defaultFilters, dateField: "fechaEvento" });
 
   useEffect(() => {
     Promise.all([get("/eventos"), get("/comedores")]).then(
@@ -177,8 +177,12 @@ export default function EventosContabilidad() {
 
   const eventosAfterDateFilter = useMemo(() => {
     let list = [...eventos];
-    if (listFilters.desde) list = list.filter((e) => e.fechaEvento >= listFilters.desde);
-    if (listFilters.hasta) list = list.filter((e) => e.fechaEvento <= listFilters.hasta);
+    const getDate = listFilters.dateField === "creadoEn"
+      ? (e: EventoResponse) =>
+          new Date(e.creadoEn).toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" })
+      : (e: EventoResponse) => e.fechaEvento;
+    if (listFilters.desde) list = list.filter((e) => getDate(e) >= listFilters.desde);
+    if (listFilters.hasta) list = list.filter((e) => getDate(e) <= listFilters.hasta);
     if (listFilters.comedorId) list = list.filter((e) => e.comedorId === Number(listFilters.comedorId));
     return list;
   }, [eventos, listFilters]);
@@ -386,7 +390,12 @@ export default function EventosContabilidad() {
   };
 
   const exportColumns: ExportColumn<EventoResponse>[] = [
-    { key: "creadoEn", header: "Fecha de Carga" },
+    { key: (e) => new Date(e.creadoEn).toLocaleString("es-AR", {
+      timeZone: "America/Argentina/Buenos_Aires",
+      day: "2-digit", month: "2-digit", year: "numeric",
+      hour: "2-digit", minute: "2-digit", second: "2-digit",
+      hour12: false,
+    }), header: "Fecha de Carga" },
     { key: "id", header: "ID" },
     { key: (e) => comedorNameById[e.comedorId] ?? e.comedorId, header: "Comedor" },
     { key: "tipoEventoNombre", header: "Tipo Evento" },
@@ -455,7 +464,16 @@ export default function EventosContabilidad() {
             </CardTitle>
           </div>
           <div className="pt-3">
-            <ListFilters filters={listFilters} onChange={setListFilters} comedores={comedores} showSociedad={false} />
+            <ListFilters
+              filters={listFilters}
+              onChange={setListFilters}
+              comedores={comedores}
+              showSociedad={false}
+              dateFieldOptions={[
+                { value: "fechaEvento", label: "Fecha Evento" },
+                { value: "creadoEn", label: "Fecha de Carga" },
+              ]}
+            />
           </div>
         </CardHeader>
         <CardContent className="p-0">

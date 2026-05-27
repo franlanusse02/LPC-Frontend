@@ -43,7 +43,7 @@ export default function CierresContabilidad() {
 
   const [cierres, setCierres] = useState<DetailedCierreCajaResponse[]>([]);
   const [comedores, setComedores] = useState<ComedorResponse[]>([]);
-  const [listFilters, setListFilters] = useState<ListFilterState>(defaultFilters);
+  const [listFilters, setListFilters] = useState<ListFilterState>({ ...defaultFilters, dateField: "fechaOperacion" });
 
   const [anularCierreModalOpen, setAnularCierreModalOpen] = useState(false);
   const [selectedCierre, setSelectedCierre] =
@@ -60,8 +60,12 @@ export default function CierresContabilidad() {
 
   const cierresAfterFilters = useMemo(() => {
     let list = cierres;
-    if (listFilters.desde) list = list.filter((c) => c.fechaOperacion >= listFilters.desde);
-    if (listFilters.hasta) list = list.filter((c) => c.fechaOperacion <= listFilters.hasta);
+    const getDate = listFilters.dateField === "createdAt"
+      ? (c: DetailedCierreCajaResponse) =>
+          new Date(c.createdAt).toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" })
+      : (c: DetailedCierreCajaResponse) => c.fechaOperacion;
+    if (listFilters.desde) list = list.filter((c) => getDate(c) >= listFilters.desde);
+    if (listFilters.hasta) list = list.filter((c) => getDate(c) <= listFilters.hasta);
     if (listFilters.comedorId) list = list.filter((c) => c.comedor.id === Number(listFilters.comedorId));
     if (listFilters.puntoDeVentaId) list = list.filter((c) => c.puntoDeVenta.id === Number(listFilters.puntoDeVentaId));
     return list;
@@ -135,7 +139,12 @@ export default function CierresContabilidad() {
   };
 
   const exportColumns: ExportColumn<DetailedCierreCajaResponse>[] = [
-    { key: "createdAt", header: "Fecha de Carga" },
+    { key: (c) => new Date(c.createdAt).toLocaleString("es-AR", {
+      timeZone: "America/Argentina/Buenos_Aires",
+      day: "2-digit", month: "2-digit", year: "numeric",
+      hour: "2-digit", minute: "2-digit", second: "2-digit",
+      hour12: false,
+    }), header: "Fecha de Carga" },
     { key: "id", header: "ID" },
     { key: (c) => c.comedor.nombre, header: "Comedor" },
     { key: (c) => c.puntoDeVenta.nombre, header: "Punto de Venta" },
@@ -207,6 +216,10 @@ export default function CierresContabilidad() {
               onChange={setListFilters}
               comedores={comedores}
               showSociedad={false}
+              dateFieldOptions={[
+                { value: "fechaOperacion", label: "Fecha Operación" },
+                { value: "createdAt", label: "Fecha de Carga" },
+              ]}
             />
           </div>
         </CardHeader>

@@ -342,7 +342,16 @@ export default function ComprasContabilidad() {
             </CardTitle>
           </div>
           <div className="pt-3">
-            <ListFilters filters={listFilters} onChange={setListFilters} comedores={comedores} showSociedad={false} />
+            <ListFilters
+              filters={listFilters}
+              onChange={setListFilters}
+              comedores={comedores}
+              showSociedad={false}
+              dateFieldOptions={[
+                { value: "fechaFactura", label: "Fecha Factura" },
+                { value: "creadoEn", label: "Fecha de Carga" },
+              ]}
+            />
           </div>
         </CardHeader>
         <CardContent className="p-0">
