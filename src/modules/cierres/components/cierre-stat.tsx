@@ -16,7 +16,7 @@ export function StatCard({
       </p>
       <p
         className={cn(
-          "mt-1 text-[clamp(1rem,3.5cqi,1.5rem)] font-bold tabular-nums",
+          "mt-1 text-[clamp(1.25rem,5cqi,1.75rem)] font-bold tabular-nums",
           accent === "emerald" && "text-emerald-600",
           accent === "red" && "text-red-500",
           accent === "blue" && "text-blue-600",
