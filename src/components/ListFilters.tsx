@@ -1,11 +1,14 @@
 import type { ComedorResponse } from "@/domain/dto/comedor/ComedorResponse";
 import type { SociedadResponse } from "@/domain/dto/sociedad/SociedadResponse";
 import { Combobox, type ComboboxOption } from "@/components/ui/combobox";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Fragment, useMemo } from "react";
-import { cn } from "@/lib/utils";
+import { useMemo } from "react";
 
-export type DateFieldFilter = "fechaFactura" | "creadoEn";
+export interface DateFieldOption {
+  value: string;
+  label: string;
+}
 
 export interface ListFilterState {
   comedorId: string;
@@ -13,7 +16,7 @@ export interface ListFilterState {
   puntoDeVentaId: string;
   desde: string;
   hasta: string;
-  dateField: DateFieldFilter;
+  dateField: string;
 }
 
 interface ListFiltersProps {
@@ -23,6 +26,7 @@ interface ListFiltersProps {
   sociedades?: SociedadResponse[];
   showSociedad?: boolean;
   showPuntoDeVenta?: boolean;
+  dateFieldOptions?: DateFieldOption[];
 }
 
 export function ListFilters({
@@ -32,6 +36,7 @@ export function ListFilters({
   sociedades,
   showSociedad = true,
   showPuntoDeVenta = true,
+  dateFieldOptions,
 }: ListFiltersProps) {
   const set = (partial: Partial<ListFilterState>) =>
     onChange({ ...filters, ...partial });
@@ -61,33 +66,24 @@ export function ListFilters({
     }));
   }, [comedores, filters.comedorId]);
 
-  const dateFieldOptions: { value: DateFieldFilter; label: string }[] = [
-    { value: "fechaFactura", label: "Fecha Factura" },
-    { value: "creadoEn", label: "Fecha de Carga" },
-  ];
-
   return (
     <div className="flex flex-wrap items-center gap-2">
       <div className="flex items-center gap-1">
-        <div className="flex items-center gap-1 mr-1">
-          {dateFieldOptions.map((opt, i) => (
-            <Fragment key={opt.value}>
-              {i > 0 && <span className="text-xs text-gray-300">|</span>}
-              <button
+        {dateFieldOptions && dateFieldOptions.length > 1 && (
+          <div className="flex items-center gap-0.5">
+            {dateFieldOptions.map((opt) => (
+              <Button
+                key={opt.value}
+                variant={filters.dateField === opt.value ? "outline" : "ghost"}
+                size="xs"
                 type="button"
                 onClick={() => set({ dateField: opt.value })}
-                className={cn(
-                  "text-sm transition-colors",
-                  filters.dateField === opt.value
-                    ? "font-semibold text-gray-900 underline underline-offset-4"
-                    : "text-gray-400 hover:text-gray-600 cursor-pointer",
-                )}
               >
                 {opt.label}
-              </button>
-            </Fragment>
-          ))}
-        </div>
+              </Button>
+            ))}
+          </div>
+        )}
         <Input
           type="date"
           value={filters.desde}

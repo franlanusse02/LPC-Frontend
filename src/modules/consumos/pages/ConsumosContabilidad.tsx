@@ -52,7 +52,7 @@ export default function ConsumosContabilidad() {
   const [viewMode, setViewMode] = useState<"detailed" | "grouped">("detailed");
   const [agrupados, setAgrupados] = useState<AgrupadosResponse[]>([]);
 
-  const [listFilters, setListFilters] = useState<ListFilterState>(defaultFilters);
+  const [listFilters, setListFilters] = useState<ListFilterState>({ ...defaultFilters, dateField: "fecha" });
 
   useEffect(() => {
     Promise.all([
@@ -93,8 +93,12 @@ export default function ConsumosContabilidad() {
 
   const consumosAfterDateFilter = useMemo(() => {
     let list = [...consumos];
-    if (listFilters.desde) list = list.filter((c) => c.fecha >= listFilters.desde);
-    if (listFilters.hasta) list = list.filter((c) => c.fecha <= listFilters.hasta);
+    const getDate = listFilters.dateField === "creadoEn"
+      ? (c: ConsumoResponse) =>
+          new Date(c.creadoEn).toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" })
+      : (c: ConsumoResponse) => c.fecha;
+    if (listFilters.desde) list = list.filter((c) => getDate(c) >= listFilters.desde);
+    if (listFilters.hasta) list = list.filter((c) => getDate(c) <= listFilters.hasta);
     if (listFilters.comedorId) {
       const cId = Number(listFilters.comedorId);
       list = list.filter((c) => {
@@ -187,7 +191,12 @@ export default function ConsumosContabilidad() {
   };
 
   const exportColumns: ExportColumn<ConsumoResponse>[] = [
-    { key: "creadoEn", header: "Fecha de Carga" },
+    { key: (c) => new Date(c.creadoEn).toLocaleString("es-AR", {
+      timeZone: "America/Argentina/Buenos_Aires",
+      day: "2-digit", month: "2-digit", year: "numeric",
+      hour: "2-digit", minute: "2-digit", second: "2-digit",
+      hour12: false,
+    }), header: "Fecha de Carga" },
     { key: "id", header: "ID" },
     { key: (c) => { const cons = consumidorById[c.consumidorId]; return cons ? (comedorNameById[cons.comedorId] ?? cons.comedorId) : "—"; }, header: "Comedor" },
     { key: (c) => puntoDeVentaNameById[c.PuntoDeVentaId] ?? c.PuntoDeVentaId, header: "Punto de Venta" },
@@ -257,7 +266,16 @@ export default function ConsumosContabilidad() {
             </CardTitle>
           </div>
           <div className="pt-3">
-            <ListFilters filters={listFilters} onChange={setListFilters} comedores={comedores} showSociedad={false} />
+            <ListFilters
+              filters={listFilters}
+              onChange={setListFilters}
+              comedores={comedores}
+              showSociedad={false}
+              dateFieldOptions={[
+                { value: "fecha", label: "Fecha Consumo" },
+                { value: "creadoEn", label: "Fecha de Carga" },
+              ]}
+            />
           </div>
         </CardHeader>
         <CardContent className="p-0">
