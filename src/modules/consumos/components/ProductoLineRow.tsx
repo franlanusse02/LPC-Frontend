@@ -1,13 +1,7 @@
 import { Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Combobox } from "@/components/ui/combobox";
 import { fmtCurrency } from "@/lib/utils";
 import type { ProductoResponse } from "@/domain/dto/consumo/ProductoResponse";
 
@@ -33,21 +27,13 @@ export function ProductoLineRow({ line, productos, usedProductoIds, onChange, on
 
   return (
     <div className="flex gap-3 items-center">
-      <Select
+      <Combobox
+        options={available.map((p) => ({ value: String(p.productoId), label: `${p.nombre} — ${fmtCurrency(p.precio)}` }))}
         value={line.productoId}
-        onValueChange={(v) => onChange({ ...line, productoId: v })}
-      >
-        <SelectTrigger className="flex-1">
-          <SelectValue placeholder="Producto..." />
-        </SelectTrigger>
-        <SelectContent>
-          {available.map((p) => (
-            <SelectItem key={p.productoId} value={String(p.productoId)}>
-              {p.nombre} — {fmtCurrency(p.precio)}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+        onChange={(v) => onChange({ ...line, productoId: v })}
+        placeholder="Producto..."
+        className="flex-1"
+      />
 
       <Input
         type="number"

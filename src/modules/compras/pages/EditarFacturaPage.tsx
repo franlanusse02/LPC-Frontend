@@ -8,13 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Combobox } from "@/components/ui/combobox";
 import type { FacturaProveedorResponse } from "@/domain/dto/compra/FacturaProveedorResponse";
 import type { PatchFacturaProveedorRequest } from "@/domain/dto/compra/PatchFacturaProveedorRequest";
 import type { MedioPago } from "@/domain/enums/MedioPago";
@@ -139,40 +133,24 @@ export default function EditarFacturaPage() {
               <div className="flex-1 space-y-5">
                 <div className="space-y-1.5">
                   <label className="text-sm font-medium">Proveedor *</label>
-                  <Select
+                  <Combobox
+                    options={proveedores.map((p) => ({ value: String(p.id), label: p.nombre }))}
                     value={proveedorId}
-                    onValueChange={(v) => setProveedorId(v)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Seleccionar proveedor..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {proveedores.map((p) => (
-                        <SelectItem key={p.id} value={String(p.id)}>
-                          {p.nombre}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    onChange={setProveedorId}
+                    placeholder="Seleccionar proveedor..."
+                    className="w-full"
+                  />
                 </div>
 
                 <div className="space-y-1.5">
                   <label className="text-sm font-medium">Comedor *</label>
-                  <Select
+                  <Combobox
+                    options={comedores.map((c) => ({ value: String(c.id), label: c.nombre }))}
                     value={comedorId}
-                    onValueChange={(v) => setComedorId(v)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Seleccionar comedor..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {comedores.map((c) => (
-                        <SelectItem key={c.id} value={String(c.id)}>
-                          {c.nombre}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    onChange={setComedorId}
+                    placeholder="Seleccionar comedor..."
+                    className="w-full"
+                  />
                 </div>
 
                 <div className="space-y-1.5">
@@ -208,24 +186,14 @@ export default function EditarFacturaPage() {
 
                 <div className="space-y-1.5">
                   <label className="text-sm font-medium">Medio de pago</label>
-                  <Select
+                  <Combobox
+                    options={Object.entries(MediosPagoDict).map(([label, value]) => ({ value, label }))}
                     value={medioPago}
-                    onValueChange={(v) =>
-                      setMedioPago(v === "__none__" ? "" : (v as MedioPago))
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Sin especificar" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="__none__">Sin especificar</SelectItem>
-                      {Object.entries(MediosPagoDict).map(([label, value]) => (
-                        <SelectItem key={value} value={value}>
-                          {label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    onChange={(v) => setMedioPago(v as MedioPago | "")}
+                    placeholder="Sin especificar"
+                    clearable
+                    className="w-full"
+                  />
                 </div>
 
                 <div className="space-y-1.5">

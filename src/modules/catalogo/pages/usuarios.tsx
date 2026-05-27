@@ -6,13 +6,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Combobox } from "@/components/ui/combobox";
 import { Spinner } from "@/components/ui/spinner";
 import { DataTable, SortableTh } from "@/components/data-table";
 import { useApi } from "@/hooks/useApi";
@@ -258,19 +252,17 @@ export default function UsuariosPage() {
               </div>
               <div>
                 <label className="mb-1 block text-sm font-medium">Rol</label>
-                <Select
+                <Combobox
+                  options={[
+                    { value: "ADMIN", label: "Admin" },
+                    { value: "ENCARGADO", label: "Encargado" },
+                    { value: "CONTABILIDAD", label: "Contabilidad" },
+                  ]}
                   value={rol}
-                  onValueChange={(v) => setRol(v as UserRole)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Seleccionar..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="ADMIN">Admin</SelectItem>
-                    <SelectItem value="ENCARGADO">Encargado</SelectItem>
-                    <SelectItem value="CONTABILIDAD">Contabilidad</SelectItem>
-                  </SelectContent>
-                </Select>
+                  onChange={(v) => setRol(v as UserRole)}
+                  placeholder="Seleccionar..."
+                  className="w-full"
+                />
               </div>
               {!editing && (
                 <div>
