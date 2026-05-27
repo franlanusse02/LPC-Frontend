@@ -65,7 +65,7 @@ export function KpiCard({
   return (
     <div
       className={cn(
-        "rounded-xl border-0 bg-white shadow-sm px-5 py-4",
+        "rounded-xl border-0 bg-white shadow-sm px-5 py-4 min-w-0",
         className,
       )}
     >
@@ -79,7 +79,7 @@ export function KpiCard({
       ) : (
         <p
           className={cn(
-            "mt-1 text-[clamp(1.1rem,2vw,1.5rem)] font-bold tabular-nums overflow-hidden whitespace-nowrap",
+            "mt-1 text-[clamp(1.1rem,2vw,1.5rem)] font-bold tabular-nums overflow-hidden whitespace-nowrap text-ellipsis",
             accent === "emerald" && "text-emerald-600",
             accent === "red" && "text-red-500",
             accent === "blue" && "text-blue-600",
