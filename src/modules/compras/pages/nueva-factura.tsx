@@ -8,13 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Combobox } from "@/components/ui/combobox";
 import { cn, fmtCurrency } from "@/lib/utils";
 import type { CreateFacturaProveedorRequest } from "@/domain/dto/compra/CreateFacturaProveedorRequest";
@@ -171,34 +164,24 @@ export default function NuevaFacturaPage() {
               <div className="flex-1 space-y-5">
                 <div className="space-y-1.5">
                   <label className="text-sm font-medium">Proveedor *</label>
-                  <Select value={proveedorId} onValueChange={setProveedorId}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Seleccionar proveedor..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {proveedores.map((p) => (
-                        <SelectItem key={p.id} value={String(p.id)}>
-                          {p.nombre}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Combobox
+                    options={proveedores.map((p) => ({ value: String(p.id), label: p.nombre }))}
+                    value={proveedorId}
+                    onChange={setProveedorId}
+                    placeholder="Seleccionar proveedor..."
+                    className="w-full"
+                  />
                 </div>
 
                 <div className="space-y-1.5">
                   <label className="text-sm font-medium">Comedor *</label>
-                  <Select value={comedorId} onValueChange={setComedorId}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Seleccionar comedor..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {comedores.map((c) => (
-                        <SelectItem key={c.id} value={String(c.id)}>
-                          {c.nombre}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Combobox
+                    options={comedores.map((c) => ({ value: String(c.id), label: c.nombre }))}
+                    value={comedorId}
+                    onChange={setComedorId}
+                    placeholder="Seleccionar comedor..."
+                    className="w-full"
+                  />
                 </div>
 
                 <div className="space-y-1.5">
@@ -236,24 +219,14 @@ export default function NuevaFacturaPage() {
 
                 <div className="space-y-1.5">
                   <label className="text-sm font-medium">Medio de pago</label>
-                  <Select
+                  <Combobox
+                    options={Object.entries(MediosPagoDict).map(([label, value]) => ({ value, label }))}
                     value={medioPago}
-                    onValueChange={(v) =>
-                      setMedioPago(v === "__none__" ? "" : (v as MedioPago))
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Sin especificar" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="__none__">Sin especificar</SelectItem>
-                      {Object.entries(MediosPagoDict).map(([label, value]) => (
-                        <SelectItem key={value} value={value}>
-                          {label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    onChange={(v) => setMedioPago(v as MedioPago | "")}
+                    placeholder="Sin especificar"
+                    clearable
+                    className="w-full"
+                  />
                 </div>
 
                 {requiresPuntoDeVentaProveedor && (
@@ -261,21 +234,13 @@ export default function NuevaFacturaPage() {
                     <label className="text-sm font-medium">
                       Punto de venta (proveedor) *
                     </label>
-                    <Select
+                    <Combobox
+                      options={(selectedProveedor?.puntosDeVenta ?? []).map((pv) => ({ value: String(pv), label: String(pv) }))}
                       value={puntoDeVentaProveedor}
-                      onValueChange={setPuntoDeVentaProveedor}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Seleccionar..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {selectedProveedor?.puntosDeVenta.map((pv) => (
-                          <SelectItem key={pv} value={String(pv)}>
-                            {pv}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                      onChange={setPuntoDeVentaProveedor}
+                      placeholder="Seleccionar..."
+                      className="w-full"
+                    />
                   </div>
                 )}
 

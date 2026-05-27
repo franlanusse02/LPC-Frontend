@@ -12,13 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Combobox } from "@/components/ui/combobox";
 
 interface Comedor {
   id: number;
@@ -175,44 +169,28 @@ export default function NuevoCierrePage() {
 
                 <div className="space-y-1.5">
                   <label className="text-sm font-medium">Comedor</label>
-                  <Select
+                  <Combobox
+                    options={comedores.map((c) => ({ value: String(c.id), label: c.nombre }))}
                     value={comedorId}
-                    onValueChange={(v) => {
+                    onChange={(v) => {
                       setComedorId(v);
                       setPuntoVentaId("");
                     }}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Seleccionar comedor..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {comedores.map((c) => (
-                        <SelectItem key={c.id} value={String(c.id)}>
-                          {c.nombre}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    placeholder="Seleccionar comedor..."
+                    className="w-full"
+                  />
                 </div>
 
                 <div className="space-y-1.5">
                   <label className="text-sm font-medium">Punto de Venta</label>
-                  <Select
+                  <Combobox
+                    options={puntosFiltrados.map((p) => ({ value: String(p.id), label: p.nombre }))}
                     value={puntoVentaId}
-                    onValueChange={setPuntoVentaId}
+                    onChange={setPuntoVentaId}
                     disabled={!comedorId}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Seleccionar punto de venta..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {puntosFiltrados.map((p) => (
-                        <SelectItem key={p.id} value={String(p.id)}>
-                          {p.nombre}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    placeholder="Seleccionar punto de venta..."
+                    className="w-full"
+                  />
                 </div>
 
                 <div className="space-y-1.5">

@@ -12,13 +12,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Combobox } from "@/components/ui/combobox";
+import type { ComedorResponse } from "@/domain/dto/comedor/ComedorResponse";
 import type { ConsumidorResponse } from "@/domain/dto/consumo/ConsumidorResponse";
 import type { PuntoDeVentaResponse } from "@/domain/dto/pto-venta/PuntoDeVentaResponse";
 import type { ProductoResponse } from "@/domain/dto/consumo/ProductoResponse";
@@ -28,12 +23,14 @@ export default function NuevoConsumoPage() {
   const navigate = useNavigate();
   const { get, post } = useApi();
 
+  const [comedores, setComedores] = useState<ComedorResponse[]>([]);
   const [consumidores, setConsumidores] = useState<ConsumidorResponse[]>([]);
   const [puntosDeVenta, setPuntosDeVenta] = useState<PuntoDeVentaResponse[]>(
     [],
   );
   const [productos, setProductos] = useState<ProductoResponse[]>([]);
 
+  const [comedorId, setComedorId] = useState("");
   const [consumidorId, setConsumidorId] = useState("");
   const [puntoDeVentaId, setPuntoDeVentaId] = useState("");
   const [fecha, setFecha] = useState(new Date().toISOString().split("T")[0]);
@@ -43,39 +40,48 @@ export default function NuevoConsumoPage() {
 
   useEffect(() => {
     Promise.all([
+      get("/comedores"),
       get("/consumos/consumidores/all"),
       get("/comedores/puntos-de-venta"),
       get("/consumos/productos"),
-    ]).then(([consumidoresRes, pvRes, productosRes]) => {
+    ]).then(([comedoresRes, consumidoresRes, pvRes, productosRes]) => {
+      comedoresRes.json().then(setComedores);
       consumidoresRes.json().then(setConsumidores);
       pvRes.json().then(setPuntosDeVenta);
       productosRes.json().then(setProductos);
     });
   }, [get]);
 
-  const selectedConsumidor = consumidores.find(
-    (c) => String(c.id) === consumidorId,
+  const consumidoresFiltrados = useMemo(
+    () =>
+      comedorId
+        ? consumidores.filter((c) => c.comedorId === Number(comedorId) && c.activo)
+        : consumidores.filter((c) => c.activo),
+    [consumidores, comedorId],
   );
 
   const puntosFiltrados = useMemo(
     () =>
-      selectedConsumidor
-        ? puntosDeVenta.filter(
-            (p) => p.comedorId === selectedConsumidor.comedorId,
-          )
+      comedorId
+        ? puntosDeVenta.filter((p) => p.comedorId === Number(comedorId))
         : puntosDeVenta,
-    [puntosDeVenta, selectedConsumidor],
+    [puntosDeVenta, comedorId],
   );
 
   const productosFiltrados = useMemo(
     () =>
-      selectedConsumidor
-        ? productos.filter(
-            (p) => p.comedorId === selectedConsumidor.comedorId && p.activo,
-          )
+      comedorId
+        ? productos.filter((p) => p.comedorId === Number(comedorId) && p.activo)
         : productos.filter((p) => p.activo),
-    [productos, selectedConsumidor],
+    [productos, comedorId],
   );
+
+  const handleComedorChange = (v: string) => {
+    setComedorId(v);
+    setConsumidorId("");
+    setPuntoDeVentaId("");
+    setLines([]);
+  };
 
   const usedProductoIds = lines.map((l) => l.productoId).filter(Boolean);
 
@@ -166,50 +172,50 @@ export default function NuevoConsumoPage() {
               {/* Left column */}
               <div className="flex-1 space-y-5">
                 <div className="space-y-1.5">
+                  <label className="text-sm font-medium">Comedor *</label>
+                  <Combobox
+                    options={comedores.map((c) => ({
+                      value: String(c.id),
+                      label: c.nombre,
+                    }))}
+                    value={comedorId}
+                    onChange={handleComedorChange}
+                    placeholder="Seleccionar comedor..."
+                    className="w-full"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
                   <label className="text-sm font-medium">Consumidor *</label>
-                  <Select
+                  <Combobox
+                    options={consumidoresFiltrados.map((c) => ({
+                      value: String(c.id),
+                      label: c.nombre,
+                    }))}
                     value={consumidorId}
-                    onValueChange={(v) => {
+                    onChange={(v) => {
                       setConsumidorId(v);
                       setPuntoDeVentaId("");
                       setLines([]);
                     }}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Seleccionar consumidor..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {consumidores
-                        .filter((c) => c.activo)
-                        .map((c) => (
-                          <SelectItem key={c.id} value={String(c.id)}>
-                            {c.nombre}
-                          </SelectItem>
-                        ))}
-                    </SelectContent>
-                  </Select>
+                    placeholder={!comedorId ? "Seleccioná un comedor primero..." : "Seleccionar consumidor..."}
+                    disabled={!comedorId}
+                    className="w-full"
+                  />
                 </div>
 
                 <div className="space-y-1.5">
                   <label className="text-sm font-medium">
                     Punto de Venta *
                   </label>
-                  <Select
+                  <Combobox
+                    options={puntosFiltrados.map((p) => ({ value: String(p.id), label: p.nombre }))}
                     value={puntoDeVentaId}
-                    onValueChange={setPuntoDeVentaId}
-                    disabled={!consumidorId}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Seleccionar punto de venta..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {puntosFiltrados.map((p) => (
-                        <SelectItem key={p.id} value={String(p.id)}>
-                          {p.nombre}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    onChange={setPuntoDeVentaId}
+                    disabled={!comedorId}
+                    placeholder="Seleccionar punto de venta..."
+                    className="w-full"
+                  />
                 </div>
 
                 <div className="space-y-1.5">
@@ -257,7 +263,7 @@ export default function NuevoConsumoPage() {
                     variant="outline"
                     onClick={handleAddLine}
                     disabled={
-                      !consumidorId || lines.length >= productosFiltrados.length
+                      !comedorId || lines.length >= productosFiltrados.length
                     }
                     className="mx-auto flex gap-2"
                   >
