@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Combobox } from "@/components/ui/combobox";
 import { Spinner } from "@/components/ui/spinner";
 import { DataTable, SortableTh } from "@/components/data-table";
 import { useApi } from "@/hooks/useApi";
@@ -277,18 +278,13 @@ export default function ProductosPage() {
                 <label className="mb-1 block text-sm font-medium">
                   Comedor
                 </label>
-                <select
-                  className="w-full h-10 px-3 border rounded-md text-sm bg-gray-50 border-gray-200"
+                <Combobox
+                  options={comedores.map((c) => ({ value: String(c.id), label: c.nombre }))}
                   value={comedorId}
-                  onChange={(e) => setComedorId(e.target.value)}
-                >
-                  <option value="">Seleccionar...</option>
-                  {comedores.map((c) => (
-                    <option key={c.id} value={String(c.id)}>
-                      {c.nombre}
-                    </option>
-                  ))}
-                </select>
+                  onChange={setComedorId}
+                  placeholder="Seleccionar..."
+                  className="w-full"
+                />
               </div>
               <div>
                 <label className="mb-1 block text-sm font-medium">Precio</label>

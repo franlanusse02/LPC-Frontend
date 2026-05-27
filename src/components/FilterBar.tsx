@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Input } from "@/components/ui/input";
+import { Combobox } from "@/components/ui/combobox";
 import { FunnelX, Search, X } from "lucide-react";
 import { Button } from "./ui/button";
 
@@ -148,34 +149,26 @@ export function FilterBar<
 
       {/* Sociedad */}
       {sociedades.length > 0 && (
-        <select
+        <Combobox
+          options={sociedades.map((s) => ({ value: s, label: s }))}
           value={sociedadFilter}
-          onChange={(e) => setSociedadFilter(e.target.value)}
-          className="h-8 rounded-md border border-gray-200 bg-gray-50 px-2 text-sm text-gray-600"
-        >
-          <option value="">Todas las sociedades</option>
-          {sociedades.map((s) => (
-            <option key={s} value={s}>
-              {s}
-            </option>
-          ))}
-        </select>
+          onChange={setSociedadFilter}
+          placeholder="Todas las sociedades"
+          clearable
+          className="h-8 text-sm"
+        />
       )}
 
       {/* Comedor */}
       {comedores.length > 0 && (
-        <select
+        <Combobox
+          options={comedores.map((c) => ({ value: c, label: c }))}
           value={comedorFilter}
-          onChange={(e) => setComedorFilter(e.target.value)}
-          className="h-8 rounded-md border border-gray-200 bg-gray-50 px-2 text-sm text-gray-600"
-        >
-          <option value="">Todos los comedores</option>
-          {comedores.map((c) => (
-            <option key={c} value={c}>
-              {c}
-            </option>
-          ))}
-        </select>
+          onChange={setComedorFilter}
+          placeholder="Todos los comedores"
+          clearable
+          className="h-8 text-sm"
+        />
       )}
     </div>
   );

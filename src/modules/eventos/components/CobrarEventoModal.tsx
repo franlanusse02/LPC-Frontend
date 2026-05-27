@@ -12,13 +12,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { CircleDollarSign } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Combobox } from "@/components/ui/combobox";
 import { MediosPagoDict, type MedioPago } from "@/domain/enums/MedioPago";
 import type { EventoResponse } from "@/domain/dto/evento/EventoResponse";
 
@@ -84,18 +78,13 @@ export function CobrarEventoModal({ open, onClose, evento, onConfirm }: Props) {
             <Label className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
               Medio de pago *
             </Label>
-            <Select value={medioPago} onValueChange={setMedioPago}>
-              <SelectTrigger className="bg-card">
-                <SelectValue placeholder="Seleccionar medio de pago..." />
-              </SelectTrigger>
-              <SelectContent>
-                {Object.entries(MediosPagoDict).map(([label, value]) => (
-                  <SelectItem key={value} value={value}>
-                    {label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Combobox
+              options={Object.entries(MediosPagoDict).map(([label, value]) => ({ value, label }))}
+              value={medioPago}
+              onChange={setMedioPago}
+              placeholder="Seleccionar medio de pago..."
+              className="w-full"
+            />
           </div>
           <DialogFooter className="flex-row justify-end gap-2 pt-2">
             <Button

@@ -2,7 +2,10 @@ import type { ComedorResponse } from "@/domain/dto/comedor/ComedorResponse";
 import type { SociedadResponse } from "@/domain/dto/sociedad/SociedadResponse";
 import { Combobox, type ComboboxOption } from "@/components/ui/combobox";
 import { Input } from "@/components/ui/input";
-import { useMemo } from "react";
+import { Fragment, useMemo } from "react";
+import { cn } from "@/lib/utils";
+
+export type DateFieldFilter = "fechaFactura" | "creadoEn";
 
 export interface ListFilterState {
   comedorId: string;
@@ -10,6 +13,7 @@ export interface ListFilterState {
   puntoDeVentaId: string;
   desde: string;
   hasta: string;
+  dateField: DateFieldFilter;
 }
 
 interface ListFiltersProps {
@@ -57,9 +61,33 @@ export function ListFilters({
     }));
   }, [comedores, filters.comedorId]);
 
+  const dateFieldOptions: { value: DateFieldFilter; label: string }[] = [
+    { value: "fechaFactura", label: "Fecha Factura" },
+    { value: "creadoEn", label: "Fecha de Carga" },
+  ];
+
   return (
     <div className="flex flex-wrap items-center gap-2">
       <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 mr-1">
+          {dateFieldOptions.map((opt, i) => (
+            <Fragment key={opt.value}>
+              {i > 0 && <span className="text-xs text-gray-300">|</span>}
+              <button
+                type="button"
+                onClick={() => set({ dateField: opt.value })}
+                className={cn(
+                  "text-sm transition-colors",
+                  filters.dateField === opt.value
+                    ? "font-semibold text-gray-900 underline underline-offset-4"
+                    : "text-gray-400 hover:text-gray-600 cursor-pointer",
+                )}
+              >
+                {opt.label}
+              </button>
+            </Fragment>
+          ))}
+        </div>
         <Input
           type="date"
           value={filters.desde}
@@ -121,5 +149,6 @@ export const defaultFilters: ListFilterState = {
   comedorId: "",
   sociedadId: "",
   puntoDeVentaId: "",
+  dateField: "fechaFactura",
   ...currentMonthRange(),
 };

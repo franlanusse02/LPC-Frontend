@@ -170,8 +170,12 @@ export default function ComprasContabilidad() {
 
   const facturasAfterDateFilter = useMemo(() => {
     let list = [...facturas];
-    if (listFilters.desde) list = list.filter((f) => f.fechaFactura >= listFilters.desde);
-    if (listFilters.hasta) list = list.filter((f) => f.fechaFactura <= listFilters.hasta);
+    const getDate = listFilters.dateField === "creadoEn"
+      ? (f: FacturaProveedorResponse) =>
+          new Date(f.creadoEn).toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" })
+      : (f: FacturaProveedorResponse) => f.fechaFactura;
+    if (listFilters.desde) list = list.filter((f) => getDate(f) >= listFilters.desde);
+    if (listFilters.hasta) list = list.filter((f) => getDate(f) <= listFilters.hasta);
     if (listFilters.comedorId) list = list.filter((f) => f.comedorId === Number(listFilters.comedorId));
     return list;
   }, [facturas, listFilters]);
@@ -223,7 +227,7 @@ export default function ComprasContabilidad() {
   const montoActivo = facturas
     .filter((f) => f.estado !== "ANULADA")
     .reduce((s, f) => s + (f.monto ?? 0), 0);
-  const isFiltered = listFilters.desde !== "" || listFilters.hasta !== "" || listFilters.comedorId !== "";
+  const isFiltered = listFilters.desde !== "" || listFilters.hasta !== "" || listFilters.comedorId !== "" || listFilters.dateField !== "fechaFactura";
   const montoFiltrado = displayed.reduce((s, f) => s + (f.monto ?? 0), 0);
 
   const refetchFacturas = () => {
@@ -274,7 +278,12 @@ export default function ComprasContabilidad() {
   };
 
   const exportColumns: ExportColumn<FacturaProveedorResponse>[] = [
-    { key: "creadoEn", header: "Fecha de Carga" },
+    { key: (f) => new Date(f.creadoEn).toLocaleString("es-AR", {
+      timeZone: "America/Argentina/Buenos_Aires",
+      day: "2-digit", month: "2-digit", year: "numeric",
+      hour: "2-digit", minute: "2-digit", second: "2-digit",
+      hour12: false,
+    }), header: "Fecha de Carga" },
     { key: "id", header: "ID" },
     { key: "numero", header: "Nº Factura" },
     { key: (f) => proveedorNameById[f.proveedorId] ?? f.proveedorId, header: "Proveedor" },
@@ -420,6 +429,11 @@ export default function ComprasContabilidad() {
                   col="fechaPago"
                   {...sortProps}
                 />
+                <SortableTh
+                  label="Nº Operación"
+                  col="numeroOperacion"
+                  {...sortProps}
+                />
                 <SortableTh label="Estado" col="estado" {...sortProps} />
                 <th className="px-4 py-3 w-12">Acciones</th>
               </>
@@ -486,6 +500,11 @@ export default function ComprasContabilidad() {
                         </td>
                         <td className="px-4 py-4 whitespace-nowrap cursor-pointer" onClick={() => expansion.toggleRow(factura.id)}>
                           {factura.fechaPago || (
+                            <span className="text-gray-300">—</span>
+                          )}
+                        </td>
+                        <td className="px-4 py-4 whitespace-nowrap cursor-pointer" onClick={() => expansion.toggleRow(factura.id)}>
+                          {factura.numeroOperacion || (
                             <span className="text-gray-300">—</span>
                           )}
                         </td>
@@ -569,7 +588,7 @@ export default function ComprasContabilidad() {
 
                       {isExpanded && (
                         <tr className="bg-gray-50/60">
-                          <td colSpan={11} className="px-8 py-4">
+                          <td colSpan={12} className="px-8 py-4">
                             <div className="grid grid-cols-2 gap-x-8 gap-y-3 sm:grid-cols-3 lg:grid-cols-4 mb-3">
                               {factura.numeroOperacion && (
                                 <div className="flex flex-col gap-0.5">

@@ -5,13 +5,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Combobox } from "@/components/ui/combobox";
 import { Spinner } from "@/components/ui/spinner";
 import { DataTable, SortableTh } from "@/components/data-table";
 import { useApi } from "@/hooks/useApi";
@@ -201,18 +195,13 @@ export default function ComedoresPage() {
                 <label className="mb-1 block text-sm font-medium">
                   Sociedad
                 </label>
-                <Select value={sociedadId} onValueChange={setSociedadId}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Seleccionar..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {sociedades.map((s) => (
-                      <SelectItem key={s.id} value={String(s.id)}>
-                        {s.nombre}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Combobox
+                  options={sociedades.map((s) => ({ value: String(s.id), label: s.nombre }))}
+                  value={sociedadId}
+                  onChange={setSociedadId}
+                  placeholder="Seleccionar..."
+                  className="w-full"
+                />
               </div>
               <div className="flex justify-end gap-2 pt-2">
                 <Button variant="outline" onClick={() => setModalOpen(false)}>

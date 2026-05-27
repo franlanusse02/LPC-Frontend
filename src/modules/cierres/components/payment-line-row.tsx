@@ -2,13 +2,7 @@ import { Trash2, Ban } from "lucide-react";
 import { MediosPagoDict } from "@/domain/enums/MedioPago";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Combobox } from "@/components/ui/combobox";
 
 export interface PaymentLine {
   id: number | null;
@@ -92,21 +86,13 @@ export function PaymentLineRow({
 
   return (
     <div className="flex gap-3">
-      <Select
+      <Combobox
+        options={availableMedios.map(([key, value]) => ({ value, label: key }))}
         value={line.medioPago}
-        onValueChange={(v) => onChange({ ...line, medioPago: v })}
-      >
-        <SelectTrigger className="flex-1">
-          <SelectValue placeholder="Medio de pago" />
-        </SelectTrigger>
-        <SelectContent>
-          {availableMedios.map(([key, value]) => (
-            <SelectItem key={key} value={value}>
-              {key}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+        onChange={(v) => onChange({ ...line, medioPago: v })}
+        placeholder="Medio de pago"
+        className="flex-1"
+      />
 
       <Input
         type="number"

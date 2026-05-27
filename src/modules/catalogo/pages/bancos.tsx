@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Combobox } from "@/components/ui/combobox";
 import { Spinner } from "@/components/ui/spinner";
 import { DataTable } from "@/components/data-table";
 import { useApi } from "@/hooks/useApi";
@@ -158,18 +159,13 @@ export default function BancosPage() {
                 <label className="mb-1 block text-sm font-medium">
                   Sociedad
                 </label>
-                <select
-                  className="w-full h-10 px-3 border rounded-md text-sm bg-gray-50 border-gray-200"
+                <Combobox
+                  options={sociedades.map((s) => ({ value: String(s.id), label: s.nombre }))}
                   value={sociedadId}
-                  onChange={(e) => setSociedadId(e.target.value)}
-                >
-                  <option value="">Seleccionar...</option>
-                  {sociedades.map((s) => (
-                    <option key={s.id} value={String(s.id)}>
-                      {s.nombre}
-                    </option>
-                  ))}
-                </select>
+                  onChange={setSociedadId}
+                  placeholder="Seleccionar..."
+                  className="w-full"
+                />
               </div>
               <div className="flex justify-end gap-2 pt-2">
                 <Button variant="outline" onClick={() => setModalOpen(false)}>

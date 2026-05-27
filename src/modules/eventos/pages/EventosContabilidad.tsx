@@ -2,13 +2,7 @@ import { Fragment, useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Combobox } from "@/components/ui/combobox";
 import { MediosPagoDict } from "@/domain/enums/MedioPago";
 import {
   DropdownMenu,
@@ -811,18 +805,13 @@ export default function EventosContabilidad() {
           </div>
           <div className="space-y-1">
             <label className="text-xs font-medium text-gray-500">Medio de pago</label>
-            <Select value={bulkMedioPago} onValueChange={setBulkMedioPago}>
-              <SelectTrigger className="bg-card">
-                <SelectValue placeholder="Seleccionar medio de pago..." />
-              </SelectTrigger>
-              <SelectContent>
-                {Object.entries(MediosPagoDict).map(([label, value]) => (
-                  <SelectItem key={value} value={value}>
-                    {label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Combobox
+              options={Object.entries(MediosPagoDict).map(([label, value]) => ({ value, label }))}
+              value={bulkMedioPago}
+              onChange={setBulkMedioPago}
+              placeholder="Seleccionar medio de pago..."
+              className="w-full"
+            />
           </div>
           <div className="space-y-1">
             <label className="text-xs font-medium text-gray-500">Nº operación</label>
