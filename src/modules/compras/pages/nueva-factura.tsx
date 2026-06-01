@@ -132,10 +132,7 @@ export default function NuevaFacturaPage() {
       });
       navigate("/encargado/compras");
     } catch (err) {
-      toast("Error", {
-        description:
-          err instanceof Error ? err.message : "No se pudo crear la factura",
-      });
+      toast.error(err instanceof Error ? err.message : "No se pudo crear la factura");
     } finally {
       setLoading(false);
     }

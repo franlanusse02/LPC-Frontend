@@ -194,10 +194,7 @@ export default function NuevoEventoPage() {
       toast("Evento creado");
       navigate("/encargado/eventos");
     } catch (err) {
-      toast("Error", {
-        description:
-          err instanceof Error ? err.message : "No se pudo crear el evento",
-      });
+      toast.error(err instanceof Error ? err.message : "No se pudo crear el evento");
     } finally {
       setLoading(false);
     }

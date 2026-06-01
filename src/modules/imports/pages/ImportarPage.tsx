@@ -57,9 +57,7 @@ export default function ImportarPage() {
       if (fileRef.current) fileRef.current.value = "";
       navigate(`/contabilidad/importar/${selectedType}/${job.id}`);
     } catch (err) {
-      toast("Error", {
-        description: err instanceof Error ? err.message : "No se pudo subir el archivo. Verificá el formato.",
-      });
+      toast.error(err instanceof Error ? err.message : "No se pudo subir el archivo. Verificá el formato.");
     } finally {
       setUploading(false);
     }

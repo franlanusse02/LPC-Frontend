@@ -1,6 +1,16 @@
 import { isTokenExpired, STORAGE_KEY } from "./auth-utils";
 import type { Session } from "./auth-types";
 
+export class ApiError extends Error {
+  status: number;
+  statusText: string;
+  constructor(status: number, statusText: string, message: string) {
+    super(message);
+    this.status = status;
+    this.statusText = statusText;
+  }
+}
+
 type FetchOptions = RequestInit & {
   /** Base URL prefix, e.g. "https://api.example.com" */
   baseUrl?: string;
@@ -64,7 +74,7 @@ export async function fetchOrThrow(
     } catch {
       msg = `Error ${res.status}`;
     }
-    throw new Error(msg);
+    throw new ApiError(res.status, res.statusText, msg);
   }
   return res;
 }

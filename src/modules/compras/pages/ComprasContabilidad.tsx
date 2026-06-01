@@ -88,10 +88,7 @@ export default function ComprasContabilidad() {
       );
       toast("Factura emitida");
     } catch (err) {
-      toast("Error", {
-        description:
-          err instanceof Error ? err.message : "No se pudo emitir la factura",
-      });
+      toast.error(err instanceof Error ? err.message : "No se pudo emitir la factura");
       throw err;
     }
   };
@@ -106,10 +103,7 @@ export default function ComprasContabilidad() {
       );
       toast("Factura anulada");
     } catch (err) {
-      toast("Error", {
-        description:
-          err instanceof Error ? err.message : "No se pudo anular la factura",
-      });
+      toast.error(err instanceof Error ? err.message : "No se pudo anular la factura");
       throw err;
     }
   };
@@ -124,10 +118,7 @@ export default function ComprasContabilidad() {
       );
       toast("Pago registrado");
     } catch (err) {
-      toast("Error", {
-        description:
-          err instanceof Error ? err.message : "No se pudo registrar el pago",
-      });
+      toast.error(err instanceof Error ? err.message : "No se pudo registrar el pago");
       throw err;
     }
   };
