@@ -271,8 +271,8 @@ export default function ComprasContabilidad() {
   const exportColumns: ExportColumn<FacturaProveedorResponse>[] = [
     { key: (f) => new Date(f.creadoEn).toLocaleString("es-AR", {
       timeZone: "America/Argentina/Buenos_Aires",
-      day: "2-digit", month: "2-digit", year: "numeric",
-      hour: "2-digit", minute: "2-digit", second: "2-digit",
+      day: "2-digit", month: "2-digit", year: "2-digit",
+      hour: "2-digit", minute: "2-digit",
       hour12: false,
     }), header: "Fecha de Carga" },
     { key: "id", header: "ID" },
@@ -614,6 +614,17 @@ export default function ComprasContabilidad() {
                                   <span className="text-sm text-gray-700">{factura.comentarios}</span>
                                 </div>
                               )}
+                              <div className="flex flex-col gap-0.5">
+                                <span className="text-xs font-medium uppercase tracking-wide text-gray-400">Fecha de Carga</span>
+                                <span className="text-sm text-gray-700">
+                                  {new Date(factura.creadoEn).toLocaleString("es-AR", {
+                                    timeZone: "America/Argentina/Buenos_Aires",
+                                    day: "2-digit", month: "2-digit", year: "2-digit",
+                                    hour: "2-digit", minute: "2-digit",
+                                    hour12: false,
+                                  })}
+                                </span>
+                              </div>
                               <div className="flex flex-col gap-0.5">
                                 <span className="text-xs font-medium uppercase tracking-wide text-gray-400">Creado por</span>
                                 <span className="text-sm text-gray-700">{factura.creadoPorNombre}</span>
