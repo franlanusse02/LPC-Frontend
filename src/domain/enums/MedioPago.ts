@@ -12,7 +12,7 @@ export const MediosPagoDict = {
   Echeq: "ECHEQ",
   "Cheque Fisico": "CHEQUE_FISICO",
   "Operacion Interna": "OPERACION_INTERNA",
-  "Consumos Techint": "CONSUMOS_TECHINT",
+  Remitos: "REMITOS",
   "Ticket de acceso": "TICKET_ACCESO",
 };
 
