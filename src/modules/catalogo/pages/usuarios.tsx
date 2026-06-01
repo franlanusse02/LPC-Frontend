@@ -91,7 +91,7 @@ export default function UsuariosPage() {
 
   const openEdit = (u: UsuarioResponse) => {
     setEditing(u);
-    setCuil(u.cuil);
+    setCuil(String(u.cuil));
     setNombre(u.nombre);
     setRol(u.rol);
     setPassword("");
