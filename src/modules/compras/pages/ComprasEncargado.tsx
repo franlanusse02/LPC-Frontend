@@ -255,48 +255,47 @@ export default function ComprasEncargado() {
                          <tr className="bg-gray-50/60">
                            <td colSpan={9} className="px-8 py-4">
                              <div className="rounded-xl border border-gray-200 overflow-hidden shadow-sm">
-                               <table className="w-full text-sm">
-                                 <thead>
-                                   <tr className="bg-gray-100 text-left text-xs uppercase text-gray-500 tracking-wider">
-                                     <th className="px-4 py-2.5">N° Factura</th>
-                                     <th className="px-4 py-2.5">Fecha Factura</th>
-                                     <th className="px-4 py-2.5">Fecha Emisión</th>
-                                     <th className="px-4 py-2.5">Fecha Pago</th>
-                                     <th className="px-4 py-2.5">Nº Operación</th>
-                                     <th className="px-4 py-2.5 text-right">Monto</th>
-                                     <th className="px-4 py-2.5">Banco</th>
-                                     <th className="px-4 py-2.5">Medio de Pago</th>
-                                   </tr>
-                                 </thead>
-                                 <tbody>
-                                   <tr className="border-b last:border-b-0 hover:bg-white transition-colors">
-                                     <td className="px-4 py-2.5 font-medium">
-                                       {factura.numero}
-                                     </td>
-                                     <td className="px-4 py-2.5 text-gray-600 whitespace-nowrap">
-                                       {factura.fechaFactura}
-                                     </td>
-                                     <td className="px-4 py-2.5 text-gray-600 whitespace-nowrap">
-                                       {factura.fechaEmision || <span className="text-gray-300">—</span>}
-                                     </td>
-                                     <td className="px-4 py-2.5 text-gray-600 whitespace-nowrap">
-                                       {factura.fechaPago || <span className="text-gray-300">—</span>}
-                                     </td>
-                                     <td className="px-4 py-2.5 text-gray-600">
-                                       {factura.numeroOperacion || <span className="text-gray-300">—</span>}
-                                     </td>
-                                     <td className="px-4 py-2.5 text-right font-mono">
-                                       {fmtCurrency(factura.monto)}
-                                     </td>
-                                     <td className="px-4 py-2.5 text-gray-600">
-                                       {factura.bancoNombre || <span className="text-gray-300">—</span>}
-                                     </td>
-                                     <td className="px-4 py-2.5 text-gray-600">
-                                       {factura.medioPago || <span className="text-gray-300">—</span>}
-                                     </td>
-                                   </tr>
-                                 </tbody>
-                               </table>
+                               <div className="grid grid-cols-2 gap-x-8 gap-y-3 sm:grid-cols-3 lg:grid-cols-4 p-4">
+                                 {factura.numeroOperacion && (
+                                   <div className="flex flex-col gap-0.5">
+                                     <span className="text-xs font-medium uppercase tracking-wide text-gray-400">Nº Operación</span>
+                                     <span className="text-sm text-gray-700">{factura.numeroOperacion}</span>
+                                   </div>
+                                 )}
+                                 {factura.bancoNombre && (
+                                   <div className="flex flex-col gap-0.5">
+                                     <span className="text-xs font-medium uppercase tracking-wide text-gray-400">Banco</span>
+                                     <span className="text-sm text-gray-700">{factura.bancoNombre}</span>
+                                   </div>
+                                 )}
+                                 {factura.medioPago && (
+                                   <div className="flex flex-col gap-0.5">
+                                     <span className="text-xs font-medium uppercase tracking-wide text-gray-400">Medio de Pago</span>
+                                     <span className="text-sm text-gray-700">{factura.medioPago}</span>
+                                   </div>
+                                 )}
+                                 {factura.comentarios && (
+                                   <div className="flex flex-col gap-0.5">
+                                     <span className="text-xs font-medium uppercase tracking-wide text-gray-400">Comentarios</span>
+                                     <span className="text-sm text-gray-700">{factura.comentarios}</span>
+                                   </div>
+                                 )}
+                                 <div className="flex flex-col gap-0.5">
+                                   <span className="text-xs font-medium uppercase tracking-wide text-gray-400">Fecha de Carga</span>
+                                   <span className="text-sm text-gray-700">
+                                     {new Date(factura.creadoEn).toLocaleString("es-AR", {
+                                       timeZone: "America/Argentina/Buenos_Aires",
+                                       day: "2-digit", month: "2-digit", year: "numeric",
+                                       hour: "2-digit", minute: "2-digit",
+                                       hour12: false,
+                                     })}
+                                   </span>
+                                 </div>
+                                 <div className="flex flex-col gap-0.5">
+                                   <span className="text-xs font-medium uppercase tracking-wide text-gray-400">Creado por</span>
+                                   <span className="text-sm text-gray-700">{factura.creadoPorNombre}</span>
+                                 </div>
+                               </div>
                              </div>
 
                              {posSplits.length > 0 && (

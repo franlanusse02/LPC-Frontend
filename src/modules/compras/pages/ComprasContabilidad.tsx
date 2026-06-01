@@ -615,6 +615,17 @@ export default function ComprasContabilidad() {
                                 </div>
                               )}
                               <div className="flex flex-col gap-0.5">
+                                <span className="text-xs font-medium uppercase tracking-wide text-gray-400">Fecha de Carga</span>
+                                <span className="text-sm text-gray-700">
+                                  {new Date(factura.creadoEn).toLocaleString("es-AR", {
+                                    timeZone: "America/Argentina/Buenos_Aires",
+                                    day: "2-digit", month: "2-digit", year: "numeric",
+                                    hour: "2-digit", minute: "2-digit",
+                                    hour12: false,
+                                  })}
+                                </span>
+                              </div>
+                              <div className="flex flex-col gap-0.5">
                                 <span className="text-xs font-medium uppercase tracking-wide text-gray-400">Creado por</span>
                                 <span className="text-sm text-gray-700">{factura.creadoPorNombre}</span>
                               </div>
