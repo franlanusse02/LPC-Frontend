@@ -13,6 +13,7 @@ export const MediosPagoDict = {
   "Cheque Fisico": "CHEQUE_FISICO",
   "Operacion Interna": "OPERACION_INTERNA",
   "Consumos Techint": "CONSUMOS_TECHINT",
+  "Ticket de acceso": "TICKET_ACCESO",
 };
 
 /*
