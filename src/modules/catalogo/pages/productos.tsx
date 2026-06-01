@@ -40,6 +40,7 @@ export default function ProductosPage() {
   const [nombre, setNombre] = useState("");
   const [comedorId, setComedorId] = useState("");
   const [precio, setPrecio] = useState("");
+  const [sapId, setSapId] = useState("");
 
   useEffect(() => {
     Promise.all([
@@ -85,6 +86,7 @@ export default function ProductosPage() {
     setNombre("");
     setComedorId("");
     setPrecio("");
+    setSapId("");
     setModalOpen(true);
   };
   const openEdit = (p: any) => {
@@ -92,6 +94,7 @@ export default function ProductosPage() {
     setNombre(p.nombre);
     setComedorId(String(p.comedorId));
     setPrecio(String(p.precio));
+    setSapId(p.sapId ?? "");
     setModalOpen(true);
   };
 
@@ -106,6 +109,7 @@ export default function ProductosPage() {
         nombre: nombre.trim(),
         comedorId: Number(comedorId),
         precio: Number(precio),
+        sapId: sapId.trim() || null,
       };
       const res = editing
         ? await patch(`/consumos/productos/${editing.productoId}`, body)
@@ -199,6 +203,7 @@ export default function ProductosPage() {
                   onSort={handleSort}
                   className="text-right"
                 />
+                <th className="px-4 py-3">SAP ID</th>
                 <th className="px-4 py-3 text-center">Estado</th>
                 <th className="px-4 py-3 w-20" />
               </>
@@ -217,6 +222,9 @@ export default function ProductosPage() {
                 </td>
                 <td className="px-6 py-4 text-right font-mono">
                   {fmtCurrency(p.precio)}
+                </td>
+                <td className="px-6 py-4 font-mono text-sm text-gray-500">
+                  {p.sapId ?? "—"}
                 </td>
                 <td className="px-6 py-4 text-center">
                   <span
@@ -295,6 +303,17 @@ export default function ProductosPage() {
                   value={precio}
                   onChange={(e) => setPrecio(e.target.value)}
                   placeholder="0.00"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-sm font-medium">
+                  SAP ID{" "}
+                  <span className="text-gray-400 font-normal">(opcional)</span>
+                </label>
+                <Input
+                  value={sapId}
+                  onChange={(e) => setSapId(e.target.value)}
+                  placeholder="SAP ID"
                 />
               </div>
               <div className="flex justify-end gap-2 pt-2">

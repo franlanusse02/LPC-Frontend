@@ -36,10 +36,7 @@ export default function PagarFacturaPage() {
       });
       navigate("/contabilidad/compras");
     } catch (err) {
-      toast("Error", {
-        description:
-          err instanceof Error ? err.message : "No se pudo registrar el pago",
-      });
+      toast.error(err instanceof Error ? err.message : "No se pudo registrar el pago");
     } finally {
       setLoading(false);
     }

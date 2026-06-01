@@ -91,7 +91,7 @@ export default function UsuariosPage() {
 
   const openEdit = (u: UsuarioResponse) => {
     setEditing(u);
-    setCuil(u.cuil);
+    setCuil(String(u.cuil));
     setNombre(u.nombre);
     setRol(u.rol);
     setPassword("");
@@ -106,7 +106,7 @@ export default function UsuariosPage() {
     setSaving(true);
     try {
       const body = editing
-        ? { cuil: cuil.trim(), nombre: nombre.trim(), rol }
+        ? { cuil: cuil.trim(), nombre: nombre.trim(), rol, ...(password ? { password } : {}) }
         : {
             cuil: cuil.trim(),
             nombre: nombre.trim(),
@@ -264,19 +264,17 @@ export default function UsuariosPage() {
                   className="w-full"
                 />
               </div>
-              {!editing && (
-                <div>
-                  <label className="mb-1 block text-sm font-medium">
-                    Contraseña
-                  </label>
-                  <Input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Mínimo 6 caracteres"
-                  />
-                </div>
-              )}
+              <div>
+                <label className="mb-1 block text-sm font-medium">
+                  Contraseña
+                </label>
+                <Input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Mínimo 6 caracteres"
+                />
+              </div>
               <div className="flex justify-end gap-2 pt-2">
                 <Button variant="outline" onClick={() => setModalOpen(false)}>
                   Cancelar

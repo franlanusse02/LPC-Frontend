@@ -92,3 +92,20 @@
     @apply bg-background text-foreground;
   }
 }
+
+[data-sonner-toast][data-styled='true'] [data-title] {
+  font-weight: 700 !important;
+}
+
+[data-sonner-toast][data-styled='true'] [data-description] {
+  color: var(--popover-foreground) !important;
+  opacity: 0.85;
+}
+
+[data-sonner-toast][data-styled='true'][data-type="error"] [data-icon] {
+  display: none !important;
+}
+
+[data-sonner-toast][data-styled='true'][data-type="error"] [data-content] {
+  color: var(--destructive) !important;
+}
