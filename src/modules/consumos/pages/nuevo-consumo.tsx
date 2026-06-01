@@ -140,10 +140,7 @@ export default function NuevoConsumoPage() {
       });
       navigate("/encargado/consumos");
     } catch (err) {
-      toast("Error", {
-        description:
-          err instanceof Error ? err.message : "No se pudo crear el consumo",
-      });
+      toast.error(err instanceof Error ? err.message : "No se pudo crear el consumo");
     } finally {
       setLoading(false);
     }

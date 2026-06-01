@@ -86,12 +86,7 @@ export default function EditarFacturaPage() {
       });
       navigate("/contabilidad/compras");
     } catch (err) {
-      toast("Error", {
-        description:
-          err instanceof Error
-            ? err.message
-            : "No se pudo actualizar la factura",
-      });
+      toast.error(err instanceof Error ? err.message : "No se pudo actualizar la factura");
     } finally {
       setLoading(false);
     }

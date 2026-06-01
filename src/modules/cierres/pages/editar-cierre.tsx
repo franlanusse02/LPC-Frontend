@@ -227,12 +227,7 @@ export default function EditarCierrePage() {
       });
       navigate("/contabilidad/cierres");
     } catch (err) {
-      toast("Error", {
-        description:
-          err instanceof Error
-            ? err.message
-            : "No se pudo actualizar el cierre",
-      });
+      toast.error(err instanceof Error ? err.message : "No se pudo actualizar el cierre");
     } finally {
       setLoading(false);
     }

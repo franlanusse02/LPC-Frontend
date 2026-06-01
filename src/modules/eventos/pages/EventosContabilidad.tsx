@@ -232,12 +232,7 @@ export default function EventosContabilidad() {
         prev.map((e) => (e.id === updated.id ? updated : e)),
       );
     } catch (err) {
-      toast("Error", {
-        description:
-          err instanceof Error
-            ? err.message
-            : "No se pudo completar la operación",
-      });
+      toast.error(err instanceof Error ? err.message : "No se pudo completar la operación");
       throw err;
     }
   };

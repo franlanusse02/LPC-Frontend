@@ -4,4 +4,5 @@ export type ProductoResponse = {
   precio: number;
   comedorId: number;
   activo: boolean;
+  sapId: string | null;
 };

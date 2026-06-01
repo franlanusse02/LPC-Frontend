@@ -126,10 +126,7 @@ export default function NuevoCierrePage() {
       });
       navigate("/encargado/cierres");
     } catch (err) {
-      toast("Error", {
-        description:
-          err instanceof Error ? err.message : "No se pudo crear el cierre",
-      });
+      toast.error(err instanceof Error ? err.message : "No se pudo crear el cierre");
     } finally {
       setLoading(false);
     }

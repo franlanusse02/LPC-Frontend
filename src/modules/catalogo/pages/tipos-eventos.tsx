@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Pencil, Plus } from "lucide-react";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -31,6 +32,7 @@ export default function TiposEventoPage() {
   const [nombre, setNombre] = useState("");
   const [comedorId, setComedorId] = useState("");
   const [precio, setPrecio] = useState("");
+  const [sapId, setSapId] = useState("");
 
   useEffect(() => {
     Promise.all([
@@ -50,6 +52,7 @@ export default function TiposEventoPage() {
     setNombre("");
     setComedorId("");
     setPrecio("");
+    setSapId("");
     setModalOpen(true);
   };
   const openEdit = (t: any) => {
@@ -57,6 +60,7 @@ export default function TiposEventoPage() {
     setNombre(t.nombre);
     setComedorId(String(t.comedorId));
     setPrecio(t.precio != null ? String(t.precio) : "");
+    setSapId(t.sapId ?? "");
     setModalOpen(true);
   };
 
@@ -71,6 +75,7 @@ export default function TiposEventoPage() {
         nombre: nombre.trim(),
         comedorId: Number(comedorId),
         precio: precio ? Number(precio) : null,
+        sapId: sapId.trim() || null,
       };
       const res = editing
         ? await patch(`/eventos/tipos/${editing.id}`, body)
@@ -131,6 +136,8 @@ export default function TiposEventoPage() {
                 <th className="px-6 py-3">Nombre</th>
                 <th className="px-6 py-3">Comedor</th>
                 <th className="px-6 py-3 text-right">Precio Unitario</th>
+                <th className="px-6 py-3">SAP ID</th>
+                <th className="px-6 py-3 text-center">Estado</th>
                 <th className="px-4 py-3 w-12" />
               </>
             }
@@ -142,6 +149,21 @@ export default function TiposEventoPage() {
                 </td>
                 <td className="px-6 py-4 text-right font-mono text-gray-600">
                   {t.precio != null ? fmtCurrency(t.precio) : "—"}
+                </td>
+                <td className="px-6 py-4 font-mono text-sm text-gray-500">
+                  {t.sapId ?? "—"}
+                </td>
+                <td className="px-6 py-4 text-center">
+                  <span
+                    className={cn(
+                      "inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold",
+                      t.activo
+                        ? "bg-emerald-100 text-emerald-700"
+                        : "bg-red-100 text-red-600",
+                    )}
+                  >
+                    {t.activo ? "Activo" : "Inactivo"}
+                  </span>
                 </td>
                 <td className="px-6 py-4 text-right">
                   <Button
@@ -199,6 +221,17 @@ export default function TiposEventoPage() {
                   value={precio}
                   onChange={(e) => setPrecio(e.target.value)}
                   placeholder="0.00"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-sm font-medium">
+                  SAP ID{" "}
+                  <span className="text-gray-400 font-normal">(opcional)</span>
+                </label>
+                <Input
+                  value={sapId}
+                  onChange={(e) => setSapId(e.target.value)}
+                  placeholder="SAP ID"
                 />
               </div>
               <div className="flex justify-end gap-2 pt-2">

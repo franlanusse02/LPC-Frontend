@@ -71,9 +71,7 @@ export default function ImportJobPage() {
       fetchJob();
       fetchRows();
     } catch (err) {
-      toast("Error", {
-        description: err instanceof Error ? err.message : "No se pudieron aplicar las filas.",
-      });
+      toast.error(err instanceof Error ? err.message : "No se pudieron aplicar las filas.");
     } finally {
       setApplying(false);
     }
@@ -87,9 +85,7 @@ export default function ImportJobPage() {
       fetchJob();
       fetchRows();
     } catch (err) {
-      toast("Error", {
-        description: err instanceof Error ? err.message : "No se pudo cancelar la importación.",
-      });
+      toast.error(err instanceof Error ? err.message : "No se pudo cancelar la importación.");
     } finally {
       setCancelling(false);
     }
@@ -102,9 +98,7 @@ export default function ImportJobPage() {
       fetchJob();
       fetchRows();
     } catch (err) {
-      toast("Error", {
-        description: err instanceof Error ? err.message : "No se pudo aplicar esta fila.",
-      });
+      toast.error(err instanceof Error ? err.message : "No se pudo aplicar esta fila.");
     }
   };
 
@@ -115,9 +109,7 @@ export default function ImportJobPage() {
       fetchJob();
       fetchRows();
     } catch (err) {
-      toast("Error", {
-        description: err instanceof Error ? err.message : "No se pudo eliminar la fila.",
-      });
+      toast.error(err instanceof Error ? err.message : "No se pudo eliminar la fila.");
     }
   };
 
@@ -127,9 +119,7 @@ export default function ImportJobPage() {
       toast("Fila revalidada");
       fetchRows();
     } catch (err) {
-      toast("Error", {
-        description: err instanceof Error ? err.message : "No se pudo revalidar la fila.",
-      });
+      toast.error(err instanceof Error ? err.message : "No se pudo revalidar la fila.");
     }
   };
 

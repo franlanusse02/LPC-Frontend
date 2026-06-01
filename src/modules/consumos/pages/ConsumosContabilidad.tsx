@@ -149,10 +149,7 @@ export default function ConsumosContabilidad() {
       );
       toast("Consumo anulado");
     } catch (err) {
-      toast("Error", {
-        description:
-          err instanceof Error ? err.message : "No se pudo anular el consumo",
-      });
+      toast.error(err instanceof Error ? err.message : "No se pudo anular el consumo");
       throw err;
     }
   };
