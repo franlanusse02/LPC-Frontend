@@ -19,10 +19,11 @@ import {
   UsersRound,
   Truck,
   Landmark,
-  Tag,
   FileSpreadsheet,
   Hand,
   FileText,
+  FolderTree,
+  BookOpen,
 } from "lucide-react";
 import TotalesContabilidad from "@/modules/analytics/components/totales";
 import {
@@ -215,14 +216,26 @@ export default function ContabilidadDashboard() {
             </Button>
             <Button
               variant="outline"
-              onClick={() => navigate("/catalogo/tipos-eventos")}
+              onClick={() => navigate("/catalogo/centros-costo")}
               className="flex flex-col items-center justify-center gap-2 h-20 px-3 rounded-lg border-gray-200 hover:bg-gray-50 hover:border-gray-300"
             >
               <div className="flex items-center justify-center w-8 h-8 rounded-md bg-gray-100">
-                <Tag className="h-4 w-4 text-gray-600" />
+                <FolderTree className="h-4 w-4 text-gray-600" />
               </div>
               <span className="text-xs font-medium text-gray-700 text-center leading-tight">
-                Tipos de Evento
+                Centros de Costo
+              </span>
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => navigate("/catalogo/partidas")}
+              className="flex flex-col items-center justify-center gap-2 h-20 px-3 rounded-lg border-gray-200 hover:bg-gray-50 hover:border-gray-300"
+            >
+              <div className="flex items-center justify-center w-8 h-8 rounded-md bg-gray-100">
+                <BookOpen className="h-4 w-4 text-gray-600" />
+              </div>
+              <span className="text-xs font-medium text-gray-700 text-center leading-tight">
+                Partidas
               </span>
             </Button>
             <Button
