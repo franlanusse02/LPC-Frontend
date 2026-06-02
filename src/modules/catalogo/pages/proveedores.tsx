@@ -11,8 +11,6 @@ import { DataTable } from "@/components/data-table";
 import { useApi } from "@/hooks/useApi";
 import { MediosPagoDict } from "@/domain/enums/MedioPago";
 import type { MedioPago } from "@/domain/enums/MedioPago";
-import type { PuntoDeVentaResponse } from "@/domain/dto/pto-venta/PuntoDeVentaResponse";
-
 export default function ProveedoresPage() {
   const navigate = useNavigate();
   const { get, post, patch } = useApi();
@@ -26,22 +24,18 @@ export default function ProveedoresPage() {
   const [nombre, setNombre] = useState("");
   const [taxId, setTaxId] = useState("");
   const [formaPago, setFormaPago] = useState<MedioPago | "">("");
-  const [puntosDeVenta, setPuntosDeVenta] = useState<PuntoDeVentaResponse[]>([]);
   const [selectedPuntos, setSelectedPuntos] = useState<number[]>([]);
+  const [nuevoPunto, setNuevoPunto] = useState("");
 
   useEffect(() => {
-    Promise.all([
-      get("/proveedores").then((r) => r.json()),
-      get("/comedores/puntos-de-venta").then((r) => r.json()),
-    ]).then(([proveedoresData, puntosData]) => {
-      setProveedores(proveedoresData);
-      setPuntosDeVenta(puntosData);
+    get("/proveedores").then((r) => r.json()).then((data) => {
+      setProveedores(data);
       setLoading(false);
     });
   }, [get]);
 
-  const openCreate = () => { setEditing(null); setNombre(""); setTaxId(""); setFormaPago(""); setSelectedPuntos([]); setModalOpen(true); };
-  const openEdit = (p: any) => { setEditing(p); setNombre(p.nombre); setTaxId(p.taxId); setFormaPago(p.formaDePagoPredeterminada ?? ""); setSelectedPuntos(p.puntosDeVenta ?? []); setModalOpen(true); };
+  const openCreate = () => { setEditing(null); setNombre(""); setTaxId(""); setFormaPago(""); setSelectedPuntos([]); setNuevoPunto(""); setModalOpen(true); };
+  const openEdit = (p: any) => { setEditing(p); setNombre(p.nombre); setTaxId(p.taxId); setFormaPago(p.formaDePagoPredeterminada ?? ""); setSelectedPuntos(p.puntosDeVenta ?? []); setNuevoPunto(""); setModalOpen(true); };
 
   const handleSave = async () => {
     if (!nombre.trim() || !taxId.trim()) { toast.error("Completá la razón social y el CUIT."); return; }
@@ -96,7 +90,7 @@ export default function ProveedoresPage() {
                 </td>
                 <td className="px-6 py-4 text-gray-500 text-sm">
                   {(p.puntosDeVenta ?? []).length > 0
-                    ? p.puntosDeVenta.map((pvId: number) => puntosDeVenta.find((pv) => pv.id === pvId)?.nombre ?? pvId).join(", ")
+                    ? p.puntosDeVenta.join(", ")
                     : "—"}
                 </td>
                 <td className="px-6 py-4 text-right"><Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEdit(p)}><Pencil className="h-4 w-4" /></Button></td>
@@ -131,24 +125,49 @@ export default function ProveedoresPage() {
                   Puntos de Venta{" "}
                   <span className="text-gray-400 font-normal">(opcional)</span>
                 </label>
-                <div className="max-h-32 overflow-y-auto rounded-md border border-gray-200 p-2 space-y-1">
-                  {puntosDeVenta.map((pv) => (
-                    <label key={pv.id} className="flex items-center gap-2 text-sm cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={selectedPuntos.includes(pv.id)}
-                        onChange={(e) =>
-                          setSelectedPuntos((prev) =>
-                            e.target.checked
-                              ? [...prev, pv.id]
-                              : prev.filter((id) => id !== pv.id),
-                          )
+                {selectedPuntos.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 mb-2">
+                    {selectedPuntos.map((pv) => (
+                      <span key={pv} className="inline-flex items-center gap-1 rounded-md bg-gray-100 px-2 py-0.5 text-sm">
+                        {pv}
+                        <button type="button" className="text-gray-400 hover:text-red-500" onClick={() => setSelectedPuntos((prev) => prev.filter((id) => id !== pv))}>×</button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+                <div className="flex gap-2">
+                  <Input
+                    type="number"
+                    min="1"
+                    value={nuevoPunto}
+                    onChange={(e) => setNuevoPunto(e.target.value)}
+                    placeholder="Ej: 1"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        const num = Number(nuevoPunto);
+                        if (num > 0 && !selectedPuntos.includes(num)) {
+                          setSelectedPuntos((prev) => [...prev, num]);
+                          setNuevoPunto("");
                         }
-                        className="rounded border-gray-300"
-                      />
-                      {pv.nombre}
-                    </label>
-                  ))}
+                      }
+                    }}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    disabled={!nuevoPunto || Number(nuevoPunto) <= 0 || selectedPuntos.includes(Number(nuevoPunto))}
+                    onClick={() => {
+                      const num = Number(nuevoPunto);
+                      if (num > 0 && !selectedPuntos.includes(num)) {
+                        setSelectedPuntos((prev) => [...prev, num]);
+                        setNuevoPunto("");
+                      }
+                    }}
+                  >
+                    Agregar
+                  </Button>
                 </div>
               </div>
               <div className="flex justify-end gap-2 pt-2"><Button variant="outline" onClick={() => setModalOpen(false)}>Cancelar</Button><Button onClick={handleSave} disabled={saving}>{saving ? <><Spinner className="mr-2 h-4 w-4" />Guardando...</> : "Guardar"}</Button></div>
