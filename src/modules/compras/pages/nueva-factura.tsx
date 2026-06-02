@@ -72,8 +72,20 @@ export default function NuevaFacturaPage() {
   }, [proveedorId, selectedProveedor]);
 
   useEffect(() => {
-    setPosLineas([]);
+    const pvs = selectedComedor?.puntosDeVenta ?? [];
+    if (pvs.length === 1) {
+      setPosLineas([{ puntoDeVentaId: String(pvs[0].id), monto: monto || "" }]);
+    } else {
+      setPosLineas([]);
+    }
   }, [comedorId]);
+
+  useEffect(() => {
+    const pvs = selectedComedor?.puntosDeVenta ?? [];
+    if (pvs.length === 1 && posLineas.length === 1) {
+      setPosLineas([{ ...posLineas[0], monto: monto || "" }]);
+    }
+  }, [monto]);
 
   const posSum = posLineas.reduce((s, l) => s + (Number(l.monto) || 0), 0);
   const montoNum = Number(monto) || 0;
