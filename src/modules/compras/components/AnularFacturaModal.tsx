@@ -58,12 +58,12 @@ export function AnularFacturaModal({
             </div>
 
             <DialogDescription className="text-sm text-gray-500 leading-relaxed">
-              Est\u00e1s por{" "}
+              Estás por{" "}
               <strong className="text-gray-700">anular</strong> la factura{" "}
               <strong className="text-gray-700">
                 #{factura?.numero}
               </strong>
-              . Esta acci\u00f3n no podr\u00e1 revertirse.
+              . Esta acción no podrá revertirse.
             </DialogDescription>
           </DialogHeader>
 
@@ -76,7 +76,7 @@ export function AnularFacturaModal({
               value={motivo}
               onChange={(e) => setMotivo(e.target.value)}
               className="bg-card"
-              placeholder="Motivo de anulaci\u00f3n"
+              placeholder="Motivo de anulación"
             />
           </div>
 

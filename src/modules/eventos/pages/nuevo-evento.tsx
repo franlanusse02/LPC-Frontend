@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useApi } from "@/hooks/useApi";
 import { Button } from "@/components/ui/button";
@@ -9,186 +9,246 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
 import { Combobox } from "@/components/ui/combobox";
 import type { ComedorResponse } from "@/domain/dto/comedor/ComedorResponse";
-import type { TipoEventoResponse } from "@/domain/dto/tipo-evento/TipoEventoResponse";
 import type { EmpleadoComedorResponse } from "@/domain/dto/comedor/EmpleadoComedorResponse";
+import type { CentroCostoResponse } from "@/domain/dto/catalogo/CentroCostoResponse";
+import type { PartidaResponse } from "@/domain/dto/catalogo/PartidaResponse";
+import type { RazonSocialComedorResponse } from "@/domain/dto/comedor/RazonSocialComedorResponse";
+import type { ProductoResponse } from "@/domain/dto/consumo/ProductoResponse";
 import type { CreateEventoRequest } from "@/domain/dto/evento/CreateEventoRequest";
-import { getCaseFields, type CaseFields } from "@/modules/eventos/config/comedorCases";
+import {
+  getCaseFields,
+  detectCase,
+  type CaseFields,
+  type ComedorCaseKey,
+} from "@/modules/eventos/config/comedorCases";
+
+type ServicioLine = { productoId: string; cantidad: string };
 
 export default function NuevoEventoPage() {
   const navigate = useNavigate();
   const { get, post } = useApi();
 
   const [comedores, setComedores] = useState<ComedorResponse[]>([]);
-  const [tiposEvento, setTiposEvento] = useState<TipoEventoResponse[]>([]);
   const [empleados, setEmpleados] = useState<EmpleadoComedorResponse[]>([]);
+  const [funcionarios, setFuncionarios] = useState<EmpleadoComedorResponse[]>([]);
+  const [centrosCosto, setCentrosCosto] = useState<CentroCostoResponse[]>([]);
+  const [partidas, setPartidas] = useState<PartidaResponse[]>([]);
+  const [razonesSociales, setRazonesSociales] = useState<RazonSocialComedorResponse[]>([]);
+  const [productos, setProductos] = useState<ProductoResponse[]>([]);
 
   const [comedorId, setComedorId] = useState("");
   const [puntoDeVentaId, setPuntoDeVentaId] = useState("");
-  const [tipoEventoId, setTipoEventoId] = useState("");
-  const [fechaEvento, setFechaEvento] = useState(
-    new Date().toISOString().split("T")[0],
-  );
+  const [fechaEvento, setFechaEvento] = useState(new Date().toISOString().split("T")[0]);
+  const [cantidadPersonas, setCantidadPersonas] = useState("");
+  const [montoTotal, setMontoTotal] = useState("");
+  const [observaciones, setObservaciones] = useState("");
+
   const [solicitanteId, setSolicitanteId] = useState("");
   const [emailSolicitante, setEmailSolicitante] = useState("");
   const [funcionarioId, setFuncionarioId] = useState("");
   const [responsableId, setResponsableId] = useState("");
-  const [centroCosto, setCentroCosto] = useState("");
-  const [partida, setPartida] = useState("");
-  const [area, setArea] = useState("");
-  const [cantidadPersonas, setCantidadPersonas] = useState("");
-  const [montoTotal, setMontoTotal] = useState("");
-  const [observaciones, setObservaciones] = useState("");
+  const [centroCostoId, setCentroCostoId] = useState("");
+  const [partidaId, setPartidaId] = useState("");
+  const [precioUnitario, setPrecioUnitario] = useState("");
+  const [retenciones, setRetenciones] = useState("");
+  const [numeroOperacion, setNumeroOperacion] = useState("");
+  const [razonSocialId, setRazonSocialId] = useState("");
+  const [destinatarioFacturacion, setDestinatarioFacturacion] = useState("");
+  const [tipoComprobante, setTipoComprobante] = useState("");
+  const [numeroComprobante, setNumeroComprobante] = useState("");
+  const [ordenCompra, setOrdenCompra] = useState("");
+  const [legajoId, setLegajoId] = useState("");
+  const [recepcionId, setRecepcionId] = useState("");
+  const [numeroPedido, setNumeroPedido] = useState("");
+  const [concepto, setConcepto] = useState("");
+  const [areaId, setAreaId] = useState("");
+  const [adicionales, setAdicionales] = useState("");
+
+  const [servicios, setServicios] = useState<ServicioLine[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    Promise.all([get("/comedores"), get("/eventos/tipos")]).then(
-      ([comedoresRes, tiposRes]) => {
-        comedoresRes.json().then(setComedores);
-        tiposRes
-          .json()
-          .then((data) =>
-            setTiposEvento(Array.isArray(data) ? data : []),
-          );
-      },
-    );
+    get("/comedores").then((r) => r.json()).then(setComedores);
   }, [get]);
 
   const selectedComedor = comedores.find((c) => c.id === Number(comedorId));
-  const caseFields: CaseFields = useMemo(
-    () => getCaseFields(selectedComedor?.nombre),
-    [selectedComedor?.nombre],
-  );
+  const caseKey: ComedorCaseKey = useMemo(() => detectCase(selectedComedor?.nombre), [selectedComedor?.nombre]);
+  const caseFields: CaseFields = useMemo(() => getCaseFields(selectedComedor?.nombre), [selectedComedor?.nombre]);
 
   const posOptions = useMemo(
-    () =>
-      (selectedComedor?.puntosDeVenta ?? []).map((p) => ({
-        value: String(p.id),
-        label: p.nombre,
-      })),
+    () => (selectedComedor?.puntosDeVenta ?? []).map((p) => ({ value: String(p.id), label: p.nombre })),
     [selectedComedor],
   );
 
-  const tiposFiltrados = useMemo(
-    () =>
-      comedorId
-        ? tiposEvento.filter(
-            (t) => t.comedorId === Number(comedorId) && t.activo,
-          )
-        : tiposEvento.filter((t) => t.activo),
-    [tiposEvento, comedorId],
-  );
-
-  const selectedTipo = tiposFiltrados.find(
-    (t) => t.id === Number(tipoEventoId),
-  );
-
-  const [funcionarios, setFuncionarios] = useState<EmpleadoComedorResponse[]>([]);
-
   useEffect(() => {
     if (!comedorId) {
-      setEmpleados([]);
-      setFuncionarios([]);
+      setEmpleados([]); setFuncionarios([]); setCentrosCosto([]); setPartidas([]);
+      setRazonesSociales([]); setProductos([]);
       return;
     }
-    get(`/comedores/empleados?comedorId=${comedorId}`)
-      .then((res) => res.json())
-      .then((data) => setEmpleados(Array.isArray(data) ? data : []));
-    get(`/comedores/empleados/funcionarios?comedorId=${comedorId}`)
-      .then((res) => res.json())
-      .then((data) => setFuncionarios(Array.isArray(data) ? data : []));
+    Promise.all([
+      get(`/comedores/empleados?comedorId=${comedorId}`).then((r) => r.json()).then(setEmpleados),
+      get(`/comedores/empleados/funcionarios?comedorId=${comedorId}`).then((r) => r.json()).then(setFuncionarios),
+      get(`/comedores/centros-costo?comedorId=${comedorId}`).then((r) => r.json()).then(setCentrosCosto),
+      get(`/comedores/partidas?comedorId=${comedorId}`).then((r) => r.json()).then(setPartidas),
+      get(`/comedores/razon-social?comedorId=${comedorId}`).then((r) => r.json()).then(setRazonesSociales),
+      get(`/consumos/productos?comedorId=${comedorId}`).then((r) => r.json()).then(setProductos),
+    ]);
   }, [comedorId, get]);
 
   const empleadoOptions = useMemo(
-    () =>
-      empleados
-        .filter((e) => e.activo)
-        .map((e) => ({
-          value: String(e.id),
-          label: e.nombre,
-          subtitle: e.email || undefined,
-        })),
+    () => empleados.filter((e) => e.activo).map((e) => ({ value: String(e.id), label: e.nombre, subtitle: e.email || undefined })),
     [empleados],
   );
-
   const funcionarioOptions = useMemo(
-    () =>
-      funcionarios.map((e) => ({
-        value: String(e.id),
-        label: e.nombre,
-        subtitle: e.email || undefined,
-      })),
+    () => funcionarios.map((e) => ({ value: String(e.id), label: e.nombre, subtitle: e.email || undefined })),
     [funcionarios],
   );
+  const ccOptions = useMemo(
+    () => centrosCosto.filter((c) => c.activo).map((c) => ({ value: String(c.id), label: c.nombre })),
+    [centrosCosto],
+  );
+  const partidaOptions = useMemo(
+    () => partidas.filter((p) => p.activo).map((p) => ({ value: String(p.id), label: p.nombre })),
+    [partidas],
+  );
+  const razonSocialOptions = useMemo(
+    () => razonesSociales.filter((r) => r.activo).map((r) => ({ value: String(r.id), label: r.nombre })),
+    [razonesSociales],
+  );
+  const productoOptions = useMemo(
+    () => productos.filter((p) => p.activo).map((p) => ({ value: String(p.productoId), label: p.nombre, subtitle: `$${p.precio.toLocaleString("es-AR")}` })),
+    [productos],
+  );
+
+  const resetPerComedorFields = () => {
+    setSolicitanteId(""); setEmailSolicitante(""); setFuncionarioId(""); setResponsableId("");
+    setCentroCostoId(""); setPartidaId(""); setPrecioUnitario(""); setRetenciones("");
+    setNumeroOperacion(""); setRazonSocialId(""); setDestinatarioFacturacion("");
+    setTipoComprobante(""); setNumeroComprobante(""); setOrdenCompra("");
+    setLegajoId(""); setRecepcionId(""); setNumeroPedido(""); setConcepto("");
+    setAreaId(""); setAdicionales(""); setServicios([]);
+  };
 
   const handleComedorChange = (v: string) => {
     setComedorId(v);
     setPuntoDeVentaId("");
-    setTipoEventoId("");
-    setSolicitanteId("");
-    setEmailSolicitante("");
-    setFuncionarioId("");
-    setResponsableId("");
-    setCentroCosto("");
-    setPartida("");
-    setArea("");
+    resetPerComedorFields();
   };
 
   useEffect(() => {
     if (!funcionarioId) {
-      if (caseFields.centroCosto.autoFill === "funcionario") setCentroCosto("");
-      if (caseFields.partida.autoFill === "funcionario") setPartida("");
+      if (caseFields.centroCosto.autoFill === "funcionario") setCentroCostoId("");
+      if (caseFields.partida.autoFill === "funcionario") setPartidaId("");
       return;
     }
     const emp = funcionarios.find((e) => e.id === Number(funcionarioId))
       ?? empleados.find((e) => e.id === Number(funcionarioId));
     if (emp) {
       if (caseFields.centroCosto.autoFill === "funcionario")
-        setCentroCosto(emp.centroCosto ?? "");
+        setCentroCostoId(emp.centroCostoId ? String(emp.centroCostoId) : "");
       if (caseFields.partida.autoFill === "funcionario")
-        setPartida(emp.partida ?? "");
+        setPartidaId(emp.partidaId ? String(emp.partidaId) : "");
     }
   }, [funcionarioId, funcionarios, empleados, caseFields]);
 
   useEffect(() => {
-    if (!solicitanteId) {
-      setEmailSolicitante("");
-      return;
-    }
+    if (!solicitanteId) return;
     const emp = empleados.find((e) => e.id === Number(solicitanteId));
-    if (emp) setEmailSolicitante(emp.email ?? "");
+    if (emp?.email) setEmailSolicitante(emp.email);
   }, [solicitanteId, empleados]);
 
-  const tipoHasPrecio = selectedTipo?.precio !== null && selectedTipo?.precio !== undefined;
+  const addServicio = () => setServicios((s) => [...s, { productoId: "", cantidad: "1" }]);
+  const removeServicio = (i: number) => setServicios((s) => s.filter((_, idx) => idx !== i));
+  const updateServicio = (i: number, field: keyof ServicioLine, val: string) =>
+    setServicios((s) => s.map((line, idx) => (idx === i ? { ...line, [field]: val } : line)));
 
-  useEffect(() => {
-    if (tipoHasPrecio && cantidadPersonas) {
-      const calc = (selectedTipo?.precio ?? 0) * Number(cantidadPersonas);
-      setMontoTotal(String(calc));
-    } else if (tipoHasPrecio && !cantidadPersonas) {
-      setMontoTotal("");
-    }
-  }, [cantidadPersonas, selectedTipo, tipoHasPrecio]);
+  const serviciosTotal = useMemo(() => {
+    return servicios.reduce((sum, line) => {
+      const prod = productos.find((p) => p.productoId === Number(line.productoId));
+      return sum + (prod ? prod.precio * Number(line.cantidad || 0) : 0);
+    }, 0);
+  }, [servicios, productos]);
 
-  const canSubmit = puntoDeVentaId && tipoEventoId && fechaEvento && cantidadPersonas;
+  const canSubmit = puntoDeVentaId && fechaEvento && cantidadPersonas;
 
   const handleSubmit = async () => {
     if (!canSubmit) return;
     setLoading(true);
     try {
-      const req: CreateEventoRequest = {
+      const serviciosMap: Record<number, number> = {};
+      for (const line of servicios) {
+        if (line.productoId && line.cantidad) {
+          serviciosMap[Number(line.productoId)] = Number(line.cantidad);
+        }
+      }
+
+      const base = {
         puntoDeVentaId: Number(puntoDeVentaId),
-        tipoEventoId: Number(tipoEventoId),
         fechaEvento,
-        solicitanteId: solicitanteId ? Number(solicitanteId) : null,
-        emailSolicitante: emailSolicitante || null,
-        funcionarioId: funcionarioId ? Number(funcionarioId) : null,
-        responsableId: responsableId ? Number(responsableId) : null,
         cantidadPersonas: cantidadPersonas ? Number(cantidadPersonas) : null,
         montoTotal: montoTotal ? Number(montoTotal) : null,
-        centroCosto: centroCosto || null,
-        partida: partida || null,
         observaciones: observaciones || null,
+        servicios: Object.keys(serviciosMap).length > 0 ? serviciosMap : null,
       };
+
+      let req: CreateEventoRequest;
+
+      switch (caseKey) {
+        case "GALICIA":
+          req = {
+            ...base,
+            tipoComedor: "GALICIA",
+            solicitanteId: solicitanteId ? Number(solicitanteId) : null,
+            emailSolicitante: emailSolicitante || null,
+            funcionarioId: funcionarioId ? Number(funcionarioId) : null,
+            responsableId: responsableId ? Number(responsableId) : null,
+            precioUnitario: precioUnitario ? Number(precioUnitario) : null,
+            retenciones: retenciones ? Number(retenciones) : null,
+            numeroOperacion: numeroOperacion || null,
+            razonSocialId: razonSocialId ? Number(razonSocialId) : null,
+            destinatarioFacturacion: destinatarioFacturacion || null,
+            tipoComprobante: tipoComprobante || null,
+            numeroComprobante: numeroComprobante || null,
+          };
+          break;
+        case "BBVA":
+          req = {
+            ...base,
+            tipoComedor: "BBVA",
+            solicitanteId: solicitanteId ? Number(solicitanteId) : null,
+            emailSolicitante: emailSolicitante || null,
+            ordenCompra: ordenCompra || null,
+            legajoId: legajoId ? Number(legajoId) : null,
+            recepcionId: recepcionId ? Number(recepcionId) : null,
+          };
+          break;
+        case "TECHINT":
+          req = {
+            ...base,
+            tipoComedor: "TECHINT",
+            numeroPedido: numeroPedido || null,
+            razonSocialId: razonSocialId ? Number(razonSocialId) : null,
+            concepto: concepto || null,
+            tipoComprobante: tipoComprobante || null,
+            numeroComprobante: numeroComprobante || null,
+          };
+          break;
+        case "UDESA":
+          req = {
+            ...base,
+            tipoComedor: "UDESA",
+            solicitanteId: solicitanteId ? Number(solicitanteId) : null,
+            centroCostoId: centroCostoId ? Number(centroCostoId) : null,
+            areaId: areaId ? Number(areaId) : null,
+            precioUnitario: precioUnitario ? Number(precioUnitario) : null,
+            adicionales: adicionales ? Number(adicionales) : null,
+          };
+          break;
+        default:
+          req = { ...base };
+          break;
+      }
 
       await post("/eventos", req);
       toast("Evento creado");
@@ -200,31 +260,121 @@ export default function NuevoEventoPage() {
     }
   };
 
+  const fieldLabel: Record<string, string> = {
+    solicitante: "Solicitante",
+    emailSolicitante: "Email solicitante",
+    funcionario: "Funcionario",
+    responsable: "Responsable",
+    centroCosto: "Centro de costo",
+    partida: "Partida",
+    precioUnitario: "Precio unitario",
+    retenciones: "Retenciones",
+    numeroOperacion: "Nº operación",
+    razonSocial: "Razón social",
+    destinatarioFacturacion: "Dest. facturación",
+    tipoComprobante: "Tipo comprobante",
+    numeroComprobante: "Nº comprobante",
+    ordenCompra: "Orden de compra",
+    legajo: "Legajo",
+    recepcion: "Recepción",
+    numeroPedido: "Nº pedido",
+    concepto: "Concepto",
+    area: "Área",
+    adicionales: "Adicionales",
+  };
+
+  const fieldState: Record<string, { value: string; onChange: (v: string) => void }> = {
+    solicitante: { value: solicitanteId, onChange: setSolicitanteId },
+    emailSolicitante: { value: emailSolicitante, onChange: setEmailSolicitante },
+    funcionario: { value: funcionarioId, onChange: setFuncionarioId },
+    responsable: { value: responsableId, onChange: setResponsableId },
+    centroCosto: { value: centroCostoId, onChange: setCentroCostoId },
+    partida: { value: partidaId, onChange: setPartidaId },
+    precioUnitario: { value: precioUnitario, onChange: setPrecioUnitario },
+    retenciones: { value: retenciones, onChange: setRetenciones },
+    numeroOperacion: { value: numeroOperacion, onChange: setNumeroOperacion },
+    razonSocial: { value: razonSocialId, onChange: setRazonSocialId },
+    destinatarioFacturacion: { value: destinatarioFacturacion, onChange: setDestinatarioFacturacion },
+    tipoComprobante: { value: tipoComprobante, onChange: setTipoComprobante },
+    numeroComprobante: { value: numeroComprobante, onChange: setNumeroComprobante },
+    ordenCompra: { value: ordenCompra, onChange: setOrdenCompra },
+    legajo: { value: legajoId, onChange: setLegajoId },
+    recepcion: { value: recepcionId, onChange: setRecepcionId },
+    numeroPedido: { value: numeroPedido, onChange: setNumeroPedido },
+    concepto: { value: concepto, onChange: setConcepto },
+    area: { value: areaId, onChange: setAreaId },
+    adicionales: { value: adicionales, onChange: setAdicionales },
+  };
+
+  const pickerOptions: Record<string, { value: string; label: string; subtitle?: string }[]> = {
+    empleado: empleadoOptions,
+    funcionario: funcionarioOptions,
+    centroCosto: ccOptions,
+    partida: partidaOptions,
+    razonSocial: razonSocialOptions,
+  };
+
+  const renderField = (key: string) => {
+    const spec = caseFields[key as keyof CaseFields];
+    if (!spec.visible) return null;
+    const label = fieldLabel[key] ?? key;
+    const state = fieldState[key];
+    const isReadonly = !!spec.readonly;
+
+    if (spec.type && spec.type !== "text" && spec.type !== "number") {
+      const opts = pickerOptions[spec.type] ?? [];
+      return (
+        <div key={key} className="space-y-1.5">
+          <label className="text-sm font-medium">{label}{spec.required ? " *" : ""}</label>
+          <Combobox
+            options={opts}
+            value={state.value}
+            onChange={state.onChange}
+            placeholder={isReadonly ? "Auto-completado" : `Seleccionar ${label.toLowerCase()}...`}
+            disabled={isReadonly}
+            clearable
+            className="w-full"
+          />
+        </div>
+      );
+    }
+
+    return (
+      <div key={key} className="space-y-1.5">
+        <label className="text-sm font-medium">{label}{spec.required ? " *" : ""}</label>
+        <Input
+          type={spec.type === "number" ? "number" : "text"}
+          min={spec.type === "number" ? "0" : undefined}
+          step={spec.type === "number" ? "0.01" : undefined}
+          value={state.value}
+          onChange={(e) => state.onChange(e.target.value)}
+          readOnly={isReadonly}
+          placeholder={isReadonly ? "Auto-completado" : label}
+        />
+      </div>
+    );
+  };
+
+  const visibleFieldKeys = Object.keys(caseFields).filter(
+    (k) => caseFields[k as keyof CaseFields].visible,
+  );
+
   return (
     <div className="mx-auto max-w-2xl px-6 py-6">
-      <Button
-        variant="ghost"
-        className="mb-6 gap-2"
-        onClick={() => navigate("/encargado/eventos")}
-      >
+      <Button variant="ghost" className="mb-6 gap-2" onClick={() => navigate("/encargado/eventos")}>
         <ArrowLeft className="h-4 w-4" />
         Volver a eventos
       </Button>
 
       <Card className="border-0 shadow-sm">
         <CardHeader className="border-b">
-          <CardTitle className="text-xl font-bold uppercase tracking-wide">
-            Nuevo Evento
-          </CardTitle>
+          <CardTitle className="text-xl font-bold uppercase tracking-wide">Nuevo Evento</CardTitle>
         </CardHeader>
         <CardContent className="p-6 space-y-5">
           <div className="space-y-1.5">
             <label className="text-sm font-medium">Comedor *</label>
             <Combobox
-              options={comedores.map((c) => ({
-                value: String(c.id),
-                label: c.nombre,
-              }))}
+              options={comedores.map((c) => ({ value: String(c.id), label: c.nombre }))}
               value={comedorId}
               onChange={handleComedorChange}
               placeholder="Seleccionar comedor..."
@@ -245,153 +395,53 @@ export default function NuevoEventoPage() {
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-sm font-medium">Tipo de evento *</label>
-            <Combobox
-              options={tiposFiltrados.map((t) => ({
-                value: String(t.id),
-                label: t.nombre,
-                subtitle:
-                  t.precio !== null ? `$${t.precio.toLocaleString("es-AR")}` : undefined,
-              }))}
-              value={tipoEventoId}
-              onChange={(v) => { setTipoEventoId(v); setMontoTotal(""); }}
-              placeholder="Seleccionar tipo de evento..."
-              disabled={!comedorId}
-              className="w-full"
-            />
-            {selectedTipo?.precio !== null && selectedTipo?.precio !== undefined && (
-              <p className="text-xs text-muted-foreground">
-                Precio unitario: ${selectedTipo.precio.toLocaleString("es-AR")}
-              </p>
-            )}
-          </div>
-
-          <div className="space-y-1.5">
             <label className="text-sm font-medium">Fecha del evento *</label>
-            <Input
-              type="date"
-              value={fechaEvento}
-              onChange={(e) => setFechaEvento(e.target.value)}
-            />
+            <Input type="date" value={fechaEvento} onChange={(e) => setFechaEvento(e.target.value)} />
           </div>
 
-          {caseFields.solicitante.visible && (
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium">
-                Solicitante{caseFields.solicitante.required ? " *" : ""}
-              </label>
-              <Combobox
-                options={empleadoOptions}
-                value={solicitanteId}
-                onChange={setSolicitanteId}
-                placeholder="Seleccionar solicitante..."
-                clearable
-                className="w-full"
-              />
-            </div>
-          )}
+          {visibleFieldKeys.map(renderField)}
 
-          {caseFields.emailSolicitante.visible && (
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium">
-                Email solicitante{caseFields.emailSolicitante.required ? " *" : ""}
-              </label>
-              <Input
-                type="email"
-                value={emailSolicitante}
-                onChange={(e) => setEmailSolicitante(e.target.value)}
-                readOnly={!!solicitanteId}
-                placeholder="email@ejemplo.com"
-              />
-            </div>
-          )}
-
-          {caseFields.funcionario.visible && (
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium">
-                Funcionario{caseFields.funcionario.required ? " *" : ""}
-              </label>
-              <Combobox
-                options={funcionarioOptions}
-                value={funcionarioId}
-                onChange={setFuncionarioId}
-                placeholder="Seleccionar funcionario..."
-                clearable
-                className="w-full"
-              />
-            </div>
-          )}
-
-          {caseFields.centroCosto.visible && (
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium">
-                Centro de costo{caseFields.centroCosto.required ? " *" : ""}
-              </label>
-              <Input
-                value={centroCosto}
-                onChange={(e) => setCentroCosto(e.target.value)}
-                readOnly={!!caseFields.centroCosto.readonly}
-                placeholder={
-                  caseFields.centroCosto.readonly
-                    ? "Auto-completado por funcionario"
-                    : "Centro de costo"
-                }
-              />
-            </div>
-          )}
-
-          {caseFields.partida.visible && (
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium">
-                Partida{caseFields.partida.required ? " *" : ""}
-              </label>
-              <Input
-                value={partida}
-                onChange={(e) => setPartida(e.target.value)}
-                readOnly={!!caseFields.partida.readonly}
-                placeholder={
-                  caseFields.partida.readonly
-                    ? "Auto-completado por funcionario"
-                    : "Partida"
-                }
-              />
-            </div>
-          )}
-
-          {caseFields.responsable.visible && (
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium">
-                Responsable{caseFields.responsable.required ? " *" : ""}
-              </label>
-              <Combobox
-                options={empleadoOptions}
-                value={responsableId}
-                onChange={setResponsableId}
-                placeholder="Seleccionar responsable..."
-                clearable
-                className="w-full"
-              />
-            </div>
-          )}
-
-          {caseFields.area.visible && (
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium">
-                Área{caseFields.area.required ? " *" : ""}
-              </label>
-              <Input
-                value={area}
-                onChange={(e) => setArea(e.target.value)}
-                placeholder="Área"
-              />
+          {comedorId && (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium">Servicios</label>
+                <Button type="button" variant="outline" size="sm" onClick={addServicio} className="gap-1">
+                  <Plus className="h-3 w-3" /> Agregar
+                </Button>
+              </div>
+              {servicios.map((line, i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <Combobox
+                    options={productoOptions}
+                    value={line.productoId}
+                    onChange={(v) => updateServicio(i, "productoId", v)}
+                    placeholder="Producto..."
+                    className="flex-1"
+                  />
+                  <Input
+                    type="number"
+                    min="1"
+                    value={line.cantidad}
+                    onChange={(e) => updateServicio(i, "cantidad", e.target.value)}
+                    className="w-20"
+                    placeholder="Cant."
+                  />
+                  <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500" onClick={() => removeServicio(i)}>
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
+              {servicios.length > 0 && serviciosTotal > 0 && (
+                <p className="text-xs text-muted-foreground">
+                  Total servicios: ${serviciosTotal.toLocaleString("es-AR")}
+                </p>
+              )}
             </div>
           )}
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="text-sm font-medium">
-                Cantidad de personas *
-              </label>
+              <label className="text-sm font-medium">Cantidad de personas *</label>
               <Input
                 type="number"
                 min="1"
@@ -401,52 +451,28 @@ export default function NuevoEventoPage() {
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-sm font-medium">
-                Monto total{!tipoHasPrecio ? " *" : ""}
-              </label>
+              <label className="text-sm font-medium">Monto total</label>
               <Input
                 type="number"
                 min="0"
                 step="0.01"
                 value={montoTotal}
                 onChange={(e) => setMontoTotal(e.target.value)}
-                readOnly={tipoHasPrecio}
-                placeholder={tipoHasPrecio ? "Auto-calculado" : "Monto"}
+                placeholder="Monto"
               />
-              {tipoHasPrecio && (
-                <p className="text-xs text-muted-foreground">
-                  {(selectedTipo?.precio ?? 0).toLocaleString("es-AR")} × {cantidadPersonas || 0} personas
-                </p>
-              )}
             </div>
           </div>
 
           <div className="space-y-1.5">
             <label className="text-sm font-medium">Observaciones</label>
-            <Input
-              value={observaciones}
-              onChange={(e) => setObservaciones(e.target.value)}
-              placeholder="Opcional"
-            />
+            <Input value={observaciones} onChange={(e) => setObservaciones(e.target.value)} placeholder="Opcional" />
           </div>
         </CardContent>
       </Card>
 
       <div className="mt-6 flex justify-center">
-        <Button
-          onClick={handleSubmit}
-          disabled={loading || !canSubmit}
-          size="lg"
-          className="px-10"
-        >
-          {loading ? (
-            <>
-              <Spinner className="mr-2" />
-              Guardando...
-            </>
-          ) : (
-            "Registrar Evento"
-          )}
+        <Button onClick={handleSubmit} disabled={loading || !canSubmit} size="lg" className="px-10">
+          {loading ? <><Spinner className="mr-2" />Guardando...</> : "Registrar Evento"}
         </Button>
       </div>
     </div>

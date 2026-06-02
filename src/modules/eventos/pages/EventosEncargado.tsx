@@ -1,4 +1,5 @@
 import { Fragment, useEffect, useMemo, useState } from "react";
+import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useApi } from "@/hooks/useApi";
@@ -12,6 +13,20 @@ import type { EventoResponse } from "@/domain/dto/evento/EventoResponse";
 import type { EstadoEvento } from "@/domain/enums/EstadoEvento";
 import { EstadoEventoLabel } from "@/domain/enums/EstadoEvento";
 import type { ComedorResponse } from "@/domain/dto/comedor/ComedorResponse";
+import type { ComedorCaseKey } from "../config/comedorCases";
+
+type TabKey = "TODOS" | ComedorCaseKey;
+
+const TAB_LABELS: Record<TabKey, string> = {
+  TODOS: "Todos",
+  DEFAULT: "Otros",
+  GALICIA: "Galicia",
+  BBVA: "BBVA",
+  TECHINT: "Techint",
+  UDESA: "UDESA",
+};
+
+const TAB_ORDER: TabKey[] = ["TODOS", "GALICIA", "BBVA", "TECHINT", "UDESA", "DEFAULT"];
 
 const ESTADO_STYLES: Record<EstadoEvento, { bg: string; text: string }> = {
   SOLICITADO: { bg: "bg-amber-100", text: "text-amber-700" },
@@ -20,6 +35,9 @@ const ESTADO_STYLES: Record<EstadoEvento, { bg: string; text: string }> = {
   COBRADO: { bg: "bg-emerald-100", text: "text-emerald-700" },
   ANULADO: { bg: "bg-red-100", text: "text-red-600" },
 };
+
+const dash = <span className="text-gray-300">—</span>;
+const ev = (e: EventoResponse, k: string): unknown => (e as Record<string, unknown>)[k];
 
 function DetailField({ label, value }: { label: string; value: string | number | null | undefined }) {
   if (value === null || value === undefined || value === "") return null;
@@ -35,19 +53,154 @@ function EventoDetail({ evento, comedorName }: { evento: EventoResponse; comedor
   return (
     <div className="grid grid-cols-2 gap-x-8 gap-y-3 sm:grid-cols-3 lg:grid-cols-4">
       <DetailField label="Comedor" value={comedorName} />
-      <DetailField label="Tipo de evento" value={evento.tipoEventoNombre} />
-      <DetailField label="Solicitante" value={evento.solicitanteNombre} />
       <DetailField label="Cantidad personas" value={evento.cantidadPersonas} />
-      <DetailField label="Precio unitario" value={evento.precioUnitario !== null ? fmtCurrency(evento.precioUnitario!) : null} />
-      <DetailField label="Monto total" value={evento.montoTotal !== null ? fmtCurrency(evento.montoTotal!) : null} />
-      <DetailField label="Centro de costo" value={evento.centroCosto} />
-      <DetailField label="Funcionario" value={evento.funcionarioNombre} />
-      <DetailField label="Responsable" value={evento.responsableNombre} />
-      <DetailField label="Dest. facturación" value={evento.destinatarioFacturacion} />
-      <DetailField label="Email solicitante" value={evento.emailSolicitante} />
+      <DetailField label="Monto total" value={evento.montoTotal !== null ? fmtCurrency(evento.montoTotal) : null} />
+      <DetailField label="Medio de pago" value={evento.medioPago} />
       <DetailField label="Observaciones" value={evento.observaciones} />
+
+      {evento.tipoComedor === "GALICIA" && (
+        <>
+          <DetailField label="Solicitante" value={evento.solicitanteNombre} />
+          <DetailField label="Email solicitante" value={evento.emailSolicitante} />
+          <DetailField label="Funcionario" value={evento.funcionarioNombre} />
+          <DetailField label="Responsable" value={evento.responsableNombre} />
+          <DetailField label="Centro de costo" value={evento.centroCosto} />
+          <DetailField label="Partida" value={evento.partida} />
+          <DetailField label="Precio unitario" value={evento.precioUnitario !== null ? fmtCurrency(evento.precioUnitario) : null} />
+          <DetailField label="Retenciones" value={evento.retenciones !== null ? fmtCurrency(evento.retenciones) : null} />
+          <DetailField label="Nro. operación" value={evento.numeroOperacion} />
+          <DetailField label="Razón social" value={evento.razonSocial} />
+          <DetailField label="Dest. facturación" value={evento.destinatarioFacturacion} />
+          <DetailField label="Tipo comprobante" value={evento.tipoComprobante} />
+          <DetailField label="Nro. comprobante" value={evento.numeroComprobante} />
+        </>
+      )}
+
+      {evento.tipoComedor === "BBVA" && (
+        <>
+          <DetailField label="Solicitante" value={evento.solicitanteNombre} />
+          <DetailField label="Email solicitante" value={evento.emailSolicitante} />
+          <DetailField label="Orden de compra" value={evento.ordenCompra} />
+          <DetailField label="Legajo" value={evento.legajo} />
+          <DetailField label="Recepción" value={evento.recepcion} />
+        </>
+      )}
+
+      {evento.tipoComedor === "TECHINT" && (
+        <>
+          <DetailField label="Nro. pedido" value={evento.numeroPedido} />
+          <DetailField label="Razón social" value={evento.razonSocial} />
+          <DetailField label="Concepto" value={evento.concepto} />
+          <DetailField label="Tipo comprobante" value={evento.tipoComprobante} />
+          <DetailField label="Nro. comprobante" value={evento.numeroComprobante} />
+        </>
+      )}
+
+      {evento.tipoComedor === "UDESA" && (
+        <>
+          <DetailField label="Solicitante" value={evento.solicitanteNombre} />
+          <DetailField label="Centro de costo" value={evento.centroCosto} />
+          <DetailField label="Área" value={evento.area} />
+          <DetailField label="Precio unitario" value={evento.precioUnitario !== null ? fmtCurrency(evento.precioUnitario) : null} />
+          <DetailField label="Adicionales" value={evento.adicionales !== null ? fmtCurrency(evento.adicionales) : null} />
+        </>
+      )}
+
+      {evento.servicios.length > 0 && (
+        <div className="col-span-full mt-2">
+          <span className="text-xs font-medium uppercase tracking-wide text-gray-400">Servicios</span>
+          <div className="mt-1 space-y-1">
+            {evento.servicios.map((s, i) => (
+              <div key={i} className="text-sm text-gray-700">
+                {s.producto.nombre} x{s.cantidad} — {fmtCurrency(s.precioUnitario * s.cantidad)}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
+}
+
+function extraHeaders(tab: TabKey): ReactNode {
+  switch (tab) {
+    case "GALICIA":
+      return (
+        <>
+          <th className="px-4 py-3">Solicitante</th>
+          <th className="px-4 py-3">Funcionario</th>
+          <th className="px-4 py-3">Centro Costo</th>
+          <th className="px-4 py-3 text-right">P. Unitario</th>
+        </>
+      );
+    case "BBVA":
+      return (
+        <>
+          <th className="px-4 py-3">Solicitante</th>
+          <th className="px-4 py-3">Legajo</th>
+          <th className="px-4 py-3">Recepción</th>
+        </>
+      );
+    case "TECHINT":
+      return (
+        <>
+          <th className="px-4 py-3">Nro. Pedido</th>
+          <th className="px-4 py-3">Razón Social</th>
+        </>
+      );
+    case "UDESA":
+      return (
+        <>
+          <th className="px-4 py-3">Solicitante</th>
+          <th className="px-4 py-3">Centro Costo</th>
+          <th className="px-4 py-3">Área</th>
+          <th className="px-4 py-3 text-right">P. Unitario</th>
+        </>
+      );
+    default:
+      return null;
+  }
+}
+
+function extraCells(evento: EventoResponse): ReactNode {
+  const click = "px-4 py-4 cursor-pointer";
+  switch (evento.tipoComedor) {
+    case "GALICIA":
+      return (
+        <>
+          <td className={click}>{evento.solicitanteNombre ?? dash}</td>
+          <td className={click}>{evento.funcionarioNombre ?? dash}</td>
+          <td className={click}>{evento.centroCosto ?? dash}</td>
+          <td className={cn(click, "text-right font-mono")}>{evento.precioUnitario !== null ? fmtCurrency(evento.precioUnitario) : dash}</td>
+        </>
+      );
+    case "BBVA":
+      return (
+        <>
+          <td className={click}>{evento.solicitanteNombre ?? dash}</td>
+          <td className={click}>{evento.legajo ?? dash}</td>
+          <td className={click}>{evento.recepcion ?? dash}</td>
+        </>
+      );
+    case "TECHINT":
+      return (
+        <>
+          <td className={click}>{evento.numeroPedido ?? dash}</td>
+          <td className={click}>{evento.razonSocial ?? dash}</td>
+        </>
+      );
+    case "UDESA":
+      return (
+        <>
+          <td className={click}>{evento.solicitanteNombre ?? dash}</td>
+          <td className={click}>{evento.centroCosto ?? dash}</td>
+          <td className={click}>{evento.area ?? dash}</td>
+          <td className={cn(click, "text-right font-mono")}>{evento.precioUnitario !== null ? fmtCurrency(evento.precioUnitario) : dash}</td>
+        </>
+      );
+    default:
+      return null;
+  }
 }
 
 export default function EventosEncargado() {
@@ -56,6 +209,7 @@ export default function EventosEncargado() {
 
   const [eventos, setEventos] = useState<EventoResponse[]>([]);
   const [comedores, setComedores] = useState<ComedorResponse[]>([]);
+  const [activeTab, setActiveTab] = useState<TabKey>("TODOS");
 
   useEffect(() => {
     Promise.all([get("/eventos/mis-cierres"), get("/comedores")]).then(
@@ -71,12 +225,31 @@ export default function EventosEncargado() {
     [comedores],
   );
 
-  const { displayed, sort, expansion, filters } = useTableState(eventos, {
+  const tabCounts = useMemo(() => {
+    const counts: Record<string, number> = { TODOS: eventos.length };
+    for (const e of eventos) {
+      counts[e.tipoComedor] = (counts[e.tipoComedor] || 0) + 1;
+    }
+    return counts;
+  }, [eventos]);
+
+  const availableTabs = useMemo(
+    () => TAB_ORDER.filter((k) => k === "TODOS" || (tabCounts[k] ?? 0) > 0),
+    [tabCounts],
+  );
+
+  const eventosForTab = useMemo(() => {
+    if (activeTab === "TODOS") return eventos;
+    return eventos.filter((e) => e.tipoComedor === activeTab);
+  }, [eventos, activeTab]);
+
+  const hasExtraCols = activeTab !== "TODOS" && activeTab !== "DEFAULT";
+
+  const { displayed, sort, expansion, filters } = useTableState(eventosForTab, {
     searchFields: (e) => [
       comedorNameById[e.comedorId] ?? "",
-      e.tipoEventoNombre ?? "",
-      e.solicitanteNombre ?? "",
       e.fechaEvento,
+      String(ev(e, "solicitanteNombre") ?? ""),
     ],
     statusField: "estado",
     statusMapping: {
@@ -111,6 +284,25 @@ export default function EventosEncargado() {
               <Plus className="h-4 w-4" /> Nuevo Evento
             </Button>
           </div>
+          {availableTabs.length > 2 && (
+            <div className="flex gap-1 pt-3 border-t mt-3 overflow-x-auto">
+              {availableTabs.map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={cn(
+                    "px-4 py-2 text-sm font-medium rounded-md whitespace-nowrap transition-colors",
+                    activeTab === tab
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : "text-gray-500 hover:text-gray-700 hover:bg-gray-100",
+                  )}
+                >
+                  {TAB_LABELS[tab]}
+                  <span className="ml-1.5 text-xs opacity-70">({tabCounts[tab] ?? 0})</span>
+                </button>
+              ))}
+            </div>
+          )}
         </CardHeader>
         <CardContent className="p-0">
           <DataTable
@@ -135,8 +327,7 @@ export default function EventosEncargado() {
                 <th className="px-4 py-3 w-8" />
                 <SortableTh label="Fecha" col="fechaEvento" {...sortProps} />
                 <th className="px-4 py-3">Comedor</th>
-                <th className="px-4 py-3">Tipo evento</th>
-                <th className="px-4 py-3">Solicitante</th>
+                {hasExtraCols && extraHeaders(activeTab)}
                 <th className="px-4 py-3 text-right">Personas</th>
                 <SortableTh label="Monto" col="montoTotal" {...sortProps} className="text-right" />
                 <th className="px-4 py-3 text-center">Estado</th>
@@ -170,17 +361,12 @@ export default function EventosEncargado() {
                         <td className="px-4 py-4 cursor-pointer" onClick={() => expansion.toggleRow(evento.id)}>
                           {comedorName}
                         </td>
-                        <td className="px-4 py-4 cursor-pointer" onClick={() => expansion.toggleRow(evento.id)}>
-                          {evento.tipoEventoNombre ?? <span className="text-gray-300">—</span>}
-                        </td>
-                        <td className="px-4 py-4 cursor-pointer" onClick={() => expansion.toggleRow(evento.id)}>
-                          {evento.solicitanteNombre ?? <span className="text-gray-300">—</span>}
+                        {hasExtraCols && extraCells(evento)}
+                        <td className="px-4 py-4 text-right font-mono cursor-pointer" onClick={() => expansion.toggleRow(evento.id)}>
+                          {evento.cantidadPersonas?.toLocaleString("es-AR") ?? dash}
                         </td>
                         <td className="px-4 py-4 text-right font-mono cursor-pointer" onClick={() => expansion.toggleRow(evento.id)}>
-                          {evento.cantidadPersonas?.toLocaleString("es-AR") ?? <span className="text-gray-300">—</span>}
-                        </td>
-                        <td className="px-4 py-4 text-right font-mono cursor-pointer" onClick={() => expansion.toggleRow(evento.id)}>
-                          {evento.montoTotal !== null ? fmtCurrency(evento.montoTotal) : <span className="text-gray-300">—</span>}
+                          {evento.montoTotal !== null ? fmtCurrency(evento.montoTotal) : dash}
                         </td>
                         <td className="px-4 py-4 text-center cursor-pointer" onClick={() => expansion.toggleRow(evento.id)}>
                           <span className={cn("inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold", estilos.bg, estilos.text)}>
@@ -191,7 +377,7 @@ export default function EventosEncargado() {
 
                       {isExpanded && (
                         <tr className="bg-gray-50/60">
-                          <td colSpan={8} className="px-8 py-5">
+                          <td colSpan={20} className="px-8 py-5">
                             <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
                               <EventoDetail evento={evento} comedorName={comedorName} />
                             </div>

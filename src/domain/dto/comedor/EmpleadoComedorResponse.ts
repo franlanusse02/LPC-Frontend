@@ -5,6 +5,8 @@ export type EmpleadoComedorResponse = {
   email: string;
   taxId: number;
   activo: boolean;
-  centroCosto: string | null;
-  partida: string | null;
+  centroCostoId: number | null;
+  centroCostoNombre: string | null;
+  partidaId: number | null;
+  partidaNombre: string | null;
 };

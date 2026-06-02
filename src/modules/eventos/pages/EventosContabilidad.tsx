@@ -1,4 +1,5 @@
 import { Fragment, useEffect, useMemo, useState } from "react";
+import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -55,6 +56,20 @@ import {
   defaultFilters,
   type ListFilterState,
 } from "@/components/ListFilters";
+import type { ComedorCaseKey } from "../config/comedorCases";
+
+type TabKey = "TODOS" | ComedorCaseKey;
+
+const TAB_LABELS: Record<TabKey, string> = {
+  TODOS: "Todos",
+  DEFAULT: "Otros",
+  GALICIA: "Galicia",
+  BBVA: "BBVA",
+  TECHINT: "Techint",
+  UDESA: "UDESA",
+};
+
+const TAB_ORDER: TabKey[] = ["TODOS", "GALICIA", "BBVA", "TECHINT", "UDESA", "DEFAULT"];
 
 const ESTADO_STYLES: Record<EstadoEvento, { bg: string; text: string }> = {
   SOLICITADO: { bg: "bg-amber-100", text: "text-amber-700" },
@@ -64,82 +79,258 @@ const ESTADO_STYLES: Record<EstadoEvento, { bg: string; text: string }> = {
   ANULADO: { bg: "bg-red-100", text: "text-red-600" },
 };
 
-function DetailField({
-  label,
-  value,
-}: {
-  label: string;
-  value: string | number | null | undefined;
-}) {
+const dash = <span className="text-gray-300">—</span>;
+const ev = (e: EventoResponse, k: string): unknown => (e as Record<string, unknown>)[k];
+
+function DetailField({ label, value }: { label: string; value: string | number | null | undefined }) {
   if (value === null || value === undefined || value === "") return null;
   return (
     <div className="flex flex-col gap-0.5">
-      <span className="text-xs font-medium uppercase tracking-wide text-gray-400">
-        {label}
-      </span>
+      <span className="text-xs font-medium uppercase tracking-wide text-gray-400">{label}</span>
       <span className="text-sm text-gray-700">{value}</span>
     </div>
   );
 }
 
-function EventoDetail({
-  evento,
-  comedorName,
-}: {
-  evento: EventoResponse;
-  comedorName: string;
-}) {
+function EventoDetail({ evento, comedorName }: { evento: EventoResponse; comedorName: string }) {
   return (
     <div className="grid grid-cols-2 gap-x-8 gap-y-3 sm:grid-cols-3 lg:grid-cols-4">
       <DetailField label="Comedor" value={comedorName} />
-      <DetailField label="Tipo de evento" value={evento.tipoEventoNombre} />
-      <DetailField label="Solicitante" value={evento.solicitanteNombre} />
       <DetailField label="Cantidad personas" value={evento.cantidadPersonas} />
-      <DetailField
-        label="Precio unitario"
-        value={
-          evento.precioUnitario !== null
-            ? fmtCurrency(evento.precioUnitario)
-            : null
-        }
-      />
-      <DetailField
-        label="Monto total"
-        value={
-          evento.montoTotal !== null ? fmtCurrency(evento.montoTotal) : null
-        }
-      />
-      <DetailField label="Centro de costo" value={evento.centroCosto} />
-      <DetailField label="Funcionario" value={evento.funcionarioNombre} />
-      <DetailField label="Responsable" value={evento.responsableNombre} />
-      <DetailField
-        label="Dest. facturación"
-        value={evento.destinatarioFacturacion}
-      />
-      <DetailField label="Email solicitante" value={evento.emailSolicitante} />
+      <DetailField label="Monto total" value={evento.montoTotal !== null ? fmtCurrency(evento.montoTotal) : null} />
       <DetailField label="Medio de pago" value={evento.medioPago} />
-      <DetailField label="Nro. operación" value={evento.numeroOperacion} />
-      <DetailField label="Tipo comprobante" value={evento.tipoComprobante} />
-      <DetailField label="Nro. comprobante" value={evento.numeroComprobante} />
       <DetailField label="Observaciones" value={evento.observaciones} />
-      <DetailField
-        label="Retenciones"
-        value={
-          evento.retenciones !== null ? fmtCurrency(evento.retenciones!) : null
-        }
-      />
-      {evento.facturaPdfNombreArchivo && (
-        <div className="flex flex-col gap-0.5">
-          <span className="text-xs font-medium uppercase tracking-wide text-gray-400">
-            Factura PDF
-          </span>
-          <span className="text-sm text-gray-700">
-            {evento.facturaPdfNombreArchivo}
-          </span>
+
+      {evento.tipoComedor === "GALICIA" && (
+        <>
+          <DetailField label="Solicitante" value={evento.solicitanteNombre} />
+          <DetailField label="Email solicitante" value={evento.emailSolicitante} />
+          <DetailField label="Funcionario" value={evento.funcionarioNombre} />
+          <DetailField label="Responsable" value={evento.responsableNombre} />
+          <DetailField label="Centro de costo" value={evento.centroCosto} />
+          <DetailField label="Partida" value={evento.partida} />
+          <DetailField label="Precio unitario" value={evento.precioUnitario !== null ? fmtCurrency(evento.precioUnitario) : null} />
+          <DetailField label="Retenciones" value={evento.retenciones !== null ? fmtCurrency(evento.retenciones) : null} />
+          <DetailField label="Nro. operación" value={evento.numeroOperacion} />
+          <DetailField label="Razón social" value={evento.razonSocial} />
+          <DetailField label="Dest. facturación" value={evento.destinatarioFacturacion} />
+          <DetailField label="Tipo comprobante" value={evento.tipoComprobante} />
+          <DetailField label="Nro. comprobante" value={evento.numeroComprobante} />
+        </>
+      )}
+
+      {evento.tipoComedor === "BBVA" && (
+        <>
+          <DetailField label="Solicitante" value={evento.solicitanteNombre} />
+          <DetailField label="Email solicitante" value={evento.emailSolicitante} />
+          <DetailField label="Orden de compra" value={evento.ordenCompra} />
+          <DetailField label="Legajo" value={evento.legajo} />
+          <DetailField label="Recepción" value={evento.recepcion} />
+        </>
+      )}
+
+      {evento.tipoComedor === "TECHINT" && (
+        <>
+          <DetailField label="Nro. pedido" value={evento.numeroPedido} />
+          <DetailField label="Razón social" value={evento.razonSocial} />
+          <DetailField label="Concepto" value={evento.concepto} />
+          <DetailField label="Tipo comprobante" value={evento.tipoComprobante} />
+          <DetailField label="Nro. comprobante" value={evento.numeroComprobante} />
+        </>
+      )}
+
+      {evento.tipoComedor === "UDESA" && (
+        <>
+          <DetailField label="Solicitante" value={evento.solicitanteNombre} />
+          <DetailField label="Centro de costo" value={evento.centroCosto} />
+          <DetailField label="Área" value={evento.area} />
+          <DetailField label="Precio unitario" value={evento.precioUnitario !== null ? fmtCurrency(evento.precioUnitario) : null} />
+          <DetailField label="Adicionales" value={evento.adicionales !== null ? fmtCurrency(evento.adicionales) : null} />
+        </>
+      )}
+
+      {evento.servicios.length > 0 && (
+        <div className="col-span-full mt-2">
+          <span className="text-xs font-medium uppercase tracking-wide text-gray-400">Servicios</span>
+          <div className="mt-1 space-y-1">
+            {evento.servicios.map((s, i) => (
+              <div key={i} className="text-sm text-gray-700">
+                {s.producto.nombre} x{s.cantidad} — {fmtCurrency(s.precioUnitario * s.cantidad)}
+              </div>
+            ))}
+          </div>
         </div>
+      )}
+
+      {evento.facturaPdfNombreArchivo && (
+        <DetailField label="Factura PDF" value={evento.facturaPdfNombreArchivo} />
       )}
     </div>
   );
+}
+
+function tabHeaders(tab: TabKey): ReactNode {
+  switch (tab) {
+    case "GALICIA":
+      return (
+        <>
+          <th className="px-4 py-3">Solicitante</th>
+          <th className="px-4 py-3">Funcionario</th>
+          <th className="px-4 py-3">Centro Costo</th>
+          <th className="px-4 py-3 text-right">P. Unitario</th>
+        </>
+      );
+    case "BBVA":
+      return (
+        <>
+          <th className="px-4 py-3">Solicitante</th>
+          <th className="px-4 py-3">Legajo</th>
+          <th className="px-4 py-3">Recepción</th>
+        </>
+      );
+    case "TECHINT":
+      return (
+        <>
+          <th className="px-4 py-3">Nro. Pedido</th>
+          <th className="px-4 py-3">Razón Social</th>
+        </>
+      );
+    case "UDESA":
+      return (
+        <>
+          <th className="px-4 py-3">Solicitante</th>
+          <th className="px-4 py-3">Centro Costo</th>
+          <th className="px-4 py-3">Área</th>
+          <th className="px-4 py-3 text-right">P. Unitario</th>
+        </>
+      );
+    default:
+      return null;
+  }
+}
+
+function tabCells(evento: EventoResponse): ReactNode {
+  const click = "px-4 py-4 cursor-pointer";
+  switch (evento.tipoComedor) {
+    case "GALICIA":
+      return (
+        <>
+          <td className={click}>{evento.solicitanteNombre ?? dash}</td>
+          <td className={click}>{evento.funcionarioNombre ?? dash}</td>
+          <td className={click}>{evento.centroCosto ?? dash}</td>
+          <td className={cn(click, "text-right font-mono")}>{evento.precioUnitario !== null ? fmtCurrency(evento.precioUnitario) : dash}</td>
+        </>
+      );
+    case "BBVA":
+      return (
+        <>
+          <td className={click}>{evento.solicitanteNombre ?? dash}</td>
+          <td className={click}>{evento.legajo ?? dash}</td>
+          <td className={click}>{evento.recepcion ?? dash}</td>
+        </>
+      );
+    case "TECHINT":
+      return (
+        <>
+          <td className={click}>{evento.numeroPedido ?? dash}</td>
+          <td className={click}>{evento.razonSocial ?? dash}</td>
+        </>
+      );
+    case "UDESA":
+      return (
+        <>
+          <td className={click}>{evento.solicitanteNombre ?? dash}</td>
+          <td className={click}>{evento.centroCosto ?? dash}</td>
+          <td className={click}>{evento.area ?? dash}</td>
+          <td className={cn(click, "text-right font-mono")}>{evento.precioUnitario !== null ? fmtCurrency(evento.precioUnitario) : dash}</td>
+        </>
+      );
+    default:
+      return null;
+  }
+}
+
+const eField = (key: string, header: string): ExportColumn<EventoResponse> => ({
+  key: (e) => ev(e, key) as string | number | null,
+  header,
+});
+
+function buildExportColumns(
+  tab: TabKey,
+  comedorNameById: Record<number, string>,
+): ExportColumn<EventoResponse>[] {
+  const fmtDate = (e: EventoResponse) =>
+    new Date(e.creadoEn).toLocaleString("es-AR", {
+      timeZone: "America/Argentina/Buenos_Aires",
+      day: "2-digit", month: "2-digit", year: "numeric",
+      hour: "2-digit", minute: "2-digit", second: "2-digit",
+      hour12: false,
+    });
+
+  const base: ExportColumn<EventoResponse>[] = [
+    { key: fmtDate, header: "Fecha de Carga" },
+    { key: "id", header: "ID" },
+    { key: (e) => comedorNameById[e.comedorId] ?? e.comedorId, header: "Comedor" },
+    { key: "estado", header: "Estado" },
+    { key: "fechaEvento", header: "Fecha Evento" },
+    { key: "cantidadPersonas", header: "Personas" },
+    { key: "montoTotal", header: "Monto Total" },
+    { key: "medioPago", header: "Medio de Pago" },
+    { key: "fechaEmision", header: "Fecha Emisión" },
+    { key: "fechaPago", header: "Fecha Pago" },
+    { key: "observaciones", header: "Observaciones" },
+    { key: (e) => e.servicios.map((s) => `${s.producto.nombre} x${s.cantidad}`).join(", ") || null, header: "Servicios" },
+    { key: "actualizadoEn", header: "Actualizado en" },
+  ];
+
+  switch (tab) {
+    case "GALICIA":
+      return [
+        ...base,
+        eField("solicitanteNombre", "Solicitante"),
+        eField("emailSolicitante", "Email Solicitante"),
+        eField("funcionarioNombre", "Funcionario"),
+        eField("responsableNombre", "Responsable"),
+        eField("centroCosto", "Centro de Costo"),
+        eField("partida", "Partida"),
+        eField("precioUnitario", "Precio Unitario"),
+        eField("retenciones", "Retenciones"),
+        eField("numeroOperacion", "Nº Operación"),
+        eField("razonSocial", "Razón Social"),
+        eField("destinatarioFacturacion", "Dest. Facturación"),
+        eField("tipoComprobante", "Tipo Comprobante"),
+        eField("numeroComprobante", "Nº Comprobante"),
+      ];
+    case "BBVA":
+      return [
+        ...base,
+        eField("solicitanteNombre", "Solicitante"),
+        eField("emailSolicitante", "Email Solicitante"),
+        eField("ordenCompra", "Orden de Compra"),
+        eField("legajo", "Legajo"),
+        eField("recepcion", "Recepción"),
+      ];
+    case "TECHINT":
+      return [
+        ...base,
+        eField("numeroPedido", "Nº Pedido"),
+        eField("razonSocial", "Razón Social"),
+        eField("concepto", "Concepto"),
+        eField("tipoComprobante", "Tipo Comprobante"),
+        eField("numeroComprobante", "Nº Comprobante"),
+      ];
+    case "UDESA":
+      return [
+        ...base,
+        eField("solicitanteNombre", "Solicitante"),
+        eField("centroCosto", "Centro de Costo"),
+        eField("area", "Área"),
+        eField("precioUnitario", "Precio Unitario"),
+        eField("adicionales", "Adicionales"),
+      ];
+    default:
+      return base;
+  }
 }
 
 export default function EventosContabilidad() {
@@ -148,10 +339,9 @@ export default function EventosContabilidad() {
 
   const [eventos, setEventos] = useState<EventoResponse[]>([]);
   const [comedores, setComedores] = useState<ComedorResponse[]>([]);
+  const [activeTab, setActiveTab] = useState<TabKey>("TODOS");
 
-  const [selectedEvento, setSelectedEvento] = useState<EventoResponse | null>(
-    null,
-  );
+  const [selectedEvento, setSelectedEvento] = useState<EventoResponse | null>(null);
   const [anularOpen, setAnularOpen] = useState(false);
   const [realizarOpen, setRealizarOpen] = useState(false);
   const [emitirOpen, setEmitirOpen] = useState(false);
@@ -162,9 +352,7 @@ export default function EventosContabilidad() {
   useEffect(() => {
     Promise.all([get("/eventos"), get("/comedores")]).then(
       ([eventosRes, comedoresRes]) => {
-        eventosRes
-          .json()
-          .then((data) => setEventos(Array.isArray(data) ? data : []));
+        eventosRes.json().then((data) => setEventos(Array.isArray(data) ? data : []));
         comedoresRes.json().then(setComedores);
       },
     );
@@ -187,50 +375,62 @@ export default function EventosContabilidad() {
     return list;
   }, [eventos, listFilters]);
 
-  const { displayed, sort, expansion, filters } = useTableState(
-    eventosAfterDateFilter,
-    {
-      searchFields: (e) => [
-        comedorNameById[e.comedorId] ?? "",
-        e.tipoEventoNombre ?? "",
-        e.solicitanteNombre ?? "",
-        e.fechaEvento,
-        e.observaciones ?? "",
-      ],
-      statusField: "estado",
-      statusMapping: {
-        SOLICITADO: { filter: (e) => e.estado === "SOLICITADO" },
-        REALIZADO: { filter: (e) => e.estado === "REALIZADO" },
-        FACTURA_EMITIDA: { filter: (e) => e.estado === "FACTURA_EMITIDA" },
-        COBRADO: { filter: (e) => e.estado === "COBRADO" },
-        ANULADO: { filter: (e) => e.estado === "ANULADO" },
-      },
-      defaultSortKey: "fechaEvento",
-    },
+  const tabCounts = useMemo(() => {
+    const counts: Record<string, number> = { TODOS: eventosAfterDateFilter.length };
+    for (const e of eventosAfterDateFilter) {
+      counts[e.tipoComedor] = (counts[e.tipoComedor] || 0) + 1;
+    }
+    return counts;
+  }, [eventosAfterDateFilter]);
+
+  const availableTabs = useMemo(
+    () => TAB_ORDER.filter((k) => k === "TODOS" || (tabCounts[k] ?? 0) > 0),
+    [tabCounts],
   );
 
-  const sortProps = {
-    sortKey: sort.key,
-    sortDir: sort.dir,
-    onSort: sort.handleSort,
-  };
+  const eventosForTab = useMemo(() => {
+    if (activeTab === "TODOS") return eventosAfterDateFilter;
+    return eventosAfterDateFilter.filter((e) => e.tipoComedor === activeTab);
+  }, [eventosAfterDateFilter, activeTab]);
 
-  const totalActivos = eventos.filter((e) => e.anulacionId === null).length;
-  const totalAnulados = eventos.filter((e) => e.anulacionId !== null).length;
-  const montoTotal = eventos
+  const hasExtraCols = activeTab !== "TODOS" && activeTab !== "DEFAULT";
+
+  const { displayed, sort, expansion, filters } = useTableState(eventosForTab, {
+    searchFields: (e) => [
+      comedorNameById[e.comedorId] ?? "",
+      e.fechaEvento,
+      e.observaciones ?? "",
+      String(ev(e, "solicitanteNombre") ?? ""),
+      String(ev(e, "funcionarioNombre") ?? ""),
+      String(ev(e, "razonSocial") ?? ""),
+    ],
+    statusField: "estado",
+    statusMapping: {
+      SOLICITADO: { filter: (e) => e.estado === "SOLICITADO" },
+      REALIZADO: { filter: (e) => e.estado === "REALIZADO" },
+      FACTURA_EMITIDA: { filter: (e) => e.estado === "FACTURA_EMITIDA" },
+      COBRADO: { filter: (e) => e.estado === "COBRADO" },
+      ANULADO: { filter: (e) => e.estado === "ANULADO" },
+    },
+    defaultSortKey: "fechaEvento",
+  });
+
+  const sortProps = { sortKey: sort.key, sortDir: sort.dir, onSort: sort.handleSort };
+
+  const totalActivos = eventosForTab.filter((e) => e.anulacionId === null).length;
+  const totalAnulados = eventosForTab.filter((e) => e.anulacionId !== null).length;
+  const montoTotal = eventosForTab
     .filter((e) => e.anulacionId === null)
     .reduce((s, e) => s + (e.montoTotal ?? 0), 0);
   const montoFiltrado = displayed
     .filter((e) => e.anulacionId === null)
     .reduce((s, e) => s + (e.montoTotal ?? 0), 0);
-  const isFiltered = displayed.length !== eventos.length;
+  const isFiltered = displayed.length !== eventosForTab.length;
 
   const handleAction = async (action: () => Promise<EventoResponse>) => {
     try {
       const updated = await action();
-      setEventos((prev) =>
-        prev.map((e) => (e.id === updated.id ? updated : e)),
-      );
+      setEventos((prev) => prev.map((e) => (e.id === updated.id ? updated : e)));
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "No se pudo completar la operación");
       throw err;
@@ -239,10 +439,7 @@ export default function EventosContabilidad() {
 
   const handleAnular = async (eventoId: number, motivo: string) => {
     await handleAction(async () => {
-      const updated: EventoResponse = await patch(
-        `/eventos/${eventoId}/anular`,
-        { motivo },
-      ).then((r) => r.json());
+      const updated: EventoResponse = await patch(`/eventos/${eventoId}/anular`, { motivo }).then((r) => r.json());
       toast("Evento anulado");
       return updated;
     });
@@ -250,38 +447,23 @@ export default function EventosContabilidad() {
 
   const handleRealizar = async (eventoId: number) => {
     await handleAction(async () => {
-      const updated: EventoResponse = await patch(
-        `/eventos/${eventoId}/realizar`,
-        {},
-      ).then((r) => r.json());
+      const updated: EventoResponse = await patch(`/eventos/${eventoId}/realizar`, {}).then((r) => r.json());
       toast("Evento marcado como realizado");
       return updated;
     });
   };
 
-  const handleEmitir = async (
-    eventoId: number,
-    payload: EmitirEventoPayload,
-  ) => {
+  const handleEmitir = async (eventoId: number, payload: EmitirEventoPayload) => {
     await handleAction(async () => {
-      const updated: EventoResponse = await patch(
-        `/eventos/${eventoId}/emitir`,
-        payload,
-      ).then((r) => r.json());
+      const updated: EventoResponse = await patch(`/eventos/${eventoId}/emitir`, payload).then((r) => r.json());
       toast("Factura de evento emitida");
       return updated;
     });
   };
 
-  const handleCobrar = async (
-    eventoId: number,
-    payload: CobrarEventoPayload,
-  ) => {
+  const handleCobrar = async (eventoId: number, payload: CobrarEventoPayload) => {
     await handleAction(async () => {
-      const updated: EventoResponse = await patch(
-        `/eventos/${eventoId}/pagado`,
-        payload,
-      ).then((r) => r.json());
+      const updated: EventoResponse = await patch(`/eventos/${eventoId}/pagado`, payload).then((r) => r.json());
       toast("Cobro del evento registrado");
       return updated;
     });
@@ -289,19 +471,13 @@ export default function EventosContabilidad() {
 
   const handleEliminarPdf = async (eventoId: number) => {
     await handleAction(async () => {
-      const updated: EventoResponse = await patch(
-        `/eventos/${eventoId}/eliminar-factura-pdf`,
-        {},
-      ).then((r) => r.json());
+      const updated: EventoResponse = await patch(`/eventos/${eventoId}/eliminar-factura-pdf`, {}).then((r) => r.json());
       toast("PDF eliminado");
       return updated;
     });
   };
 
-  const openModal = (
-    evento: EventoResponse,
-    modal: "anular" | "realizar" | "emitir" | "cobrar",
-  ) => {
+  const openModal = (evento: EventoResponse, modal: "anular" | "realizar" | "emitir" | "cobrar") => {
     setSelectedEvento(evento);
     if (modal === "anular") setAnularOpen(true);
     if (modal === "realizar") setRealizarOpen(true);
@@ -384,47 +560,18 @@ export default function EventosContabilidad() {
     setBulkMotivo("");
   };
 
-  const exportColumns: ExportColumn<EventoResponse>[] = [
-    { key: (e) => new Date(e.creadoEn).toLocaleString("es-AR", {
-      timeZone: "America/Argentina/Buenos_Aires",
-      day: "2-digit", month: "2-digit", year: "numeric",
-      hour: "2-digit", minute: "2-digit", second: "2-digit",
-      hour12: false,
-    }), header: "Fecha de Carga" },
-    { key: "id", header: "ID" },
-    { key: (e) => comedorNameById[e.comedorId] ?? e.comedorId, header: "Comedor" },
-    { key: "tipoEventoNombre", header: "Tipo Evento" },
-    { key: "estado", header: "Estado" },
-    { key: "fechaEvento", header: "Fecha Evento" },
-    { key: "solicitanteNombre", header: "Solicitante" },
-    { key: "emailSolicitante", header: "Email Solicitante" },
-    { key: "funcionarioNombre", header: "Funcionario" },
-    { key: "responsableNombre", header: "Responsable" },
-    { key: "cantidadPersonas", header: "Personas" },
-    { key: "precioUnitario", header: "Precio Unitario" },
-    { key: "montoTotal", header: "Monto Total" },
-    { key: "medioPago", header: "Medio de Pago" },
-    { key: "centroCosto", header: "Centro de Costo" },
-    { key: "partida", header: "Partida" },
-    { key: "razonSocial", header: "Razón Social" },
-    { key: "destinatarioFacturacion", header: "Dest. Facturación" },
-    { key: "tipoComprobante", header: "Tipo Comprobante" },
-    { key: "numeroComprobante", header: "Nº Comprobante" },
-    { key: "fechaEmision", header: "Fecha Emisión" },
-    { key: "fechaPago", header: "Fecha Pago" },
-    { key: "numeroOperacion", header: "Nº Operación" },
-    { key: "retenciones", header: "Retenciones" },
-    { key: "observaciones", header: "Observaciones" },
-    { key: "actualizadoEn", header: "Actualizado en" },
-  ];
+  const exportColumns = useMemo(
+    () => buildExportColumns(activeTab, comedorNameById),
+    [activeTab, comedorNameById],
+  );
 
   const handleExport = () => {
     const data = selection.count > 0
       ? displayed.filter((e) => selection.selected.has(e.id))
       : displayed;
     const segments = ["eventos"];
+    if (activeTab !== "TODOS") segments.push(activeTab.toLowerCase());
     if (filters.status !== "all") segments.push(filters.status.toLowerCase());
-    if (listFilters.comedorId) segments.push(`comedor-${listFilters.comedorId}`);
     if (listFilters.desde) segments.push(`desde-${listFilters.desde}`);
     if (listFilters.hasta) segments.push(`hasta-${listFilters.hasta}`);
     exportToXlsx({ data, columns: exportColumns, filename: segments.join("-") });
@@ -440,7 +587,7 @@ export default function EventosContabilidad() {
       </div>
 
       <div className="mx-auto max-w-7xl grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5 pb-4">
-        <StatCard label="Total eventos" value={eventos.length} />
+        <StatCard label="Total eventos" value={eventosForTab.length} />
         <StatCard label="Activos" value={totalActivos} accent="emerald" />
         <StatCard label="Anulados" value={totalAnulados} accent="red" />
         <StatCard label="Monto total" value={fmtCurrency(montoTotal)} />
@@ -454,9 +601,7 @@ export default function EventosContabilidad() {
       <Card className="mx-auto max-w-7xl py-6 border-0 shadow-md rounded-xl">
         <CardHeader className="border-b px-6 py-4">
           <div className="flex flex-row justify-between">
-            <CardTitle className="text-xl font-bold text-gray-800">
-              Eventos
-            </CardTitle>
+            <CardTitle className="text-xl font-bold text-gray-800">Eventos</CardTitle>
           </div>
           <div className="pt-3">
             <ListFilters
@@ -469,6 +614,23 @@ export default function EventosContabilidad() {
                 { value: "creadoEn", label: "Fecha de Carga" },
               ]}
             />
+          </div>
+          <div className="flex gap-1 pt-3 border-t mt-3 overflow-x-auto">
+            {availableTabs.map((tab) => (
+              <button
+                key={tab}
+                onClick={() => { setActiveTab(tab); selection.clear(); }}
+                className={cn(
+                  "px-4 py-2 text-sm font-medium rounded-md whitespace-nowrap transition-colors",
+                  activeTab === tab
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "text-gray-500 hover:text-gray-700 hover:bg-gray-100",
+                )}
+              >
+                {TAB_LABELS[tab]}
+                <span className="ml-1.5 text-xs opacity-70">({tabCounts[tab] ?? 0})</span>
+              </button>
+            ))}
           </div>
         </CardHeader>
         <CardContent className="p-0">
@@ -540,15 +702,9 @@ export default function EventosContabilidad() {
                 <th className="px-4 py-3 w-8" />
                 <SortableTh label="Fecha" col="fechaEvento" {...sortProps} />
                 <th className="px-4 py-3">Comedor</th>
-                <th className="px-4 py-3">Tipo evento</th>
-                <th className="px-4 py-3">Solicitante</th>
+                {hasExtraCols && tabHeaders(activeTab)}
                 <th className="px-4 py-3 text-right">Personas</th>
-                <SortableTh
-                  label="Monto"
-                  col="montoTotal"
-                  {...sortProps}
-                  className="text-right"
-                />
+                <SortableTh label="Monto" col="montoTotal" {...sortProps} className="text-right" />
                 <th className="px-4 py-3 text-center">Estado</th>
                 <th className="px-4 py-3 w-12" />
               </>
@@ -559,29 +715,20 @@ export default function EventosContabilidad() {
                   const isExpanded = expansion.expandedRows.has(evento.id);
                   const estilos = ESTADO_STYLES[evento.estado];
                   const isAnulado = evento.estado === "ANULADO";
-                  const comedorName =
-                    comedorNameById[evento.comedorId] ??
-                    String(evento.comedorId);
+                  const comedorName = comedorNameById[evento.comedorId] ?? String(evento.comedorId);
 
                   const canRealizar = evento.estado === "SOLICITADO";
-                  const canEmitir =
-                    evento.estado === "SOLICITADO" ||
-                    evento.estado === "REALIZADO";
+                  const canEmitir = evento.estado === "SOLICITADO" || evento.estado === "REALIZADO";
                   const canCobrar = evento.estado === "FACTURA_EMITIDA";
                   const hasPdf = !!evento.facturaPdfNombreArchivo;
-                  const canEliminarPdf =
-                    hasPdf &&
-                    (evento.estado === "FACTURA_EMITIDA" ||
-                      evento.estado === "COBRADO");
+                  const canEliminarPdf = hasPdf && (evento.estado === "FACTURA_EMITIDA" || evento.estado === "COBRADO");
 
                   return (
                     <Fragment key={evento.id}>
                       <tr
                         className={cn(
                           "border-b transition-colors",
-                          isAnulado
-                            ? "bg-red-50/30 text-gray-400"
-                            : "hover:bg-gray-50/80",
+                          isAnulado ? "bg-red-50/30 text-gray-400" : "hover:bg-gray-50/80",
                           selection.selected.has(evento.id) && "bg-blue-50/40",
                         )}
                       >
@@ -598,133 +745,57 @@ export default function EventosContabilidad() {
                           className="px-4 py-4 cursor-pointer text-gray-400 hover:text-gray-600"
                           onClick={() => expansion.toggleRow(evento.id)}
                         >
-                          {isExpanded ? (
-                            <ChevronUp className="h-4 w-4" />
-                          ) : (
-                            <ChevronDown className="h-4 w-4" />
-                          )}
+                          {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                         </td>
-                        <td
-                          className="px-4 py-4 font-medium whitespace-nowrap cursor-pointer"
-                          onClick={() => expansion.toggleRow(evento.id)}
-                        >
+                        <td className="px-4 py-4 font-medium whitespace-nowrap cursor-pointer" onClick={() => expansion.toggleRow(evento.id)}>
                           {evento.fechaEvento}
                         </td>
-                        <td
-                          className="px-4 py-4 cursor-pointer"
-                          onClick={() => expansion.toggleRow(evento.id)}
-                        >
+                        <td className="px-4 py-4 cursor-pointer" onClick={() => expansion.toggleRow(evento.id)}>
                           {comedorName}
                         </td>
-                        <td
-                          className="px-4 py-4 cursor-pointer"
-                          onClick={() => expansion.toggleRow(evento.id)}
-                        >
-                          {evento.tipoEventoNombre ?? (
-                            <span className="text-gray-300">—</span>
-                          )}
+                        {hasExtraCols && tabCells(evento)}
+                        <td className="px-4 py-4 text-right font-mono cursor-pointer" onClick={() => expansion.toggleRow(evento.id)}>
+                          {evento.cantidadPersonas?.toLocaleString("es-AR") ?? dash}
                         </td>
-                        <td
-                          className="px-4 py-4 cursor-pointer"
-                          onClick={() => expansion.toggleRow(evento.id)}
-                        >
-                          {evento.solicitanteNombre ?? (
-                            <span className="text-gray-300">—</span>
-                          )}
+                        <td className="px-4 py-4 text-right font-mono cursor-pointer" onClick={() => expansion.toggleRow(evento.id)}>
+                          {evento.montoTotal !== null ? fmtCurrency(evento.montoTotal) : dash}
                         </td>
-                        <td
-                          className="px-4 py-4 text-right font-mono cursor-pointer"
-                          onClick={() => expansion.toggleRow(evento.id)}
-                        >
-                          {evento.cantidadPersonas?.toLocaleString("es-AR") ?? (
-                            <span className="text-gray-300">—</span>
-                          )}
-                        </td>
-                        <td
-                          className="px-4 py-4 text-right font-mono cursor-pointer"
-                          onClick={() => expansion.toggleRow(evento.id)}
-                        >
-                          {evento.montoTotal !== null ? (
-                            fmtCurrency(evento.montoTotal)
-                          ) : (
-                            <span className="text-gray-300">—</span>
-                          )}
-                        </td>
-                        <td
-                          className="px-4 py-4 text-center cursor-pointer"
-                          onClick={() => expansion.toggleRow(evento.id)}
-                        >
-                          <span
-                            className={cn(
-                              "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold",
-                              estilos.bg,
-                              estilos.text,
-                            )}
-                          >
+                        <td className="px-4 py-4 text-center cursor-pointer" onClick={() => expansion.toggleRow(evento.id)}>
+                          <span className={cn("inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold", estilos.bg, estilos.text)}>
                             {EstadoEventoLabel[evento.estado]}
                           </span>
                         </td>
-                        <td
-                          className="px-4 py-4"
-                          onClick={(e) => e.stopPropagation()}
-                        >
+                        <td className="px-4 py-4" onClick={(e) => e.stopPropagation()}>
                           {!isAnulado && (
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-8 w-8 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100"
-                                  aria-label="Acciones"
-                                >
+                                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100" aria-label="Acciones">
                                   <MoreHorizontal className="h-4 w-4" />
                                 </Button>
                               </DropdownMenuTrigger>
-                              <DropdownMenuContent
-                                align="end"
-                                className="w-48 rounded-xl shadow-lg border-gray-100"
-                              >
+                              <DropdownMenuContent align="end" className="w-48 rounded-xl shadow-lg border-gray-100">
                                 {canRealizar && (
-                                  <DropdownMenuItem
-                                    onClick={() =>
-                                      openModal(evento, "realizar")
-                                    }
-                                    className="gap-2.5 cursor-pointer rounded-lg"
-                                  >
-                                    <CheckCircle2 className="h-4 w-4" />{" "}
-                                    Realizar
+                                  <DropdownMenuItem onClick={() => openModal(evento, "realizar")} className="gap-2.5 cursor-pointer rounded-lg">
+                                    <CheckCircle2 className="h-4 w-4" /> Realizar
                                   </DropdownMenuItem>
                                 )}
                                 {canEmitir && (
-                                  <DropdownMenuItem
-                                    onClick={() => openModal(evento, "emitir")}
-                                    className="gap-2.5 cursor-pointer rounded-lg"
-                                  >
+                                  <DropdownMenuItem onClick={() => openModal(evento, "emitir")} className="gap-2.5 cursor-pointer rounded-lg">
                                     <Send className="h-4 w-4" /> Emitir factura
                                   </DropdownMenuItem>
                                 )}
                                 {canCobrar && (
-                                  <DropdownMenuItem
-                                    onClick={() => openModal(evento, "cobrar")}
-                                    className="gap-2.5 cursor-pointer rounded-lg"
-                                  >
-                                    <CircleDollarSign className="h-4 w-4" />{" "}
-                                    Cobrar
+                                  <DropdownMenuItem onClick={() => openModal(evento, "cobrar")} className="gap-2.5 cursor-pointer rounded-lg">
+                                    <CircleDollarSign className="h-4 w-4" /> Cobrar
                                   </DropdownMenuItem>
                                 )}
                                 {canEliminarPdf && (
-                                  <DropdownMenuItem
-                                    onClick={() => handleEliminarPdf(evento.id)}
-                                    className="gap-2.5 cursor-pointer rounded-lg"
-                                  >
+                                  <DropdownMenuItem onClick={() => handleEliminarPdf(evento.id)} className="gap-2.5 cursor-pointer rounded-lg">
                                     <FileX2 className="h-4 w-4" /> Eliminar PDF
                                   </DropdownMenuItem>
                                 )}
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem
-                                  onClick={() => openModal(evento, "anular")}
-                                  className="gap-2.5 cursor-pointer rounded-lg text-red-600 focus:text-red-700 focus:bg-red-50"
-                                >
+                                <DropdownMenuItem onClick={() => openModal(evento, "anular")} className="gap-2.5 cursor-pointer rounded-lg text-red-600 focus:text-red-700 focus:bg-red-50">
                                   <Ban className="h-4 w-4" /> Anular
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
@@ -735,12 +806,9 @@ export default function EventosContabilidad() {
 
                       {isExpanded && (
                         <tr className="bg-gray-50/60">
-                          <td colSpan={10} className="px-8 py-5">
+                          <td colSpan={20} className="px-8 py-5">
                             <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-                              <EventoDetail
-                                evento={evento}
-                                comedorName={comedorName}
-                              />
+                              <EventoDetail evento={evento} comedorName={comedorName} />
                             </div>
                           </td>
                         </tr>
@@ -754,30 +822,10 @@ export default function EventosContabilidad() {
         </CardContent>
       </Card>
 
-      <AnularEventoModal
-        open={anularOpen}
-        onClose={() => setAnularOpen(false)}
-        evento={selectedEvento}
-        onConfirm={handleAnular}
-      />
-      <RealizarEventoModal
-        open={realizarOpen}
-        onClose={() => setRealizarOpen(false)}
-        evento={selectedEvento}
-        onConfirm={handleRealizar}
-      />
-      <EmitirEventoModal
-        open={emitirOpen}
-        onClose={() => setEmitirOpen(false)}
-        evento={selectedEvento}
-        onConfirm={handleEmitir}
-      />
-      <CobrarEventoModal
-        open={cobrarOpen}
-        onClose={() => setCobrarOpen(false)}
-        evento={selectedEvento}
-        onConfirm={handleCobrar}
-      />
+      <AnularEventoModal open={anularOpen} onClose={() => setAnularOpen(false)} evento={selectedEvento} onConfirm={handleAnular} />
+      <RealizarEventoModal open={realizarOpen} onClose={() => setRealizarOpen(false)} evento={selectedEvento} onConfirm={handleRealizar} />
+      <EmitirEventoModal open={emitirOpen} onClose={() => setEmitirOpen(false)} evento={selectedEvento} onConfirm={handleEmitir} />
+      <CobrarEventoModal open={cobrarOpen} onClose={() => setCobrarOpen(false)} evento={selectedEvento} onConfirm={handleCobrar} />
 
       <BulkActionModal
         open={bulkRealizar}
