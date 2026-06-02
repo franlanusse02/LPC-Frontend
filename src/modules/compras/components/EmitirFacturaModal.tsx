@@ -73,7 +73,7 @@ export function EmitirFacturaModal({
 
           <div className="space-y-2">
             <label className="text-[10px] font-bold uppercase tracking-wide text-gray-500">
-              Fecha de emisi\u00f3n *
+              Fecha de emisión *
             </label>
             <Input
               type="date"

@@ -23,8 +23,9 @@ import ProductosPage from "./modules/catalogo/pages/productos";
 import ConsumidoresPage from "./modules/catalogo/pages/consumidores";
 import ProveedoresPage from "./modules/catalogo/pages/proveedores";
 import BancosPage from "./modules/catalogo/pages/bancos";
-import TiposEventoPage from "./modules/catalogo/pages/tipos-eventos";
 import EmpleadosPage from "./modules/catalogo/pages/empleados";
+import CentrosCostoPage from "./modules/catalogo/pages/centros-costo";
+import PartidasPage from "./modules/catalogo/pages/partidas";
 import RazonesSocialesPage from "./modules/catalogo/pages/razones-sociales";
 import SociedadesPage from "./modules/catalogo/pages/sociedades";
 import ComprasEncargado from "./modules/compras/pages/ComprasEncargado";
@@ -154,16 +155,20 @@ export default function App() {
               />
               <Route path="/catalogo/bancos" element={<BancosPage />} />
               <Route
-                path="/catalogo/tipos-eventos"
-                element={<TiposEventoPage />}
-              />
-              <Route
                 path="/catalogo/empleados"
                 element={<EmpleadosPage />}
               />
               <Route
                 path="/catalogo/razones-sociales"
                 element={<RazonesSocialesPage />}
+              />
+              <Route
+                path="/catalogo/centros-costo"
+                element={<CentrosCostoPage />}
+              />
+              <Route
+                path="/catalogo/partidas"
+                element={<PartidasPage />}
               />
             </Route>
           </Route>

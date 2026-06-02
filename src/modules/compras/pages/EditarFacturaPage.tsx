@@ -150,7 +150,7 @@ export default function EditarFacturaPage() {
 
                 <div className="space-y-1.5">
                   <label className="text-sm font-medium">
-                    N\u00famero de factura *
+                    Número de factura *
                   </label>
                   <Input
                     type="text"
@@ -193,7 +193,7 @@ export default function EditarFacturaPage() {
 
                 <div className="space-y-1.5">
                   <label className="text-sm font-medium">
-                    N\u00famero de operaci\u00f3n
+                    Número de operación
                   </label>
                   <Input
                     type="text"

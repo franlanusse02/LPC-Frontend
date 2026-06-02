@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
@@ -11,6 +11,8 @@ import { DataTable, SortableTh } from "@/components/data-table";
 import { useApi } from "@/hooks/useApi";
 import type { EmpleadoComedorResponse } from "@/domain/dto/comedor/EmpleadoComedorResponse";
 import type { ComedorResponse } from "@/domain/dto/comedor/ComedorResponse";
+import type { CentroCostoResponse } from "@/domain/dto/catalogo/CentroCostoResponse";
+import type { PartidaResponse } from "@/domain/dto/catalogo/PartidaResponse";
 
 type SortKey = "nombre" | "comedor" | "email" | "taxId";
 
@@ -20,6 +22,8 @@ export default function EmpleadosPage() {
 
   const [empleados, setEmpleados] = useState<EmpleadoComedorResponse[]>([]);
   const [comedores, setComedores] = useState<ComedorResponse[]>([]);
+  const [centrosCosto, setCentrosCosto] = useState<CentroCostoResponse[]>([]);
+  const [partidas, setPartidas] = useState<PartidaResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
@@ -32,8 +36,8 @@ export default function EmpleadosPage() {
   const [comedorId, setComedorId] = useState("");
   const [email, setEmail] = useState("");
   const [taxId, setTaxId] = useState("");
-  const [centroCosto, setCentroCosto] = useState("");
-  const [partida, setPartida] = useState("");
+  const [centroCostoId, setCentroCostoId] = useState("");
+  const [partidaId, setPartidaId] = useState("");
 
   useEffect(() => {
     Promise.all([
@@ -45,6 +49,31 @@ export default function EmpleadosPage() {
       setLoading(false);
     });
   }, [get]);
+
+  useEffect(() => {
+    if (!comedorId) {
+      setCentrosCosto([]);
+      setPartidas([]);
+      return;
+    }
+    Promise.all([
+      get(`/comedores/centros-costo?comedorId=${comedorId}`).then((r) => r.json()),
+      get(`/comedores/partidas?comedorId=${comedorId}`).then((r) => r.json()),
+    ]).then(([ccData, pData]) => {
+      setCentrosCosto(ccData);
+      setPartidas(pData);
+    });
+  }, [comedorId, get]);
+
+  const ccOptions = useMemo(
+    () => centrosCosto.filter((c) => c.activo).map((c) => ({ value: String(c.id), label: c.nombre })),
+    [centrosCosto],
+  );
+
+  const partidaOptions = useMemo(
+    () => partidas.filter((p) => p.activo).map((p) => ({ value: String(p.id), label: p.nombre })),
+    [partidas],
+  );
 
   const handleSort = (key: SortKey) => {
     if (key === sortKey) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
@@ -74,8 +103,8 @@ export default function EmpleadosPage() {
     setComedorId("");
     setEmail("");
     setTaxId("");
-    setCentroCosto("");
-    setPartida("");
+    setCentroCostoId("");
+    setPartidaId("");
     setModalOpen(true);
   };
 
@@ -85,8 +114,8 @@ export default function EmpleadosPage() {
     setComedorId(String(e.comedorId));
     setEmail(e.email ?? "");
     setTaxId(e.taxId ? String(e.taxId) : "");
-    setCentroCosto(e.centroCosto ?? "");
-    setPartida(e.partida ?? "");
+    setCentroCostoId(e.centroCostoId ? String(e.centroCostoId) : "");
+    setPartidaId(e.partidaId ? String(e.partidaId) : "");
     setModalOpen(true);
   };
 
@@ -102,8 +131,8 @@ export default function EmpleadosPage() {
         comedorId: Number(comedorId),
         email: email.trim() || null,
         taxId: taxId ? Number(taxId) : null,
-        centroCosto: centroCosto.trim() || null,
-        partida: partida.trim() || null,
+        centroCostoId: centroCostoId ? Number(centroCostoId) : null,
+        partidaId: partidaId ? Number(partidaId) : null,
       };
       const res = editing
         ? await patch(`/comedores/empleados/${editing.id}`, body)
@@ -188,8 +217,8 @@ export default function EmpleadosPage() {
                 </td>
                 <td className="px-6 py-4 text-gray-500">{e.email ?? "—"}</td>
                 <td className="px-6 py-4 font-mono text-sm">{e.taxId ?? "—"}</td>
-                <td className="px-6 py-4 text-gray-500">{e.centroCosto ?? "—"}</td>
-                <td className="px-6 py-4 text-gray-500">{e.partida ?? "—"}</td>
+                <td className="px-6 py-4 text-gray-500">{e.centroCostoNombre ?? "—"}</td>
+                <td className="px-6 py-4 text-gray-500">{e.partidaNombre ?? "—"}</td>
                 <td className="px-6 py-4 text-right">
                   <div className="flex justify-end gap-1">
                     <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEdit(e)}>
@@ -218,7 +247,7 @@ export default function EmpleadosPage() {
                 <Combobox
                   options={comedores.map((c) => ({ value: String(c.id), label: c.nombre }))}
                   value={comedorId}
-                  onChange={setComedorId}
+                  onChange={(v) => { setComedorId(v); setCentroCostoId(""); setPartidaId(""); }}
                   placeholder="Seleccionar..."
                   className="w-full"
                 />
@@ -263,10 +292,14 @@ export default function EmpleadosPage() {
                   Centro de Costo{" "}
                   <span className="text-gray-400 font-normal">(opcional)</span>
                 </label>
-                <Input
-                  value={centroCosto}
-                  onChange={(e) => setCentroCosto(e.target.value)}
-                  placeholder="Centro de costo"
+                <Combobox
+                  options={ccOptions}
+                  value={centroCostoId}
+                  onChange={setCentroCostoId}
+                  placeholder={!comedorId ? "Seleccioná un comedor primero..." : "Seleccionar..."}
+                  disabled={!comedorId}
+                  clearable
+                  className="w-full"
                 />
               </div>
               <div>
@@ -274,10 +307,14 @@ export default function EmpleadosPage() {
                   Partida{" "}
                   <span className="text-gray-400 font-normal">(opcional)</span>
                 </label>
-                <Input
-                  value={partida}
-                  onChange={(e) => setPartida(e.target.value)}
-                  placeholder="Partida"
+                <Combobox
+                  options={partidaOptions}
+                  value={partidaId}
+                  onChange={setPartidaId}
+                  placeholder={!comedorId ? "Seleccioná un comedor primero..." : "Seleccionar..."}
+                  disabled={!comedorId}
+                  clearable
+                  className="w-full"
                 />
               </div>
               <div className="flex justify-end gap-2 pt-2">

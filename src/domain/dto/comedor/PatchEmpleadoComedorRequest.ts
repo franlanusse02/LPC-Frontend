@@ -3,6 +3,6 @@ export type PatchEmpleadoComedorRequest = {
   nombre?: string | null;
   email?: string | null;
   taxId?: number | null;
-  centroCosto?: string | null;
-  partida?: string | null;
+  centroCostoId?: number | null;
+  partidaId?: number | null;
 };
