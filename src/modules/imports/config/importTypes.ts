@@ -65,17 +65,6 @@ export const IMPORT_TYPES: ImportTypeConfig[] = [
       { key: "activo", label: "Activo" },
     ],
   },
-  {
-    key: "tipos-evento",
-    endpoint: "/import/tipos-evento",
-    label: "Tipos de Evento",
-    columns: [
-      { key: "comedorNombre", label: "Comedor" },
-      { key: "nombre", label: "Nombre" },
-      { key: "precio", label: "Precio" },
-      { key: "sapId", label: "SAP ID" },
-    ],
-  },
 ];
 
 export function getImportType(key: string): ImportTypeConfig | undefined {
