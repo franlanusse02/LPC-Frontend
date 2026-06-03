@@ -65,6 +65,27 @@ export const IMPORT_TYPES: ImportTypeConfig[] = [
       { key: "activo", label: "Activo" },
     ],
   },
+  {
+    key: "razones-sociales",
+    endpoint: "/import/razones-sociales",
+    label: "Razones Sociales",
+    columns: [
+      { key: "comedorNombre", label: "Comedor" },
+      { key: "nombre", label: "Nombre" },
+      { key: "taxId", label: "CUIT" },
+    ],
+  },
+  {
+    key: "centros-costo-partidas",
+    endpoint: "/import/centros-costo-partidas",
+    label: "Centros de Costo y Partidas",
+    columns: [
+      { key: "ccComedorNombre", label: "Comedor (CC)" },
+      { key: "ccNombre", label: "Centro de Costo" },
+      { key: "partidaComedorNombre", label: "Comedor (Partida)" },
+      { key: "partidaNombre", label: "Partida" },
+    ],
+  },
 ];
 
 export function getImportType(key: string): ImportTypeConfig | undefined {
