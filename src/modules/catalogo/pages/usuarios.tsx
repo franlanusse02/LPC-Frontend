@@ -19,12 +19,14 @@ const ROL_LABELS: Record<UserRole, string> = {
   ADMIN: "Admin",
   ENCARGADO: "Encargado",
   CONTABILIDAD: "Contabilidad",
+  CARGA_DATOS: "Carga Datos",
 };
 
 const ROL_STYLES: Record<UserRole, string> = {
   ADMIN: "bg-violet-100 text-violet-700",
   ENCARGADO: "bg-blue-100 text-blue-700",
   CONTABILIDAD: "bg-amber-100 text-amber-700",
+  CARGA_DATOS: "bg-gray-100 text-gray-700",
 };
 
 function RolBadge({ rol }: { rol: UserRole }) {
@@ -257,6 +259,7 @@ export default function UsuariosPage() {
                     { value: "ADMIN", label: "Admin" },
                     { value: "ENCARGADO", label: "Encargado" },
                     { value: "CONTABILIDAD", label: "Contabilidad" },
+                    { value: "CARGA_DATOS", label: "Carga Datos" },
                   ]}
                   value={rol}
                   onChange={(v) => setRol(v as UserRole)}

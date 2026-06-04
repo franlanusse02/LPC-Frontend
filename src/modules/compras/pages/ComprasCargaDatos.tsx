@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useApi } from "@/hooks/useApi";
-import { cn, fmtCurrency } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { ArrowLeft, Ban, ChevronDown, ChevronUp, Plus } from "lucide-react";
 import { Fragment, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
