@@ -18,9 +18,9 @@ export default function PuntosDeVentaPage() {
   const navigate = useNavigate();
   const { get, post, patch } = useApi();
 
-  const [puntos, setPuntos] = useState<PuntoDeVentaResponse[]>([]);
+  const [puntos, setPuntos] = useState<PuntoDeVentaResponse[] | null>(null);
   const [comedores, setComedores] = useState<ComedorResponse[]>([]);
-  const [loading, setLoading] = useState(true);
+  const loading = puntos === null;
   const [saving, setSaving] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<PuntoDeVentaResponse | null>(null);
@@ -37,7 +37,6 @@ export default function PuntosDeVentaPage() {
     ]).then(([puntosData, comedoresData]) => {
       setPuntos(puntosData);
       setComedores(comedoresData);
-      setLoading(false);
     });
   }, [get]);
 
@@ -49,7 +48,7 @@ export default function PuntosDeVentaPage() {
     }
   };
 
-  const sorted = [...puntos].sort((a, b) => {
+  const sorted = [...(puntos ?? [])].sort((a, b) => {
     const av =
       sortKey === "comedor"
         ? (comedores.find((c) => c.id === a.comedorId)?.nombre ?? "")
@@ -90,8 +89,8 @@ export default function PuntosDeVentaPage() {
       const saved = (await res.json()) as PuntoDeVentaResponse;
       setPuntos((prev) =>
         editing
-          ? prev.map((p) => (p.id === saved.id ? saved : p))
-          : [...prev, saved],
+          ? (prev ?? []).map((p) => (p.id === saved.id ? saved : p))
+          : [...(prev ?? []), saved],
       );
       toast.success(
         editing ? "Punto de venta actualizado" : "Punto de venta creado",

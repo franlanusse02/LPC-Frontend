@@ -34,6 +34,7 @@ function Combobox({
   const [open, setOpen] = React.useState(false);
   const [search, setSearch] = React.useState("");
   const searchRef = React.useRef<HTMLInputElement>(null);
+  const listboxId = React.useId();
 
   const selected = options.find((o) => o.value === value);
 
@@ -60,6 +61,7 @@ function Combobox({
           type="button"
           role="combobox"
           aria-expanded={open}
+          aria-controls={listboxId}
           className={cn(
             "flex w-fit items-center justify-between gap-1.5 rounded-lg border border-input bg-transparent py-2 pr-2 pl-2.5 text-sm whitespace-nowrap transition-colors outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 h-8",
             className,
@@ -108,7 +110,7 @@ function Combobox({
               className="h-7 text-sm"
             />
           </div>
-          <div className="max-h-60 overflow-y-auto p-1">
+          <div id={listboxId} role="listbox" className="max-h-60 overflow-y-auto p-1">
             {filtered.length === 0 ? (
               <div className="py-4 text-center text-sm text-muted-foreground">
                 Sin resultados

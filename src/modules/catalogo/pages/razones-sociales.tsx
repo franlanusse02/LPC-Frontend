@@ -18,9 +18,9 @@ export default function RazonesSocialesPage() {
   const navigate = useNavigate();
   const { get, post, patch, del } = useApi();
 
-  const [razones, setRazones] = useState<RazonSocialComedorResponse[]>([]);
+  const [razones, setRazones] = useState<RazonSocialComedorResponse[] | null>(null);
   const [comedores, setComedores] = useState<ComedorResponse[]>([]);
-  const [loading, setLoading] = useState(true);
+  const loading = razones === null;
   const [saving, setSaving] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<RazonSocialComedorResponse | null>(null);
@@ -39,7 +39,6 @@ export default function RazonesSocialesPage() {
     ]).then(([razonesData, comedoresData]) => {
       setRazones(razonesData);
       setComedores(comedoresData);
-      setLoading(false);
     });
   }, [get]);
 
@@ -51,7 +50,7 @@ export default function RazonesSocialesPage() {
     }
   };
 
-  const sorted = [...razones].sort((a, b) => {
+  const sorted = [...(razones ?? [])].sort((a, b) => {
     const av =
       sortKey === "comedor"
         ? (comedores.find((c) => c.id === a.comedorId)?.nombre ?? "")
@@ -99,8 +98,8 @@ export default function RazonesSocialesPage() {
       const saved = (await res.json()) as RazonSocialComedorResponse;
       setRazones((prev) =>
         editing
-          ? prev.map((r) => (r.id === saved.id ? saved : r))
-          : [...prev, saved],
+          ? (prev ?? []).map((r) => (r.id === saved.id ? saved : r))
+          : [...(prev ?? []), saved],
       );
       toast.success(editing ? "Razón social actualizada" : "Razón social creada");
       setModalOpen(false);
@@ -115,7 +114,7 @@ export default function RazonesSocialesPage() {
     if (!deleteTarget) return;
     try {
       await del(`/comedores/razon-social/${deleteTarget.id}`);
-      setRazones((prev) => prev.filter((r) => r.id !== deleteTarget.id));
+      setRazones((prev) => (prev ?? []).filter((r) => r.id !== deleteTarget.id));
       toast.success("Razón social eliminada");
       setDeleteTarget(null);
     } catch (err) {

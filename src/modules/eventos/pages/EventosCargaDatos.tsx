@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useApi } from "@/hooks/useApi";
-import { cn, fmtCurrency } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { ArrowLeft, ChevronDown, ChevronUp, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { DataTable, SortableTh } from "@/components/data-table";
@@ -36,91 +36,7 @@ const ESTADO_STYLES: Record<EstadoEvento, { bg: string; text: string }> = {
   ANULADO: { bg: "bg-red-100", text: "text-red-600" },
 };
 
-const dash = <span className="text-gray-300">—</span>;
 const ev = (e: EventoResponse, k: string): unknown => (e as Record<string, unknown>)[k];
-
-function DetailField({ label, value }: { label: string; value: string | number | null | undefined }) {
-  if (value === null || value === undefined || value === "") return null;
-  return (
-    <div className="flex flex-col gap-0.5">
-      <span className="text-xs font-medium uppercase tracking-wide text-gray-400">{label}</span>
-      <span className="text-sm text-gray-700">{value}</span>
-    </div>
-  );
-}
-
-function EventoDetail({ evento, comedorName }: { evento: EventoResponse; comedorName: string }) {
-  return (
-    <div className="grid grid-cols-2 gap-x-8 gap-y-3 sm:grid-cols-3 lg:grid-cols-4">
-      <DetailField label="Comedor" value={comedorName} />
-      <DetailField label="Cantidad personas" value={evento.cantidadPersonas} />
-      <DetailField label="Monto total" value={evento.montoTotal !== null ? fmtCurrency(evento.montoTotal) : null} />
-      <DetailField label="Medio de pago" value={evento.medioPago} />
-      <DetailField label="Observaciones" value={evento.observaciones} />
-
-      {evento.tipoComedor === "GALICIA" && (
-        <>
-          <DetailField label="Solicitante" value={evento.solicitanteNombre} />
-          <DetailField label="Email solicitante" value={evento.emailSolicitante} />
-          <DetailField label="Funcionario" value={evento.funcionarioNombre} />
-          <DetailField label="Responsable" value={evento.responsableNombre} />
-          <DetailField label="Centro de costo" value={evento.centroCosto} />
-          <DetailField label="Partida" value={evento.partida} />
-          <DetailField label="Precio unitario" value={evento.precioUnitario !== null ? fmtCurrency(evento.precioUnitario) : null} />
-          <DetailField label="Retenciones" value={evento.retenciones !== null ? fmtCurrency(evento.retenciones) : null} />
-          <DetailField label="Nro. operación" value={evento.numeroOperacion} />
-          <DetailField label="Razón social" value={evento.razonSocial} />
-          <DetailField label="Dest. facturación" value={evento.destinatarioFacturacion} />
-          <DetailField label="Tipo comprobante" value={evento.tipoComprobante} />
-          <DetailField label="Nro. comprobante" value={evento.numeroComprobante} />
-        </>
-      )}
-
-      {evento.tipoComedor === "BBVA" && (
-        <>
-          <DetailField label="Solicitante" value={evento.solicitanteNombre} />
-          <DetailField label="Email solicitante" value={evento.emailSolicitante} />
-          <DetailField label="Orden de compra" value={evento.ordenCompra} />
-          <DetailField label="Legajo" value={evento.legajo} />
-          <DetailField label="Recepción" value={evento.recepcion} />
-        </>
-      )}
-
-      {evento.tipoComedor === "TECHINT" && (
-        <>
-          <DetailField label="Nro. pedido" value={evento.numeroPedido} />
-          <DetailField label="Razón social" value={evento.razonSocial} />
-          <DetailField label="Concepto" value={evento.concepto} />
-          <DetailField label="Tipo comprobante" value={evento.tipoComprobante} />
-          <DetailField label="Nro. comprobante" value={evento.numeroComprobante} />
-        </>
-      )}
-
-      {evento.tipoComedor === "UDESA" && (
-        <>
-          <DetailField label="Solicitante" value={evento.solicitanteNombre} />
-          <DetailField label="Centro de costo" value={evento.centroCosto} />
-          <DetailField label="Área" value={evento.area} />
-          <DetailField label="Precio unitario" value={evento.precioUnitario !== null ? fmtCurrency(evento.precioUnitario) : null} />
-          <DetailField label="Adicionales" value={evento.adicionales !== null ? fmtCurrency(evento.adicionales) : null} />
-        </>
-      )}
-
-      {evento.servicios.length > 0 && (
-        <div className="col-span-full mt-2">
-          <span className="text-xs font-medium uppercase tracking-wide text-gray-400">Servicios</span>
-          <div className="mt-1 space-y-1">
-            {evento.servicios.map((s, i) => (
-              <div key={i} className="text-sm text-gray-700">
-                {s.producto.nombre} x{s.cantidad} — {fmtCurrency(s.precioUnitario * s.cantidad)}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
 
 function extraHeaders(tab: TabKey): ReactNode {
   switch (tab) {
@@ -130,7 +46,6 @@ function extraHeaders(tab: TabKey): ReactNode {
           <th className="px-4 py-3">Solicitante</th>
           <th className="px-4 py-3">Funcionario</th>
           <th className="px-4 py-3">Centro Costo</th>
-          <th className="px-4 py-3 text-right">P. Unitario</th>
         </>
       );
     case "BBVA":
@@ -154,7 +69,6 @@ function extraHeaders(tab: TabKey): ReactNode {
           <th className="px-4 py-3">Solicitante</th>
           <th className="px-4 py-3">Centro Costo</th>
           <th className="px-4 py-3">Área</th>
-          <th className="px-4 py-3 text-right">P. Unitario</th>
         </>
       );
     default:
@@ -164,6 +78,7 @@ function extraHeaders(tab: TabKey): ReactNode {
 
 function extraCells(evento: EventoResponse): ReactNode {
   const click = "px-4 py-4 cursor-pointer";
+  const dash = <span className="text-gray-300">—</span>;
   switch (evento.tipoComedor) {
     case "GALICIA":
       return (
@@ -171,7 +86,6 @@ function extraCells(evento: EventoResponse): ReactNode {
           <td className={click}>{evento.solicitanteNombre ?? dash}</td>
           <td className={click}>{evento.funcionarioNombre ?? dash}</td>
           <td className={click}>{evento.centroCosto ?? dash}</td>
-          <td className={cn(click, "text-right font-mono")}>{evento.precioUnitario !== null ? fmtCurrency(evento.precioUnitario) : dash}</td>
         </>
       );
     case "BBVA":
@@ -195,7 +109,6 @@ function extraCells(evento: EventoResponse): ReactNode {
           <td className={click}>{evento.solicitanteNombre ?? dash}</td>
           <td className={click}>{evento.centroCosto ?? dash}</td>
           <td className={click}>{evento.area ?? dash}</td>
-          <td className={cn(click, "text-right font-mono")}>{evento.precioUnitario !== null ? fmtCurrency(evento.precioUnitario) : dash}</td>
         </>
       );
     default:
@@ -203,7 +116,7 @@ function extraCells(evento: EventoResponse): ReactNode {
   }
 }
 
-export default function EventosEncargado() {
+export default function EventosCargaDatos() {
   const navigate = useNavigate();
   const { get } = useApi();
 
@@ -267,7 +180,7 @@ export default function EventosEncargado() {
   return (
     <div className="px-4 sm:px-8 lg:px-18 py-8">
       <div className="max-w-7xl mx-auto">
-        <Button variant="ghost" onClick={() => navigate("/encargado")}>
+        <Button variant="ghost" onClick={() => navigate("/carga-datos")}>
           <ArrowLeft className="h-4 w-4" />
           Volver
         </Button>
@@ -278,7 +191,7 @@ export default function EventosEncargado() {
             <CardTitle className="text-xl font-bold text-gray-800">Tus Eventos</CardTitle>
             <Button
               size="sm"
-              onClick={() => navigate("/encargado/eventos/nuevo")}
+              onClick={() => navigate("/carga-datos/eventos/nuevo")}
               className="gap-2 px-4 py-2 text-sm font-semibold uppercase tracking-wide hover:scale-105 transition"
             >
               <Plus className="h-4 w-4" /> Nuevo Evento
@@ -330,7 +243,6 @@ export default function EventosEncargado() {
                 <th className="px-4 py-3">Comedor</th>
                 {hasExtraCols && extraHeaders(activeTab)}
                 <th className="px-4 py-3 text-right">Personas</th>
-                <SortableTh label="Monto" col="montoTotal" {...sortProps} className="text-right" />
                 <th className="px-4 py-3 text-center">Estado</th>
               </>
             }
@@ -364,10 +276,7 @@ export default function EventosEncargado() {
                         </td>
                         {hasExtraCols && extraCells(evento)}
                         <td className="px-4 py-4 text-right font-mono cursor-pointer" onClick={() => expansion.toggleRow(evento.id)}>
-                          {evento.cantidadPersonas?.toLocaleString("es-AR") ?? dash}
-                        </td>
-                        <td className="px-4 py-4 text-right font-mono cursor-pointer" onClick={() => expansion.toggleRow(evento.id)}>
-                          {evento.montoTotal !== null ? fmtCurrency(evento.montoTotal) : dash}
+                          {evento.cantidadPersonas?.toLocaleString("es-AR") ?? <span className="text-gray-300">—</span>}
                         </td>
                         <td className="px-4 py-4 text-center cursor-pointer" onClick={() => expansion.toggleRow(evento.id)}>
                           <span className={cn("inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold", estilos.bg, estilos.text)}>
@@ -380,7 +289,30 @@ export default function EventosEncargado() {
                         <tr className="bg-gray-50/60">
                           <td colSpan={20} className="px-8 py-5">
                             <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-                              <EventoDetail evento={evento} comedorName={comedorName} />
+                              <div className="grid grid-cols-2 gap-x-8 gap-y-3 sm:grid-cols-3 lg:grid-cols-4">
+                                <div className="flex flex-col gap-0.5">
+                                  <span className="text-xs font-medium uppercase tracking-wide text-gray-400">Comedor</span>
+                                  <span className="text-sm text-gray-700">{comedorName}</span>
+                                </div>
+                                {evento.cantidadPersonas !== null && evento.cantidadPersonas !== undefined && (
+                                  <div className="flex flex-col gap-0.5">
+                                    <span className="text-xs font-medium uppercase tracking-wide text-gray-400">Cantidad personas</span>
+                                    <span className="text-sm text-gray-700">{evento.cantidadPersonas}</span>
+                                  </div>
+                                )}
+                                {evento.medioPago && (
+                                  <div className="flex flex-col gap-0.5">
+                                    <span className="text-xs font-medium uppercase tracking-wide text-gray-400">Medio de pago</span>
+                                    <span className="text-sm text-gray-700">{evento.medioPago}</span>
+                                  </div>
+                                )}
+                                {evento.observaciones && (
+                                  <div className="flex flex-col gap-0.5">
+                                    <span className="text-xs font-medium uppercase tracking-wide text-gray-400">Observaciones</span>
+                                    <span className="text-sm text-gray-700">{evento.observaciones}</span>
+                                  </div>
+                                )}
+                              </div>
                             </div>
                           </td>
                         </tr>

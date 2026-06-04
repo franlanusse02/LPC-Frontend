@@ -28,9 +28,9 @@ import {
 import TotalesContabilidad from "@/modules/analytics/components/totales";
 import {
   ListFilters,
-  defaultFilters,
   type ListFilterState,
 } from "@/components/ListFilters";
+import { defaultFilters } from "@/components/list-filter-defaults";
 import { useApi } from "@/hooks/useApi";
 import type { ComedorResponse } from "@/domain/dto/comedor/ComedorResponse";
 import type { SociedadResponse } from "@/domain/dto/sociedad/SociedadResponse";

@@ -26,9 +26,9 @@ export default function ProductosPage() {
   const navigate = useNavigate();
   const { get, post, patch } = useApi();
 
-  const [productos, setProductos] = useState<any[]>([]);
+  const [productos, setProductos] = useState<any[] | null>(null);
   const [comedores, setComedores] = useState<ComedorResponse[]>([]);
-  const [loading, setLoading] = useState(true);
+  const loading = productos === null;
   const [saving, setSaving] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<any | null>(null);
@@ -49,7 +49,6 @@ export default function ProductosPage() {
     ]).then(([productosData, comedoresData]) => {
       setProductos(productosData);
       setComedores(comedoresData);
-      setLoading(false);
     });
   }, [get]);
 
@@ -61,7 +60,7 @@ export default function ProductosPage() {
     }
   };
 
-  const sorted = [...productos].sort((a, b) => {
+  const sorted = [...(productos ?? [])].sort((a, b) => {
     const av =
       sortKey === "comedor"
         ? (comedores.find((c) => c.id === a.comedorId)?.nombre ?? "")
@@ -117,8 +116,8 @@ export default function ProductosPage() {
       const saved = await res.json();
       setProductos((prev) =>
         editing
-          ? prev.map((p) => (p.productoId === saved.productoId ? saved : p))
-          : [...prev, saved],
+          ? (prev ?? []).map((p) => (p.productoId === saved.productoId ? saved : p))
+          : [...(prev ?? []), saved],
       );
       toast.success(editing ? "Producto actualizado" : "Producto creado");
       setModalOpen(false);
@@ -137,7 +136,7 @@ export default function ProductosPage() {
   const handleAnularSuccess = () => {
     if (!anularProducto) return;
     setProductos((prev) =>
-      prev.map((item) =>
+      (prev ?? []).map((item) =>
         item.productoId === anularProducto?.productoId
           ? { ...item, activo: false }
           : item,

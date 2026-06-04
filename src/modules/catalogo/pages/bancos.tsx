@@ -14,9 +14,9 @@ export default function BancosPage() {
   const navigate = useNavigate();
   const { get, post, patch } = useApi();
 
-  const [bancos, setBancos] = useState<any[]>([]);
+  const [bancos, setBancos] = useState<any[] | null>(null);
   const [sociedades, setSociedades] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const loading = bancos === null;
   const [saving, setSaving] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<any | null>(null);
@@ -31,7 +31,6 @@ export default function BancosPage() {
     ]).then(([bancosData, sociedadesData]) => {
       setBancos(bancosData);
       setSociedades(sociedadesData);
-      setLoading(false);
     });
   }, [get]);
 
@@ -62,8 +61,8 @@ export default function BancosPage() {
       const saved = await res.json();
       setBancos((prev) =>
         editing
-          ? prev.map((b) => (b.id === saved.id ? saved : b))
-          : [...prev, saved],
+          ? (prev ?? []).map((b) => (b.id === saved.id ? saved : b))
+          : [...(prev ?? []), saved],
       );
       toast.success(editing ? "Banco actualizado" : "Banco creado");
       setModalOpen(false);

@@ -18,9 +18,9 @@ export default function ComedoresPage() {
   const navigate = useNavigate();
   const { get, post, patch } = useApi();
 
-  const [comedores, setComedores] = useState<ComedorResponse[]>([]);
+  const [comedores, setComedores] = useState<ComedorResponse[] | null>(null);
   const [sociedades, setSociedades] = useState<SociedadResponse[]>([]);
-  const [loading, setLoading] = useState(true);
+  const loading = comedores === null;
   const [saving, setSaving] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<ComedorResponse | null>(null);
@@ -37,7 +37,6 @@ export default function ComedoresPage() {
     ]).then(([comedoresData, sociedadesData]) => {
       setComedores(comedoresData);
       setSociedades(sociedadesData);
-      setLoading(false);
     });
   }, [get]);
 
@@ -49,7 +48,7 @@ export default function ComedoresPage() {
     }
   };
 
-  const sorted = [...comedores].sort((a, b) => {
+  const sorted = [...(comedores ?? [])].sort((a, b) => {
     const av =
       sortKey === "sociedad"
         ? (sociedades.find((s) => s.id === a.sociedadId)?.nombre ?? "")
@@ -88,8 +87,8 @@ export default function ComedoresPage() {
       const saved = (await res.json()) as ComedorResponse;
       setComedores((prev) =>
         editing
-          ? prev.map((c) => (c.id === saved.id ? saved : c))
-          : [...prev, saved],
+          ? (prev ?? []).map((c) => (c.id === saved.id ? saved : c))
+          : [...(prev ?? []), saved],
       );
       toast.success(editing ? "Comedor actualizado" : "Comedor creado");
       setModalOpen(false);

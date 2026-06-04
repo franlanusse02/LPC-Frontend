@@ -24,17 +24,14 @@ import {
 
 type ServicioLine = { productoId: string; cantidad: string };
 
-export default function NuevoEventoPage() {
+export default function NuevoEventoPage({ basePath = "/encargado" }: { basePath?: string }) {
   const navigate = useNavigate();
   const { get, post } = useApi();
 
   const [comedores, setComedores] = useState<ComedorResponse[]>([]);
-  const [empleados, setEmpleados] = useState<EmpleadoComedorResponse[]>([]);
-  const [funcionarios, setFuncionarios] = useState<EmpleadoComedorResponse[]>([]);
-  const [centrosCosto, setCentrosCosto] = useState<CentroCostoResponse[]>([]);
-  const [partidas, setPartidas] = useState<PartidaResponse[]>([]);
-  const [razonesSociales, setRazonesSociales] = useState<RazonSocialComedorResponse[]>([]);
-  const [productos, setProductos] = useState<ProductoResponse[]>([]);
+  const emptyComedorDeps = { empleados: [] as EmpleadoComedorResponse[], funcionarios: [] as EmpleadoComedorResponse[], centrosCosto: [] as CentroCostoResponse[], partidas: [] as PartidaResponse[], razonesSociales: [] as RazonSocialComedorResponse[], productos: [] as ProductoResponse[] };
+  const [comedorDeps, setComedorDeps] = useState(emptyComedorDeps);
+  const { empleados, funcionarios, centrosCosto, partidas, razonesSociales, productos } = comedorDeps;
 
   const [comedorId, setComedorId] = useState("");
   const [puntoDeVentaId, setPuntoDeVentaId] = useState("");
@@ -82,18 +79,19 @@ export default function NuevoEventoPage() {
 
   useEffect(() => {
     if (!comedorId) {
-      setEmpleados([]); setFuncionarios([]); setCentrosCosto([]); setPartidas([]);
-      setRazonesSociales([]); setProductos([]);
+      setComedorDeps(emptyComedorDeps);
       return;
     }
     Promise.all([
-      get(`/comedores/empleados?comedorId=${comedorId}`).then((r) => r.json()).then(setEmpleados),
-      get(`/comedores/empleados/funcionarios?comedorId=${comedorId}`).then((r) => r.json()).then(setFuncionarios),
-      get(`/comedores/centros-costo?comedorId=${comedorId}`).then((r) => r.json()).then(setCentrosCosto),
-      get(`/comedores/partidas?comedorId=${comedorId}`).then((r) => r.json()).then(setPartidas),
-      get(`/comedores/razon-social?comedorId=${comedorId}`).then((r) => r.json()).then(setRazonesSociales),
-      get(`/consumos/productos?comedorId=${comedorId}`).then((r) => r.json()).then(setProductos),
-    ]);
+      get(`/comedores/empleados?comedorId=${comedorId}`).then((r) => r.json()),
+      get(`/comedores/empleados/funcionarios?comedorId=${comedorId}`).then((r) => r.json()),
+      get(`/comedores/centros-costo?comedorId=${comedorId}`).then((r) => r.json()),
+      get(`/comedores/partidas?comedorId=${comedorId}`).then((r) => r.json()),
+      get(`/comedores/razon-social?comedorId=${comedorId}`).then((r) => r.json()),
+      get(`/consumos/productos?comedorId=${comedorId}`).then((r) => r.json()),
+    ]).then(([emp, func, cc, part, rs, prod]) => {
+      setComedorDeps({ empleados: emp, funcionarios: func, centrosCosto: cc, partidas: part, razonesSociales: rs, productos: prod });
+    });
   }, [comedorId, get]);
 
   const empleadoOptions = useMemo(
@@ -137,19 +135,25 @@ export default function NuevoEventoPage() {
   };
 
   useEffect(() => {
+    let ccId: string | undefined;
+    let pId: string | undefined;
+
     if (!funcionarioId) {
-      if (caseFields.centroCosto.autoFill === "funcionario") setCentroCostoId("");
-      if (caseFields.partida.autoFill === "funcionario") setPartidaId("");
-      return;
+      if (caseFields.centroCosto.autoFill === "funcionario") ccId = "";
+      if (caseFields.partida.autoFill === "funcionario") pId = "";
+    } else {
+      const emp = funcionarios.find((e) => e.id === Number(funcionarioId))
+        ?? empleados.find((e) => e.id === Number(funcionarioId));
+      if (emp) {
+        if (caseFields.centroCosto.autoFill === "funcionario")
+          ccId = emp.centroCostoId ? String(emp.centroCostoId) : "";
+        if (caseFields.partida.autoFill === "funcionario")
+          pId = emp.partidaId ? String(emp.partidaId) : "";
+      }
     }
-    const emp = funcionarios.find((e) => e.id === Number(funcionarioId))
-      ?? empleados.find((e) => e.id === Number(funcionarioId));
-    if (emp) {
-      if (caseFields.centroCosto.autoFill === "funcionario")
-        setCentroCostoId(emp.centroCostoId ? String(emp.centroCostoId) : "");
-      if (caseFields.partida.autoFill === "funcionario")
-        setPartidaId(emp.partidaId ? String(emp.partidaId) : "");
-    }
+
+    if (ccId !== undefined) setCentroCostoId(ccId);
+    if (pId !== undefined) setPartidaId(pId);
   }, [funcionarioId, funcionarios, empleados, caseFields]);
 
   useEffect(() => {
@@ -254,7 +258,7 @@ export default function NuevoEventoPage() {
 
       await post("/eventos", req);
       toast("Evento creado");
-      navigate("/encargado/eventos");
+      navigate(`${basePath}/eventos`);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "No se pudo crear el evento");
     } finally {
@@ -363,7 +367,7 @@ export default function NuevoEventoPage() {
 
   return (
     <div className="mx-auto max-w-2xl px-6 py-6">
-      <Button variant="ghost" className="mb-6 gap-2" onClick={() => navigate("/encargado/eventos")}>
+      <Button variant="ghost" className="mb-6 gap-2" onClick={() => navigate(`${basePath}/eventos`)}>
         <ArrowLeft className="h-4 w-4" />
         Volver a eventos
       </Button>

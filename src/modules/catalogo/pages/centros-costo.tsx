@@ -19,9 +19,9 @@ export default function CentrosCostoPage() {
   const navigate = useNavigate();
   const { get, post, patch } = useApi();
 
-  const [items, setItems] = useState<CentroCostoResponse[]>([]);
+  const [items, setItems] = useState<CentroCostoResponse[] | null>(null);
   const [comedores, setComedores] = useState<ComedorResponse[]>([]);
-  const [loading, setLoading] = useState(true);
+  const loading = items === null;
   const [saving, setSaving] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<CentroCostoResponse | null>(null);
@@ -38,7 +38,6 @@ export default function CentrosCostoPage() {
     ]).then(([data, comedoresData]) => {
       setItems(data);
       setComedores(comedoresData);
-      setLoading(false);
     });
   }, [get]);
 
@@ -49,7 +48,7 @@ export default function CentrosCostoPage() {
 
   const comedorMap = new Map(comedores.map((c) => [c.id, c.nombre]));
 
-  const sorted = [...items].sort((a, b) => {
+  const sorted = [...(items ?? [])].sort((a, b) => {
     const av = sortKey === "comedor" ? (comedorMap.get(a.comedorId) ?? "") : a.nombre;
     const bv = sortKey === "comedor" ? (comedorMap.get(b.comedorId) ?? "") : b.nombre;
     return sortDir === "asc" ? av.localeCompare(bv) : bv.localeCompare(av);
@@ -81,7 +80,7 @@ export default function CentrosCostoPage() {
         : await post("/comedores/centros-costo", { nombre: nombre.trim(), comedorId: Number(comedorId) });
       const saved = (await res.json()) as CentroCostoResponse;
       setItems((prev) =>
-        editing ? prev.map((i) => (i.id === saved.id ? saved : i)) : [...prev, saved],
+        editing ? (prev ?? []).map((i) => (i.id === saved.id ? saved : i)) : [...(prev ?? []), saved],
       );
       toast.success(editing ? "Centro de costo actualizado" : "Centro de costo creado");
       setModalOpen(false);
@@ -96,7 +95,7 @@ export default function CentrosCostoPage() {
     try {
       const res = await patch(`/comedores/centros-costo/${item.id}`, { activo: !item.activo });
       const saved = (await res.json()) as CentroCostoResponse;
-      setItems((prev) => prev.map((i) => (i.id === saved.id ? saved : i)));
+      setItems((prev) => (prev ?? []).map((i) => (i.id === saved.id ? saved : i)));
       toast.success(saved.activo ? "Activado" : "Desactivado");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "No se pudo actualizar.");
@@ -142,6 +141,7 @@ export default function CentrosCostoPage() {
                 <td className="px-6 py-4 text-gray-600">{comedorMap.get(item.comedorId) ?? `ID ${item.comedorId}`}</td>
                 <td className="px-6 py-4 text-center">
                   <button
+                    type="button"
                     onClick={() => handleToggleActivo(item)}
                     className={cn(
                       "inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold cursor-pointer transition-colors",

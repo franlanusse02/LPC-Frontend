@@ -20,11 +20,11 @@ export default function EmpleadosPage() {
   const navigate = useNavigate();
   const { get, post, patch, del } = useApi();
 
-  const [empleados, setEmpleados] = useState<EmpleadoComedorResponse[]>([]);
+  const [empleados, setEmpleados] = useState<EmpleadoComedorResponse[] | null>(null);
   const [comedores, setComedores] = useState<ComedorResponse[]>([]);
-  const [centrosCosto, setCentrosCosto] = useState<CentroCostoResponse[]>([]);
-  const [partidas, setPartidas] = useState<PartidaResponse[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [comedorDeps, setComedorDeps] = useState<{ centrosCosto: CentroCostoResponse[]; partidas: PartidaResponse[] }>({ centrosCosto: [], partidas: [] });
+  const { centrosCosto, partidas } = comedorDeps;
+  const loading = empleados === null;
   const [saving, setSaving] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<EmpleadoComedorResponse | null>(null);
@@ -46,22 +46,19 @@ export default function EmpleadosPage() {
     ]).then(([empleadosData, comedoresData]) => {
       setEmpleados(empleadosData);
       setComedores(comedoresData);
-      setLoading(false);
     });
   }, [get]);
 
   useEffect(() => {
     if (!comedorId) {
-      setCentrosCosto([]);
-      setPartidas([]);
+      setComedorDeps({ centrosCosto: [], partidas: [] });
       return;
     }
     Promise.all([
       get(`/comedores/centros-costo?comedorId=${comedorId}`).then((r) => r.json()),
       get(`/comedores/partidas?comedorId=${comedorId}`).then((r) => r.json()),
     ]).then(([ccData, pData]) => {
-      setCentrosCosto(ccData);
-      setPartidas(pData);
+      setComedorDeps({ centrosCosto: ccData, partidas: pData });
     });
   }, [comedorId, get]);
 
@@ -83,7 +80,7 @@ export default function EmpleadosPage() {
     }
   };
 
-  const sorted = [...empleados.filter((e) => e.activo)].sort((a, b) => {
+  const sorted = [...(empleados ?? []).filter((e) => e.activo)].sort((a, b) => {
     const av =
       sortKey === "comedor"
         ? (comedores.find((c) => c.id === a.comedorId)?.nombre ?? "")
@@ -140,8 +137,8 @@ export default function EmpleadosPage() {
       const saved = (await res.json()) as EmpleadoComedorResponse;
       setEmpleados((prev) =>
         editing
-          ? prev.map((e) => (e.id === saved.id ? saved : e))
-          : [...prev, saved],
+          ? (prev ?? []).map((e) => (e.id === saved.id ? saved : e))
+          : [...(prev ?? []), saved],
       );
       toast.success(editing ? "Empleado actualizado" : "Empleado creado");
       setModalOpen(false);
@@ -156,7 +153,7 @@ export default function EmpleadosPage() {
     if (!deleteTarget) return;
     try {
       await del(`/comedores/empleados/${deleteTarget.id}`);
-      setEmpleados((prev) => prev.filter((e) => e.id !== deleteTarget.id));
+      setEmpleados((prev) => (prev ?? []).filter((e) => e.id !== deleteTarget.id));
       toast.success("Empleado eliminado");
       setDeleteTarget(null);
     } catch (err) {

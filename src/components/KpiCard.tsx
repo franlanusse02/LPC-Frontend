@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useApi } from "@/hooks/useApi";
 import { cn, fmtCurrency } from "@/lib/utils";
 import { Spinner } from "@/components/ui/spinner";
@@ -23,36 +23,42 @@ export function KpiCard({
   className,
 }: KpiCardProps) {
   const { get } = useApi();
-  const [value, setValue] = useState<number | null>(null);
-  const [loading, setLoading] = useState(true);
 
   const filterKey = JSON.stringify(filters);
+  const requestKey = `${endpoint}|${filterKey}`;
+
+  const [result, setResult] = useState<{ fetchedFor: string | null; value: number | null }>({
+    fetchedFor: null,
+    value: null,
+  });
+  const loading = result.fetchedFor !== requestKey;
+
+  const valueExtractorRef = useRef(valueExtractor);
+  valueExtractorRef.current = valueExtractor;
 
   useEffect(() => {
     const controller = new AbortController();
-    setLoading(true);
+    const key = `${endpoint}|${filterKey}`;
 
+    const parsed: Record<string, string | undefined> = filterKey ? JSON.parse(filterKey) : {};
     const params = new URLSearchParams();
-    if (filters) {
-      for (const [k, v] of Object.entries(filters)) {
-        if (v) params.set(k, v);
-      }
+    for (const [k, v] of Object.entries(parsed)) {
+      if (v) params.set(k, v);
     }
     const qs = params.toString();
     const url = qs ? `${endpoint}?${qs}` : endpoint;
 
     get(url, { signal: controller.signal })
       .then((res) => res.json())
-      .then((data) => setValue(valueExtractor(data)))
+      .then((data) => setResult({ fetchedFor: key, value: valueExtractorRef.current(data) }))
       .catch((err) => {
-        if (err.name !== "AbortError") setValue(null);
-      })
-      .finally(() => setLoading(false));
+        if (err.name !== "AbortError") setResult({ fetchedFor: key, value: null });
+      });
 
     return () => controller.abort();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [get, endpoint, filterKey]);
 
+  const value = result.value;
   const formatted =
     value === null
       ? "—"
