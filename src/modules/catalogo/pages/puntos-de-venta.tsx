@@ -48,7 +48,7 @@ export default function PuntosDeVentaPage() {
     }
   };
 
-  const sorted = [...puntos].sort((a, b) => {
+  const sorted = [...(puntos ?? [])].sort((a, b) => {
     const av =
       sortKey === "comedor"
         ? (comedores.find((c) => c.id === a.comedorId)?.nombre ?? "")
@@ -89,8 +89,8 @@ export default function PuntosDeVentaPage() {
       const saved = (await res.json()) as PuntoDeVentaResponse;
       setPuntos((prev) =>
         editing
-          ? prev.map((p) => (p.id === saved.id ? saved : p))
-          : [...prev, saved],
+          ? (prev ?? []).map((p) => (p.id === saved.id ? saved : p))
+          : [...(prev ?? []), saved],
       );
       toast.success(
         editing ? "Punto de venta actualizado" : "Punto de venta creado",

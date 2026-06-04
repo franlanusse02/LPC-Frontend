@@ -80,7 +80,7 @@ export default function EmpleadosPage() {
     }
   };
 
-  const sorted = [...empleados.filter((e) => e.activo)].sort((a, b) => {
+  const sorted = [...(empleados ?? []).filter((e) => e.activo)].sort((a, b) => {
     const av =
       sortKey === "comedor"
         ? (comedores.find((c) => c.id === a.comedorId)?.nombre ?? "")
@@ -137,8 +137,8 @@ export default function EmpleadosPage() {
       const saved = (await res.json()) as EmpleadoComedorResponse;
       setEmpleados((prev) =>
         editing
-          ? prev.map((e) => (e.id === saved.id ? saved : e))
-          : [...prev, saved],
+          ? (prev ?? []).map((e) => (e.id === saved.id ? saved : e))
+          : [...(prev ?? []), saved],
       );
       toast.success(editing ? "Empleado actualizado" : "Empleado creado");
       setModalOpen(false);
@@ -153,7 +153,7 @@ export default function EmpleadosPage() {
     if (!deleteTarget) return;
     try {
       await del(`/comedores/empleados/${deleteTarget.id}`);
-      setEmpleados((prev) => prev.filter((e) => e.id !== deleteTarget.id));
+      setEmpleados((prev) => (prev ?? []).filter((e) => e.id !== deleteTarget.id));
       toast.success("Empleado eliminado");
       setDeleteTarget(null);
     } catch (err) {

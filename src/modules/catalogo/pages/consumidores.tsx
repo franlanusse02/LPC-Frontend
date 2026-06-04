@@ -50,7 +50,7 @@ export default function ConsumidoresPage() {
     }
   };
 
-  const sorted = [...consumidores.filter((c) => c.activo)].sort((a, b) => {
+  const sorted = [...(consumidores ?? []).filter((c) => c.activo)].sort((a, b) => {
     const av =
       sortKey === "comedor"
         ? (comedores.find((c) => c.id === a.comedorId)?.nombre ?? "")
@@ -100,8 +100,8 @@ export default function ConsumidoresPage() {
       const saved = await res.json();
       setConsumidores((prev) =>
         editing
-          ? prev.map((c) => (c.id === saved.id ? saved : c))
-          : [...prev, saved],
+          ? (prev ?? []).map((c) => (c.id === saved.id ? saved : c))
+          : [...(prev ?? []), saved],
       );
       toast.success(editing ? "Consumidor actualizado" : "Consumidor creado");
       setModalOpen(false);
@@ -116,7 +116,7 @@ export default function ConsumidoresPage() {
     if (!deleteTarget) return;
     try {
       await del(`/consumos/consumidores/${deleteTarget.id}`);
-      setConsumidores((prev) => prev.filter((c) => c.id !== deleteTarget.id));
+      setConsumidores((prev) => (prev ?? []).filter((c) => c.id !== deleteTarget.id));
       toast.success("Consumidor eliminado");
       setDeleteTarget(null);
     } catch (err) {

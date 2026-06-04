@@ -60,7 +60,7 @@ export default function ProductosPage() {
     }
   };
 
-  const sorted = [...productos].sort((a, b) => {
+  const sorted = [...(productos ?? [])].sort((a, b) => {
     const av =
       sortKey === "comedor"
         ? (comedores.find((c) => c.id === a.comedorId)?.nombre ?? "")
@@ -116,8 +116,8 @@ export default function ProductosPage() {
       const saved = await res.json();
       setProductos((prev) =>
         editing
-          ? prev.map((p) => (p.productoId === saved.productoId ? saved : p))
-          : [...prev, saved],
+          ? (prev ?? []).map((p) => (p.productoId === saved.productoId ? saved : p))
+          : [...(prev ?? []), saved],
       );
       toast.success(editing ? "Producto actualizado" : "Producto creado");
       setModalOpen(false);
@@ -136,7 +136,7 @@ export default function ProductosPage() {
   const handleAnularSuccess = () => {
     if (!anularProducto) return;
     setProductos((prev) =>
-      prev.map((item) =>
+      (prev ?? []).map((item) =>
         item.productoId === anularProducto?.productoId
           ? { ...item, activo: false }
           : item,

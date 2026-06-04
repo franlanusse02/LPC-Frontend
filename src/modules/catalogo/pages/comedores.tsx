@@ -48,7 +48,7 @@ export default function ComedoresPage() {
     }
   };
 
-  const sorted = [...comedores].sort((a, b) => {
+  const sorted = [...(comedores ?? [])].sort((a, b) => {
     const av =
       sortKey === "sociedad"
         ? (sociedades.find((s) => s.id === a.sociedadId)?.nombre ?? "")
@@ -87,8 +87,8 @@ export default function ComedoresPage() {
       const saved = (await res.json()) as ComedorResponse;
       setComedores((prev) =>
         editing
-          ? prev.map((c) => (c.id === saved.id ? saved : c))
-          : [...prev, saved],
+          ? (prev ?? []).map((c) => (c.id === saved.id ? saved : c))
+          : [...(prev ?? []), saved],
       );
       toast.success(editing ? "Comedor actualizado" : "Comedor creado");
       setModalOpen(false);
