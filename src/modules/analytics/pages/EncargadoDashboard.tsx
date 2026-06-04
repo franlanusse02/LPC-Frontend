@@ -18,9 +18,9 @@ import { useApi } from "@/hooks/useApi";
 import { KpiCard } from "@/components/KpiCard";
 import {
   ListFilters,
-  defaultFilters,
   type ListFilterState,
 } from "@/components/ListFilters";
+import { defaultFilters } from "@/components/list-filter-defaults";
 import type { ComedorResponse } from "@/domain/dto/comedor/ComedorResponse";
 
 export default function EncargadoDashboard() {

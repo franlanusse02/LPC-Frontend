@@ -29,9 +29,9 @@ import type { PuntoDeVentaResponse } from "@/domain/dto/pto-venta/PuntoDeVentaRe
 import type { ComedorResponse } from "@/domain/dto/comedor/ComedorResponse";
 import {
   ListFilters,
-  defaultFilters,
   type ListFilterState,
 } from "@/components/ListFilters";
+import { defaultFilters } from "@/components/list-filter-defaults";
 
 import type { ConsumoResponse } from "@/domain/dto/consumo/ConsumoResponse";
 import type { AgrupadosResponse } from "@/domain/dto/consumo/AgrupadosResponse";

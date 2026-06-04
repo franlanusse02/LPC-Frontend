@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
@@ -35,6 +35,9 @@ export default function NuevaFacturaPage() {
   const [loading, setLoading] = useState(false);
   const [posLineas, setPosLineas] = useState<PosLinea[]>([]);
 
+  const posLineasRef = useRef(posLineas);
+  posLineasRef.current = posLineas;
+
   useEffect(() => {
     Promise.all([get("/proveedores"), get("/comedores")]).then(
       ([proveedores, comedores]) => {
@@ -51,6 +54,13 @@ export default function NuevaFacturaPage() {
     selectedProveedor && selectedProveedor.puntosDeVenta.length > 0;
 
   const selectedComedor = comedores.find((c) => c.id === Number(comedorId));
+
+  const selectedComedorRef = useRef(selectedComedor);
+  selectedComedorRef.current = selectedComedor;
+
+  const montoRef = useRef(monto);
+  montoRef.current = monto;
+
   const comedorPosOptions = useMemo(
     () =>
       (selectedComedor?.puntosDeVenta ?? []).map((pv) => ({
@@ -72,18 +82,18 @@ export default function NuevaFacturaPage() {
   }, [proveedorId, selectedProveedor]);
 
   useEffect(() => {
-    const pvs = selectedComedor?.puntosDeVenta ?? [];
+    const pvs = selectedComedorRef.current?.puntosDeVenta ?? [];
     if (pvs.length === 1) {
-      setPosLineas([{ puntoDeVentaId: String(pvs[0].id), monto: monto || "" }]);
+      setPosLineas([{ puntoDeVentaId: String(pvs[0].id), monto: montoRef.current || "" }]);
     } else {
       setPosLineas([]);
     }
   }, [comedorId]);
 
   useEffect(() => {
-    const pvs = selectedComedor?.puntosDeVenta ?? [];
-    if (pvs.length === 1 && posLineas.length === 1) {
-      setPosLineas([{ ...posLineas[0], monto: monto || "" }]);
+    const pvs = selectedComedorRef.current?.puntosDeVenta ?? [];
+    if (pvs.length === 1 && posLineasRef.current.length === 1) {
+      setPosLineas([{ ...posLineasRef.current[0], monto: monto || "" }]);
     }
   }, [monto]);
 

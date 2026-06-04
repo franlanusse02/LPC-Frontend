@@ -288,6 +288,7 @@ export default function EventosEncargado() {
             <div className="flex gap-1 pt-3 border-t mt-3 overflow-x-auto">
               {availableTabs.map((tab) => (
                 <button
+                  type="button"
                   key={tab}
                   onClick={() => setActiveTab(tab)}
                   className={cn(

@@ -142,6 +142,7 @@ export default function CentrosCostoPage() {
                 <td className="px-6 py-4 text-gray-600">{comedorMap.get(item.comedorId) ?? `ID ${item.comedorId}`}</td>
                 <td className="px-6 py-4 text-center">
                   <button
+                    type="button"
                     onClick={() => handleToggleActivo(item)}
                     className={cn(
                       "inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold cursor-pointer transition-colors",
