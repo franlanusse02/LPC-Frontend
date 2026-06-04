@@ -40,9 +40,9 @@ import type { FacturaProveedorResponse } from "@/domain/dto/compra/FacturaProvee
 import type { ComedorResponse } from "@/domain/dto/comedor/ComedorResponse";
 import {
   ListFilters,
-  defaultFilters,
   type ListFilterState,
 } from "@/components/ListFilters";
+import { defaultFilters } from "@/components/list-filter-defaults";
 
 const ESTADO_STYLES: Record<
   string,

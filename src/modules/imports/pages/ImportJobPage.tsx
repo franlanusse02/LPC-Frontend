@@ -58,10 +58,18 @@ export default function ImportJobPage() {
   };
 
   useEffect(() => {
-    fetchJob();
-    fetchRows();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [basePath, estadoFilter]);
+    if (!basePath) return;
+
+    get(basePath)
+      .then((r) => r.json())
+      .then(setJob);
+
+    const qs = estadoFilter !== "all" ? `?estado=${estadoFilter}` : "";
+    get(`${basePath}/rows${qs}`)
+      .then((r) => r.json())
+      .then((data) => setRows(Array.isArray(data) ? data : []))
+      .finally(() => setLoading(false));
+  }, [get, basePath, estadoFilter]);
 
   const handleApplyAll = async () => {
     setApplying(true);

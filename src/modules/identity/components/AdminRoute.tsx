@@ -13,6 +13,8 @@ export function AdminRoute() {
     return <Navigate to="/encargado" replace />;
   } else if (session?.rol.toUpperCase() === "CONTABILIDAD") {
     return <Navigate to="/contabilidad" replace />;
+  } else if (session?.rol.toUpperCase() === "CARGA_DATOS") {
+    return <Navigate to="/carga-datos" replace />;
   }
 
   return <Outlet />;

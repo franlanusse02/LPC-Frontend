@@ -20,11 +20,10 @@ export default function TotalesContabilidad({
   const filterKey = JSON.stringify(filters);
 
   useEffect(() => {
+    const parsed: Record<string, string | undefined> = filterKey ? JSON.parse(filterKey) : {};
     const params = new URLSearchParams();
-    if (filters) {
-      for (const [k, v] of Object.entries(filters)) {
-        if (v) params.set(k, v);
-      }
+    for (const [k, v] of Object.entries(parsed)) {
+      if (v) params.set(k, v);
     }
     const qs = params.toString();
     const base = qs ? `?${qs}` : "";
@@ -37,7 +36,6 @@ export default function TotalesContabilidad({
         setPorcentaje(d.porcentaje ?? 0),
       ),
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [get, filterKey]);
 
   return (

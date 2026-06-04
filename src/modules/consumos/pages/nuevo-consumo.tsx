@@ -19,7 +19,7 @@ import type { PuntoDeVentaResponse } from "@/domain/dto/pto-venta/PuntoDeVentaRe
 import type { ProductoResponse } from "@/domain/dto/consumo/ProductoResponse";
 import type { CreateConsumoRequest } from "@/domain/dto/consumo/CreateConsumoRequest";
 
-export default function NuevoConsumoPage() {
+export default function NuevoConsumoPage({ basePath = "/encargado" }: { basePath?: string }) {
   const navigate = useNavigate();
   const { get, post } = useApi();
 
@@ -138,7 +138,7 @@ export default function NuevoConsumoPage() {
       toast("Consumo creado", {
         description: `Consumo registrado por ${fmtCurrency(total)}.`,
       });
-      navigate("/encargado/consumos");
+      navigate(`${basePath}/consumos`);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "No se pudo crear el consumo");
     } finally {
@@ -152,7 +152,7 @@ export default function NuevoConsumoPage() {
         <Button
           variant="ghost"
           className="mb-6 gap-2"
-          onClick={() => navigate("/encargado/consumos")}
+          onClick={() => navigate(`${basePath}/consumos`)}
         >
           <ArrowLeft className="h-4 w-4" />
           Volver a consumos

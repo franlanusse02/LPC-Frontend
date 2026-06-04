@@ -53,9 +53,9 @@ import { exportToXlsx, type ExportColumn } from "@/lib/exportXlsx";
 import type { ComedorResponse } from "@/domain/dto/comedor/ComedorResponse";
 import {
   ListFilters,
-  defaultFilters,
   type ListFilterState,
 } from "@/components/ListFilters";
+import { defaultFilters } from "@/components/list-filter-defaults";
 import type { ComedorCaseKey } from "../config/comedorCases";
 
 type TabKey = "TODOS" | ComedorCaseKey;
@@ -618,6 +618,7 @@ export default function EventosContabilidad() {
           <div className="flex gap-1 pt-3 border-t mt-3 overflow-x-auto">
             {availableTabs.map((tab) => (
               <button
+                type="button"
                 key={tab}
                 onClick={() => { setActiveTab(tab); selection.clear(); }}
                 className={cn(

@@ -46,6 +46,7 @@ export function AnuladosGroup({ movimientos }: { movimientos: MovimientoResponse
       <tr className="bg-gray-50/80">
         <td colSpan={5} className="px-4 py-2">
           <button
+            type="button"
             onClick={() => setOpen((v) => !v)}
             className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-600 transition-colors"
           >

@@ -18,9 +18,9 @@ export default function ComedoresPage() {
   const navigate = useNavigate();
   const { get, post, patch } = useApi();
 
-  const [comedores, setComedores] = useState<ComedorResponse[]>([]);
+  const [comedores, setComedores] = useState<ComedorResponse[] | null>(null);
   const [sociedades, setSociedades] = useState<SociedadResponse[]>([]);
-  const [loading, setLoading] = useState(true);
+  const loading = comedores === null;
   const [saving, setSaving] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<ComedorResponse | null>(null);
@@ -37,7 +37,6 @@ export default function ComedoresPage() {
     ]).then(([comedoresData, sociedadesData]) => {
       setComedores(comedoresData);
       setSociedades(sociedadesData);
-      setLoading(false);
     });
   }, [get]);
 

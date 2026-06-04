@@ -19,9 +19,9 @@ export default function CentrosCostoPage() {
   const navigate = useNavigate();
   const { get, post, patch } = useApi();
 
-  const [items, setItems] = useState<CentroCostoResponse[]>([]);
+  const [items, setItems] = useState<CentroCostoResponse[] | null>(null);
   const [comedores, setComedores] = useState<ComedorResponse[]>([]);
-  const [loading, setLoading] = useState(true);
+  const loading = items === null;
   const [saving, setSaving] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<CentroCostoResponse | null>(null);
@@ -38,7 +38,6 @@ export default function CentrosCostoPage() {
     ]).then(([data, comedoresData]) => {
       setItems(data);
       setComedores(comedoresData);
-      setLoading(false);
     });
   }, [get]);
 
@@ -142,6 +141,7 @@ export default function CentrosCostoPage() {
                 <td className="px-6 py-4 text-gray-600">{comedorMap.get(item.comedorId) ?? `ID ${item.comedorId}`}</td>
                 <td className="px-6 py-4 text-center">
                   <button
+                    type="button"
                     onClick={() => handleToggleActivo(item)}
                     className={cn(
                       "inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold cursor-pointer transition-colors",

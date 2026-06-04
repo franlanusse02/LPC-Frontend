@@ -65,6 +65,7 @@ export function FilterPills<T extends string>({
     <div className="flex items-center gap-1 rounded-lg border border-gray-200 bg-gray-50 p-1">
       {options.map((opt) => (
         <button
+          type="button"
           key={opt.value}
           onClick={() => onChange(opt.value)}
           className={cn(

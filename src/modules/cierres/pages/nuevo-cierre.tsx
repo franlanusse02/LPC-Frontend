@@ -25,7 +25,7 @@ interface PuntoVenta {
   comedorId: number;
 }
 
-export default function NuevoCierrePage() {
+export default function NuevoCierrePage({ basePath = "/encargado" }: { basePath?: string }) {
   const navigate = useNavigate();
   const { get, post } = useApi();
 
@@ -124,7 +124,7 @@ export default function NuevoCierrePage() {
           ? `Se creó el cierre con ${validLines.length} línea(s) de pago.`
           : "Se creó el cierre correctamente.",
       });
-      navigate("/encargado/cierres");
+      navigate(`${basePath}/cierres`);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "No se pudo crear el cierre");
     } finally {
@@ -138,7 +138,7 @@ export default function NuevoCierrePage() {
         <Button
           variant="ghost"
           className="mb-6 gap-2"
-          onClick={() => navigate("/encargado/cierres")}
+          onClick={() => navigate(`${basePath}/cierres`)}
         >
           <ArrowLeft className="h-4 w-4" />
           Volver a cierres
