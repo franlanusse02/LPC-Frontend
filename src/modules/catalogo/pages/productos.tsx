@@ -26,9 +26,9 @@ export default function ProductosPage() {
   const navigate = useNavigate();
   const { get, post, patch } = useApi();
 
-  const [productos, setProductos] = useState<any[]>([]);
+  const [productos, setProductos] = useState<any[] | null>(null);
   const [comedores, setComedores] = useState<ComedorResponse[]>([]);
-  const [loading, setLoading] = useState(true);
+  const loading = productos === null;
   const [saving, setSaving] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<any | null>(null);
@@ -49,7 +49,6 @@ export default function ProductosPage() {
     ]).then(([productosData, comedoresData]) => {
       setProductos(productosData);
       setComedores(comedoresData);
-      setLoading(false);
     });
   }, [get]);
 

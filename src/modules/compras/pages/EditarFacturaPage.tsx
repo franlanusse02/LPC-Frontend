@@ -26,14 +26,21 @@ export default function EditarFacturaPage() {
     [],
   );
 
-  const [proveedorId, setProveedorId] = useState("");
-  const [comedorId, setComedorId] = useState("");
-  const [fechaFactura, setFechaFactura] = useState("");
-  const [monto, setMonto] = useState("");
-  const [comentarios, setComentarios] = useState("");
-  const [puntoDeVenta, setPuntoDeVenta] = useState("");
-  const [numeroOperacion, setNumeroOperacion] = useState("");
-  const [medioPago, setMedioPago] = useState<MedioPago | "">("");
+  interface FacturaForm {
+    proveedorId: string;
+    comedorId: string;
+    fechaFactura: string;
+    monto: string;
+    comentarios: string;
+    puntoDeVenta: string;
+    numeroOperacion: string;
+    medioPago: MedioPago | "";
+  }
+  const [form, setForm] = useState<FacturaForm>({
+    proveedorId: "", comedorId: "", fechaFactura: "", monto: "",
+    comentarios: "", puntoDeVenta: "", numeroOperacion: "", medioPago: "",
+  });
+  const updateForm = (partial: Partial<FacturaForm>) => setForm(prev => ({ ...prev, ...partial }));
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -51,16 +58,16 @@ export default function EditarFacturaPage() {
 
   useEffect(() => {
     if (!factura) return;
-    setProveedorId(String(factura.proveedorId));
-    setComedorId(String(factura.comedorId));
-    setFechaFactura(factura.fechaFactura);
-    setMonto(String(factura.monto));
-    setComentarios(factura.comentarios ?? "");
-    setPuntoDeVenta(
-      factura.puntoDeVentaProveedor != null ? String(factura.puntoDeVentaProveedor) : "",
-    );
-    setNumeroOperacion(factura.numeroOperacion ?? "");
-    setMedioPago(factura.medioPago ?? "");
+    setForm({
+      proveedorId: String(factura.proveedorId),
+      comedorId: String(factura.comedorId),
+      fechaFactura: factura.fechaFactura,
+      monto: String(factura.monto),
+      comentarios: factura.comentarios ?? "",
+      puntoDeVenta: factura.puntoDeVentaProveedor != null ? String(factura.puntoDeVentaProveedor) : "",
+      numeroOperacion: factura.numeroOperacion ?? "",
+      medioPago: factura.medioPago ?? "",
+    });
   }, [factura]);
 
   const handleSubmit = async () => {
@@ -69,14 +76,14 @@ export default function EditarFacturaPage() {
     setLoading(true);
     try {
       const req: PatchFacturaProveedorRequest = {
-        proveedorId: Number(proveedorId),
-        comedorId: Number(comedorId),
-        fechaFactura,
-        monto: Number(monto),
-        comentarios: comentarios || undefined,
-        puntoDeVentaProveedor: puntoDeVenta ? Number(puntoDeVenta) : null,
-        numeroOperacion: numeroOperacion || undefined,
-        medioPago: medioPago || null,
+        proveedorId: Number(form.proveedorId),
+        comedorId: Number(form.comedorId),
+        fechaFactura: form.fechaFactura,
+        monto: Number(form.monto),
+        comentarios: form.comentarios || undefined,
+        puntoDeVentaProveedor: form.puntoDeVenta ? Number(form.puntoDeVenta) : null,
+        numeroOperacion: form.numeroOperacion || undefined,
+        medioPago: form.medioPago || null,
       };
 
       await patch(`/facturas/proveedor/${id}`, req);
@@ -130,8 +137,8 @@ export default function EditarFacturaPage() {
                   <label className="text-sm font-medium">Proveedor *</label>
                   <Combobox
                     options={proveedores.map((p) => ({ value: String(p.id), label: p.nombre }))}
-                    value={proveedorId}
-                    onChange={setProveedorId}
+                    value={form.proveedorId}
+                    onChange={(v) => updateForm({ proveedorId: v })}
                     placeholder="Seleccionar proveedor..."
                     className="w-full"
                   />
@@ -141,8 +148,8 @@ export default function EditarFacturaPage() {
                   <label className="text-sm font-medium">Comedor *</label>
                   <Combobox
                     options={comedores.map((c) => ({ value: String(c.id), label: c.nombre }))}
-                    value={comedorId}
-                    onChange={setComedorId}
+                    value={form.comedorId}
+                    onChange={(v) => updateForm({ comedorId: v })}
                     placeholder="Seleccionar comedor..."
                     className="w-full"
                   />
@@ -164,8 +171,8 @@ export default function EditarFacturaPage() {
                   <label className="text-sm font-medium">Fecha factura *</label>
                   <Input
                     type="date"
-                    value={fechaFactura}
-                    onChange={(e) => setFechaFactura(e.target.value)}
+                    value={form.fechaFactura}
+                    onChange={(e) => updateForm({ fechaFactura: e.target.value })}
                   />
                 </div>
 
@@ -174,8 +181,8 @@ export default function EditarFacturaPage() {
                   <Input
                     type="number"
                     min="0"
-                    value={monto}
-                    onChange={(e) => setMonto(e.target.value)}
+                    value={form.monto}
+                    onChange={(e) => updateForm({ monto: e.target.value })}
                   />
                 </div>
 
@@ -183,8 +190,8 @@ export default function EditarFacturaPage() {
                   <label className="text-sm font-medium">Medio de pago</label>
                   <Combobox
                     options={Object.entries(MediosPagoDict).map(([label, value]) => ({ value, label }))}
-                    value={medioPago}
-                    onChange={(v) => setMedioPago(v as MedioPago | "")}
+                    value={form.medioPago}
+                    onChange={(v) => updateForm({ medioPago: v as MedioPago | "" })}
                     placeholder="Sin especificar"
                     clearable
                     className="w-full"
@@ -197,8 +204,8 @@ export default function EditarFacturaPage() {
                   </label>
                   <Input
                     type="text"
-                    value={numeroOperacion}
-                    onChange={(e) => setNumeroOperacion(e.target.value)}
+                    value={form.numeroOperacion}
+                    onChange={(e) => updateForm({ numeroOperacion: e.target.value })}
                     placeholder="Opcional"
                   />
                 </div>
@@ -206,8 +213,8 @@ export default function EditarFacturaPage() {
                 <div className="space-y-1.5">
                   <label className="text-sm font-medium">Comentarios</label>
                   <Input
-                    value={comentarios}
-                    onChange={(e) => setComentarios(e.target.value)}
+                    value={form.comentarios}
+                    onChange={(e) => updateForm({ comentarios: e.target.value })}
                     placeholder="Opcional"
                   />
                 </div>

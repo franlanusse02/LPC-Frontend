@@ -17,9 +17,9 @@ export default function ConsumidoresPage() {
   const navigate = useNavigate();
   const { get, post, patch, del } = useApi();
 
-  const [consumidores, setConsumidores] = useState<any[]>([]);
+  const [consumidores, setConsumidores] = useState<any[] | null>(null);
   const [comedores, setComedores] = useState<ComedorResponse[]>([]);
-  const [loading, setLoading] = useState(true);
+  const loading = consumidores === null;
   const [saving, setSaving] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<any | null>(null);
@@ -39,7 +39,6 @@ export default function ConsumidoresPage() {
     ]).then(([consumidoresData, comedoresData]) => {
       setConsumidores(consumidoresData);
       setComedores(comedoresData);
-      setLoading(false);
     });
   }, [get]);
 

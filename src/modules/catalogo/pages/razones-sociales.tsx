@@ -18,9 +18,9 @@ export default function RazonesSocialesPage() {
   const navigate = useNavigate();
   const { get, post, patch, del } = useApi();
 
-  const [razones, setRazones] = useState<RazonSocialComedorResponse[]>([]);
+  const [razones, setRazones] = useState<RazonSocialComedorResponse[] | null>(null);
   const [comedores, setComedores] = useState<ComedorResponse[]>([]);
-  const [loading, setLoading] = useState(true);
+  const loading = razones === null;
   const [saving, setSaving] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<RazonSocialComedorResponse | null>(null);
@@ -39,7 +39,6 @@ export default function RazonesSocialesPage() {
     ]).then(([razonesData, comedoresData]) => {
       setRazones(razonesData);
       setComedores(comedoresData);
-      setLoading(false);
     });
   }, [get]);
 

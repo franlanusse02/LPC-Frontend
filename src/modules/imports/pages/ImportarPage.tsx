@@ -26,22 +26,21 @@ export default function ImportarPage() {
   const [selectedType, setSelectedType] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
-  const [jobs, setJobs] = useState<ImportJob[]>([]);
-  const [loadingJobs, setLoadingJobs] = useState(false);
+  const [jobsResult, setJobsResult] = useState<{ forType: string | null; jobs: ImportJob[] }>({ forType: null, jobs: [] });
   const fileRef = useRef<HTMLInputElement>(null);
 
   const importType = IMPORT_TYPES.find((t) => t.key === selectedType);
+  const loadingJobs = importType != null && jobsResult.forType !== importType.key;
+  const jobs = jobsResult.forType === (importType?.key ?? null) ? jobsResult.jobs : [];
 
   useEffect(() => {
     if (!importType) {
-      setJobs([]);
+      setJobsResult({ forType: null, jobs: [] });
       return;
     }
-    setLoadingJobs(true);
     get(`${importType.endpoint}/jobs`)
       .then((r) => r.json())
-      .then((data) => setJobs(Array.isArray(data) ? data : []))
-      .finally(() => setLoadingJobs(false));
+      .then((data) => setJobsResult({ forType: importType.key, jobs: Array.isArray(data) ? data : [] }));
   }, [get, importType]);
 
   const handleUpload = async () => {

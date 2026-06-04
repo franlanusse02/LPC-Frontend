@@ -23,17 +23,22 @@ export function KpiCard({
   className,
 }: KpiCardProps) {
   const { get } = useApi();
-  const [value, setValue] = useState<number | null>(null);
-  const [loading, setLoading] = useState(true);
 
   const filterKey = JSON.stringify(filters);
+  const requestKey = `${endpoint}|${filterKey}`;
+
+  const [result, setResult] = useState<{ fetchedFor: string | null; value: number | null }>({
+    fetchedFor: null,
+    value: null,
+  });
+  const loading = result.fetchedFor !== requestKey;
 
   const valueExtractorRef = useRef(valueExtractor);
   valueExtractorRef.current = valueExtractor;
 
   useEffect(() => {
     const controller = new AbortController();
-    setLoading(true);
+    const key = `${endpoint}|${filterKey}`;
 
     const parsed: Record<string, string | undefined> = filterKey ? JSON.parse(filterKey) : {};
     const params = new URLSearchParams();
@@ -45,15 +50,15 @@ export function KpiCard({
 
     get(url, { signal: controller.signal })
       .then((res) => res.json())
-      .then((data) => setValue(valueExtractorRef.current(data)))
+      .then((data) => setResult({ fetchedFor: key, value: valueExtractorRef.current(data) }))
       .catch((err) => {
-        if (err.name !== "AbortError") setValue(null);
-      })
-      .finally(() => setLoading(false));
+        if (err.name !== "AbortError") setResult({ fetchedFor: key, value: null });
+      });
 
     return () => controller.abort();
   }, [get, endpoint, filterKey]);
 
+  const value = result.value;
   const formatted =
     value === null
       ? "—"

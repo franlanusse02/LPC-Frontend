@@ -1,1 +1,1 @@
-export type UserRole = "ADMIN" | "ENCARGADO" | "CONTABILIDAD";
+export type UserRole = "ADMIN" | "ENCARGADO" | "CONTABILIDAD" | "CARGA_DATOS";
