@@ -170,6 +170,8 @@ export default function NuevoEventoPage() {
     }, 0);
   }, [servicios, productos]);
 
+  const hasAutoTotal = servicios.length > 0 && serviciosTotal > 0;
+
   const canSubmit = puntoDeVentaId && fechaEvento && cantidadPersonas;
 
   const handleSubmit = async () => {
@@ -187,7 +189,7 @@ export default function NuevoEventoPage() {
         puntoDeVentaId: Number(puntoDeVentaId),
         fechaEvento,
         cantidadPersonas: cantidadPersonas ? Number(cantidadPersonas) : null,
-        montoTotal: montoTotal ? Number(montoTotal) : null,
+        montoTotal: hasAutoTotal ? serviciosTotal : (montoTotal ? Number(montoTotal) : null),
         observaciones: observaciones || null,
         servicios: Object.keys(serviciosMap).length > 0 ? serviciosMap : null,
       };
@@ -452,14 +454,23 @@ export default function NuevoEventoPage() {
             </div>
             <div className="space-y-1.5">
               <label className="text-sm font-medium">Monto total</label>
-              <Input
-                type="number"
-                min="0"
-                step="0.01"
-                value={montoTotal}
-                onChange={(e) => setMontoTotal(e.target.value)}
-                placeholder="Monto"
-              />
+              {hasAutoTotal ? (
+                <Input
+                  type="text"
+                  value={`$${serviciosTotal.toLocaleString("es-AR")}`}
+                  readOnly
+                  className="bg-muted"
+                />
+              ) : (
+                <Input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={montoTotal}
+                  onChange={(e) => setMontoTotal(e.target.value)}
+                  placeholder="Monto"
+                />
+              )}
             </div>
           </div>
 
