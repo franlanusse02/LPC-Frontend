@@ -41,6 +41,12 @@ import EventosContabilidad from "./modules/eventos/pages/EventosContabilidad";
 import ImportarPage from "./modules/imports/pages/ImportarPage";
 import ImportJobPage from "./modules/imports/pages/ImportJobPage";
 
+import CargaDatosDashboard from "@/modules/analytics/pages/CargaDatosDashboard";
+import CierresCargaDatos from "./modules/cierres/pages/CierresCargaDatos";
+import ComprasCargaDatos from "./modules/compras/pages/ComprasCargaDatos";
+import ConsumosCargaDatos from "./modules/consumos/pages/ConsumosCargaDatos";
+import EventosCargaDatos from "./modules/eventos/pages/EventosCargaDatos";
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -95,6 +101,21 @@ export default function App() {
                 path="/encargado/eventos/nuevo"
                 element={<NuevoEventoPage />}
               />
+            </Route>
+          </Route>
+
+          {/* Carga Datos */}
+          <Route element={<ProtectedRoute allowOnly="CARGA_DATOS" />}>
+            <Route element={<RootLayout />}>
+              <Route path="/carga-datos" element={<CargaDatosDashboard />} />
+              <Route path="/carga-datos/cierres" element={<CierresCargaDatos />} />
+              <Route path="/carga-datos/cierres/nuevo" element={<NuevoCierrePage basePath="/carga-datos" />} />
+              <Route path="/carga-datos/compras" element={<ComprasCargaDatos />} />
+              <Route path="/carga-datos/compras/nueva" element={<NuevaFacturaPage basePath="/carga-datos" />} />
+              <Route path="/carga-datos/consumos" element={<ConsumosCargaDatos />} />
+              <Route path="/carga-datos/consumos/nuevo" element={<NuevoConsumoPage basePath="/carga-datos" />} />
+              <Route path="/carga-datos/eventos" element={<EventosCargaDatos />} />
+              <Route path="/carga-datos/eventos/nuevo" element={<NuevoEventoPage basePath="/carga-datos" />} />
             </Route>
           </Route>
 

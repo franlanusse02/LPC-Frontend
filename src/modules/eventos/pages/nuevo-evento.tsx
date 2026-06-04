@@ -24,7 +24,7 @@ import {
 
 type ServicioLine = { productoId: string; cantidad: string };
 
-export default function NuevoEventoPage() {
+export default function NuevoEventoPage({ basePath = "/encargado" }: { basePath?: string }) {
   const navigate = useNavigate();
   const { get, post } = useApi();
 
@@ -258,7 +258,7 @@ export default function NuevoEventoPage() {
 
       await post("/eventos", req);
       toast("Evento creado");
-      navigate("/encargado/eventos");
+      navigate(`${basePath}/eventos`);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "No se pudo crear el evento");
     } finally {
@@ -367,7 +367,7 @@ export default function NuevoEventoPage() {
 
   return (
     <div className="mx-auto max-w-2xl px-6 py-6">
-      <Button variant="ghost" className="mb-6 gap-2" onClick={() => navigate("/encargado/eventos")}>
+      <Button variant="ghost" className="mb-6 gap-2" onClick={() => navigate(`${basePath}/eventos`)}>
         <ArrowLeft className="h-4 w-4" />
         Volver a eventos
       </Button>

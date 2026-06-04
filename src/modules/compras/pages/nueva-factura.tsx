@@ -17,7 +17,7 @@ import type { MedioPago } from "@/domain/enums/MedioPago";
 
 type PosLinea = { puntoDeVentaId: string; monto: string };
 
-export default function NuevaFacturaPage() {
+export default function NuevaFacturaPage({ basePath = "/encargado" }: { basePath?: string }) {
   const navigate = useNavigate();
   const { get, post } = useApi();
 
@@ -152,7 +152,7 @@ export default function NuevaFacturaPage() {
       toast("Factura creada", {
         description: `Factura ${numero} creada exitosamente.`,
       });
-      navigate("/encargado/compras");
+      navigate(`${basePath}/compras`);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "No se pudo crear la factura");
     } finally {
@@ -166,7 +166,7 @@ export default function NuevaFacturaPage() {
         <Button
           variant="ghost"
           className="mb-6 gap-2"
-          onClick={() => navigate("/encargado/compras")}
+          onClick={() => navigate(`${basePath}/compras`)}
         >
           <ArrowLeft className="h-4 w-4" />
           Volver a facturas
