@@ -48,7 +48,7 @@ export default function PartidasPage() {
 
   const comedorMap = new Map(comedores.map((c) => [c.id, c.nombre]));
 
-  const sorted = [...items].sort((a, b) => {
+  const sorted = [...(items ?? [])].sort((a, b) => {
     const av = sortKey === "comedor" ? (comedorMap.get(a.comedorId) ?? "") : a.nombre;
     const bv = sortKey === "comedor" ? (comedorMap.get(b.comedorId) ?? "") : b.nombre;
     return sortDir === "asc" ? av.localeCompare(bv) : bv.localeCompare(av);
@@ -80,7 +80,7 @@ export default function PartidasPage() {
         : await post("/comedores/partidas", { nombre: nombre.trim(), comedorId: Number(comedorId) });
       const saved = (await res.json()) as PartidaResponse;
       setItems((prev) =>
-        editing ? prev.map((i) => (i.id === saved.id ? saved : i)) : [...prev, saved],
+        editing ? (prev ?? []).map((i) => (i.id === saved.id ? saved : i)) : [...(prev ?? []), saved],
       );
       toast.success(editing ? "Partida actualizada" : "Partida creada");
       setModalOpen(false);
@@ -95,7 +95,7 @@ export default function PartidasPage() {
     try {
       const res = await patch(`/comedores/partidas/${item.id}`, { activo: !item.activo });
       const saved = (await res.json()) as PartidaResponse;
-      setItems((prev) => prev.map((i) => (i.id === saved.id ? saved : i)));
+      setItems((prev) => (prev ?? []).map((i) => (i.id === saved.id ? saved : i)));
       toast.success(saved.activo ? "Activada" : "Desactivada");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "No se pudo actualizar.");

@@ -61,8 +61,8 @@ export default function BancosPage() {
       const saved = await res.json();
       setBancos((prev) =>
         editing
-          ? prev.map((b) => (b.id === saved.id ? saved : b))
-          : [...prev, saved],
+          ? (prev ?? []).map((b) => (b.id === saved.id ? saved : b))
+          : [...(prev ?? []), saved],
       );
       toast.success(editing ? "Banco actualizado" : "Banco creado");
       setModalOpen(false);
