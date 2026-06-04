@@ -22,6 +22,8 @@ import {
   FileText,
   FolderTree,
   BookOpen,
+  Upload,
+  DatabaseZap,
 } from "lucide-react";
 
 export default function AdminDashboard() {
@@ -58,6 +60,26 @@ export default function AdminDashboard() {
               <ClipboardList className="h-5 w-5 text-gray-500 shrink-0" />
               <span className="text-sm font-medium text-gray-700">
                 Vista Encargado
+              </span>
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => navigate("/carga-datos")}
+              className="flex items-center justify-start gap-3 h-14 px-4 rounded-lg border-gray-200 hover:bg-gray-50 hover:border-gray-300"
+            >
+              <DatabaseZap className="h-5 w-5 text-gray-500 shrink-0" />
+              <span className="text-sm font-medium text-gray-700">
+                Vista Carga Datos
+              </span>
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => navigate("/contabilidad/importar")}
+              className="flex items-center justify-start gap-3 h-14 px-4 rounded-lg border-gray-200 hover:bg-gray-50 hover:border-gray-300"
+            >
+              <Upload className="h-5 w-5 text-gray-500 shrink-0" />
+              <span className="text-sm font-medium text-gray-700">
+                Importar
               </span>
             </Button>
           </CardContent>
