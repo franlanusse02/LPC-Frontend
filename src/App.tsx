@@ -159,7 +159,12 @@ export default function App() {
                 element={<ImportJobPage />}
               />
 
-              {/* Catalogo */}
+            </Route>
+          </Route>
+
+          {/* Catalogo — any authenticated user */}
+          <Route element={<ProtectedRoute />}>
+            <Route element={<RootLayout />}>
               <Route path="/catalogo/comedores" element={<ComedoresPage />} />
               <Route
                 path="/catalogo/puntos-de-venta"
