@@ -15,6 +15,7 @@ export const defaultFilters: ListFilterState = {
   comedorId: "",
   sociedadId: "",
   puntoDeVentaId: "",
+  consumidorId: "",
   dateField: "fechaFactura",
   ...currentMonthRange(),
 };

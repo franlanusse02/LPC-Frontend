@@ -20,6 +20,10 @@ export type CreateEventoGaliciaRequest = CreateEventoBase & {
   emailSolicitante?: string | null;
   funcionarioId?: number | null;
   responsableId?: number | null;
+  centroCostoId?: number | null;
+  centroCostoNombre?: string | null;
+  partidaId?: number | null;
+  partidaNombre?: string | null;
   precioUnitario?: number | null;
   retenciones?: number | null;
   numeroOperacion?: string | null;
@@ -35,7 +39,9 @@ export type CreateEventoBBVARequest = CreateEventoBase & {
   emailSolicitante?: string | null;
   ordenCompra?: string | null;
   legajoId?: number | null;
+  legajoNombre?: string | null;
   recepcionId?: number | null;
+  recepcionNombre?: string | null;
 };
 
 export type CreateEventoTechintRequest = CreateEventoBase & {
@@ -51,7 +57,9 @@ export type CreateEventoUDESARequest = CreateEventoBase & {
   tipoComedor: "UDESA";
   solicitanteId?: number | null;
   centroCostoId?: number | null;
+  centroCostoNombre?: string | null;
   areaId?: number | null;
+  areaNombre?: string | null;
   precioUnitario?: number | null;
   adicionales?: number | null;
 };

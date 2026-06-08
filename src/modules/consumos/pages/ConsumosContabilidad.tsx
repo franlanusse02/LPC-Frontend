@@ -106,6 +106,10 @@ export default function ConsumosContabilidad() {
         return cons?.comedorId === cId;
       });
     }
+    if (listFilters.consumidorId) {
+      const cId = Number(listFilters.consumidorId);
+      list = list.filter((c) => c.consumidorId === cId);
+    }
     return list;
   }, [consumos, listFilters, consumidorById]);
 
@@ -267,6 +271,7 @@ export default function ConsumosContabilidad() {
               filters={listFilters}
               onChange={setListFilters}
               comedores={comedores}
+              consumidores={consumidores}
               showSociedad={false}
               dateFieldOptions={[
                 { value: "fecha", label: "Fecha Consumo" },

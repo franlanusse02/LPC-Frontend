@@ -1,5 +1,6 @@
 import type { ComedorResponse } from "@/domain/dto/comedor/ComedorResponse";
 import type { SociedadResponse } from "@/domain/dto/sociedad/SociedadResponse";
+import type { ConsumidorResponse } from "@/domain/dto/consumo/ConsumidorResponse";
 import { Combobox, type ComboboxOption } from "@/components/ui/combobox";
 import { FilterPills } from "@/components/data-table";
 import { Input } from "@/components/ui/input";
@@ -14,6 +15,7 @@ export interface ListFilterState {
   comedorId: string;
   sociedadId: string;
   puntoDeVentaId: string;
+  consumidorId: string;
   desde: string;
   hasta: string;
   dateField: string;
@@ -24,6 +26,7 @@ interface ListFiltersProps {
   onChange: (filters: ListFilterState) => void;
   comedores: ComedorResponse[];
   sociedades?: SociedadResponse[];
+  consumidores?: ConsumidorResponse[];
   showSociedad?: boolean;
   showPuntoDeVenta?: boolean;
   dateFieldOptions?: DateFieldOption[];
@@ -34,6 +37,7 @@ export function ListFilters({
   onChange,
   comedores,
   sociedades,
+  consumidores,
   showSociedad = true,
   showPuntoDeVenta = true,
   dateFieldOptions,
@@ -54,6 +58,13 @@ export function ListFilters({
       })),
     [sociedades],
   );
+
+  const consumidorOptions: ComboboxOption[] = useMemo(() => {
+    const list = filters.comedorId
+      ? (consumidores ?? []).filter((c) => c.comedorId === Number(filters.comedorId) && c.activo)
+      : (consumidores ?? []).filter((c) => c.activo);
+    return list.map((c) => ({ value: String(c.id), label: c.nombre }));
+  }, [consumidores, filters.comedorId]);
 
   const posOptions: ComboboxOption[] = useMemo(() => {
     const selected = comedores.find(
@@ -103,11 +114,21 @@ export function ListFilters({
       <Combobox
         options={comedorOptions}
         value={filters.comedorId}
-        onChange={(v) => set({ comedorId: v, puntoDeVentaId: "" })}
+        onChange={(v) => set({ comedorId: v, puntoDeVentaId: "", consumidorId: "" })}
         placeholder="Todos los comedores"
         clearable
         className="w-52 h-8 text-sm"
       />
+      {consumidores && consumidorOptions.length > 0 && (
+        <Combobox
+          options={consumidorOptions}
+          value={filters.consumidorId}
+          onChange={(v) => set({ consumidorId: v })}
+          placeholder="Todos los consumidores"
+          clearable
+          className="w-52 h-8 text-sm"
+        />
+      )}
       {showPuntoDeVenta && posOptions.length > 0 && (
         <Combobox
           options={posOptions}
