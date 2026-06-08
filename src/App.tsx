@@ -38,6 +38,7 @@ import ConsumosContabilidad from "./modules/consumos/pages/ConsumosContabilidad"
 import EventosEncargado from "./modules/eventos/pages/EventosEncargado";
 import NuevoEventoPage from "./modules/eventos/pages/nuevo-evento";
 import EventosContabilidad from "./modules/eventos/pages/EventosContabilidad";
+import EditarEventoPage from "./modules/eventos/pages/EditarEventoPage";
 import ImportarPage from "./modules/imports/pages/ImportarPage";
 import ImportJobPage from "./modules/imports/pages/ImportJobPage";
 
@@ -149,6 +150,10 @@ export default function App() {
               <Route
                 path="/contabilidad/eventos"
                 element={<EventosContabilidad />}
+              />
+              <Route
+                path="/contabilidad/eventos/:id/editar"
+                element={<EditarEventoPage />}
               />
               <Route
                 path="/contabilidad/importar"

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Plus, Trash2 } from "lucide-react";
+import { useNavigate, useParams } from "react-router-dom";
+import { ArrowLeft, Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useApi } from "@/hooks/useApi";
 import { Button } from "@/components/ui/button";
@@ -14,28 +14,29 @@ import type { CentroCostoResponse } from "@/domain/dto/catalogo/CentroCostoRespo
 import type { PartidaResponse } from "@/domain/dto/catalogo/PartidaResponse";
 import type { RazonSocialComedorResponse } from "@/domain/dto/comedor/RazonSocialComedorResponse";
 import type { ProductoResponse } from "@/domain/dto/consumo/ProductoResponse";
-import type { CreateEventoRequest } from "@/domain/dto/evento/CreateEventoRequest";
+import type { EventoResponse } from "@/domain/dto/evento/EventoResponse";
+import type { PatchEventoRequest } from "@/domain/dto/evento/PatchEventoRequest";
 import {
   getCaseFields,
-  detectCase,
   type CaseFields,
   type ComedorCaseKey,
 } from "@/modules/eventos/config/comedorCases";
 
 type ServicioLine = { productoId: string; cantidad: string };
 
-export default function NuevoEventoPage({ basePath = "/encargado" }: { basePath?: string }) {
+export default function EditarEventoPage() {
   const navigate = useNavigate();
-  const { get, post } = useApi();
+  const { id } = useParams<{ id: string }>();
+  const { get, patch } = useApi();
 
+  const [evento, setEvento] = useState<EventoResponse | null>(null);
   const [comedores, setComedores] = useState<ComedorResponse[]>([]);
-  const emptyComedorDeps = { empleados: [] as EmpleadoComedorResponse[], funcionarios: [] as EmpleadoComedorResponse[], centrosCosto: [] as CentroCostoResponse[], partidas: [] as PartidaResponse[], razonesSociales: [] as RazonSocialComedorResponse[], productos: [] as ProductoResponse[] };
-  const [comedorDeps, setComedorDeps] = useState(emptyComedorDeps);
-  const { empleados, funcionarios, centrosCosto, partidas, razonesSociales, productos } = comedorDeps;
+  const emptyDeps = { empleados: [] as EmpleadoComedorResponse[], funcionarios: [] as EmpleadoComedorResponse[], centrosCosto: [] as CentroCostoResponse[], partidas: [] as PartidaResponse[], razonesSociales: [] as RazonSocialComedorResponse[], productos: [] as ProductoResponse[] };
+  const [deps, setDeps] = useState(emptyDeps);
+  const { empleados, funcionarios, centrosCosto, partidas, razonesSociales, productos } = deps;
 
-  const [comedorId, setComedorId] = useState("");
   const [puntoDeVentaId, setPuntoDeVentaId] = useState("");
-  const [fechaEvento, setFechaEvento] = useState(new Date().toISOString().split("T")[0]);
+  const [fechaEvento, setFechaEvento] = useState("");
   const [cantidadPersonas, setCantidadPersonas] = useState("");
   const [montoTotal, setMontoTotal] = useState("");
   const [observaciones, setObservaciones] = useState("");
@@ -65,12 +66,21 @@ export default function NuevoEventoPage({ basePath = "/encargado" }: { basePath?
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    get("/comedores").then((r) => r.json()).then(setComedores);
-  }, [get]);
+    if (!id) return;
+    Promise.all([get(`/eventos/${id}`), get("/comedores")]).then(
+      ([eventoRes, comedoresRes]) => {
+        eventoRes.json().then(setEvento);
+        comedoresRes.json().then(setComedores);
+      },
+    );
+  }, [id, get]);
 
-  const selectedComedor = comedores.find((c) => c.id === Number(comedorId));
-  const caseKey: ComedorCaseKey = useMemo(() => detectCase(selectedComedor?.nombre), [selectedComedor?.nombre]);
-  const caseFields: CaseFields = useMemo(() => getCaseFields(selectedComedor?.nombre), [selectedComedor?.nombre]);
+  const selectedComedor = comedores.find((c) => c.id === evento?.comedorId);
+  const caseKey: ComedorCaseKey = evento?.tipoComedor ?? "DEFAULT";
+  const caseFields: CaseFields = useMemo(
+    () => getCaseFields(selectedComedor?.nombre),
+    [selectedComedor?.nombre],
+  );
 
   const posOptions = useMemo(
     () => (selectedComedor?.puntosDeVenta ?? []).map((p) => ({ value: String(p.id), label: p.nombre })),
@@ -78,21 +88,52 @@ export default function NuevoEventoPage({ basePath = "/encargado" }: { basePath?
   );
 
   useEffect(() => {
-    if (!comedorId) {
-      setComedorDeps(emptyComedorDeps);
-      return;
-    }
+    if (!evento?.comedorId) return;
+    const cid = evento.comedorId;
     Promise.all([
-      get(`/comedores/empleados?comedorId=${comedorId}`).then((r) => r.json()),
-      get(`/comedores/empleados/funcionarios?comedorId=${comedorId}`).then((r) => r.json()),
-      get(`/comedores/centros-costo?comedorId=${comedorId}`).then((r) => r.json()),
-      get(`/comedores/partidas?comedorId=${comedorId}`).then((r) => r.json()),
-      get(`/comedores/razon-social?comedorId=${comedorId}`).then((r) => r.json()),
-      get(`/consumos/productos?comedorId=${comedorId}`).then((r) => r.json()),
+      get(`/comedores/empleados?comedorId=${cid}`).then((r) => r.json()),
+      get(`/comedores/empleados/funcionarios?comedorId=${cid}`).then((r) => r.json()),
+      get(`/comedores/centros-costo?comedorId=${cid}`).then((r) => r.json()),
+      get(`/comedores/partidas?comedorId=${cid}`).then((r) => r.json()),
+      get(`/comedores/razon-social?comedorId=${cid}`).then((r) => r.json()),
+      get(`/consumos/productos?comedorId=${cid}`).then((r) => r.json()),
     ]).then(([emp, func, cc, part, rs, prod]) => {
-      setComedorDeps({ empleados: emp, funcionarios: func, centrosCosto: cc, partidas: part, razonesSociales: rs, productos: prod });
+      setDeps({ empleados: emp, funcionarios: func, centrosCosto: cc, partidas: part, razonesSociales: rs, productos: prod });
     });
-  }, [comedorId, get]);
+  }, [evento?.comedorId, get]);
+
+  useEffect(() => {
+    if (!evento) return;
+    setPuntoDeVentaId(String(evento.puntoDeVentaId));
+    setFechaEvento(evento.fechaEvento);
+    setCantidadPersonas(evento.cantidadPersonas != null ? String(evento.cantidadPersonas) : "");
+    setMontoTotal(evento.montoTotal != null ? String(evento.montoTotal) : "");
+    setObservaciones(evento.observaciones ?? "");
+    setServicios(evento.servicios.map((s) => ({ productoId: String(s.producto.productoId), cantidad: String(s.cantidad) })));
+
+    const ev = evento as Record<string, unknown>;
+    const str = (k: string) => (ev[k] != null ? String(ev[k]) : "");
+    setSolicitanteId(str("solicitanteId"));
+    setEmailSolicitante(str("emailSolicitante"));
+    setFuncionarioId(str("funcionarioId"));
+    setResponsableId(str("responsableId"));
+    setCentroCostoId(str("centroCostoId"));
+    setPartidaId(str("partidaId"));
+    setPrecioUnitario(str("precioUnitario"));
+    setRetenciones(str("retenciones"));
+    setNumeroOperacion(str("numeroOperacion"));
+    setRazonSocialId(str("razonSocialId"));
+    setDestinatarioFacturacion(str("destinatarioFacturacion"));
+    setTipoComprobante(str("tipoComprobante"));
+    setNumeroComprobante(str("numeroComprobante"));
+    setOrdenCompra(str("ordenCompra"));
+    setLegajoId(str("legajoId"));
+    setRecepcionId(str("recepcionId"));
+    setNumeroPedido(str("numeroPedido"));
+    setConcepto(str("concepto"));
+    setAreaId(str("areaId"));
+    setAdicionales(str("adicionales"));
+  }, [evento]);
 
   const empleadoOptions = useMemo(
     () => empleados.filter((e) => e.activo).map((e) => ({ value: String(e.id), label: e.nombre, subtitle: e.email || undefined })),
@@ -119,49 +160,6 @@ export default function NuevoEventoPage({ basePath = "/encargado" }: { basePath?
     [productos],
   );
 
-  const resetPerComedorFields = () => {
-    setSolicitanteId(""); setEmailSolicitante(""); setFuncionarioId(""); setResponsableId("");
-    setCentroCostoId(""); setPartidaId(""); setPrecioUnitario(""); setRetenciones("");
-    setNumeroOperacion(""); setRazonSocialId(""); setDestinatarioFacturacion("");
-    setTipoComprobante(""); setNumeroComprobante(""); setOrdenCompra("");
-    setLegajoId(""); setRecepcionId(""); setNumeroPedido(""); setConcepto("");
-    setAreaId(""); setAdicionales(""); setServicios([]);
-  };
-
-  const handleComedorChange = (v: string) => {
-    setComedorId(v);
-    setPuntoDeVentaId("");
-    resetPerComedorFields();
-  };
-
-  useEffect(() => {
-    let ccId: string | undefined;
-    let pId: string | undefined;
-
-    if (!funcionarioId) {
-      if (caseFields.centroCosto.autoFill === "funcionario") ccId = "";
-      if (caseFields.partida.autoFill === "funcionario") pId = "";
-    } else {
-      const emp = funcionarios.find((e) => e.id === Number(funcionarioId))
-        ?? empleados.find((e) => e.id === Number(funcionarioId));
-      if (emp) {
-        if (caseFields.centroCosto.autoFill === "funcionario")
-          ccId = emp.centroCostoId ? String(emp.centroCostoId) : "";
-        if (caseFields.partida.autoFill === "funcionario")
-          pId = emp.partidaId ? String(emp.partidaId) : "";
-      }
-    }
-
-    if (ccId !== undefined) setCentroCostoId(ccId);
-    if (pId !== undefined) setPartidaId(pId);
-  }, [funcionarioId, funcionarios, empleados, caseFields]);
-
-  useEffect(() => {
-    if (!solicitanteId) return;
-    const emp = empleados.find((e) => e.id === Number(solicitanteId));
-    if (emp?.email) setEmailSolicitante(emp.email);
-  }, [solicitanteId, empleados]);
-
   const addServicio = () => setServicios((s) => [...s, { productoId: "", cantidad: "1" }]);
   const removeServicio = (i: number) => setServicios((s) => s.filter((_, idx) => idx !== i));
   const updateServicio = (i: number, field: keyof ServicioLine, val: string) =>
@@ -176,19 +174,10 @@ export default function NuevoEventoPage({ basePath = "/encargado" }: { basePath?
 
   const hasAutoTotal = servicios.length > 0 && serviciosTotal > 0;
 
-  const resolveIdOrNombre = (value: string): { id: number | null; nombre: string | null } => {
-    if (!value) return { id: null, nombre: null };
-    if (value.startsWith("new:")) return { id: null, nombre: value.slice(4) };
-    return { id: Number(value), nombre: null };
-  };
-
-  const requiredFieldsFilled = Object.entries(caseFields).every(
-    ([k, spec]) => !spec.visible || !spec.required || !!fieldState[k]?.value,
-  );
-  const canSubmit = puntoDeVentaId && fechaEvento && cantidadPersonas && requiredFieldsFilled;
+  const canSubmit = puntoDeVentaId && fechaEvento && cantidadPersonas;
 
   const handleSubmit = async () => {
-    if (!canSubmit) return;
+    if (!canSubmit || !id) return;
     setLoading(true);
     try {
       const serviciosMap: Record<number, number> = {};
@@ -201,118 +190,91 @@ export default function NuevoEventoPage({ basePath = "/encargado" }: { basePath?
       const base = {
         puntoDeVentaId: Number(puntoDeVentaId),
         fechaEvento,
-        cantidadPersonas: cantidadPersonas ? Number(cantidadPersonas) : null,
-        montoTotal: hasAutoTotal ? serviciosTotal : (montoTotal ? Number(montoTotal) : null),
-        observaciones: observaciones || null,
-        servicios: Object.keys(serviciosMap).length > 0 ? serviciosMap : null,
+        cantidadPersonas: cantidadPersonas ? Number(cantidadPersonas) : undefined,
+        montoTotal: hasAutoTotal ? serviciosTotal : (montoTotal ? Number(montoTotal) : undefined),
+        observaciones: observaciones || undefined,
+        servicios: Object.keys(serviciosMap).length > 0 ? serviciosMap : undefined,
       };
 
-      let req: CreateEventoRequest;
+      let req: PatchEventoRequest;
 
       switch (caseKey) {
-        case "GALICIA": {
-          const ccGal = resolveIdOrNombre(centroCostoId);
-          const partGal = resolveIdOrNombre(partidaId);
+        case "GALICIA":
           req = {
             ...base,
             tipoComedor: "GALICIA",
-            solicitanteId: solicitanteId ? Number(solicitanteId) : null,
-            emailSolicitante: emailSolicitante || null,
-            funcionarioId: funcionarioId ? Number(funcionarioId) : null,
-            responsableId: responsableId ? Number(responsableId) : null,
-            centroCostoId: ccGal.id,
-            centroCostoNombre: ccGal.nombre,
-            partidaId: partGal.id,
-            partidaNombre: partGal.nombre,
-            retenciones: retenciones ? Number(retenciones) : null,
-            numeroOperacion: numeroOperacion || null,
-            razonSocialId: razonSocialId ? Number(razonSocialId) : null,
-            destinatarioFacturacion: destinatarioFacturacion || null,
-            tipoComprobante: tipoComprobante || null,
-            numeroComprobante: numeroComprobante || null,
+            solicitanteId: solicitanteId ? Number(solicitanteId) : undefined,
+            emailSolicitante: emailSolicitante || undefined,
+            funcionarioId: funcionarioId ? Number(funcionarioId) : undefined,
+            responsableId: responsableId ? Number(responsableId) : undefined,
+            precioUnitario: precioUnitario ? Number(precioUnitario) : undefined,
+            retenciones: retenciones ? Number(retenciones) : undefined,
+            numeroOperacion: numeroOperacion || undefined,
+            razonSocialId: razonSocialId ? Number(razonSocialId) : undefined,
+            destinatarioFacturacion: destinatarioFacturacion || undefined,
+            tipoComprobante: tipoComprobante || undefined,
+            numeroComprobante: numeroComprobante || undefined,
           };
           break;
-        }
-        case "BBVA": {
-          const legajo = resolveIdOrNombre(legajoId);
-          const recepcion = resolveIdOrNombre(recepcionId);
+        case "BBVA":
           req = {
             ...base,
             tipoComedor: "BBVA",
-            solicitanteId: solicitanteId ? Number(solicitanteId) : null,
-            emailSolicitante: emailSolicitante || null,
-            ordenCompra: ordenCompra || null,
-            legajoId: legajo.id,
-            legajoNombre: legajo.nombre,
-            recepcionId: recepcion.id,
-            recepcionNombre: recepcion.nombre,
+            solicitanteId: solicitanteId ? Number(solicitanteId) : undefined,
+            emailSolicitante: emailSolicitante || undefined,
+            ordenCompra: ordenCompra || undefined,
+            legajoId: legajoId ? Number(legajoId) : undefined,
+            recepcionId: recepcionId ? Number(recepcionId) : undefined,
           };
           break;
-        }
         case "TECHINT":
           req = {
             ...base,
             tipoComedor: "TECHINT",
-            numeroPedido: numeroPedido || null,
-            razonSocialId: razonSocialId ? Number(razonSocialId) : null,
-            concepto: concepto || null,
-            tipoComprobante: tipoComprobante || null,
-            numeroComprobante: numeroComprobante || null,
+            numeroPedido: numeroPedido || undefined,
+            razonSocialId: razonSocialId ? Number(razonSocialId) : undefined,
+            concepto: concepto || undefined,
+            tipoComprobante: tipoComprobante || undefined,
+            numeroComprobante: numeroComprobante || undefined,
           };
           break;
-
-        case "UDESA": {
-          const ccUdesa = resolveIdOrNombre(centroCostoId);
-          const areaUdesa = resolveIdOrNombre(areaId);
+        case "UDESA":
           req = {
             ...base,
             tipoComedor: "UDESA",
-            solicitanteId: solicitanteId ? Number(solicitanteId) : null,
-            centroCostoId: ccUdesa.id,
-            centroCostoNombre: ccUdesa.nombre,
-            areaId: areaUdesa.id,
-            areaNombre: areaUdesa.nombre,
-            precioUnitario: precioUnitario ? Number(precioUnitario) : null,
-            adicionales: adicionales ? Number(adicionales) : null,
+            solicitanteId: solicitanteId ? Number(solicitanteId) : undefined,
+            centroCostoId: centroCostoId ? Number(centroCostoId) : undefined,
+            areaId: areaId ? Number(areaId) : undefined,
+            precioUnitario: precioUnitario ? Number(precioUnitario) : undefined,
+            adicionales: adicionales ? Number(adicionales) : undefined,
           };
           break;
-        }
         default:
           req = { ...base };
           break;
       }
 
-      await post("/eventos", req);
-      toast("Evento creado");
-      navigate(`${basePath}/eventos`);
+      await patch(`/eventos/${id}`, req);
+      toast("Evento actualizado");
+      navigate("/contabilidad/eventos");
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "No se pudo crear el evento");
+      toast.error(err instanceof Error ? err.message : "No se pudo actualizar el evento");
     } finally {
       setLoading(false);
     }
   };
 
   const fieldLabel: Record<string, string> = {
-    solicitante: "Solicitante",
-    emailSolicitante: "Email solicitante",
-    funcionario: "Funcionario",
-    responsable: "Responsable",
-    centroCosto: "Centro de costo",
-    partida: "Partida",
-    precioUnitario: "Precio unitario",
-    retenciones: "Retenciones",
-    numeroOperacion: "Nº operación",
-    razonSocial: "Razón social",
+    solicitante: "Solicitante", emailSolicitante: "Email solicitante",
+    funcionario: "Funcionario", responsable: "Responsable",
+    centroCosto: "Centro de costo", partida: "Partida",
+    precioUnitario: "Precio unitario", retenciones: "Retenciones",
+    numeroOperacion: "Nº operación", razonSocial: "Razón social",
     destinatarioFacturacion: "Dest. facturación",
-    tipoComprobante: "Tipo comprobante",
-    numeroComprobante: "Nº comprobante",
-    ordenCompra: "Orden de compra",
-    legajo: "Legajo",
-    recepcion: "Recepción",
-    numeroPedido: "Nº pedido",
-    concepto: "Concepto",
-    area: "Área",
-    adicionales: "Adicionales",
+    tipoComprobante: "Tipo comprobante", numeroComprobante: "Nº comprobante",
+    ordenCompra: "Orden de compra", legajo: "Legajo", recepcion: "Recepción",
+    numeroPedido: "Nº pedido", concepto: "Concepto",
+    area: "Área", adicionales: "Adicionales",
   };
 
   const fieldState: Record<string, { value: string; onChange: (v: string) => void }> = {
@@ -355,7 +317,6 @@ export default function NuevoEventoPage({ basePath = "/encargado" }: { basePath?
 
     if (spec.type && spec.type !== "text" && spec.type !== "number") {
       const opts = pickerOptions[spec.type] ?? [];
-      const isCreatable = (spec.type === "centroCosto" || spec.type === "partida") && !isReadonly;
       return (
         <div key={key} className="space-y-1.5">
           <label className="text-sm font-medium">{label}{spec.required ? " *" : ""}</label>
@@ -366,7 +327,6 @@ export default function NuevoEventoPage({ basePath = "/encargado" }: { basePath?
             placeholder={isReadonly ? "Auto-completado" : `Seleccionar ${label.toLowerCase()}...`}
             disabled={isReadonly}
             clearable
-            creatable={isCreatable}
             className="w-full"
           />
         </div>
@@ -393,27 +353,38 @@ export default function NuevoEventoPage({ basePath = "/encargado" }: { basePath?
     (k) => caseFields[k as keyof CaseFields].visible,
   );
 
+  if (!evento) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <Spinner />
+      </div>
+    );
+  }
+
+  const comedorName = selectedComedor?.nombre ?? String(evento.comedorId);
+
   return (
     <div className="mx-auto max-w-2xl px-6 py-6">
-      <Button variant="ghost" className="mb-6 gap-2" onClick={() => navigate(`${basePath}/eventos`)}>
+      <Button variant="ghost" className="mb-6 gap-2" onClick={() => navigate("/contabilidad/eventos")}>
         <ArrowLeft className="h-4 w-4" />
         Volver a eventos
       </Button>
 
       <Card className="border-0 shadow-sm">
         <CardHeader className="border-b">
-          <CardTitle className="text-xl font-bold uppercase tracking-wide">Nuevo Evento</CardTitle>
+          <div className="flex items-center gap-3">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-50 text-amber-500">
+              <Pencil className="h-5 w-5" />
+            </span>
+            <CardTitle className="text-xl font-bold uppercase tracking-wide">
+              Editar Evento #{evento.id}
+            </CardTitle>
+          </div>
         </CardHeader>
         <CardContent className="p-6 space-y-5">
           <div className="space-y-1.5">
-            <label className="text-sm font-medium">Comedor *</label>
-            <Combobox
-              options={comedores.map((c) => ({ value: String(c.id), label: c.nombre }))}
-              value={comedorId}
-              onChange={handleComedorChange}
-              placeholder="Seleccionar comedor..."
-              className="w-full"
-            />
+            <label className="text-sm font-medium">Comedor</label>
+            <Input type="text" value={comedorName} readOnly className="bg-gray-50" />
           </div>
 
           <div className="space-y-1.5">
@@ -422,8 +393,7 @@ export default function NuevoEventoPage({ basePath = "/encargado" }: { basePath?
               options={posOptions}
               value={puntoDeVentaId}
               onChange={setPuntoDeVentaId}
-              placeholder={!comedorId ? "Seleccioná un comedor primero..." : "Seleccionar punto de venta..."}
-              disabled={!comedorId}
+              placeholder="Seleccionar punto de venta..."
               className="w-full"
             />
           </div>
@@ -435,43 +405,41 @@ export default function NuevoEventoPage({ basePath = "/encargado" }: { basePath?
 
           {visibleFieldKeys.map(renderField)}
 
-          {comedorId && (
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <label className="text-sm font-medium">Servicios</label>
-                <Button type="button" variant="outline" size="sm" onClick={addServicio} className="gap-1">
-                  <Plus className="h-3 w-3" /> Agregar
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <label className="text-sm font-medium">Servicios</label>
+              <Button type="button" variant="outline" size="sm" onClick={addServicio} className="gap-1">
+                <Plus className="h-3 w-3" /> Agregar
+              </Button>
+            </div>
+            {servicios.map((line, i) => (
+              <div key={i} className="flex items-center gap-2">
+                <Combobox
+                  options={productoOptions}
+                  value={line.productoId}
+                  onChange={(v) => updateServicio(i, "productoId", v)}
+                  placeholder="Producto..."
+                  className="flex-1"
+                />
+                <Input
+                  type="number"
+                  min="1"
+                  value={line.cantidad}
+                  onChange={(e) => updateServicio(i, "cantidad", e.target.value)}
+                  className="w-20"
+                  placeholder="Cant."
+                />
+                <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500" onClick={() => removeServicio(i)}>
+                  <Trash2 className="h-4 w-4" />
                 </Button>
               </div>
-              {servicios.map((line, i) => (
-                <div key={i} className="flex items-center gap-2">
-                  <Combobox
-                    options={productoOptions}
-                    value={line.productoId}
-                    onChange={(v) => updateServicio(i, "productoId", v)}
-                    placeholder="Producto..."
-                    className="flex-1"
-                  />
-                  <Input
-                    type="number"
-                    min="1"
-                    value={line.cantidad}
-                    onChange={(e) => updateServicio(i, "cantidad", e.target.value)}
-                    className="w-20"
-                    placeholder="Cant."
-                  />
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500" onClick={() => removeServicio(i)}>
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              ))}
-              {servicios.length > 0 && serviciosTotal > 0 && (
-                <p className="text-xs text-muted-foreground">
-                  Total servicios: ${serviciosTotal.toLocaleString("es-AR")}
-                </p>
-              )}
-            </div>
-          )}
+            ))}
+            {servicios.length > 0 && serviciosTotal > 0 && (
+              <p className="text-xs text-muted-foreground">
+                Total servicios: ${serviciosTotal.toLocaleString("es-AR")}
+              </p>
+            )}
+          </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
@@ -514,8 +482,13 @@ export default function NuevoEventoPage({ basePath = "/encargado" }: { basePath?
       </Card>
 
       <div className="mt-6 flex justify-center">
-        <Button onClick={handleSubmit} disabled={loading || !canSubmit} size="lg" className="px-10">
-          {loading ? <><Spinner className="mr-2" />Guardando...</> : "Registrar Evento"}
+        <Button
+          onClick={handleSubmit}
+          disabled={loading || !canSubmit}
+          size="lg"
+          className="px-10 bg-amber-400 hover:bg-amber-500 text-white"
+        >
+          {loading ? <><Spinner className="mr-2" />Guardando...</> : "Guardar Cambios"}
         </Button>
       </div>
     </div>

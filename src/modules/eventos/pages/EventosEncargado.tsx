@@ -130,7 +130,7 @@ function extraHeaders(tab: TabKey): ReactNode {
           <th className="px-4 py-3">Solicitante</th>
           <th className="px-4 py-3">Funcionario</th>
           <th className="px-4 py-3">Centro Costo</th>
-          <th className="px-4 py-3 text-right">P. Unitario</th>
+          <th className="px-4 py-3">Partida</th>
         </>
       );
     case "BBVA":
@@ -171,7 +171,7 @@ function extraCells(evento: EventoResponse): ReactNode {
           <td className={click}>{evento.solicitanteNombre ?? dash}</td>
           <td className={click}>{evento.funcionarioNombre ?? dash}</td>
           <td className={click}>{evento.centroCosto ?? dash}</td>
-          <td className={cn(click, "text-right font-mono")}>{evento.precioUnitario !== null ? fmtCurrency(evento.precioUnitario) : dash}</td>
+          <td className={click}>{evento.partida ?? dash}</td>
         </>
       );
     case "BBVA":
