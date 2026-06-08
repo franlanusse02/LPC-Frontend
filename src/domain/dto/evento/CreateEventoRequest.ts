@@ -24,7 +24,6 @@ export type CreateEventoGaliciaRequest = CreateEventoBase & {
   centroCostoNombre?: string | null;
   partidaId?: number | null;
   partidaNombre?: string | null;
-  precioUnitario?: number | null;
   retenciones?: number | null;
   numeroOperacion?: string | null;
   razonSocialId?: number | null;
