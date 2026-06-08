@@ -221,7 +221,6 @@ export default function NuevoEventoPage({ basePath = "/encargado" }: { basePath?
             centroCostoNombre: ccGal.nombre,
             partidaId: partGal.id,
             partidaNombre: partGal.nombre,
-            precioUnitario: precioUnitario ? Number(precioUnitario) : null,
             retenciones: retenciones ? Number(retenciones) : null,
             numeroOperacion: numeroOperacion || null,
             razonSocialId: razonSocialId ? Number(razonSocialId) : null,

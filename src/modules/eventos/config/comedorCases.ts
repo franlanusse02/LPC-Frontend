@@ -73,7 +73,6 @@ export const COMEDOR_CASES: Record<ComedorCaseKey, CaseFields> = {
     responsable: req({ type: "empleado" }),
     centroCosto: req({ type: "centroCosto" }),
     partida: req({ type: "partida" }),
-    precioUnitario: opt({ type: "number" }),
     retenciones: opt({ type: "number" }),
     numeroOperacion: opt({ type: "text" }),
     razonSocial: req({ type: "razonSocial" }),
