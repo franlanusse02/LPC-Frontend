@@ -24,6 +24,7 @@ import {
   Download,
   FileX2,
   MoreHorizontal,
+  Pencil,
   Send,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -177,7 +178,7 @@ function tabHeaders(tab: TabKey): ReactNode {
           <th className="px-4 py-3">Solicitante</th>
           <th className="px-4 py-3">Funcionario</th>
           <th className="px-4 py-3">Centro Costo</th>
-          <th className="px-4 py-3 text-right">P. Unitario</th>
+          <th className="px-4 py-3">Partida</th>
         </>
       );
     case "BBVA":
@@ -218,7 +219,7 @@ function tabCells(evento: EventoResponse): ReactNode {
           <td className={click}>{evento.solicitanteNombre ?? dash}</td>
           <td className={click}>{evento.funcionarioNombre ?? dash}</td>
           <td className={click}>{evento.centroCosto ?? dash}</td>
-          <td className={cn(click, "text-right font-mono")}>{evento.precioUnitario !== null ? fmtCurrency(evento.precioUnitario) : dash}</td>
+          <td className={click}>{evento.partida ?? dash}</td>
         </>
       );
     case "BBVA":
@@ -279,6 +280,8 @@ function buildExportColumns(
     { key: "fechaEmision", header: "Fecha Emisión" },
     { key: "fechaPago", header: "Fecha Pago" },
     { key: "observaciones", header: "Observaciones" },
+    eField("centroCosto", "Centro de Costo"),
+    eField("partida", "Partida"),
     { key: (e) => e.servicios.map((s) => `${s.producto.nombre} x${s.cantidad}`).join(", ") || null, header: "Servicios" },
     { key: "actualizadoEn", header: "Actualizado en" },
   ];
@@ -663,6 +666,9 @@ export default function EventosContabilidad() {
                       <Ban className="h-3.5 w-3.5" /> Anular
                     </Button>
                   )}
+                  <Button size="sm" variant="outline" className="gap-1.5" onClick={handleExport}>
+                    <Download className="h-3.5 w-3.5" /> Exportar ({selection.count})
+                  </Button>
                   <Button size="sm" variant="ghost" className="text-gray-500 text-xs" onClick={selection.clear}>
                     Deseleccionar
                   </Button>
@@ -793,6 +799,15 @@ export default function EventosContabilidad() {
                                 {canEliminarPdf && (
                                   <DropdownMenuItem onClick={() => handleEliminarPdf(evento.id)} className="gap-2.5 cursor-pointer rounded-lg">
                                     <FileX2 className="h-4 w-4" /> Eliminar PDF
+                                  </DropdownMenuItem>
+                                )}
+                                {evento.estado === "SOLICITADO" && (
+                                  <DropdownMenuItem
+                                    onClick={() => navigate(`/contabilidad/eventos/${evento.id}/editar`)}
+                                    className="gap-2.5 cursor-pointer rounded-lg text-gray-700 focus:text-gray-900"
+                                  >
+                                    <Pencil className="h-4 w-4 text-gray-400" />
+                                    Editar
                                   </DropdownMenuItem>
                                 )}
                                 <DropdownMenuSeparator />
