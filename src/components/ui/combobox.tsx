@@ -18,6 +18,7 @@ interface ComboboxProps {
   searchPlaceholder?: string;
   disabled?: boolean;
   clearable?: boolean;
+  creatable?: boolean;
   className?: string;
 }
 
@@ -29,6 +30,7 @@ function Combobox({
   searchPlaceholder = "Buscar...",
   disabled = false,
   clearable = false,
+  creatable = false,
   className,
 }: ComboboxProps) {
   const [open, setOpen] = React.useState(false);
@@ -36,7 +38,9 @@ function Combobox({
   const searchRef = React.useRef<HTMLInputElement>(null);
   const listboxId = React.useId();
 
-  const selected = options.find((o) => o.value === value);
+  const isNewValue = value.startsWith("new:");
+  const selected = isNewValue ? null : options.find((o) => o.value === value);
+  const displayLabel = isNewValue ? value.slice(4) : selected?.label;
 
   const filtered = React.useMemo(() => {
     if (!search) return options;
@@ -70,10 +74,10 @@ function Combobox({
           <span
             className={cn(
               "truncate",
-              !selected && "text-muted-foreground",
+              !displayLabel && "text-muted-foreground",
             )}
           >
-            {selected ? selected.label : placeholder}
+            {displayLabel ?? placeholder}
           </span>
           <span className="flex items-center gap-0.5">
             {clearable && value && (
@@ -111,7 +115,7 @@ function Combobox({
             />
           </div>
           <div id={listboxId} role="listbox" className="max-h-60 overflow-y-auto p-1">
-            {filtered.length === 0 ? (
+            {filtered.length === 0 && !creatable ? (
               <div className="py-4 text-center text-sm text-muted-foreground">
                 Sin resultados
               </div>
@@ -142,6 +146,18 @@ function Combobox({
                   )}
                 </button>
               ))
+            )}
+            {creatable && search.trim() && !filtered.some((o) => o.label.toLowerCase() === search.trim().toLowerCase()) && (
+              <button
+                type="button"
+                className="relative flex w-full cursor-default items-center gap-1.5 rounded-md py-1.5 pr-8 pl-1.5 text-sm outline-hidden select-none hover:bg-accent hover:text-accent-foreground text-primary font-medium"
+                onClick={() => {
+                  onChange(`new:${search.trim()}`);
+                  setOpen(false);
+                }}
+              >
+                + Crear &ldquo;{search.trim()}&rdquo;
+              </button>
             )}
           </div>
         </PopoverPrimitive.Content>

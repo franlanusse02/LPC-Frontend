@@ -176,6 +176,12 @@ export default function NuevoEventoPage({ basePath = "/encargado" }: { basePath?
 
   const hasAutoTotal = servicios.length > 0 && serviciosTotal > 0;
 
+  const resolveIdOrNombre = (value: string): { id: number | null; nombre: string | null } => {
+    if (!value) return { id: null, nombre: null };
+    if (value.startsWith("new:")) return { id: null, nombre: value.slice(4) };
+    return { id: Number(value), nombre: null };
+  };
+
   const canSubmit = puntoDeVentaId && fechaEvento && cantidadPersonas;
 
   const handleSubmit = async () => {
@@ -201,7 +207,9 @@ export default function NuevoEventoPage({ basePath = "/encargado" }: { basePath?
       let req: CreateEventoRequest;
 
       switch (caseKey) {
-        case "GALICIA":
+        case "GALICIA": {
+          const ccGal = resolveIdOrNombre(centroCostoId);
+          const partGal = resolveIdOrNombre(partidaId);
           req = {
             ...base,
             tipoComedor: "GALICIA",
@@ -209,6 +217,10 @@ export default function NuevoEventoPage({ basePath = "/encargado" }: { basePath?
             emailSolicitante: emailSolicitante || null,
             funcionarioId: funcionarioId ? Number(funcionarioId) : null,
             responsableId: responsableId ? Number(responsableId) : null,
+            centroCostoId: ccGal.id,
+            centroCostoNombre: ccGal.nombre,
+            partidaId: partGal.id,
+            partidaNombre: partGal.nombre,
             precioUnitario: precioUnitario ? Number(precioUnitario) : null,
             retenciones: retenciones ? Number(retenciones) : null,
             numeroOperacion: numeroOperacion || null,
@@ -218,17 +230,23 @@ export default function NuevoEventoPage({ basePath = "/encargado" }: { basePath?
             numeroComprobante: numeroComprobante || null,
           };
           break;
-        case "BBVA":
+        }
+        case "BBVA": {
+          const legajo = resolveIdOrNombre(legajoId);
+          const recepcion = resolveIdOrNombre(recepcionId);
           req = {
             ...base,
             tipoComedor: "BBVA",
             solicitanteId: solicitanteId ? Number(solicitanteId) : null,
             emailSolicitante: emailSolicitante || null,
             ordenCompra: ordenCompra || null,
-            legajoId: legajoId ? Number(legajoId) : null,
-            recepcionId: recepcionId ? Number(recepcionId) : null,
+            legajoId: legajo.id,
+            legajoNombre: legajo.nombre,
+            recepcionId: recepcion.id,
+            recepcionNombre: recepcion.nombre,
           };
           break;
+        }
         case "TECHINT":
           req = {
             ...base,
@@ -240,17 +258,23 @@ export default function NuevoEventoPage({ basePath = "/encargado" }: { basePath?
             numeroComprobante: numeroComprobante || null,
           };
           break;
-        case "UDESA":
+
+        case "UDESA": {
+          const ccUdesa = resolveIdOrNombre(centroCostoId);
+          const areaUdesa = resolveIdOrNombre(areaId);
           req = {
             ...base,
             tipoComedor: "UDESA",
             solicitanteId: solicitanteId ? Number(solicitanteId) : null,
-            centroCostoId: centroCostoId ? Number(centroCostoId) : null,
-            areaId: areaId ? Number(areaId) : null,
+            centroCostoId: ccUdesa.id,
+            centroCostoNombre: ccUdesa.nombre,
+            areaId: areaUdesa.id,
+            areaNombre: areaUdesa.nombre,
             precioUnitario: precioUnitario ? Number(precioUnitario) : null,
             adicionales: adicionales ? Number(adicionales) : null,
           };
           break;
+        }
         default:
           req = { ...base };
           break;
@@ -329,6 +353,7 @@ export default function NuevoEventoPage({ basePath = "/encargado" }: { basePath?
 
     if (spec.type && spec.type !== "text" && spec.type !== "number") {
       const opts = pickerOptions[spec.type] ?? [];
+      const isCreatable = (spec.type === "centroCosto" || spec.type === "partida") && !isReadonly;
       return (
         <div key={key} className="space-y-1.5">
           <label className="text-sm font-medium">{label}{spec.required ? " *" : ""}</label>
@@ -339,6 +364,7 @@ export default function NuevoEventoPage({ basePath = "/encargado" }: { basePath?
             placeholder={isReadonly ? "Auto-completado" : `Seleccionar ${label.toLowerCase()}...`}
             disabled={isReadonly}
             clearable
+            creatable={isCreatable}
             className="w-full"
           />
         </div>
