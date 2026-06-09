@@ -182,11 +182,6 @@ export default function NuevoEventoPage({ basePath = "/encargado" }: { basePath?
     return { id: Number(value), nombre: null };
   };
 
-  const requiredFieldsFilled = Object.entries(caseFields).every(
-    ([k, spec]) => !spec.visible || !spec.required || !!fieldState[k]?.value,
-  );
-  const canSubmit = puntoDeVentaId && fechaEvento && cantidadPersonas && requiredFieldsFilled;
-
   const handleSubmit = async () => {
     if (!canSubmit) return;
     setLoading(true);
@@ -337,6 +332,11 @@ export default function NuevoEventoPage({ basePath = "/encargado" }: { basePath?
     area: { value: areaId, onChange: setAreaId },
     adicionales: { value: adicionales, onChange: setAdicionales },
   };
+
+  const requiredFieldsFilled = Object.entries(caseFields).every(
+    ([k, spec]) => !spec.visible || !spec.required || !!fieldState[k]?.value,
+  );
+  const canSubmit = puntoDeVentaId && fechaEvento && cantidadPersonas && requiredFieldsFilled;
 
   const pickerOptions: Record<string, { value: string; label: string; subtitle?: string }[]> = {
     empleado: empleadoOptions,
