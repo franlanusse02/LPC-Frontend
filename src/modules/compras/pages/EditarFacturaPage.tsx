@@ -78,17 +78,22 @@ export default function EditarFacturaPage() {
 
     setLoading(true);
     try {
-      const req: PatchFacturaProveedorRequest = {
-        proveedorId: Number(form.proveedorId),
-        comedorId: Number(form.comedorId),
-        fechaFactura: form.fechaFactura,
-        monto: Number(form.monto),
-        comentarios: form.comentarios || undefined,
-        puntoDeVentaProveedor: form.puntoDeVenta ? Number(form.puntoDeVenta) : null,
-        numeroFactura: form.numeroFactura || undefined,
-        numeroOperacion: form.numeroOperacion || undefined,
-        medioPago: form.medioPago || null,
-      };
+      const req: PatchFacturaProveedorRequest = isPagada
+        ? {
+            numeroFactura: form.numeroFactura || undefined,
+            numeroOperacion: form.numeroOperacion || undefined,
+          }
+        : {
+            proveedorId: Number(form.proveedorId),
+            comedorId: Number(form.comedorId),
+            fechaFactura: form.fechaFactura,
+            monto: Number(form.monto),
+            comentarios: form.comentarios || undefined,
+            puntoDeVentaProveedor: form.puntoDeVenta ? Number(form.puntoDeVenta) : null,
+            numeroFactura: form.numeroFactura || undefined,
+            numeroOperacion: form.numeroOperacion || undefined,
+            medioPago: form.medioPago || null,
+          };
 
       await patch(`/facturas/proveedor/${id}`, req);
 
