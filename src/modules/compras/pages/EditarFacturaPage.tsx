@@ -35,10 +35,12 @@ export default function EditarFacturaPage() {
     puntoDeVenta: string;
     numeroOperacion: string;
     medioPago: MedioPago | "";
+    numeroFactura: string;
   }
   const [form, setForm] = useState<FacturaForm>({
     proveedorId: "", comedorId: "", fechaFactura: "", monto: "",
     comentarios: "", puntoDeVenta: "", numeroOperacion: "", medioPago: "",
+    numeroFactura: "",
   });
   const updateForm = (partial: Partial<FacturaForm>) => setForm(prev => ({ ...prev, ...partial }));
   const [loading, setLoading] = useState(false);
@@ -67,6 +69,7 @@ export default function EditarFacturaPage() {
       puntoDeVenta: factura.puntoDeVentaProveedor != null ? String(factura.puntoDeVentaProveedor) : "",
       numeroOperacion: factura.numeroOperacion ?? "",
       medioPago: factura.medioPago ?? "",
+      numeroFactura: factura.numero ?? "",
     });
   }, [factura]);
 
@@ -82,6 +85,7 @@ export default function EditarFacturaPage() {
         monto: Number(form.monto),
         comentarios: form.comentarios || undefined,
         puntoDeVentaProveedor: form.puntoDeVenta ? Number(form.puntoDeVenta) : null,
+        numeroFactura: form.numeroFactura || undefined,
         numeroOperacion: form.numeroOperacion || undefined,
         medioPago: form.medioPago || null,
       };
@@ -106,6 +110,8 @@ export default function EditarFacturaPage() {
       </div>
     );
   }
+
+  const isPagada = factura.estado === "PAGADA";
 
   return (
     <Fragment>
@@ -141,6 +147,7 @@ export default function EditarFacturaPage() {
                     onChange={(v) => updateForm({ proveedorId: v })}
                     placeholder="Seleccionar proveedor..."
                     className="w-full"
+                    disabled={isPagada}
                   />
                 </div>
 
@@ -152,6 +159,7 @@ export default function EditarFacturaPage() {
                     onChange={(v) => updateForm({ comedorId: v })}
                     placeholder="Seleccionar comedor..."
                     className="w-full"
+                    disabled={isPagada}
                   />
                 </div>
 
@@ -161,9 +169,8 @@ export default function EditarFacturaPage() {
                   </label>
                   <Input
                     type="text"
-                    value={factura.numero}
-                    readOnly
-                    className="bg-gray-50"
+                    value={form.numeroFactura}
+                    onChange={(e) => updateForm({ numeroFactura: e.target.value })}
                   />
                 </div>
 
@@ -173,6 +180,7 @@ export default function EditarFacturaPage() {
                     type="date"
                     value={form.fechaFactura}
                     onChange={(e) => updateForm({ fechaFactura: e.target.value })}
+                    disabled={isPagada}
                   />
                 </div>
 
@@ -183,6 +191,7 @@ export default function EditarFacturaPage() {
                     min="0"
                     value={form.monto}
                     onChange={(e) => updateForm({ monto: e.target.value })}
+                    disabled={isPagada}
                   />
                 </div>
 
@@ -195,6 +204,7 @@ export default function EditarFacturaPage() {
                     placeholder="Sin especificar"
                     clearable
                     className="w-full"
+                    disabled={isPagada}
                   />
                 </div>
 
@@ -216,6 +226,7 @@ export default function EditarFacturaPage() {
                     value={form.comentarios}
                     onChange={(e) => updateForm({ comentarios: e.target.value })}
                     placeholder="Opcional"
+                    disabled={isPagada}
                   />
                 </div>
               </div>

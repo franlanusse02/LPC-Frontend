@@ -528,7 +528,6 @@ export default function ComprasContabilidad() {
                             <DropdownMenu>
                               <DropdownMenuTrigger
                                 asChild
-                                disabled={factura.estado === "PAGADA"}
                               >
                                 <Button
                                   variant="ghost"
@@ -572,14 +571,18 @@ export default function ComprasContabilidad() {
                                   <Pencil className="h-4 w-4 text-gray-400" />
                                   Editar
                                 </DropdownMenuItem>
-                                <DropdownMenuSeparator className="my-1" />
-                                <DropdownMenuItem
-                                  onClick={() => setAnularFactura(factura)}
-                                  className="gap-2.5 cursor-pointer rounded-lg text-red-600 focus:text-red-700 focus:bg-red-50"
-                                >
-                                  <Ban className="h-4 w-4" />
-                                  Anular
-                                </DropdownMenuItem>
+                                {factura.estado !== "PAGADA" && (
+                                  <>
+                                    <DropdownMenuSeparator className="my-1" />
+                                    <DropdownMenuItem
+                                      onClick={() => setAnularFactura(factura)}
+                                      className="gap-2.5 cursor-pointer rounded-lg text-red-600 focus:text-red-700 focus:bg-red-50"
+                                    >
+                                      <Ban className="h-4 w-4" />
+                                      Anular
+                                    </DropdownMenuItem>
+                                  </>
+                                )}
                               </DropdownMenuContent>
                             </DropdownMenu>
                           )}
