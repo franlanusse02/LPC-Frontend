@@ -131,31 +131,13 @@ export default function TotalesContabilidad({
           )}
         </button>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div className="flex h-[92px] min-w-0 flex-col justify-start rounded-xl bg-white px-5 py-3 text-left shadow-sm">
-            <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
-              Total
-            </p>
-            <p
-              className={cn(
-                "mt-1.5 overflow-hidden whitespace-nowrap text-[clamp(1.2rem,1.75vw,2rem)] font-bold leading-none tracking-tight tabular-nums",
-                totales?.total && totales.total >= 0
-                  ? "text-blue-700"
-                  : "text-red-600",
-              )}
-            >
-              {fmtCurrency(totales?.total ?? 0)}
-            </p>
-          </div>
-
-          <div className="flex h-[92px] min-w-0 flex-col justify-start rounded-xl bg-white px-5 py-3 text-left shadow-sm">
-            <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
-              % Compra
-            </p>
-            <p className="mt-1.5 overflow-hidden whitespace-nowrap text-[clamp(1.2rem,1.75vw,2rem)] font-bold leading-none tracking-tight text-blue-700 tabular-nums">
-              {porcentaje}%
-            </p>
-          </div>
+        <div className="flex h-[92px] min-w-0 flex-col justify-start rounded-xl bg-white px-5 py-3 text-left shadow-sm">
+          <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
+            % Compra
+          </p>
+          <p className="mt-1.5 overflow-hidden whitespace-nowrap text-[clamp(1.2rem,1.75vw,2rem)] font-bold leading-none tracking-tight text-blue-700 tabular-nums">
+            {porcentaje}%
+          </p>
         </div>
       </div>
     </div>
