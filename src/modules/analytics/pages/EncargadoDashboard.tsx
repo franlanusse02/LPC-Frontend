@@ -73,17 +73,6 @@ export default function EncargadoDashboard() {
             accent="red"
           />
           <KpiCard
-            title="Mi Total"
-            endpoint="/analytics/mis-totales"
-            filters={analyticsFilters}
-            format="currency"
-            valueExtractor={(d: unknown) => {
-              const obj = d as Record<string, Record<string, number>>;
-              return (obj?.ingresos?.total ?? 0) - (obj?.egresos?.total ?? 0);
-            }}
-            accent="blue"
-          />
-          <KpiCard
             title="Mi % Compra"
             endpoint="/analytics/mi-porcentaje-compra"
             filters={analyticsFilters}
