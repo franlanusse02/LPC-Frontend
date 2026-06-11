@@ -78,7 +78,8 @@ export default function NuevaFacturaPage({ basePath = "/encargado" }: { basePath
     } else {
       setMedioPago("");
     }
-    setPuntoDeVentaProveedor("");
+    const pvs = selectedProveedor?.puntosDeVenta ?? [];
+    setPuntoDeVentaProveedor(pvs.length === 1 ? String(pvs[0]) : "");
   }, [proveedorId, selectedProveedor]);
 
   useEffect(() => {

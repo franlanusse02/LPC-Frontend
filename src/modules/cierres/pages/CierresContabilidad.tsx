@@ -37,6 +37,7 @@ import { defaultFilters } from "@/components/list-filter-defaults";
 import type { BulkActionResponse } from "@/domain/dto/shared/BulkActionResponse";
 import { exportToXlsx, type ExportColumn } from "@/lib/exportXlsx";
 import type { ComedorResponse } from "@/domain/dto/comedor/ComedorResponse";
+import { MediosPagoDict } from "@/domain/enums/MedioPago";
 
 export default function CierresContabilidad() {
   const navigate = useNavigate();
@@ -139,6 +140,18 @@ export default function CierresContabilidad() {
     setBulkMotivo("");
   };
 
+  const medioPagoLabel = Object.fromEntries(
+    Object.entries(MediosPagoDict).map(([label, value]) => [value, label]),
+  );
+
+  const mediosPagoEnUso = useMemo(() => {
+    const enUso = new Set<string>();
+    for (const c of cierres)
+      for (const m of c.movimientos ?? [])
+        if (!m.anulacionId) enUso.add(m.medioPago);
+    return Object.values(MediosPagoDict).filter((mp) => enUso.has(mp));
+  }, [cierres]);
+
   const exportColumns: ExportColumn<DetailedCierreCajaResponse>[] = [
     { key: (c) => new Date(c.createdAt).toLocaleString("es-AR", {
       timeZone: "America/Argentina/Buenos_Aires",
@@ -156,6 +169,13 @@ export default function CierresContabilidad() {
     { key: (c) => c.anulacionId ? "Anulado" : "Activo", header: "Estado" },
     { key: "comentarios", header: "Comentarios" },
     { key: (c) => c.movimientos?.length ?? 0, header: "Movimientos" },
+    ...mediosPagoEnUso.map((mp): ExportColumn<DetailedCierreCajaResponse> => ({
+      key: (c) =>
+        (c.movimientos ?? [])
+          .filter((m) => !m.anulacionId && m.medioPago === mp)
+          .reduce((s, m) => s + m.monto, 0) || "",
+      header: medioPagoLabel[mp] ?? mp,
+    })),
   ];
 
   const handleExport = () => {
@@ -238,6 +258,10 @@ export default function CierresContabilidad() {
                       <Ban className="h-3.5 w-3.5" /> Anular
                     </Button>
                   )}
+                  <Button variant="outline" size="sm" onClick={handleExport}>
+                    <Download className="size-4 mr-1.5" />
+                    Exportar ({selection.count})
+                  </Button>
                   <Button size="sm" variant="ghost" className="text-gray-500 text-xs" onClick={selection.clear}>
                     Deseleccionar
                   </Button>

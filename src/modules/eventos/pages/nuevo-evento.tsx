@@ -267,7 +267,6 @@ export default function NuevoEventoPage({ basePath = "/encargado" }: { basePath?
             centroCostoNombre: ccUdesa.nombre,
             areaId: areaUdesa.id,
             areaNombre: areaUdesa.nombre,
-            precioUnitario: precioUnitario ? Number(precioUnitario) : null,
             adicionales: adicionales ? Number(adicionales) : null,
           };
           break;
@@ -336,7 +335,7 @@ export default function NuevoEventoPage({ basePath = "/encargado" }: { basePath?
   const requiredFieldsFilled = Object.entries(caseFields).every(
     ([k, spec]) => !spec.visible || !spec.required || !!fieldState[k]?.value,
   );
-  const canSubmit = puntoDeVentaId && fechaEvento && cantidadPersonas && requiredFieldsFilled;
+  const canSubmit = puntoDeVentaId && fechaEvento && (caseKey === "UDESA" || cantidadPersonas) && requiredFieldsFilled;
 
   const pickerOptions: Record<string, { value: string; label: string; subtitle?: string }[]> = {
     empleado: empleadoOptions,
@@ -474,16 +473,18 @@ export default function NuevoEventoPage({ basePath = "/encargado" }: { basePath?
           )}
 
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium">Cantidad de personas *</label>
-              <Input
-                type="number"
-                min="1"
-                value={cantidadPersonas}
-                onChange={(e) => setCantidadPersonas(e.target.value)}
-                placeholder="Cantidad"
-              />
-            </div>
+            {caseKey !== "UDESA" && (
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium">Cantidad de personas *</label>
+                <Input
+                  type="number"
+                  min="1"
+                  value={cantidadPersonas}
+                  onChange={(e) => setCantidadPersonas(e.target.value)}
+                  placeholder="Cantidad"
+                />
+              </div>
+            )}
             <div className="space-y-1.5">
               <label className="text-sm font-medium">Monto total</label>
               {hasAutoTotal ? (
