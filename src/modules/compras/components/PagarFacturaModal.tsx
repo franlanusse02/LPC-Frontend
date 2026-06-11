@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -17,7 +17,11 @@ interface PagarFacturaModalProps {
   open: boolean;
   onClose: () => void;
   factura: FacturaProveedorResponse | null;
-  onConfirm: (facturaId: number, fechaPago: string) => Promise<void>;
+  onConfirm: (
+    facturaId: number,
+    fechaPago: string,
+    numeroOperacion: string,
+  ) => Promise<void>;
 }
 
 export function PagarFacturaModal({
@@ -28,14 +32,23 @@ export function PagarFacturaModal({
 }: PagarFacturaModalProps) {
   const [loading, setLoading] = useState(false);
   const [fechaPago, setFechaPago] = useState("");
+  const [numeroOperacion, setNumeroOperacion] = useState("");
+
+  useEffect(() => {
+    if (factura) {
+      setFechaPago(factura.fechaPago ?? "");
+      setNumeroOperacion(factura.numeroOperacion ?? "");
+    }
+  }, [factura]);
 
   const handleConfirm = async () => {
-    if (!factura || !fechaPago) return;
+    if (!factura || !fechaPago || !numeroOperacion.trim()) return;
     setLoading(true);
     try {
-      await onConfirm(factura.id, fechaPago);
+      await onConfirm(factura.id, fechaPago, numeroOperacion.trim());
       onClose();
       setFechaPago("");
+      setNumeroOperacion("");
     } finally {
       setLoading(false);
     }
@@ -75,6 +88,18 @@ export function PagarFacturaModal({
             />
           </div>
 
+          <div className="space-y-2">
+            <label className="text-[10px] font-bold uppercase tracking-wide text-gray-500">
+              Nº de operación *
+            </label>
+            <Input
+              value={numeroOperacion}
+              onChange={(e) => setNumeroOperacion(e.target.value)}
+              placeholder="Nº de operación"
+              className="bg-card"
+            />
+          </div>
+
           <DialogFooter className="flex-row justify-end gap-2 pt-2">
             <Button
               variant="outline"
@@ -86,7 +111,7 @@ export function PagarFacturaModal({
             </Button>
             <Button
               onClick={handleConfirm}
-              disabled={loading || !fechaPago}
+              disabled={loading || !fechaPago || !numeroOperacion.trim()}
               className="rounded-lg font-semibold bg-emerald-500 hover:bg-emerald-600 text-white"
             >
               {loading ? (
