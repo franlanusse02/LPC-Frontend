@@ -108,10 +108,15 @@ export default function ComprasContabilidad() {
     }
   };
 
-  const handlePagar = async (facturaId: number, fechaPago: string) => {
+  const handlePagar = async (
+    facturaId: number,
+    fechaPago: string,
+    numeroOperacion: string,
+  ) => {
     try {
       const updated = await patch(`/facturas/proveedor/${facturaId}/pagar`, {
         fechaPago,
+        numeroOperacion,
       }).then((r) => r.json());
       setFacturas((prev) =>
         prev.map((f) => (f.id === facturaId ? updated : f)),
@@ -202,6 +207,25 @@ export default function ComprasContabilidad() {
   const [bulkMotivo, setBulkMotivo] = useState("");
 
   const selectedFacturas = displayed.filter((f) => selection.selected.has(f.id));
+
+  const bulkPagarPrefill = useMemo(() => {
+    const ops = selectedFacturas.map((f) => f.numeroOperacion ?? "");
+    const fechas = selectedFacturas.map((f) => f.fechaPago ?? "");
+    const opAllSame = ops.every((o) => o === ops[0]);
+    const fechaAllSame = fechas.every((d) => d === fechas[0]);
+    return {
+      op: opAllSame ? ops[0] : "",
+      fecha: fechaAllSame ? fechas[0] : "",
+      opDiffer: !opAllSame,
+      fechaDiffer: !fechaAllSame,
+    };
+  }, [selectedFacturas]);
+
+  const openBulkPagar = () => {
+    setBulkFechaPago(bulkPagarPrefill.fecha);
+    setBulkNumeroOp(bulkPagarPrefill.op);
+    setBulkPagar(true);
+  };
   const allPendiente = selectedFacturas.length > 0 && selectedFacturas.every((f) => f.estado === "PENDIENTE");
   const allEmitida = selectedFacturas.length > 0 && selectedFacturas.every((f) => f.estado === "EMITIDA");
   const allAnulable = selectedFacturas.length > 0 && selectedFacturas.every((f) => f.estado === "PENDIENTE" || f.estado === "EMITIDA");
@@ -248,7 +272,7 @@ export default function ComprasContabilidad() {
     const res = await post("/facturas/proveedor/bulk/pagar", {
       ids: [...selection.selected],
       fechaPago: bulkFechaPago || null,
-      numeroOperacion: bulkNumeroOp || null,
+      numeroOperacion: bulkNumeroOp.trim() || null,
     }).then((r) => r.json() as Promise<BulkActionResponse>);
     handleBulkResponse(res, "Pago");
     selection.clear();
@@ -360,7 +384,7 @@ export default function ComprasContabilidad() {
                     </Button>
                   )}
                   {allEmitida && (
-                    <Button size="sm" variant="outline" className="gap-1.5 text-emerald-600 border-emerald-200 hover:bg-emerald-50" onClick={() => setBulkPagar(true)}>
+                    <Button size="sm" variant="outline" className="gap-1.5 text-emerald-600 border-emerald-200 hover:bg-emerald-50" onClick={openBulkPagar}>
                       <CircleDollarSign className="h-3.5 w-3.5" /> Pagar
                     </Button>
                   )}
@@ -732,6 +756,16 @@ export default function ComprasContabilidad() {
         onConfirm={handleBulkPagar}
       >
         <div className="space-y-3">
+          {bulkPagarPrefill.fechaDiffer && (
+            <p className="rounded-md bg-amber-50 border border-amber-200 px-3 py-2 text-xs text-amber-700">
+              Las compras seleccionadas tienen diferentes fecha de pago. Reconciliar la fecha, realizar la acción por separado, o dejar vacío para mantener las anteriores.
+            </p>
+          )}
+          {bulkPagarPrefill.opDiffer && (
+            <p className="rounded-md bg-amber-50 border border-amber-200 px-3 py-2 text-xs text-amber-700">
+              Las compras seleccionadas tienen diferentes número de operación. Reconciliar el número, realizar la acción por separado, o dejar vacío para mantener los anteriores.
+            </p>
+          )}
           <div className="space-y-1">
             <label className="text-xs font-medium text-gray-500">Fecha pago</label>
             <Input type="date" value={bulkFechaPago} onChange={(e) => setBulkFechaPago(e.target.value)} className="bg-card" />
