@@ -267,7 +267,6 @@ export default function NuevoEventoPage({ basePath = "/encargado" }: { basePath?
             centroCostoNombre: ccUdesa.nombre,
             areaId: areaUdesa.id,
             areaNombre: areaUdesa.nombre,
-            adicionales: adicionales ? Number(adicionales) : null,
           };
           break;
         }
