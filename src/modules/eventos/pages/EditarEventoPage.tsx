@@ -245,7 +245,6 @@ export default function EditarEventoPage() {
             solicitanteId: solicitanteId ? Number(solicitanteId) : undefined,
             centroCostoId: centroCostoId ? Number(centroCostoId) : undefined,
             areaId: areaId ? Number(areaId) : undefined,
-            adicionales: adicionales ? Number(adicionales) : undefined,
           };
           break;
         default:
