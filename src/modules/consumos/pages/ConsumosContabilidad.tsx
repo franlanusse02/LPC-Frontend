@@ -304,6 +304,10 @@ export default function ConsumosContabilidad() {
                       Anular
                     </Button>
                   )}
+                  <Button variant="outline" size="sm" onClick={handleExport}>
+                    <Download className="size-4 mr-1.5" />
+                    Exportar ({selection.count})
+                  </Button>
                   <Button
                     size="sm"
                     variant="ghost"
