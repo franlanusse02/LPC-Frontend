@@ -174,7 +174,7 @@ export default function EditarEventoPage() {
 
   const hasAutoTotal = servicios.length > 0 && serviciosTotal > 0;
 
-  const canSubmit = puntoDeVentaId && fechaEvento && cantidadPersonas;
+  const canSubmit = puntoDeVentaId && fechaEvento && (caseKey === "UDESA" || cantidadPersonas);
 
   const handleSubmit = async () => {
     if (!canSubmit || !id) return;
@@ -245,8 +245,6 @@ export default function EditarEventoPage() {
             solicitanteId: solicitanteId ? Number(solicitanteId) : undefined,
             centroCostoId: centroCostoId ? Number(centroCostoId) : undefined,
             areaId: areaId ? Number(areaId) : undefined,
-            precioUnitario: precioUnitario ? Number(precioUnitario) : undefined,
-            adicionales: adicionales ? Number(adicionales) : undefined,
           };
           break;
         default:
@@ -442,16 +440,18 @@ export default function EditarEventoPage() {
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium">Cantidad de personas *</label>
-              <Input
-                type="number"
-                min="1"
-                value={cantidadPersonas}
-                onChange={(e) => setCantidadPersonas(e.target.value)}
-                placeholder="Cantidad"
-              />
-            </div>
+            {caseKey !== "UDESA" && (
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium">Cantidad de personas *</label>
+                <Input
+                  type="number"
+                  min="1"
+                  value={cantidadPersonas}
+                  onChange={(e) => setCantidadPersonas(e.target.value)}
+                  placeholder="Cantidad"
+                />
+              </div>
+            )}
             <div className="space-y-1.5">
               <label className="text-sm font-medium">Monto total</label>
               {hasAutoTotal ? (

@@ -369,6 +369,10 @@ export default function ComprasContabilidad() {
                       <Ban className="h-3.5 w-3.5" /> Anular
                     </Button>
                   )}
+                  <Button variant="outline" size="sm" onClick={handleExport}>
+                    <Download className="size-4 mr-1.5" />
+                    Exportar ({selection.count})
+                  </Button>
                   <Button size="sm" variant="ghost" className="text-gray-500 text-xs" onClick={selection.clear}>
                     Deseleccionar
                   </Button>
