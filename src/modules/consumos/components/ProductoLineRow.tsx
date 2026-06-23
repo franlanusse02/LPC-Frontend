@@ -32,7 +32,7 @@ export function ProductoLineRow({ line, productos, usedProductoIds, onChange, on
         value={line.productoId}
         onChange={(v) => onChange({ ...line, productoId: v })}
         placeholder="Producto..."
-        className="flex-1"
+        className="flex-1 min-w-0"
       />
 
       <Input
@@ -45,7 +45,7 @@ export function ProductoLineRow({ line, productos, usedProductoIds, onChange, on
         className="w-24"
       />
 
-      <span className="w-24 text-right text-sm font-mono text-gray-600">
+      <span className="shrink-0 whitespace-nowrap text-right text-sm font-mono text-gray-600">
         {subtotal !== null ? fmtCurrency(subtotal) : "—"}
       </span>
 

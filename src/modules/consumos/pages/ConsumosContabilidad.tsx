@@ -462,7 +462,7 @@ export default function ConsumosContabilidad() {
                             </div>
                           )}
                         </td>
-                        <td className="px-4 py-4 text-right font-mono">
+                        <td className="px-4 py-4 text-right font-mono whitespace-nowrap">
                           {fmtCurrency(consumo.total)}
                         </td>
                         <td className="px-4 py-4 text-center">

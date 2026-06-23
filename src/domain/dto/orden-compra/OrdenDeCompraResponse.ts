@@ -1,0 +1,31 @@
+import type { EstadoOrden } from "@/domain/enums/EstadoOrden";
+import type { OrdenDeCompraItemResponse } from "@/domain/dto/orden-compra/OrdenDeCompraItemResponse";
+
+export type OrdenDeCompraResponse = {
+  id: number;
+  nroOrden: string;
+  fecha: string;
+  fechaEstimadaEntrega: string | null;
+  fechaRecepcion: string | null;
+  solicitante: string;
+  sociedadId: number;
+  sociedadNombre: string;
+  sociedadCuit: string;
+  comedorId: number;
+  comedorName: string;
+  proveedorId: number;
+  proveedorNombre: string;
+  proveedorCuit: string;
+  plazoEntrega: string | null;
+  condicionEntrega: string | null;
+  tipoFactura: string | null;
+  estado: EstadoOrden;
+  subtotal: number;
+  descuento: number;
+  total: number;
+  observaciones: string | null;
+  archivoPdf: string | null;
+  creadoPorId: number;
+  creadoEn: string;
+  items: OrdenDeCompraItemResponse[];
+};
