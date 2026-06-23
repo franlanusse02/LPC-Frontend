@@ -26,7 +26,7 @@ export default function ConsumosEncargado() {
 
   useEffect(() => {
     Promise.all([
-      get("/consumos"),
+      get("/consumos/mis-consumos"),
       get("/consumos/consumidores/all"),
       get("/comedores/puntos-de-venta"),
       get("/comedores"),
@@ -181,7 +181,7 @@ export default function ConsumosEncargado() {
                           </div>
                         )}
                       </td>
-                      <td className="px-4 py-4 text-right font-mono">
+                      <td className="px-4 py-4 text-right font-mono whitespace-nowrap">
                         {fmtCurrency(consumo.total)}
                       </td>
                       <td className="px-4 py-4 text-center">

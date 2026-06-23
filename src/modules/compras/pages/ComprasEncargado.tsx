@@ -11,6 +11,12 @@ import { FacturasStatusFilter } from "../components/filters/FacturasStatusFilter
 import { useTableState } from "@/hooks/useTableState";
 import type { FacturaProveedorResponse } from "@/domain/dto/compra/FacturaProveedorResponse";
 import type { ComedorResponse } from "@/domain/dto/comedor/ComedorResponse";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { KpiCard } from "@/components/KpiCard";
+import { OrdenesDeCompraTable } from "../components/OrdenesDeCompraTable";
+import { downloadPdf } from "@/lib/download";
+import { toast } from "sonner";
+import type { OrdenDeCompraResponse } from "@/domain/dto/orden-compra/OrdenDeCompraResponse";
 
 const ESTADO_STYLES: Record<
   string,
@@ -30,6 +36,8 @@ export default function ComprasEncargado() {
   const [comedores, setComedores] = useState<ComedorResponse[]>([]);
   const [proveedores, setProveedores] = useState<{ id: number; nombre: string }[]>([]);
 
+  const [ordenes, setOrdenes] = useState<OrdenDeCompraResponse[]>([]);
+
   useEffect(() => {
     Promise.all([get("/facturas/proveedor/mis-facturas"), get("/comedores"), get("/proveedores")]).then(
       ([facturasRes, comedoresRes, proveedoresRes]) => {
@@ -39,6 +47,20 @@ export default function ComprasEncargado() {
       },
     );
   }, [get]);
+
+  useEffect(() => {
+    get("/ordenes-de-compra/mis-ordenes")
+      .then((r) => r.json())
+      .then((data: OrdenDeCompraResponse[]) => setOrdenes(Array.isArray(data) ? data : []));
+  }, [get]);
+
+  const handleDownloadPdf = async (o: OrdenDeCompraResponse) => {
+    try {
+      await downloadPdf(get, `/ordenes-de-compra/${o.id}/pdf`, `orden-${o.nroOrden}.pdf`);
+    } catch {
+      toast.error("No se pudo descargar el PDF");
+    }
+  };
 
   const proveedorNameById = useMemo(
     () => Object.fromEntries(proveedores.map((p) => [p.id, p.nombre])),
@@ -95,7 +117,7 @@ export default function ComprasEncargado() {
         </Button>
       </div>
 
-      <div className="mx-auto max-w-7xl grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5 pb-4">
+      <div className="mx-auto max-w-7xl grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6 pb-4">
         <StatCard label="Total facturas" value={facturas.length} />
         <StatCard label="Activas" value={totalActivos} accent="emerald" />
         <StatCard label="Anuladas" value={totalAnulados} accent="red" />
@@ -105,9 +127,46 @@ export default function ComprasEncargado() {
           value={fmtCurrency(isFiltered ? montoFiltrado : montoTotal)}
           accent={isFiltered ? "blue" : undefined}
         />
+        <KpiCard
+          title="Monto estimado OC"
+          endpoint="/analytics/ordenes-compra/monto-estimado"
+          format="currency"
+          valueExtractor={(d) =>
+            typeof d === "number" ? d : ((d as { total?: number })?.total ?? 0)
+          }
+        />
       </div>
 
-      <Card className="mx-auto max-w-7xl py-6 border-0 shadow-md rounded-xl">
+      <Tabs defaultValue="ordenes" className="mx-auto max-w-7xl">
+        <TabsList className="mb-4 px-1">
+          <TabsTrigger value="ordenes">Órdenes de Compra</TabsTrigger>
+          <TabsTrigger value="facturas">Facturas</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="ordenes">
+          <Card className="py-6 border-0 shadow-md rounded-xl">
+            <CardHeader className="border-b px-6 py-4">
+              <div className="w-full flex flex-row justify-between">
+                <CardTitle className="text-xl font-bold text-gray-800">
+                  Tus Órdenes de Compra
+                </CardTitle>
+                <Button
+                  size="sm"
+                  onClick={() => navigate("/encargado/compras/ordenes/nueva")}
+                  className="gap-2 px-4 py-2 text-sm font-semibold uppercase tracking-wide hover:scale-105 transition"
+                >
+                  <Plus className="h-4 w-4" /> Nueva Orden
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="p-0">
+              <OrdenesDeCompraTable ordenes={ordenes} onDownloadPdf={handleDownloadPdf} />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="facturas">
+      <Card className="py-6 border-0 shadow-md rounded-xl">
         <CardHeader className="border-b px-6 py-4">
           <div className="w-full flex flex-row justify-between">
             <CardTitle className="text-xl font-bold text-gray-800">
@@ -333,6 +392,8 @@ export default function ComprasEncargado() {
           />
         </CardContent>
       </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

@@ -167,7 +167,7 @@ export default function NuevoConsumoPage({ basePath = "/encargado" }: { basePath
           <CardContent className="p-6">
             <div className="flex flex-col gap-8 lg:flex-row">
               {/* Left column */}
-              <div className="flex-1 space-y-5">
+              <div className="flex-1 min-w-0 space-y-5">
                 <div className="space-y-1.5">
                   <label className="text-sm font-medium">Comedor *</label>
                   <Combobox
@@ -236,7 +236,7 @@ export default function NuevoConsumoPage({ basePath = "/encargado" }: { basePath
               </div>
 
               {/* Right column */}
-              <div className="flex-1">
+              <div className="flex-1 min-w-0">
                 <h3 className="mb-4 text-center text-xs font-bold uppercase tracking-wide text-muted-foreground">
                   Productos
                 </h3>
