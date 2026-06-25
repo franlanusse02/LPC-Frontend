@@ -76,14 +76,14 @@ export default function ConsumidoresPage() {
     setEditing(c);
     setNombre(c.nombre);
     setComedorId(String(c.comedorId));
-    setTaxId(String(c.taxId));
+    setTaxId(c.taxId != null ? String(c.taxId) : "");
     setPosicion(c.posicion ?? "");
     setModalOpen(true);
   };
 
   const handleSave = async () => {
-    if (!nombre.trim() || !comedorId || !taxId.trim()) {
-      toast.error("Completá el nombre, comedor y documento del consumidor.");
+    if (!nombre.trim() || !comedorId) {
+      toast.error("Completá el nombre y el comedor.");
       return;
     }
     setSaving(true);
@@ -91,7 +91,7 @@ export default function ConsumidoresPage() {
       const body = {
         nombre: nombre.trim(),
         comedorId: Number(comedorId),
-        taxId: Number(taxId),
+        taxId: taxId.trim() ? Number(taxId) : undefined,
         posicion: posicion.trim() || undefined,
       };
       const res = editing
@@ -191,7 +191,7 @@ export default function ConsumidoresPage() {
                 <td className="px-6 py-4 text-gray-600">
                   {comedorMap.get(c.comedorId) ?? `ID ${c.comedorId}`}
                 </td>
-                <td className="px-6 py-4 font-mono text-sm">{c.taxId}</td>
+                <td className="px-6 py-4 font-mono text-sm">{c.taxId ?? "—"}</td>
                 <td className="px-6 py-4 text-gray-500">{c.posicion ?? "—"}</td>
                 <td className="px-6 py-4 text-right">
                   <div className="flex justify-end gap-1">
@@ -248,7 +248,7 @@ export default function ConsumidoresPage() {
                 />
               </div>
               <div>
-                <label className="mb-1 block text-sm font-medium">DNI</label>
+                <label className="mb-1 block text-sm font-medium">DNI (opcional)</label>
                 <Input
                   value={taxId}
                   onChange={(e) =>
@@ -260,7 +260,7 @@ export default function ConsumidoresPage() {
               </div>
               <div>
                 <label className="mb-1 block text-sm font-medium">
-                  Posición
+                  Posición (opcional)
                 </label>
                 <Input
                   value={posicion}
