@@ -29,6 +29,7 @@ const TAB_LABELS: Record<TabKey, string> = {
 const TAB_ORDER: TabKey[] = ["TODOS", "GALICIA", "BBVA", "TECHINT", "UDESA", "DEFAULT"];
 
 const ESTADO_STYLES: Record<EstadoEvento, { bg: string; text: string }> = {
+  CARGA_PARCIAL: { bg: "bg-gray-100", text: "text-gray-600" },
   SOLICITADO: { bg: "bg-amber-100", text: "text-amber-700" },
   REALIZADO: { bg: "bg-blue-100", text: "text-blue-700" },
   FACTURA_EMITIDA: { bg: "bg-violet-100", text: "text-violet-700" },
@@ -168,6 +169,7 @@ export default function EventosCargaDatos() {
     ],
     statusField: "estado",
     statusMapping: {
+      CARGA_PARCIAL: { filter: (e) => e.estado === "CARGA_PARCIAL" },
       SOLICITADO: { filter: (e) => e.estado === "SOLICITADO" },
       REALIZADO: { filter: (e) => e.estado === "REALIZADO" },
       FACTURA_EMITIDA: { filter: (e) => e.estado === "FACTURA_EMITIDA" },

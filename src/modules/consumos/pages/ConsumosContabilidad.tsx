@@ -110,6 +110,7 @@ export default function ConsumosContabilidad() {
       const cId = Number(listFilters.consumidorId);
       list = list.filter((c) => c.consumidorId === cId);
     }
+    if (listFilters.puntoDeVentaIds.length) list = list.filter((c) => listFilters.puntoDeVentaIds.includes(String(c.PuntoDeVentaId)));
     return list;
   }, [consumos, listFilters, consumidorById]);
 

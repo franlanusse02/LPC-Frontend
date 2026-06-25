@@ -5,6 +5,7 @@ type StatusFilter = "all" | EstadoEvento;
 
 const STATUS_OPTIONS = [
   { value: "all" as const, label: "Todos" },
+  { value: "CARGA_PARCIAL" as const, label: "Carga parcial" },
   { value: "SOLICITADO" as const, label: "Solicitado" },
   { value: "REALIZADO" as const, label: "Realizado" },
   { value: "FACTURA_EMITIDA" as const, label: "Factura emitida" },

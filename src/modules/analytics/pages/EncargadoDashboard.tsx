@@ -46,7 +46,7 @@ export default function EncargadoDashboard() {
       fechaInicio: filters.desde || undefined,
       fechaFin: filters.hasta || undefined,
       comedorId: filters.comedorId || undefined,
-      puntoDeVentaId: filters.puntoDeVentaId || undefined,
+      puntoDeVentaIds: filters.puntoDeVentaIds.length ? filters.puntoDeVentaIds : undefined,
     }),
     [filters],
   );

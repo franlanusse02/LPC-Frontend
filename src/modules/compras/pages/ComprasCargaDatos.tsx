@@ -11,7 +11,6 @@ import { useTableState } from "@/hooks/useTableState";
 import type { FacturaProveedorResponse } from "@/domain/dto/compra/FacturaProveedorResponse";
 import type { ComedorResponse } from "@/domain/dto/comedor/ComedorResponse";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { KpiCard } from "@/components/KpiCard";
 import { OrdenesDeCompraTable } from "../components/OrdenesDeCompraTable";
 import { downloadPdf } from "@/lib/download";
 import { toast } from "sonner";
@@ -108,21 +107,10 @@ export default function ComprasCargaDatos() {
         </Button>
       </div>
 
-      <div className="mx-auto max-w-7xl grid grid-cols-2 gap-4 sm:grid-cols-4 pb-4">
-        <KpiCard
-          title="Monto estimado OC"
-          endpoint="/analytics/ordenes-compra/monto-estimado"
-          format="currency"
-          valueExtractor={(d) =>
-            typeof d === "number" ? d : ((d as { total?: number })?.total ?? 0)
-          }
-        />
-      </div>
-
-      <Tabs defaultValue="ordenes" className="mx-auto max-w-7xl">
+      <Tabs defaultValue="facturas" className="mx-auto max-w-7xl">
         <TabsList className="mb-4 px-1">
-          <TabsTrigger value="ordenes">Órdenes de Compra</TabsTrigger>
           <TabsTrigger value="facturas">Facturas</TabsTrigger>
+          <TabsTrigger value="ordenes">Órdenes de Compra</TabsTrigger>
         </TabsList>
 
         <TabsContent value="ordenes">

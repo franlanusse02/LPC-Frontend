@@ -2,12 +2,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useApi } from "@/hooks/useApi";
 import { cn, fmtCurrency } from "@/lib/utils";
-import { ArrowLeft, Ban, Plus } from "lucide-react";
+import { ArrowLeft, Ban, Download, Plus } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { DataTable, SortableTh } from "@/components/data-table";
 import { ConsumosStatusFilter } from "../components/filters/ConsumosStatusFilter";
 import { useTableState } from "@/hooks/useTableState";
+import { exportToXlsx, type ExportColumn } from "@/lib/exportXlsx";
 import type { ConsumoResponse } from "@/domain/dto/consumo/ConsumoResponse";
 import type { ConsumidorResponse } from "@/domain/dto/consumo/ConsumidorResponse";
 import type { PuntoDeVentaResponse } from "@/domain/dto/pto-venta/PuntoDeVentaResponse";
@@ -76,6 +77,26 @@ export default function ConsumosEncargado() {
     onSort: sort.handleSort,
   };
 
+  const exportColumns: ExportColumn<ConsumoResponse>[] = [
+    { key: "fecha", header: "Fecha" },
+    { key: (c) => {
+      const cons = consumidorById[c.consumidorId];
+      return cons ? (comedorNameById[cons.comedorId] ?? cons.comedorId) : "";
+    }, header: "Comedor" },
+    { key: (c) => puntoDeVentaNameById[c.PuntoDeVentaId] ?? c.PuntoDeVentaId, header: "Punto de Venta" },
+    { key: (c) => consumidorById[c.consumidorId]?.nombre ?? c.consumidorId, header: "Consumidor" },
+    { key: (c) => c.productos.map((p) => `${p.producto.nombre} x${p.cantidad}`).join(", "), header: "Productos" },
+    { key: "total", header: "Total" },
+    { key: (c) => (c.anulacion !== null ? "Anulado" : "Activo"), header: "Estado" },
+    { key: "observaciones", header: "Observaciones" },
+  ];
+
+  const handleExport = () => {
+    const segments = ["mis-consumos"];
+    if (filters.status !== "all") segments.push(filters.status);
+    exportToXlsx({ data: displayed, columns: exportColumns, filename: segments.join("-") });
+  };
+
   return (
     <div className="px-4 sm:px-8 lg:px-18 py-8">
       <div className="max-w-7xl mx-auto">
@@ -116,6 +137,12 @@ export default function ConsumosEncargado() {
                   onChange={filters.setStatus}
                 />
               </div>
+            }
+            toolbarRight={
+              <Button variant="outline" size="sm" onClick={handleExport}>
+                <Download className="size-4 mr-1.5" />
+                Exportar Excel
+              </Button>
             }
             columns={
               <>

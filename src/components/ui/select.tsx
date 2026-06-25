@@ -3,6 +3,7 @@ import { Select as SelectPrimitive } from "radix-ui"
 
 import { cn } from "@/lib/utils"
 import { ChevronDownIcon, CheckIcon, ChevronUpIcon } from "lucide-react"
+import { useStopWheelPropagation } from "@/components/ui/use-stop-wheel-propagation"
 
 function Select({
   ...props
@@ -62,6 +63,7 @@ function SelectContent({
   align = "center",
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Content>) {
+  const viewportRef = useStopWheelPropagation<HTMLDivElement>()
   return (
     <SelectPrimitive.Portal>
       <SelectPrimitive.Content
@@ -74,6 +76,7 @@ function SelectContent({
       >
         <SelectScrollUpButton />
         <SelectPrimitive.Viewport
+          ref={viewportRef}
           data-position={position}
           className={cn(
             "data-[position=popper]:h-(--radix-select-trigger-height) data-[position=popper]:w-full data-[position=popper]:min-w-(--radix-select-trigger-width)",

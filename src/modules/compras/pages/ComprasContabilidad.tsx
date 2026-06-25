@@ -211,6 +211,7 @@ export default function ComprasContabilidad() {
     if (listFilters.desde) list = list.filter((f) => getDate(f) >= listFilters.desde);
     if (listFilters.hasta) list = list.filter((f) => getDate(f) <= listFilters.hasta);
     if (listFilters.comedorId) list = list.filter((f) => f.comedorId === Number(listFilters.comedorId));
+    if (listFilters.puntoDeVentaIds.length) list = list.filter((f) => (f.puntoDeVentaComedor ?? []).some((s) => listFilters.puntoDeVentaIds.includes(String(s.puntoDeVentaId))));
     return list;
   }, [facturas, listFilters]);
 
@@ -387,7 +388,7 @@ export default function ComprasContabilidad() {
         />
         <KpiCard
           title="Monto estimado OC"
-          endpoint="/analytics/ordenes-compra/monto-estimado"
+          endpoint="/analytics/contabilidad/ordenes-compra/monto-estimado"
           format="currency"
           valueExtractor={(d) =>
             typeof d === "number" ? d : ((d as { total?: number })?.total ?? 0)
@@ -395,10 +396,10 @@ export default function ComprasContabilidad() {
         />
       </div>
 
-      <Tabs defaultValue="ordenes" className="mx-auto max-w-7xl">
+      <Tabs defaultValue="facturas" className="mx-auto max-w-7xl">
         <TabsList className="mb-4 px-1">
-          <TabsTrigger value="ordenes">Órdenes de Compra</TabsTrigger>
           <TabsTrigger value="facturas">Facturas</TabsTrigger>
+          <TabsTrigger value="ordenes">Órdenes de Compra</TabsTrigger>
         </TabsList>
 
         <TabsContent value="ordenes">

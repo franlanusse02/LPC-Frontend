@@ -3,46 +3,45 @@ import { Popover as PopoverPrimitive } from "radix-ui";
 import { CheckIcon, ChevronsUpDownIcon, XIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
+import type { ComboboxOption } from "@/components/ui/combobox";
 import { useStopWheelPropagation } from "@/components/ui/use-stop-wheel-propagation";
 
-export interface ComboboxOption {
-  value: string;
-  label: string;
-  subtitle?: string;
-}
-
-interface ComboboxProps {
+interface MultiComboboxProps {
   options: ComboboxOption[];
-  value: string;
-  onChange: (value: string) => void;
+  values: string[];
+  onChange: (values: string[]) => void;
   placeholder?: string;
   searchPlaceholder?: string;
   disabled?: boolean;
   clearable?: boolean;
-  creatable?: boolean;
   className?: string;
 }
 
-function Combobox({
+function MultiCombobox({
   options,
-  value,
+  values,
   onChange,
   placeholder = "Seleccionar...",
   searchPlaceholder = "Buscar...",
   disabled = false,
   clearable = false,
-  creatable = false,
   className,
-}: ComboboxProps) {
+}: MultiComboboxProps) {
   const [open, setOpen] = React.useState(false);
   const [search, setSearch] = React.useState("");
   const searchRef = React.useRef<HTMLInputElement>(null);
   const listboxId = React.useId();
   const listRef = useStopWheelPropagation<HTMLDivElement>();
 
-  const isNewValue = value.startsWith("new:");
-  const selected = isNewValue ? null : options.find((o) => o.value === value);
-  const displayLabel = isNewValue ? value.slice(4) : selected?.label;
+  const selectedSet = React.useMemo(() => new Set(values), [values]);
+
+  const displayLabel = React.useMemo(() => {
+    if (values.length === 0) return undefined;
+    if (values.length === 1) {
+      return options.find((o) => o.value === values[0])?.label ?? values[0];
+    }
+    return `${values.length} seleccionados`;
+  }, [values, options]);
 
   const filtered = React.useMemo(() => {
     if (!search) return options;
@@ -53,6 +52,14 @@ function Combobox({
         (o.subtitle && o.subtitle.toLowerCase().includes(q)),
     );
   }, [options, search]);
+
+  const toggle = (value: string) => {
+    if (selectedSet.has(value)) {
+      onChange(values.filter((v) => v !== value));
+    } else {
+      onChange([...values, value]);
+    }
+  };
 
   return (
     <PopoverPrimitive.Root
@@ -73,21 +80,16 @@ function Combobox({
             className,
           )}
         >
-          <span
-            className={cn(
-              "truncate",
-              !displayLabel && "text-muted-foreground",
-            )}
-          >
+          <span className={cn("truncate", !displayLabel && "text-muted-foreground")}>
             {displayLabel ?? placeholder}
           </span>
           <span className="flex items-center gap-0.5">
-            {clearable && value && (
+            {clearable && values.length > 0 && (
               <XIcon
                 className="size-3.5 text-muted-foreground hover:text-foreground cursor-pointer"
                 onClick={(e) => {
                   e.stopPropagation();
-                  onChange("");
+                  onChange([]);
                 }}
               />
             )}
@@ -117,49 +119,35 @@ function Combobox({
             />
           </div>
           <div ref={listRef} id={listboxId} role="listbox" className="max-h-60 overflow-y-auto p-1">
-            {filtered.length === 0 && !creatable ? (
+            {filtered.length === 0 ? (
               <div className="py-4 text-center text-sm text-muted-foreground">
                 Sin resultados
               </div>
             ) : (
-              filtered.map((option) => (
-                <button
-                  key={option.value}
-                  type="button"
-                  className={cn(
-                    "relative flex w-full cursor-default items-center gap-1.5 rounded-md py-1.5 pr-8 pl-1.5 text-sm outline-hidden select-none hover:bg-accent hover:text-accent-foreground",
-                    option.value === value && "bg-accent/50",
-                  )}
-                  onClick={() => {
-                    onChange(option.value === value ? "" : option.value);
-                    setOpen(false);
-                  }}
-                >
-                  <div className="flex flex-col">
-                    <span>{option.label}</span>
-                    {option.subtitle && (
-                      <span className="text-xs text-muted-foreground">
-                        {option.subtitle}
-                      </span>
+              filtered.map((option) => {
+                const isSelected = selectedSet.has(option.value);
+                return (
+                  <button
+                    key={option.value}
+                    type="button"
+                    className={cn(
+                      "relative flex w-full cursor-default items-center gap-1.5 rounded-md py-1.5 pr-8 pl-1.5 text-sm outline-hidden select-none hover:bg-accent hover:text-accent-foreground",
+                      isSelected && "bg-accent/50",
                     )}
-                  </div>
-                  {option.value === value && (
-                    <CheckIcon className="absolute right-2 size-4" />
-                  )}
-                </button>
-              ))
-            )}
-            {creatable && search.trim() && !filtered.some((o) => o.label.toLowerCase() === search.trim().toLowerCase()) && (
-              <button
-                type="button"
-                className="relative flex w-full cursor-default items-center gap-1.5 rounded-md py-1.5 pr-8 pl-1.5 text-sm outline-hidden select-none hover:bg-accent hover:text-accent-foreground text-primary font-medium"
-                onClick={() => {
-                  onChange(`new:${search.trim()}`);
-                  setOpen(false);
-                }}
-              >
-                + Crear &ldquo;{search.trim()}&rdquo;
-              </button>
+                    onClick={() => toggle(option.value)}
+                  >
+                    <div className="flex flex-col">
+                      <span>{option.label}</span>
+                      {option.subtitle && (
+                        <span className="text-xs text-muted-foreground">
+                          {option.subtitle}
+                        </span>
+                      )}
+                    </div>
+                    {isSelected && <CheckIcon className="absolute right-2 size-4" />}
+                  </button>
+                );
+              })
             )}
           </div>
         </PopoverPrimitive.Content>
@@ -168,4 +156,4 @@ function Combobox({
   );
 }
 
-export { Combobox };
+export { MultiCombobox };
