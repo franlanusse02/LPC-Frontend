@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useApi } from "@/hooks/useApi";
 import { cn, fmtCurrency } from "@/lib/utils";
 import { StatCard } from "@/modules/cierres/components/cierre-stat";
-import { ArrowLeft, Ban, ChevronDown, ChevronUp, Plus } from "lucide-react";
+import { ArrowLeft, Ban, ChevronDown, ChevronUp, Download, Plus } from "lucide-react";
 import { Fragment, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { DataTable, SortableTh } from "@/components/data-table";
@@ -15,6 +15,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { KpiCard } from "@/components/KpiCard";
 import { OrdenesDeCompraTable } from "../components/OrdenesDeCompraTable";
 import { downloadPdf } from "@/lib/download";
+import { exportToXlsx, type ExportColumn } from "@/lib/exportXlsx";
 import { toast } from "sonner";
 import type { OrdenDeCompraResponse } from "@/domain/dto/orden-compra/OrdenDeCompraResponse";
 
@@ -108,6 +109,36 @@ export default function ComprasEncargado() {
   const montoFiltrado = displayed.reduce((s, f) => s + (f.monto ?? 0), 0);
   const isFiltered = displayed.length !== facturas.length;
 
+  const exportColumns: ExportColumn<FacturaProveedorResponse>[] = [
+    { key: (f) => new Date(f.creadoEn).toLocaleString("es-AR", {
+      timeZone: "America/Argentina/Buenos_Aires",
+      day: "2-digit", month: "2-digit", year: "2-digit",
+      hour: "2-digit", minute: "2-digit",
+      hour12: false,
+    }), header: "Fecha de Carga" },
+    { key: "id", header: "ID" },
+    { key: "numero", header: "Nº Factura" },
+    { key: (f) => proveedorNameById[f.proveedorId] ?? f.proveedorId, header: "Proveedor" },
+    { key: (f) => comedorNameById[f.comedorId] ?? f.comedorId, header: "Comedor" },
+    { key: "fechaFactura", header: "Fecha Factura" },
+    { key: "monto", header: "Monto" },
+    { key: "estado", header: "Estado" },
+    { key: "medioPago", header: "Medio de Pago" },
+    { key: "fechaEmision", header: "Fecha Emisión" },
+    { key: "fechaPago", header: "Fecha Pago" },
+    { key: "numeroOperacion", header: "Nº Operación" },
+    { key: "bancoNombre", header: "Banco" },
+    { key: "comentarios", header: "Comentarios" },
+    { key: (f) => (f.puntoDeVentaComedor ?? []).map((s) => `${posNameById[s.puntoDeVentaId] ?? `Punto de venta #${s.puntoDeVentaId}`}: $${s.monto}`).join(", "), header: "Puntos de Venta" },
+    { key: "creadoPorNombre", header: "Creado por" },
+  ];
+
+  const handleExport = () => {
+    const segments = ["mis-compras"];
+    if (filters.status !== "all") segments.push(filters.status);
+    exportToXlsx({ data: displayed, columns: exportColumns, filename: segments.join("-") });
+  };
+
   return (
     <div className="px-4 sm:px-8 lg:px-18 py-8">
       <div className="max-w-7xl mx-auto">
@@ -129,7 +160,7 @@ export default function ComprasEncargado() {
         />
         <KpiCard
           title="Monto estimado OC"
-          endpoint="/analytics/ordenes-compra/monto-estimado"
+          endpoint="/analytics/encargado/ordenes-compra/monto-estimado"
           format="currency"
           valueExtractor={(d) =>
             typeof d === "number" ? d : ((d as { total?: number })?.total ?? 0)
@@ -137,10 +168,10 @@ export default function ComprasEncargado() {
         />
       </div>
 
-      <Tabs defaultValue="ordenes" className="mx-auto max-w-7xl">
+      <Tabs defaultValue="facturas" className="mx-auto max-w-7xl">
         <TabsList className="mb-4 px-1">
-          <TabsTrigger value="ordenes">Órdenes de Compra</TabsTrigger>
           <TabsTrigger value="facturas">Facturas</TabsTrigger>
+          <TabsTrigger value="ordenes">Órdenes de Compra</TabsTrigger>
         </TabsList>
 
         <TabsContent value="ordenes">
@@ -201,6 +232,12 @@ export default function ComprasEncargado() {
                  />
                </div>
              }
+            toolbarRight={
+              <Button variant="outline" size="sm" onClick={handleExport}>
+                <Download className="size-4 mr-1.5" />
+                Exportar Excel
+              </Button>
+            }
             columns={
               <>
                 <th className="px-4 py-3 w-8" />

@@ -13,6 +13,7 @@ import { useApi } from "@/hooks/useApi";
 import { cn, fmtCurrency } from "@/lib/utils";
 import type { ProveedorResponse } from "@/domain/dto/proveedor/ProveedorResponse";
 import type { ProveedorItemResponse } from "@/domain/dto/proveedor/ProveedorItemResponse";
+import type { PagedResponse } from "@/domain/dto/common/PagedResponse";
 
 export default function ProveedorItemsPage() {
   const navigate = useNavigate();
@@ -30,11 +31,25 @@ export default function ProveedorItemsPage() {
   }, [get]);
 
   useEffect(() => {
-    if (!proveedorId) { setItems([]); return; }
+    if (!proveedorId) return;
     get(`/proveedores/${proveedorId}/items`)
       .then((r) => r.json())
       .then((data: ProveedorItemResponse[]) => setItems(Array.isArray(data) ? data : []));
   }, [proveedorId, get]);
+
+  // No proveedor selected → search across all proveedores (query-only, page 0).
+  useEffect(() => {
+    if (proveedorId) return;
+    const q = search.trim();
+    if (q.length < 2) { setItems([]); return; }
+    const t = setTimeout(() => {
+      get(`/articulos/codificacion/items?q=${encodeURIComponent(q)}&page=0`)
+        .then((r) => r.json())
+        .then((d: PagedResponse<ProveedorItemResponse>) =>
+          setItems(Array.isArray(d?.content) ? d.content : []));
+    }, 250);
+    return () => clearTimeout(t);
+  }, [proveedorId, search, get]);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -48,6 +63,8 @@ export default function ProveedorItemsPage() {
 
   const activos = items.filter((i) => i.activo).length;
   const inactivos = items.length - activos;
+  const globalMode = !proveedorId;
+  const showTable = !!proveedorId || search.trim().length >= 2;
 
   const handleDesactivar = async (item: ProveedorItemResponse) => {
     try {
@@ -103,15 +120,16 @@ export default function ProveedorItemsPage() {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Buscar por código o nombre..."
-              disabled={!proveedorId}
+              placeholder={proveedorId ? "Filtrar por código o nombre..." : "Buscar en todos los proveedores..."}
               className="h-8 w-64 px-3 text-sm bg-gray-50 border border-gray-200 rounded-md disabled:opacity-50"
             />
           </div>
         </CardHeader>
         <CardContent className="p-0">
-          {!proveedorId ? (
-            <p className="py-16 text-center text-sm text-gray-400">Seleccioná un proveedor para ver sus artículos.</p>
+          {!showTable ? (
+            <p className="py-16 text-center text-sm text-gray-400">
+              Seleccioná un proveedor, o buscá un artículo por código/nombre en todos los proveedores.
+            </p>
           ) : (
             <DataTable
               displayedCount={filtered.length}
@@ -119,6 +137,7 @@ export default function ProveedorItemsPage() {
                 <>
                   <th className="px-6 py-3">Código</th>
                   <th className="px-6 py-3">Nombre</th>
+                  {globalMode && <th className="px-6 py-3">Proveedor</th>}
                   <th className="px-6 py-3">U.M.</th>
                   <th className="px-6 py-3 text-right">Precio unit.</th>
                   <th className="px-6 py-3">Estado</th>
@@ -129,6 +148,7 @@ export default function ProveedorItemsPage() {
                 <tr key={item.id} className={cn("border-b hover:bg-gray-50/60", !item.activo && "bg-red-50/30 text-gray-400")}>
                   <td className="px-6 py-4 font-mono text-sm text-gray-600">{item.codigo ?? "—"}</td>
                   <td className="px-6 py-4 font-medium">{item.nombre}</td>
+                  {globalMode && <td className="px-6 py-4 text-gray-600">{item.proveedorNombre ?? "—"}</td>}
                   <td className="px-6 py-4 text-gray-600">{item.unidadMedida ?? "—"}</td>
                   <td className="px-6 py-4 text-right font-mono">{fmtCurrency(item.precioUnitario)}</td>
                   <td className="px-6 py-4">

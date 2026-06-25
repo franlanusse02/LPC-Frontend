@@ -17,9 +17,12 @@ export type CreateEventoDefaultRequest = CreateEventoBase & {
 export type CreateEventoGaliciaRequest = CreateEventoBase & {
   tipoComedor: "GALICIA";
   solicitanteId?: number | null;
+  solicitanteNombre?: string | null;
   emailSolicitante?: string | null;
   funcionarioId?: number | null;
+  funcionarioNombre?: string | null;
   responsableId?: number | null;
+  responsableNombre?: string | null;
   centroCostoId?: number | null;
   centroCostoNombre?: string | null;
   partidaId?: number | null;
@@ -35,6 +38,7 @@ export type CreateEventoGaliciaRequest = CreateEventoBase & {
 export type CreateEventoBBVARequest = CreateEventoBase & {
   tipoComedor: "BBVA";
   solicitanteId?: number | null;
+  solicitanteNombre?: string | null;
   emailSolicitante?: string | null;
   ordenCompra?: string | null;
   legajoId?: number | null;
@@ -55,6 +59,7 @@ export type CreateEventoTechintRequest = CreateEventoBase & {
 export type CreateEventoUDESARequest = CreateEventoBase & {
   tipoComedor: "UDESA";
   solicitanteId?: number | null;
+  solicitanteNombre?: string | null;
   centroCostoId?: number | null;
   centroCostoNombre?: string | null;
   areaId?: number | null;

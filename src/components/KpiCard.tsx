@@ -6,7 +6,7 @@ import { Spinner } from "@/components/ui/spinner";
 interface KpiCardProps {
   title: string;
   endpoint: string;
-  filters?: Record<string, string | undefined>;
+  filters?: Record<string, string | string[] | undefined>;
   format?: "currency" | "percentage" | "number";
   valueExtractor?: (data: unknown) => number;
   accent?: "emerald" | "red" | "blue";
@@ -40,10 +40,14 @@ export function KpiCard({
     const controller = new AbortController();
     const key = `${endpoint}|${filterKey}`;
 
-    const parsed: Record<string, string | undefined> = filterKey ? JSON.parse(filterKey) : {};
+    const parsed: Record<string, string | string[] | undefined> = filterKey ? JSON.parse(filterKey) : {};
     const params = new URLSearchParams();
     for (const [k, v] of Object.entries(parsed)) {
-      if (v) params.set(k, v);
+      if (Array.isArray(v)) {
+        for (const item of v) if (item) params.append(k, item);
+      } else if (v) {
+        params.set(k, v);
+      }
     }
     const qs = params.toString();
     const url = qs ? `${endpoint}?${qs}` : endpoint;

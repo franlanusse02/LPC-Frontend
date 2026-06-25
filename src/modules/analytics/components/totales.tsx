@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import type { TotalResponse } from "../types/TotalResponse";
 
 interface TotalesContabilidadProps {
-  filters?: Record<string, string | undefined>;
+  filters?: Record<string, string | string[] | undefined>;
 }
 
 export default function TotalesContabilidad({
@@ -20,10 +20,14 @@ export default function TotalesContabilidad({
   const filterKey = JSON.stringify(filters);
 
   useEffect(() => {
-    const parsed: Record<string, string | undefined> = filterKey ? JSON.parse(filterKey) : {};
+    const parsed: Record<string, string | string[] | undefined> = filterKey ? JSON.parse(filterKey) : {};
     const params = new URLSearchParams();
     for (const [k, v] of Object.entries(parsed)) {
-      if (v) params.set(k, v);
+      if (Array.isArray(v)) {
+        for (const item of v) if (item) params.append(k, item);
+      } else if (v) {
+        params.set(k, v);
+      }
     }
     const qs = params.toString();
     const base = qs ? `?${qs}` : "";

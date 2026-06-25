@@ -1,7 +1,4 @@
-import { Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Combobox } from "@/components/ui/combobox";
 import { fmtCurrency } from "@/lib/utils";
 import type { ProductoResponse } from "@/domain/dto/consumo/ProductoResponse";
 
@@ -11,53 +8,34 @@ export interface ProductoLine {
 }
 
 interface Props {
-  line: ProductoLine;
-  productos: ProductoResponse[];
-  usedProductoIds: string[];
-  onChange: (line: ProductoLine) => void;
-  onRemove: () => void;
+  producto: ProductoResponse;
+  cantidad: string;
+  onChange: (cantidad: string) => void;
 }
 
-export function ProductoLineRow({ line, productos, usedProductoIds, onChange, onRemove }: Props) {
-  const available = productos.filter(
-    (p) => !usedProductoIds.includes(String(p.productoId)) || String(p.productoId) === line.productoId,
-  );
-  const selected = productos.find((p) => String(p.productoId) === line.productoId);
-  const subtotal = selected && line.cantidad ? selected.precio * Number(line.cantidad) : null;
+export function ProductoLineRow({ producto, cantidad, onChange }: Props) {
+  const qty = Number(cantidad) || 0;
+  const subtotal = producto.precio * qty;
 
   return (
-    <div className="flex gap-3 items-center">
-      <Combobox
-        options={available.map((p) => ({ value: String(p.productoId), label: `${p.nombre} — ${fmtCurrency(p.precio)}` }))}
-        value={line.productoId}
-        onChange={(v) => onChange({ ...line, productoId: v })}
-        placeholder="Producto..."
-        className="flex-1 min-w-0"
-      />
-
-      <Input
-        type="number"
-        min="1"
-        step="1"
-        value={line.cantidad}
-        onChange={(e) => onChange({ ...line, cantidad: e.target.value })}
-        placeholder="Cant."
-        className="w-24"
-      />
-
-      <span className="shrink-0 whitespace-nowrap text-right text-sm font-mono text-gray-600">
-        {subtotal !== null ? fmtCurrency(subtotal) : "—"}
-      </span>
-
-      <Button
-        type="button"
-        variant="outline"
-        size="icon"
-        onClick={onRemove}
-        className="h-9 w-9 shrink-0 border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground"
-      >
-        <Trash2 className="h-4 w-4" />
-      </Button>
-    </div>
+    <tr className="border-b last:border-0">
+      <td className="py-2 pr-3 text-sm">{producto.nombre}</td>
+      <td className="py-2 px-3 text-right text-sm font-mono text-gray-600">
+        {fmtCurrency(producto.precio)}
+      </td>
+      <td className="py-2 px-3">
+        <Input
+          type="number"
+          min="0"
+          step="1"
+          value={cantidad}
+          onChange={(e) => onChange(e.target.value)}
+          className="w-20 text-right"
+        />
+      </td>
+      <td className="py-2 pl-3 text-right text-sm font-mono text-gray-700">
+        {subtotal > 0 ? fmtCurrency(subtotal) : "—"}
+      </td>
+    </tr>
   );
 }

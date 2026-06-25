@@ -176,6 +176,12 @@ export default function EditarEventoPage() {
 
   const canSubmit = puntoDeVentaId && fechaEvento && (caseKey === "UDESA" || cantidadPersonas);
 
+  const resolveIdOrNombre = (value: string): { id: number | null; nombre: string | null } => {
+    if (!value) return { id: null, nombre: null };
+    if (value.startsWith("new:")) return { id: null, nombre: value.slice(4) };
+    return { id: Number(value), nombre: null };
+  };
+
   const handleSubmit = async () => {
     if (!canSubmit || !id) return;
     setLoading(true);
@@ -199,14 +205,20 @@ export default function EditarEventoPage() {
       let req: PatchEventoRequest;
 
       switch (caseKey) {
-        case "GALICIA":
+        case "GALICIA": {
+          const sol = resolveIdOrNombre(solicitanteId);
+          const func = resolveIdOrNombre(funcionarioId);
+          const resp = resolveIdOrNombre(responsableId);
           req = {
             ...base,
             tipoComedor: "GALICIA",
-            solicitanteId: solicitanteId ? Number(solicitanteId) : undefined,
+            solicitanteId: sol.id ?? undefined,
+            solicitanteNombre: sol.nombre ?? undefined,
             emailSolicitante: emailSolicitante || undefined,
-            funcionarioId: funcionarioId ? Number(funcionarioId) : undefined,
-            responsableId: responsableId ? Number(responsableId) : undefined,
+            funcionarioId: func.id ?? undefined,
+            funcionarioNombre: func.nombre ?? undefined,
+            responsableId: resp.id ?? undefined,
+            responsableNombre: resp.nombre ?? undefined,
             precioUnitario: precioUnitario ? Number(precioUnitario) : undefined,
             retenciones: retenciones ? Number(retenciones) : undefined,
             numeroOperacion: numeroOperacion || undefined,
@@ -216,17 +228,21 @@ export default function EditarEventoPage() {
             numeroComprobante: numeroComprobante || undefined,
           };
           break;
-        case "BBVA":
+        }
+        case "BBVA": {
+          const sol = resolveIdOrNombre(solicitanteId);
           req = {
             ...base,
             tipoComedor: "BBVA",
-            solicitanteId: solicitanteId ? Number(solicitanteId) : undefined,
+            solicitanteId: sol.id ?? undefined,
+            solicitanteNombre: sol.nombre ?? undefined,
             emailSolicitante: emailSolicitante || undefined,
             ordenCompra: ordenCompra || undefined,
             legajoId: legajoId ? Number(legajoId) : undefined,
             recepcionId: recepcionId ? Number(recepcionId) : undefined,
           };
           break;
+        }
         case "TECHINT":
           req = {
             ...base,
@@ -238,15 +254,18 @@ export default function EditarEventoPage() {
             numeroComprobante: numeroComprobante || undefined,
           };
           break;
-        case "UDESA":
+        case "UDESA": {
+          const sol = resolveIdOrNombre(solicitanteId);
           req = {
             ...base,
             tipoComedor: "UDESA",
-            solicitanteId: solicitanteId ? Number(solicitanteId) : undefined,
+            solicitanteId: sol.id ?? undefined,
+            solicitanteNombre: sol.nombre ?? undefined,
             centroCostoId: centroCostoId ? Number(centroCostoId) : undefined,
             areaId: areaId ? Number(areaId) : undefined,
           };
           break;
+        }
         default:
           req = { ...base };
           break;
@@ -315,6 +334,7 @@ export default function EditarEventoPage() {
 
     if (spec.type && spec.type !== "text" && spec.type !== "number") {
       const opts = pickerOptions[spec.type] ?? [];
+      const isCreatable = (spec.type === "empleado" || spec.type === "funcionario") && !isReadonly;
       return (
         <div key={key} className="space-y-1.5">
           <label className="text-sm font-medium">{label}{spec.required ? " *" : ""}</label>
@@ -325,6 +345,7 @@ export default function EditarEventoPage() {
             placeholder={isReadonly ? "Auto-completado" : `Seleccionar ${label.toLowerCase()}...`}
             disabled={isReadonly}
             clearable
+            creatable={isCreatable}
             className="w-full"
           />
         </div>
