@@ -15,7 +15,30 @@ import type { ProveedorResponse } from "@/domain/dto/proveedor/ProveedorResponse
 import type { ComedorResponse } from "@/domain/dto/comedor/ComedorResponse";
 import type { MedioPago } from "@/domain/enums/MedioPago";
 
-type PosLinea = { puntoDeVentaId: string; monto: string };
+type PosLinea = { puntoDeVentaId: string; monto: string; touched?: boolean };
+
+function redistribute(lines: PosLinea[], total: number): PosLinea[] {
+  const touchedSum = lines.reduce(
+    (s, l) => s + (l.touched ? Number(l.monto) || 0 : 0),
+    0,
+  );
+  const untouched = lines
+    .map((l, i) => (l.touched ? -1 : i))
+    .filter((i) => i >= 0);
+  const n = untouched.length;
+  if (n === 0) return lines;
+  const remaining = total - touchedSum;
+  const per = Math.floor((remaining / n) * 100) / 100;
+  return lines.map((l, i) => {
+    const k = untouched.indexOf(i);
+    if (k === -1) return l;
+    const monto =
+      k === n - 1
+        ? Math.round((remaining - per * (n - 1)) * 100) / 100
+        : per;
+    return { ...l, monto: String(monto) };
+  });
+}
 
 export default function NuevaFacturaPage({ basePath = "/encargado" }: { basePath?: string }) {
   const navigate = useNavigate();
@@ -34,9 +57,6 @@ export default function NuevaFacturaPage({ basePath = "/encargado" }: { basePath
   const [medioPago, setMedioPago] = useState<MedioPago | "">("");
   const [loading, setLoading] = useState(false);
   const [posLineas, setPosLineas] = useState<PosLinea[]>([]);
-
-  const posLineasRef = useRef(posLineas);
-  posLineasRef.current = posLineas;
 
   useEffect(() => {
     Promise.all([get("/proveedores"), get("/comedores")]).then(
@@ -85,18 +105,16 @@ export default function NuevaFacturaPage({ basePath = "/encargado" }: { basePath
   useEffect(() => {
     const pvs = selectedComedorRef.current?.puntosDeVenta ?? [];
     if (pvs.length === 1) {
-      setPosLineas([{ puntoDeVentaId: String(pvs[0].id), monto: montoRef.current || "" }]);
+      setPosLineas(
+        redistribute(
+          [{ puntoDeVentaId: String(pvs[0].id), monto: "" }],
+          Number(montoRef.current) || 0,
+        ),
+      );
     } else {
       setPosLineas([]);
     }
   }, [comedorId]);
-
-  useEffect(() => {
-    const pvs = selectedComedorRef.current?.puntosDeVenta ?? [];
-    if (pvs.length === 1 && posLineasRef.current.length === 1) {
-      setPosLineas([{ ...posLineasRef.current[0], monto: monto || "" }]);
-    }
-  }, [monto]);
 
   const posSum = posLineas.reduce((s, l) => s + (Number(l.monto) || 0), 0);
   const montoNum = Number(monto) || 0;
@@ -113,17 +131,30 @@ export default function NuevaFacturaPage({ basePath = "/encargado" }: { basePath
     !posMismatch;
 
   const addPosLinea = () => {
-    setPosLineas((prev) => [...prev, { puntoDeVentaId: "", monto: "" }]);
+    setPosLineas((prev) =>
+      redistribute([...prev, { puntoDeVentaId: "", monto: "" }], montoNum),
+    );
   };
 
   const updatePosLinea = (idx: number, field: keyof PosLinea, value: string) => {
     setPosLineas((prev) =>
-      prev.map((l, i) => (i === idx ? { ...l, [field]: value } : l)),
+      prev.map((l, i) =>
+        i === idx
+          ? { ...l, [field]: value, ...(field === "monto" ? { touched: true } : {}) }
+          : l,
+      ),
     );
   };
 
   const removePosLinea = (idx: number) => {
-    setPosLineas((prev) => prev.filter((_, i) => i !== idx));
+    setPosLineas((prev) =>
+      redistribute(prev.filter((_, i) => i !== idx), montoNum),
+    );
+  };
+
+  const handleMontoChange = (value: string) => {
+    setMonto(value);
+    setPosLineas((prev) => redistribute(prev, Number(value) || 0));
   };
 
   const handleSubmit = async () => {
@@ -232,7 +263,7 @@ export default function NuevaFacturaPage({ basePath = "/encargado" }: { basePath
                     type="number"
                     min="0"
                     value={monto}
-                    onChange={(e) => setMonto(e.target.value)}
+                    onChange={(e) => handleMontoChange(e.target.value)}
                     placeholder="0"
                   />
                 </div>

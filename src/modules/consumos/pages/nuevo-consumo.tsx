@@ -1,6 +1,6 @@
 import { Fragment, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Plus } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { useApi } from "@/hooks/useApi";
 import { fmtCurrency } from "@/lib/utils";
@@ -76,25 +76,26 @@ export default function NuevoConsumoPage({ basePath = "/encargado" }: { basePath
     [productos, comedorId],
   );
 
+  useEffect(() => {
+    if (!comedorId) {
+      setLines([]);
+      return;
+    }
+    setLines(
+      productos
+        .filter((p) => p.comedorId === Number(comedorId) && p.activo)
+        .map((p) => ({ productoId: String(p.productoId), cantidad: "0" })),
+    );
+  }, [comedorId, productos]);
+
   const handleComedorChange = (v: string) => {
     setComedorId(v);
     setConsumidorId("");
     setPuntoDeVentaId("");
-    setLines([]);
-  };
-
-  const usedProductoIds = lines.map((l) => l.productoId).filter(Boolean);
-
-  const handleAddLine = () => {
-    setLines((prev) => [...prev, { productoId: "", cantidad: "" }]);
   };
 
   const handleLineChange = (index: number, line: ProductoLine) => {
     setLines((prev) => prev.map((l, i) => (i === index ? line : l)));
-  };
-
-  const handleRemoveLine = (index: number) => {
-    setLines((prev) => prev.filter((_, i) => i !== index));
   };
 
   const total = useMemo(() => {
@@ -108,11 +109,10 @@ export default function NuevoConsumoPage({ basePath = "/encargado" }: { basePath
   }, [lines, productosFiltrados]);
 
   const canSubmit =
-    consumidorId &&
-    puntoDeVentaId &&
-    fecha &&
-    lines.length > 0 &&
-    lines.every((l) => l.productoId && l.cantidad && Number(l.cantidad) > 0);
+    Boolean(consumidorId) &&
+    Boolean(puntoDeVentaId) &&
+    Boolean(fecha) &&
+    lines.some((l) => Number(l.cantidad) > 0);
 
   const handleSubmit = async () => {
     if (!canSubmit) return;
@@ -126,7 +126,8 @@ export default function NuevoConsumoPage({ basePath = "/encargado" }: { basePath
         observaciones: observaciones || undefined,
         productos: lines.reduce(
           (acc, l) => {
-            acc[Number(l.productoId)] = Number(l.cantidad);
+            const cant = Number(l.cantidad);
+            if (cant > 0) acc[Number(l.productoId)] = cant;
             return acc;
           },
           {} as Record<number, number>,
@@ -167,7 +168,7 @@ export default function NuevoConsumoPage({ basePath = "/encargado" }: { basePath
           <CardContent className="p-6">
             <div className="flex flex-col gap-8 lg:flex-row">
               {/* Left column */}
-              <div className="flex-1 space-y-5">
+              <div className="flex-1 min-w-0 space-y-5">
                 <div className="space-y-1.5">
                   <label className="text-sm font-medium">Comedor *</label>
                   <Combobox
@@ -193,7 +194,6 @@ export default function NuevoConsumoPage({ basePath = "/encargado" }: { basePath
                     onChange={(v) => {
                       setConsumidorId(v);
                       setPuntoDeVentaId("");
-                      setLines([]);
                     }}
                     placeholder={!comedorId ? "Seleccioná un comedor primero..." : "Seleccionar consumidor..."}
                     disabled={!comedorId}
@@ -236,46 +236,56 @@ export default function NuevoConsumoPage({ basePath = "/encargado" }: { basePath
               </div>
 
               {/* Right column */}
-              <div className="flex-1">
+              <div className="flex-1 min-w-0">
                 <h3 className="mb-4 text-center text-xs font-bold uppercase tracking-wide text-muted-foreground">
                   Productos
                 </h3>
 
-                <div className="space-y-4">
-                  {lines.map((line, i) => (
-                    <ProductoLineRow
-                      key={i}
-                      line={line}
-                      productos={productosFiltrados}
-                      usedProductoIds={usedProductoIds.filter(
-                        (_, idx) => idx !== i,
-                      )}
-                      onChange={(updated) => handleLineChange(i, updated)}
-                      onRemove={() => handleRemoveLine(i)}
-                    />
-                  ))}
+                {!comedorId ? (
+                  <p className="text-center text-sm text-muted-foreground">
+                    Seleccioná un comedor para ver los productos.
+                  </p>
+                ) : (
+                  <>
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b text-left text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                          <th className="py-2 pr-3">Producto</th>
+                          <th className="py-2 px-3 text-right">Precio</th>
+                          <th className="py-2 px-3">Cant.</th>
+                          <th className="py-2 pl-3 text-right">Subtotal</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {productosFiltrados.map((p) => {
+                          const idx = lines.findIndex(
+                            (l) => l.productoId === String(p.productoId),
+                          );
+                          const cantidad = idx >= 0 ? lines[idx].cantidad : "0";
+                          return (
+                            <ProductoLineRow
+                              key={p.productoId}
+                              producto={p}
+                              cantidad={cantidad}
+                              onChange={(c) =>
+                                handleLineChange(idx, {
+                                  productoId: String(p.productoId),
+                                  cantidad: c,
+                                })
+                              }
+                            />
+                          );
+                        })}
+                      </tbody>
+                    </table>
 
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleAddLine}
-                    disabled={
-                      !comedorId || lines.length >= productosFiltrados.length
-                    }
-                    className="mx-auto flex gap-2"
-                  >
-                    <Plus className="h-4 w-4" />
-                    Agregar Producto
-                  </Button>
-
-                  {lines.length > 0 && (
-                    <div className="flex justify-end border-t pt-3">
+                    <div className="mt-3 flex justify-end border-t pt-3">
                       <span className="text-sm font-bold text-gray-700">
                         Total: {fmtCurrency(total)}
                       </span>
                     </div>
-                  )}
-                </div>
+                  </>
+                )}
               </div>
             </div>
           </CardContent>

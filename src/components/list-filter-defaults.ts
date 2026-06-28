@@ -14,7 +14,7 @@ function currentMonthRange() {
 export const defaultFilters: ListFilterState = {
   comedorId: "",
   sociedadId: "",
-  puntoDeVentaId: "",
+  puntoDeVentaIds: [],
   consumidorId: "",
   dateField: "fechaFactura",
   ...currentMonthRange(),

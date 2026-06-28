@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import {
   Card,
   CardContent,
@@ -7,7 +6,6 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import {
   CalendarPlus,
   PackagePlus,
@@ -16,6 +14,7 @@ import {
   Utensils,
   ShoppingCart,
   Package2,
+  PackageSearch,
   UsersRound,
   Truck,
   Landmark,
@@ -26,6 +25,7 @@ import {
   BookOpen,
 } from "lucide-react";
 import TotalesContabilidad from "@/modules/analytics/components/totales";
+import { ModuleButtonGrid, type ModuleButton } from "@/modules/analytics/components/ModuleButtonGrid";
 import {
   ListFilters,
   type ListFilterState,
@@ -35,8 +35,29 @@ import { useApi } from "@/hooks/useApi";
 import type { ComedorResponse } from "@/domain/dto/comedor/ComedorResponse";
 import type { SociedadResponse } from "@/domain/dto/sociedad/SociedadResponse";
 
+const ACCESO_ITEMS: ModuleButton[] = [
+  { icon: BanknoteArrowUp, label: "Ver Cierres", to: "/contabilidad/cierres" },
+  { icon: PackagePlus, label: "Ver Compras", to: "/contabilidad/compras" },
+  { icon: CalendarPlus, label: "Ver Eventos", to: "/contabilidad/eventos" },
+  { icon: ClipboardList, label: "Ver Consumos", to: "/contabilidad/consumos" },
+];
+
+const CONFIG_ITEMS: ModuleButton[] = [
+  { icon: Utensils, label: "Comedores", to: "/catalogo/comedores" },
+  { icon: ShoppingCart, label: "Puntos de Venta", to: "/catalogo/puntos-de-venta" },
+  { icon: Package2, label: "Productos", to: "/catalogo/productos" },
+  { icon: UsersRound, label: "Consumidores", to: "/catalogo/consumidores" },
+  { icon: Truck, label: "Proveedores", to: "/catalogo/proveedores" },
+  { icon: PackageSearch, label: "Artículos Proveedor", to: "/catalogo/proveedor-items" },
+  { icon: Landmark, label: "Bancos", to: "/catalogo/bancos" },
+  { icon: FolderTree, label: "Centros de Costo", to: "/catalogo/centros-costo" },
+  { icon: BookOpen, label: "Partidas", to: "/catalogo/partidas" },
+  { icon: Hand, label: "Empleados Comedor", to: "/catalogo/empleados" },
+  { icon: FileText, label: "Razones Sociales", to: "/catalogo/razones-sociales" },
+  { icon: FileSpreadsheet, label: "Importar Excel", to: "/contabilidad/importar" },
+];
+
 export default function ContabilidadDashboard() {
-  const navigate = useNavigate();
   const { get } = useApi();
 
   const [comedores, setComedores] = useState<ComedorResponse[]>([]);
@@ -58,7 +79,7 @@ export default function ContabilidadDashboard() {
       fechaFin: filters.hasta || undefined,
       comedorId: filters.comedorId || undefined,
       sociedadId: filters.sociedadId || undefined,
-      puntoDeVentaId: filters.puntoDeVentaId || undefined,
+      puntoDeVentaIds: filters.puntoDeVentaIds.length ? filters.puntoDeVentaIds : undefined,
     }),
     [filters],
   );
@@ -88,47 +109,8 @@ export default function ContabilidadDashboard() {
               Elegí un módulo para analizar datos
             </CardDescription>
           </CardHeader>
-          <CardContent className="p-4 grid grid-cols-2 gap-3">
-            <Button
-              variant="outline"
-              onClick={() => navigate("/contabilidad/cierres")}
-              className="flex items-center justify-start gap-3 h-14 px-4 border-gray-200 hover:bg-gray-50 hover:border-gray-300"
-            >
-              <BanknoteArrowUp className="h-5 w-5 text-gray-500 shrink-0" />
-              <span className="text-sm font-medium text-gray-700">
-                Ver Cierres
-              </span>
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => navigate("/contabilidad/compras")}
-              className="flex items-center justify-start gap-3 h-14 px-4 rounded-lg border-gray-200 hover:bg-gray-50 hover:border-gray-300"
-            >
-              <PackagePlus className="h-5 w-5 text-gray-500 shrink-0" />
-              <span className="text-sm font-medium text-gray-700">
-                Ver Compras
-              </span>
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => navigate("/contabilidad/eventos")}
-              className="flex items-center justify-start gap-3 h-14 px-4 rounded-lg border-gray-200 hover:bg-gray-50 hover:border-gray-300"
-            >
-              <CalendarPlus className="h-5 w-5 text-gray-500 shrink-0" />
-              <span className="text-sm font-medium text-gray-700">
-                Ver Eventos
-              </span>
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => navigate("/contabilidad/consumos")}
-              className="flex items-center justify-start gap-3 h-14 px-4 rounded-lg border-gray-200 hover:bg-gray-50 hover:border-gray-300"
-            >
-              <ClipboardList className="h-5 w-5 text-gray-500 shrink-0" />
-              <span className="text-sm font-medium text-gray-700">
-                Ver Consumos
-              </span>
-            </Button>
+          <CardContent className="p-4">
+            <ModuleButtonGrid items={ACCESO_ITEMS} layout="row" />
           </CardContent>
         </Card>
 
@@ -141,139 +123,8 @@ export default function ContabilidadDashboard() {
               Podés crear datos estáticos del sistema
             </CardDescription>
           </CardHeader>
-          <CardContent className="p-4 grid grid-cols-3 gap-3">
-            <Button
-              variant="outline"
-              onClick={() => navigate("/catalogo/comedores")}
-              className="flex flex-col items-center justify-center gap-2 h-20 px-3 rounded-lg border-gray-200 hover:bg-gray-50 hover:border-gray-300"
-            >
-              <div className="flex items-center justify-center w-8 h-8 rounded-md bg-gray-100">
-                <Utensils className="h-4 w-4 text-gray-600" />
-              </div>
-              <span className="text-xs font-medium text-gray-700 text-center leading-tight">
-                Comedores
-              </span>
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => navigate("/catalogo/puntos-de-venta")}
-              className="flex flex-col items-center justify-center gap-2 h-20 px-3 rounded-lg border-gray-200 hover:bg-gray-50 hover:border-gray-300"
-            >
-              <div className="flex items-center justify-center w-8 h-8 rounded-md bg-gray-100">
-                <ShoppingCart className="h-4 w-4 text-gray-600" />
-              </div>
-              <span className="text-xs font-medium text-gray-700 text-center leading-tight">
-                Puntos de Venta
-              </span>
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => navigate("/catalogo/productos")}
-              className="flex flex-col items-center justify-center gap-2 h-20 px-3 rounded-lg border-gray-200 hover:bg-gray-50 hover:border-gray-300"
-            >
-              <div className="flex items-center justify-center w-8 h-8 rounded-md bg-gray-100">
-                <Package2 className="h-4 w-4 text-gray-600" />
-              </div>
-              <span className="text-xs font-medium text-gray-700 text-center leading-tight">
-                Productos
-              </span>
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => navigate("/catalogo/consumidores")}
-              className="flex flex-col items-center justify-center gap-2 h-20 px-3 rounded-lg border-gray-200 hover:bg-gray-50 hover:border-gray-300"
-            >
-              <div className="flex items-center justify-center w-8 h-8 rounded-md bg-gray-100">
-                <UsersRound className="h-4 w-4 text-gray-600" />
-              </div>
-              <span className="text-xs font-medium text-gray-700 text-center leading-tight">
-                Consumidores
-              </span>
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => navigate("/catalogo/proveedores")}
-              className="flex flex-col items-center justify-center gap-2 h-20 px-3 rounded-lg border-gray-200 hover:bg-gray-50 hover:border-gray-300"
-            >
-              <div className="flex items-center justify-center w-8 h-8 rounded-md bg-gray-100">
-                <Truck className="h-4 w-4 text-gray-600" />
-              </div>
-              <span className="text-xs font-medium text-gray-700 text-center leading-tight">
-                Proveedores
-              </span>
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => navigate("/catalogo/bancos")}
-              className="flex flex-col items-center justify-center gap-2 h-20 px-3 rounded-lg border-gray-200 hover:bg-gray-50 hover:border-gray-300"
-            >
-              <div className="flex items-center justify-center w-8 h-8 rounded-md bg-gray-100">
-                <Landmark className="h-4 w-4 text-gray-600" />
-              </div>
-              <span className="text-xs font-medium text-gray-700 text-center leading-tight">
-                Bancos
-              </span>
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => navigate("/catalogo/centros-costo")}
-              className="flex flex-col items-center justify-center gap-2 h-20 px-3 rounded-lg border-gray-200 hover:bg-gray-50 hover:border-gray-300"
-            >
-              <div className="flex items-center justify-center w-8 h-8 rounded-md bg-gray-100">
-                <FolderTree className="h-4 w-4 text-gray-600" />
-              </div>
-              <span className="text-xs font-medium text-gray-700 text-center leading-tight">
-                Centros de Costo
-              </span>
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => navigate("/catalogo/partidas")}
-              className="flex flex-col items-center justify-center gap-2 h-20 px-3 rounded-lg border-gray-200 hover:bg-gray-50 hover:border-gray-300"
-            >
-              <div className="flex items-center justify-center w-8 h-8 rounded-md bg-gray-100">
-                <BookOpen className="h-4 w-4 text-gray-600" />
-              </div>
-              <span className="text-xs font-medium text-gray-700 text-center leading-tight">
-                Partidas
-              </span>
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => navigate("/catalogo/empleados")}
-              className="flex flex-col items-center justify-center gap-2 h-20 px-3 rounded-lg border-gray-200 hover:bg-gray-50 hover:border-gray-300"
-            >
-              <div className="flex items-center justify-center w-8 h-8 rounded-md bg-gray-100">
-                <Hand className="h-4 w-4 text-gray-600" />
-              </div>
-              <span className="text-xs font-medium text-gray-700 text-center leading-tight">
-                Empleados Comedor
-              </span>
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => navigate("/catalogo/razones-sociales")}
-              className="flex flex-col items-center justify-center gap-2 h-20 px-3 rounded-lg border-gray-200 hover:bg-gray-50 hover:border-gray-300"
-            >
-              <div className="flex items-center justify-center w-8 h-8 rounded-md bg-gray-100">
-                <FileText className="h-4 w-4 text-gray-600" />
-              </div>
-              <span className="text-xs font-medium text-gray-700 text-center leading-tight">
-                Razones Sociales
-              </span>
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => navigate("/contabilidad/importar")}
-              className="flex flex-col items-center justify-center gap-2 h-20 px-3 rounded-lg border-gray-200 hover:bg-gray-50 hover:border-gray-300"
-            >
-              <div className="flex items-center justify-center w-8 h-8 rounded-md bg-gray-100">
-                <FileSpreadsheet className="h-4 w-4 text-gray-600" />
-              </div>
-              <span className="text-xs font-medium text-gray-700 text-center leading-tight">
-                Importar Excel
-              </span>
-            </Button>
+          <CardContent className="p-4">
+            <ModuleButtonGrid items={CONFIG_ITEMS} layout="tile" />
           </CardContent>
         </Card>
       </main>

@@ -2,6 +2,7 @@ import type { ComedorResponse } from "@/domain/dto/comedor/ComedorResponse";
 import type { SociedadResponse } from "@/domain/dto/sociedad/SociedadResponse";
 import type { ConsumidorResponse } from "@/domain/dto/consumo/ConsumidorResponse";
 import { Combobox, type ComboboxOption } from "@/components/ui/combobox";
+import { MultiCombobox } from "@/components/ui/multi-combobox";
 import { FilterPills } from "@/components/data-table";
 import { Input } from "@/components/ui/input";
 import { useMemo } from "react";
@@ -14,7 +15,7 @@ export interface DateFieldOption {
 export interface ListFilterState {
   comedorId: string;
   sociedadId: string;
-  puntoDeVentaId: string;
+  puntoDeVentaIds: string[];
   consumidorId: string;
   desde: string;
   hasta: string;
@@ -114,7 +115,7 @@ export function ListFilters({
       <Combobox
         options={comedorOptions}
         value={filters.comedorId}
-        onChange={(v) => set({ comedorId: v, puntoDeVentaId: "", consumidorId: "" })}
+        onChange={(v) => set({ comedorId: v, puntoDeVentaIds: [], consumidorId: "" })}
         placeholder="Todos los comedores"
         clearable
         className="w-52 h-8 text-sm"
@@ -130,10 +131,10 @@ export function ListFilters({
         />
       )}
       {showPuntoDeVenta && posOptions.length > 0 && (
-        <Combobox
+        <MultiCombobox
           options={posOptions}
-          value={filters.puntoDeVentaId}
-          onChange={(v) => set({ puntoDeVentaId: v })}
+          values={filters.puntoDeVentaIds}
+          onChange={(v) => set({ puntoDeVentaIds: v })}
           placeholder="Todos los puntos de venta"
           clearable
           className="w-48 h-8 text-sm"

@@ -69,7 +69,7 @@ export default function CierresContabilidad() {
     if (listFilters.desde) list = list.filter((c) => getDate(c) >= listFilters.desde);
     if (listFilters.hasta) list = list.filter((c) => getDate(c) <= listFilters.hasta);
     if (listFilters.comedorId) list = list.filter((c) => c.comedor.id === Number(listFilters.comedorId));
-    if (listFilters.puntoDeVentaId) list = list.filter((c) => c.puntoDeVenta.id === Number(listFilters.puntoDeVentaId));
+    if (listFilters.puntoDeVentaIds.length) list = list.filter((c) => listFilters.puntoDeVentaIds.includes(String(c.puntoDeVenta.id)));
     return list;
   }, [cierres, listFilters]);
 

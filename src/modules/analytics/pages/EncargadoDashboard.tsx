@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import {
   Card,
   CardContent,
@@ -7,7 +6,6 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import {
   CalendarPlus,
   PackagePlus,
@@ -16,6 +14,7 @@ import {
 } from "lucide-react";
 import { useApi } from "@/hooks/useApi";
 import { KpiCard } from "@/components/KpiCard";
+import { ModuleButtonGrid, type ModuleButton } from "@/modules/analytics/components/ModuleButtonGrid";
 import {
   ListFilters,
   type ListFilterState,
@@ -23,8 +22,14 @@ import {
 import { defaultFilters } from "@/components/list-filter-defaults";
 import type { ComedorResponse } from "@/domain/dto/comedor/ComedorResponse";
 
+const ACCESO_ITEMS: ModuleButton[] = [
+  { icon: BanknoteArrowUp, label: "Cargar Cierres", to: "/encargado/cierres" },
+  { icon: PackagePlus, label: "Cargar Compras", to: "/encargado/compras" },
+  { icon: CalendarPlus, label: "Cargar Eventos", to: "/encargado/eventos" },
+  { icon: ClipboardList, label: "Cargar Consumos", to: "/encargado/consumos" },
+];
+
 export default function EncargadoDashboard() {
-  const navigate = useNavigate();
   const { get } = useApi();
 
   const [comedores, setComedores] = useState<ComedorResponse[]>([]);
@@ -41,7 +46,7 @@ export default function EncargadoDashboard() {
       fechaInicio: filters.desde || undefined,
       fechaFin: filters.hasta || undefined,
       comedorId: filters.comedorId || undefined,
-      puntoDeVentaId: filters.puntoDeVentaId || undefined,
+      puntoDeVentaIds: filters.puntoDeVentaIds.length ? filters.puntoDeVentaIds : undefined,
     }),
     [filters],
   );
@@ -103,47 +108,8 @@ export default function EncargadoDashboard() {
               Elegí un módulo para cargar datos
             </CardDescription>
           </CardHeader>
-          <CardContent className="p-4 grid grid-cols-2 gap-3">
-            <Button
-              variant="outline"
-              onClick={() => navigate("/encargado/cierres")}
-              className="flex items-center justify-start gap-3 h-14 px-4 rounded-lg border-gray-200 hover:bg-gray-50 hover:border-gray-300"
-            >
-              <BanknoteArrowUp className="h-5 w-5 text-gray-500 shrink-0" />
-              <span className="text-sm font-medium text-gray-700">
-                Cargar Cierres
-              </span>
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => navigate("/encargado/compras")}
-              className="flex items-center justify-start gap-3 h-14 px-4 rounded-lg border-gray-200 hover:bg-gray-50 hover:border-gray-300"
-            >
-              <PackagePlus className="h-5 w-5 text-gray-500 shrink-0" />
-              <span className="text-sm font-medium text-gray-700">
-                Cargar Compras
-              </span>
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => navigate("/encargado/eventos")}
-              className="flex items-center justify-start gap-3 h-14 px-4 rounded-lg border-gray-200 hover:bg-gray-50 hover:border-gray-300"
-            >
-              <CalendarPlus className="h-5 w-5 text-gray-500 shrink-0" />
-              <span className="text-sm font-medium text-gray-700">
-                Cargar Eventos
-              </span>
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => navigate("/encargado/consumos")}
-              className="flex items-center justify-start gap-3 h-14 px-4 rounded-lg border-gray-200 hover:bg-gray-50 hover:border-gray-300"
-            >
-              <ClipboardList className="h-5 w-5 text-gray-500 shrink-0" />
-              <span className="text-sm font-medium text-gray-700">
-                Cargar Consumos
-              </span>
-            </Button>
+          <CardContent className="p-4">
+            <ModuleButtonGrid items={ACCESO_ITEMS} layout="row" />
           </CardContent>
         </Card>
       </main>

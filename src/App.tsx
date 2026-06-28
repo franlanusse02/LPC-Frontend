@@ -32,6 +32,9 @@ import ComprasEncargado from "./modules/compras/pages/ComprasEncargado";
 import NuevaFacturaPage from "./modules/compras/pages/nueva-factura";
 import ComprasContabilidad from "./modules/compras/pages/ComprasContabilidad";
 import EditarFacturaPage from "./modules/compras/pages/EditarFacturaPage";
+import NuevaOrdenPage from "./modules/compras/pages/nueva-orden";
+import EditarOrdenPage from "./modules/compras/pages/EditarOrdenPage";
+import ProveedorItemsPage from "./modules/catalogo/pages/proveedor-items";
 import ConsumosEncargado from "./modules/consumos/pages/ConsumosEncargado";
 import NuevoConsumoPage from "./modules/consumos/pages/nuevo-consumo";
 import ConsumosContabilidad from "./modules/consumos/pages/ConsumosContabilidad";
@@ -87,6 +90,10 @@ export default function App() {
                 element={<NuevaFacturaPage />}
               />
               <Route
+                path="/encargado/compras/ordenes/nueva"
+                element={<NuevaOrdenPage />}
+              />
+              <Route
                 path="/encargado/consumos"
                 element={<ConsumosEncargado />}
               />
@@ -113,6 +120,7 @@ export default function App() {
               <Route path="/carga-datos/cierres/nuevo" element={<NuevoCierrePage basePath="/carga-datos" />} />
               <Route path="/carga-datos/compras" element={<ComprasCargaDatos />} />
               <Route path="/carga-datos/compras/nueva" element={<NuevaFacturaPage basePath="/carga-datos" />} />
+              <Route path="/carga-datos/compras/ordenes/nueva" element={<NuevaOrdenPage basePath="/carga-datos" />} />
               <Route path="/carga-datos/consumos" element={<ConsumosCargaDatos />} />
               <Route path="/carga-datos/consumos/nuevo" element={<NuevoConsumoPage basePath="/carga-datos" />} />
               <Route path="/carga-datos/eventos" element={<EventosCargaDatos />} />
@@ -142,6 +150,10 @@ export default function App() {
               <Route
                 path="/contabilidad/compras/:id/editar"
                 element={<EditarFacturaPage />}
+              />
+              <Route
+                path="/contabilidad/compras/ordenes/:id/editar"
+                element={<EditarOrdenPage />}
               />
               <Route
                 path="/contabilidad/consumos"
@@ -200,6 +212,10 @@ export default function App() {
               <Route
                 path="/catalogo/partidas"
                 element={<PartidasPage />}
+              />
+              <Route
+                path="/catalogo/proveedor-items"
+                element={<ProveedorItemsPage />}
               />
             </Route>
           </Route>

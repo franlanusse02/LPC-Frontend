@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useApi } from "@/hooks/useApi";
 import { cn, fmtCurrency } from "@/lib/utils";
-import { ArrowLeft, Ban, ChevronDown, ChevronUp, Plus } from "lucide-react";
+import { ArrowLeft, Ban, ChevronDown, ChevronUp, Download, Plus } from "lucide-react";
 import { Fragment, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { DetailedCierreCajaResponse } from "@/domain/dto/cierre-caja/CierreCajaResponse";
@@ -11,6 +11,7 @@ import { DataTable, SortableTh } from "@/components/data-table";
 import { MovimientoRow, AnuladosGroup } from "../components/MovimientoRow";
 import { CierresStatusFilter } from "../components/filters/CierresStatusFilter";
 import { useTableState } from "@/hooks/useTableState";
+import { exportToXlsx, type ExportColumn } from "@/lib/exportXlsx";
 
 export default function CierresPage() {
   const navigate = useNavigate();
@@ -51,6 +52,23 @@ export default function CierresPage() {
     onSort: sort.handleSort,
   };
 
+  const exportColumns: ExportColumn<DetailedCierreCajaResponse>[] = [
+    { key: "fechaOperacion", header: "Fecha" },
+    { key: (c) => c.comedor.nombre, header: "Comedor" },
+    { key: (c) => c.puntoDeVenta.nombre, header: "Punto de Venta" },
+    { key: (c) => c.creadoPor.nombre, header: "Creado por" },
+    { key: "totalPlatosVendidos", header: "Platos" },
+    { key: "montoTotal", header: "Monto Total" },
+    { key: (c) => (c.anulacionId ? "Anulado" : "Activo"), header: "Estado" },
+    { key: "comentarios", header: "Comentarios" },
+  ];
+
+  const handleExport = () => {
+    const segments = ["mis-cierres"];
+    if (filters.status !== "all") segments.push(filters.status);
+    exportToXlsx({ data: displayed, columns: exportColumns, filename: segments.join("-") });
+  };
+
   return (
     <div className="px-4 sm:px-8 lg:px-18 py-8">
       <div className="max-w-7xl mx-auto">
@@ -84,6 +102,12 @@ export default function CierresPage() {
                   onChange={filters.setStatus}
                 />
               </div>
+            }
+            toolbarRight={
+              <Button variant="outline" size="sm" onClick={handleExport}>
+                <Download className="size-4 mr-1.5" />
+                Exportar Excel
+              </Button>
             }
             columns={
               <>

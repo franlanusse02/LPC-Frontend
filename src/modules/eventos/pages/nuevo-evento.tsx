@@ -206,15 +206,21 @@ export default function NuevoEventoPage({ basePath = "/encargado" }: { basePath?
 
       switch (caseKey) {
         case "GALICIA": {
+          const solGal = resolveIdOrNombre(solicitanteId);
+          const funcGal = resolveIdOrNombre(funcionarioId);
+          const respGal = resolveIdOrNombre(responsableId);
           const ccGal = resolveIdOrNombre(centroCostoId);
           const partGal = resolveIdOrNombre(partidaId);
           req = {
             ...base,
             tipoComedor: "GALICIA",
-            solicitanteId: solicitanteId ? Number(solicitanteId) : null,
+            solicitanteId: solGal.id,
+            solicitanteNombre: solGal.nombre,
             emailSolicitante: emailSolicitante || null,
-            funcionarioId: funcionarioId ? Number(funcionarioId) : null,
-            responsableId: responsableId ? Number(responsableId) : null,
+            funcionarioId: funcGal.id,
+            funcionarioNombre: funcGal.nombre,
+            responsableId: respGal.id,
+            responsableNombre: respGal.nombre,
             centroCostoId: ccGal.id,
             centroCostoNombre: ccGal.nombre,
             partidaId: partGal.id,
@@ -229,12 +235,14 @@ export default function NuevoEventoPage({ basePath = "/encargado" }: { basePath?
           break;
         }
         case "BBVA": {
+          const solBbva = resolveIdOrNombre(solicitanteId);
           const legajo = resolveIdOrNombre(legajoId);
           const recepcion = resolveIdOrNombre(recepcionId);
           req = {
             ...base,
             tipoComedor: "BBVA",
-            solicitanteId: solicitanteId ? Number(solicitanteId) : null,
+            solicitanteId: solBbva.id,
+            solicitanteNombre: solBbva.nombre,
             emailSolicitante: emailSolicitante || null,
             ordenCompra: ordenCompra || null,
             legajoId: legajo.id,
@@ -257,12 +265,14 @@ export default function NuevoEventoPage({ basePath = "/encargado" }: { basePath?
           break;
 
         case "UDESA": {
+          const solUdesa = resolveIdOrNombre(solicitanteId);
           const ccUdesa = resolveIdOrNombre(centroCostoId);
           const areaUdesa = resolveIdOrNombre(areaId);
           req = {
             ...base,
             tipoComedor: "UDESA",
-            solicitanteId: solicitanteId ? Number(solicitanteId) : null,
+            solicitanteId: solUdesa.id,
+            solicitanteNombre: solUdesa.nombre,
             centroCostoId: ccUdesa.id,
             centroCostoNombre: ccUdesa.nombre,
             areaId: areaUdesa.id,
@@ -331,10 +341,15 @@ export default function NuevoEventoPage({ basePath = "/encargado" }: { basePath?
     adicionales: { value: adicionales, onChange: setAdicionales },
   };
 
-  const requiredFieldsFilled = Object.entries(caseFields).every(
+  const isBBVA = caseKey === "BBVA";
+  const requiredFieldsFilled = isBBVA || Object.entries(caseFields).every(
     ([k, spec]) => !spec.visible || !spec.required || !!fieldState[k]?.value,
   );
-  const canSubmit = puntoDeVentaId && fechaEvento && (caseKey === "UDESA" || cantidadPersonas) && requiredFieldsFilled;
+  const canSubmit =
+    puntoDeVentaId &&
+    fechaEvento &&
+    (caseKey === "UDESA" || isBBVA || cantidadPersonas) &&
+    requiredFieldsFilled;
 
   const pickerOptions: Record<string, { value: string; label: string; subtitle?: string }[]> = {
     empleado: empleadoOptions,
@@ -353,7 +368,7 @@ export default function NuevoEventoPage({ basePath = "/encargado" }: { basePath?
 
     if (spec.type && spec.type !== "text" && spec.type !== "number") {
       const opts = pickerOptions[spec.type] ?? [];
-      const isCreatable = (spec.type === "centroCosto" || spec.type === "partida") && !isReadonly;
+      const isCreatable = (spec.type === "centroCosto" || spec.type === "partida" || spec.type === "empleado" || spec.type === "funcionario") && !isReadonly;
       return (
         <div key={key} className="space-y-1.5">
           <label className="text-sm font-medium">{label}{spec.required ? " *" : ""}</label>

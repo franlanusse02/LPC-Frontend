@@ -4,11 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useApi } from "@/hooks/useApi";
 import { cn, fmtCurrency } from "@/lib/utils";
-import { ArrowLeft, ChevronDown, ChevronUp, Plus } from "lucide-react";
+import { ArrowLeft, ChevronDown, ChevronUp, Download, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { DataTable, SortableTh } from "@/components/data-table";
 import { EventosStatusFilter } from "../components/filters/EventosStatusFilter";
 import { useTableState } from "@/hooks/useTableState";
+import { exportToXlsx, type ExportColumn } from "@/lib/exportXlsx";
 import type { EventoResponse } from "@/domain/dto/evento/EventoResponse";
 import type { EstadoEvento } from "@/domain/enums/EstadoEvento";
 import { EstadoEventoLabel } from "@/domain/enums/EstadoEvento";
@@ -29,6 +30,7 @@ const TAB_LABELS: Record<TabKey, string> = {
 const TAB_ORDER: TabKey[] = ["TODOS", "GALICIA", "BBVA", "TECHINT", "UDESA", "DEFAULT"];
 
 const ESTADO_STYLES: Record<EstadoEvento, { bg: string; text: string }> = {
+  CARGA_PARCIAL: { bg: "bg-gray-100", text: "text-gray-600" },
   SOLICITADO: { bg: "bg-amber-100", text: "text-amber-700" },
   REALIZADO: { bg: "bg-blue-100", text: "text-blue-700" },
   FACTURA_EMITIDA: { bg: "bg-violet-100", text: "text-violet-700" },
@@ -253,6 +255,7 @@ export default function EventosEncargado() {
     ],
     statusField: "estado",
     statusMapping: {
+      CARGA_PARCIAL: { filter: (e) => e.estado === "CARGA_PARCIAL" },
       SOLICITADO: { filter: (e) => e.estado === "SOLICITADO" },
       REALIZADO: { filter: (e) => e.estado === "REALIZADO" },
       FACTURA_EMITIDA: { filter: (e) => e.estado === "FACTURA_EMITIDA" },
@@ -263,6 +266,45 @@ export default function EventosEncargado() {
   });
 
   const sortProps = { sortKey: sort.key, sortDir: sort.dir, onSort: sort.handleSort };
+
+  const exportColumns: ExportColumn<EventoResponse>[] = [
+    { key: "fechaEvento", header: "Fecha" },
+    { key: (e) => comedorNameById[e.comedorId] ?? e.comedorId, header: "Comedor" },
+    { key: "tipoComedor", header: "Tipo" },
+    { key: "cantidadPersonas", header: "Personas" },
+    { key: "montoTotal", header: "Monto" },
+    { key: (e) => EstadoEventoLabel[e.estado], header: "Estado" },
+    { key: "medioPago", header: "Medio de Pago" },
+    { key: (e) => ev(e, "solicitanteNombre"), header: "Solicitante" },
+    { key: (e) => ev(e, "emailSolicitante"), header: "Email Solicitante" },
+    { key: (e) => ev(e, "funcionarioNombre"), header: "Funcionario" },
+    { key: (e) => ev(e, "responsableNombre"), header: "Responsable" },
+    { key: (e) => ev(e, "centroCosto"), header: "Centro de Costo" },
+    { key: (e) => ev(e, "partida"), header: "Partida" },
+    { key: (e) => ev(e, "area"), header: "Área" },
+    { key: (e) => ev(e, "legajo"), header: "Legajo" },
+    { key: (e) => ev(e, "recepcion"), header: "Recepción" },
+    { key: (e) => ev(e, "ordenCompra"), header: "Orden de Compra" },
+    { key: (e) => ev(e, "numeroPedido"), header: "Nº Pedido" },
+    { key: (e) => ev(e, "concepto"), header: "Concepto" },
+    { key: (e) => ev(e, "razonSocial"), header: "Razón Social" },
+    { key: (e) => ev(e, "destinatarioFacturacion"), header: "Dest. Facturación" },
+    { key: (e) => ev(e, "tipoComprobante"), header: "Tipo Comprobante" },
+    { key: (e) => ev(e, "numeroComprobante"), header: "Nº Comprobante" },
+    { key: (e) => ev(e, "numeroOperacion"), header: "Nº Operación" },
+    { key: (e) => ev(e, "precioUnitario"), header: "Precio Unitario" },
+    { key: (e) => ev(e, "retenciones"), header: "Retenciones" },
+    { key: (e) => ev(e, "adicionales"), header: "Adicionales" },
+    { key: "observaciones", header: "Observaciones" },
+  ];
+
+  const handleExport = () => {
+    const data = displayed.filter((e) => e.estado !== "CARGA_PARCIAL");
+    const segments = ["mis-eventos"];
+    if (activeTab !== "TODOS") segments.push(activeTab.toLowerCase());
+    if (filters.status !== "all") segments.push(filters.status);
+    exportToXlsx({ data, columns: exportColumns, filename: segments.join("-") });
+  };
 
   return (
     <div className="px-4 sm:px-8 lg:px-18 py-8">
@@ -322,6 +364,12 @@ export default function EventosEncargado() {
                   onChange={filters.setStatus}
                 />
               </div>
+            }
+            toolbarRight={
+              <Button variant="outline" size="sm" onClick={handleExport}>
+                <Download className="size-4 mr-1.5" />
+                Exportar Excel
+              </Button>
             }
             columns={
               <>

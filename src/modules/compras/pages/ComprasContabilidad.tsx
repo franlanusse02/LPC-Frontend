@@ -43,6 +43,11 @@ import {
   type ListFilterState,
 } from "@/components/ListFilters";
 import { defaultFilters } from "@/components/list-filter-defaults";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { KpiCard } from "@/components/KpiCard";
+import { OrdenesDeCompraTable } from "../components/OrdenesDeCompraTable";
+import { downloadPdf } from "@/lib/download";
+import type { OrdenDeCompraResponse } from "@/domain/dto/orden-compra/OrdenDeCompraResponse";
 
 const ESTADO_STYLES: Record<
   string,
@@ -72,6 +77,39 @@ export default function ComprasContabilidad() {
   const [comedores, setComedores] = useState<ComedorResponse[]>([]);
 
   const [listFilters, setListFilters] = useState<ListFilterState>(defaultFilters);
+
+  const [ordenes, setOrdenes] = useState<OrdenDeCompraResponse[]>([]);
+
+  useEffect(() => {
+    get("/ordenes-de-compra")
+      .then((r) => r.json())
+      .then((data: OrdenDeCompraResponse[]) => setOrdenes(Array.isArray(data) ? data : []));
+  }, [get]);
+
+  const handleDownloadPdf = async (o: OrdenDeCompraResponse) => {
+    try {
+      await downloadPdf(get, `/ordenes-de-compra/${o.id}/pdf`, `orden-${o.nroOrden}.pdf`);
+    } catch {
+      toast.error("No se pudo descargar el PDF");
+    }
+  };
+
+  const applyOrdenAction = async (
+    o: OrdenDeCompraResponse,
+    action: "aprobar" | "enviar" | "cancelar",
+    successMsg: string,
+  ) => {
+    try {
+      const updated: OrdenDeCompraResponse = await patch(
+        `/ordenes-de-compra/${o.id}/${action}`,
+        {},
+      ).then((r) => r.json());
+      setOrdenes((prev) => prev.map((x) => (x.id === o.id ? updated : x)));
+      toast(successMsg);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "No se pudo realizar la acción");
+    }
+  };
 
   const handleEmitir = async (
     facturaId: number,
@@ -173,6 +211,7 @@ export default function ComprasContabilidad() {
     if (listFilters.desde) list = list.filter((f) => getDate(f) >= listFilters.desde);
     if (listFilters.hasta) list = list.filter((f) => getDate(f) <= listFilters.hasta);
     if (listFilters.comedorId) list = list.filter((f) => f.comedorId === Number(listFilters.comedorId));
+    if (listFilters.puntoDeVentaIds.length) list = list.filter((f) => (f.puntoDeVentaComedor ?? []).some((s) => listFilters.puntoDeVentaIds.includes(String(s.puntoDeVentaId))));
     return list;
   }, [facturas, listFilters]);
 
@@ -337,7 +376,7 @@ export default function ComprasContabilidad() {
         </Button>
       </div>
 
-      <div className="mx-auto max-w-7xl grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5 pb-4">
+      <div className="mx-auto max-w-7xl grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6 pb-4">
         <StatCard label="Total facturas" value={facturas.length} />
         <StatCard label="Activas" value={totalActivos} accent="emerald" />
         <StatCard label="Anuladas" value={totalAnulados} accent="red" />
@@ -347,9 +386,44 @@ export default function ComprasContabilidad() {
           value={fmtCurrency(isFiltered ? montoFiltrado : montoActivo)}
           accent={isFiltered ? "blue" : undefined}
         />
+        <KpiCard
+          title="Monto estimado OC"
+          endpoint="/analytics/contabilidad/ordenes-compra/monto-estimado"
+          format="currency"
+          valueExtractor={(d) =>
+            typeof d === "number" ? d : ((d as { total?: number })?.total ?? 0)
+          }
+        />
       </div>
 
-      <Card className="mx-auto max-w-7xl py-6 border-0 shadow-md rounded-xl">
+      <Tabs defaultValue="facturas" className="mx-auto max-w-7xl">
+        <TabsList className="mb-4 px-1">
+          <TabsTrigger value="facturas">Facturas</TabsTrigger>
+          <TabsTrigger value="ordenes">Órdenes de Compra</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="ordenes">
+          <Card className="py-6 border-0 shadow-md rounded-xl">
+            <CardHeader className="border-b px-6 py-4">
+              <CardTitle className="text-xl font-bold text-gray-800">
+                Órdenes de Compra
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              <OrdenesDeCompraTable
+                ordenes={ordenes}
+                onDownloadPdf={handleDownloadPdf}
+                onEdit={(o) => navigate(`/contabilidad/compras/ordenes/${o.id}/editar`)}
+                onAprobar={(o) => applyOrdenAction(o, "aprobar", "Orden aprobada")}
+                onEnviar={(o) => applyOrdenAction(o, "enviar", "Orden enviada")}
+                onCancelar={(o) => applyOrdenAction(o, "cancelar", "Orden cancelada")}
+              />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="facturas">
+      <Card className="py-6 border-0 shadow-md rounded-xl">
         <CardHeader className="border-b px-6 py-4">
           <div className="w-full flex flex-row justify-between">
             <CardTitle className="text-xl font-bold text-gray-800">
@@ -697,6 +771,8 @@ export default function ComprasContabilidad() {
           />
         </CardContent>
       </Card>
+        </TabsContent>
+      </Tabs>
 
       <EmitirFacturaModal
         open={!!emitirFactura}

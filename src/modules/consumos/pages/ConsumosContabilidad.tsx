@@ -110,6 +110,7 @@ export default function ConsumosContabilidad() {
       const cId = Number(listFilters.consumidorId);
       list = list.filter((c) => c.consumidorId === cId);
     }
+    if (listFilters.puntoDeVentaIds.length) list = list.filter((c) => listFilters.puntoDeVentaIds.includes(String(c.PuntoDeVentaId)));
     return list;
   }, [consumos, listFilters, consumidorById]);
 
@@ -462,7 +463,7 @@ export default function ConsumosContabilidad() {
                             </div>
                           )}
                         </td>
-                        <td className="px-4 py-4 text-right font-mono">
+                        <td className="px-4 py-4 text-right font-mono whitespace-nowrap">
                           {fmtCurrency(consumo.total)}
                         </td>
                         <td className="px-4 py-4 text-center">

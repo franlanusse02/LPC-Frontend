@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useApi } from "@/hooks/useApi";
 import { cn, fmtCurrency } from "@/lib/utils";
 import { StatCard } from "@/modules/cierres/components/cierre-stat";
-import { ArrowLeft, Ban, ChevronDown, ChevronUp, Plus } from "lucide-react";
+import { ArrowLeft, Ban, ChevronDown, ChevronUp, Download, Plus } from "lucide-react";
 import { Fragment, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { DataTable, SortableTh } from "@/components/data-table";
@@ -11,6 +11,13 @@ import { FacturasStatusFilter } from "../components/filters/FacturasStatusFilter
 import { useTableState } from "@/hooks/useTableState";
 import type { FacturaProveedorResponse } from "@/domain/dto/compra/FacturaProveedorResponse";
 import type { ComedorResponse } from "@/domain/dto/comedor/ComedorResponse";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { KpiCard } from "@/components/KpiCard";
+import { OrdenesDeCompraTable } from "../components/OrdenesDeCompraTable";
+import { downloadPdf } from "@/lib/download";
+import { exportToXlsx, type ExportColumn } from "@/lib/exportXlsx";
+import { toast } from "sonner";
+import type { OrdenDeCompraResponse } from "@/domain/dto/orden-compra/OrdenDeCompraResponse";
 
 const ESTADO_STYLES: Record<
   string,
@@ -30,6 +37,8 @@ export default function ComprasEncargado() {
   const [comedores, setComedores] = useState<ComedorResponse[]>([]);
   const [proveedores, setProveedores] = useState<{ id: number; nombre: string }[]>([]);
 
+  const [ordenes, setOrdenes] = useState<OrdenDeCompraResponse[]>([]);
+
   useEffect(() => {
     Promise.all([get("/facturas/proveedor/mis-facturas"), get("/comedores"), get("/proveedores")]).then(
       ([facturasRes, comedoresRes, proveedoresRes]) => {
@@ -39,6 +48,20 @@ export default function ComprasEncargado() {
       },
     );
   }, [get]);
+
+  useEffect(() => {
+    get("/ordenes-de-compra/mis-ordenes")
+      .then((r) => r.json())
+      .then((data: OrdenDeCompraResponse[]) => setOrdenes(Array.isArray(data) ? data : []));
+  }, [get]);
+
+  const handleDownloadPdf = async (o: OrdenDeCompraResponse) => {
+    try {
+      await downloadPdf(get, `/ordenes-de-compra/${o.id}/pdf`, `orden-${o.nroOrden}.pdf`);
+    } catch {
+      toast.error("No se pudo descargar el PDF");
+    }
+  };
 
   const proveedorNameById = useMemo(
     () => Object.fromEntries(proveedores.map((p) => [p.id, p.nombre])),
@@ -86,6 +109,36 @@ export default function ComprasEncargado() {
   const montoFiltrado = displayed.reduce((s, f) => s + (f.monto ?? 0), 0);
   const isFiltered = displayed.length !== facturas.length;
 
+  const exportColumns: ExportColumn<FacturaProveedorResponse>[] = [
+    { key: (f) => new Date(f.creadoEn).toLocaleString("es-AR", {
+      timeZone: "America/Argentina/Buenos_Aires",
+      day: "2-digit", month: "2-digit", year: "2-digit",
+      hour: "2-digit", minute: "2-digit",
+      hour12: false,
+    }), header: "Fecha de Carga" },
+    { key: "id", header: "ID" },
+    { key: "numero", header: "Nº Factura" },
+    { key: (f) => proveedorNameById[f.proveedorId] ?? f.proveedorId, header: "Proveedor" },
+    { key: (f) => comedorNameById[f.comedorId] ?? f.comedorId, header: "Comedor" },
+    { key: "fechaFactura", header: "Fecha Factura" },
+    { key: "monto", header: "Monto" },
+    { key: "estado", header: "Estado" },
+    { key: "medioPago", header: "Medio de Pago" },
+    { key: "fechaEmision", header: "Fecha Emisión" },
+    { key: "fechaPago", header: "Fecha Pago" },
+    { key: "numeroOperacion", header: "Nº Operación" },
+    { key: "bancoNombre", header: "Banco" },
+    { key: "comentarios", header: "Comentarios" },
+    { key: (f) => (f.puntoDeVentaComedor ?? []).map((s) => `${posNameById[s.puntoDeVentaId] ?? `Punto de venta #${s.puntoDeVentaId}`}: $${s.monto}`).join(", "), header: "Puntos de Venta" },
+    { key: "creadoPorNombre", header: "Creado por" },
+  ];
+
+  const handleExport = () => {
+    const segments = ["mis-compras"];
+    if (filters.status !== "all") segments.push(filters.status);
+    exportToXlsx({ data: displayed, columns: exportColumns, filename: segments.join("-") });
+  };
+
   return (
     <div className="px-4 sm:px-8 lg:px-18 py-8">
       <div className="max-w-7xl mx-auto">
@@ -95,7 +148,7 @@ export default function ComprasEncargado() {
         </Button>
       </div>
 
-      <div className="mx-auto max-w-7xl grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5 pb-4">
+      <div className="mx-auto max-w-7xl grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6 pb-4">
         <StatCard label="Total facturas" value={facturas.length} />
         <StatCard label="Activas" value={totalActivos} accent="emerald" />
         <StatCard label="Anuladas" value={totalAnulados} accent="red" />
@@ -105,9 +158,46 @@ export default function ComprasEncargado() {
           value={fmtCurrency(isFiltered ? montoFiltrado : montoTotal)}
           accent={isFiltered ? "blue" : undefined}
         />
+        <KpiCard
+          title="Monto estimado OC"
+          endpoint="/analytics/encargado/ordenes-compra/monto-estimado"
+          format="currency"
+          valueExtractor={(d) =>
+            typeof d === "number" ? d : ((d as { total?: number })?.total ?? 0)
+          }
+        />
       </div>
 
-      <Card className="mx-auto max-w-7xl py-6 border-0 shadow-md rounded-xl">
+      <Tabs defaultValue="facturas" className="mx-auto max-w-7xl">
+        <TabsList className="mb-4 px-1">
+          <TabsTrigger value="facturas">Facturas</TabsTrigger>
+          <TabsTrigger value="ordenes">Órdenes de Compra</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="ordenes">
+          <Card className="py-6 border-0 shadow-md rounded-xl">
+            <CardHeader className="border-b px-6 py-4">
+              <div className="w-full flex flex-row justify-between">
+                <CardTitle className="text-xl font-bold text-gray-800">
+                  Tus Órdenes de Compra
+                </CardTitle>
+                <Button
+                  size="sm"
+                  onClick={() => navigate("/encargado/compras/ordenes/nueva")}
+                  className="gap-2 px-4 py-2 text-sm font-semibold uppercase tracking-wide hover:scale-105 transition"
+                >
+                  <Plus className="h-4 w-4" /> Nueva Orden
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="p-0">
+              <OrdenesDeCompraTable ordenes={ordenes} onDownloadPdf={handleDownloadPdf} />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="facturas">
+      <Card className="py-6 border-0 shadow-md rounded-xl">
         <CardHeader className="border-b px-6 py-4">
           <div className="w-full flex flex-row justify-between">
             <CardTitle className="text-xl font-bold text-gray-800">
@@ -142,6 +232,12 @@ export default function ComprasEncargado() {
                  />
                </div>
              }
+            toolbarRight={
+              <Button variant="outline" size="sm" onClick={handleExport}>
+                <Download className="size-4 mr-1.5" />
+                Exportar Excel
+              </Button>
+            }
             columns={
               <>
                 <th className="px-4 py-3 w-8" />
@@ -333,6 +429,8 @@ export default function ComprasEncargado() {
           />
         </CardContent>
       </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

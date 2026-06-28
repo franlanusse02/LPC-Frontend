@@ -73,6 +73,7 @@ const TAB_LABELS: Record<TabKey, string> = {
 const TAB_ORDER: TabKey[] = ["TODOS", "GALICIA", "BBVA", "TECHINT", "UDESA", "DEFAULT"];
 
 const ESTADO_STYLES: Record<EstadoEvento, { bg: string; text: string }> = {
+  CARGA_PARCIAL: { bg: "bg-gray-100", text: "text-gray-600" },
   SOLICITADO: { bg: "bg-amber-100", text: "text-amber-700" },
   REALIZADO: { bg: "bg-blue-100", text: "text-blue-700" },
   FACTURA_EMITIDA: { bg: "bg-violet-100", text: "text-violet-700" },
@@ -375,6 +376,7 @@ export default function EventosContabilidad() {
     if (listFilters.desde) list = list.filter((e) => getDate(e) >= listFilters.desde);
     if (listFilters.hasta) list = list.filter((e) => getDate(e) <= listFilters.hasta);
     if (listFilters.comedorId) list = list.filter((e) => e.comedorId === Number(listFilters.comedorId));
+    if (listFilters.puntoDeVentaIds.length) list = list.filter((e) => listFilters.puntoDeVentaIds.includes(String(e.puntoDeVentaId)));
     return list;
   }, [eventos, listFilters]);
 
@@ -409,6 +411,7 @@ export default function EventosContabilidad() {
     ],
     statusField: "estado",
     statusMapping: {
+      CARGA_PARCIAL: { filter: (e) => e.estado === "CARGA_PARCIAL" },
       SOLICITADO: { filter: (e) => e.estado === "SOLICITADO" },
       REALIZADO: { filter: (e) => e.estado === "REALIZADO" },
       FACTURA_EMITIDA: { filter: (e) => e.estado === "FACTURA_EMITIDA" },
@@ -569,9 +572,10 @@ export default function EventosContabilidad() {
   );
 
   const handleExport = () => {
-    const data = selection.count > 0
+    const data = (selection.count > 0
       ? displayed.filter((e) => selection.selected.has(e.id))
-      : displayed;
+      : displayed
+    ).filter((e) => e.estado !== "CARGA_PARCIAL");
     const segments = ["eventos"];
     if (activeTab !== "TODOS") segments.push(activeTab.toLowerCase());
     if (filters.status !== "all") segments.push(filters.status.toLowerCase());
