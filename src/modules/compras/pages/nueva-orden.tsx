@@ -1,6 +1,6 @@
 import { Fragment, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useApi } from "@/hooks/useApi";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { Combobox } from "@/components/ui/combobox";
 import { cn, fmtCurrency } from "@/lib/utils";
 import { NuevoItemProveedorModal } from "../components/NuevoItemProveedorModal";
+import { EditarItemProveedorModal } from "@/modules/catalogo/components/EditarItemProveedorModal";
 import type { ProveedorResponse } from "@/domain/dto/proveedor/ProveedorResponse";
 import type { ComedorResponse } from "@/domain/dto/comedor/ComedorResponse";
 import type { SociedadResponse } from "@/domain/dto/sociedad/SociedadResponse";
@@ -41,6 +42,8 @@ export default function NuevaOrdenPage({ basePath = "/encargado" }: { basePath?:
   const [observaciones, setObservaciones] = useState("");
   const [lines, setLines] = useState<ItemLine[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
+  const [editItem, setEditItem] = useState<ProveedorItemResponse | null>(null);
+  const [editOpen, setEditOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -94,6 +97,9 @@ export default function NuevaOrdenPage({ basePath = "/encargado" }: { basePath?:
     setItems((p) => [...p, item]);
     setLines((p) => [...p, { proveedorItemId: String(item.id), cantidad: "" }]);
   };
+
+  const onItemEdited = (saved: ProveedorItemResponse) =>
+    setItems((p) => p.map((i) => (i.id === saved.id ? saved : i)));
 
   const canSubmit =
     !!fecha &&
@@ -211,6 +217,9 @@ export default function NuevaOrdenPage({ basePath = "/encargado" }: { basePath?:
                     </div>
                     <Input type="number" min="0" value={line.cantidad} onChange={(e) => updateLine(idx, "cantidad", e.target.value)} placeholder="Cant." className="w-24" />
                     <span className="w-28 text-right text-sm font-mono text-gray-600">{lineTotal !== null ? fmtCurrency(lineTotal) : "—"}</span>
+                    <Button type="button" variant="ghost" size="icon" disabled={!it} className="h-9 w-9 text-gray-400 hover:text-gray-700" onClick={() => { if (it) { setEditItem(it); setEditOpen(true); } }}>
+                      <Pencil className="h-4 w-4" />
+                    </Button>
                     <Button type="button" variant="ghost" size="icon" className="h-9 w-9 text-gray-400 hover:text-red-500" onClick={() => removeLine(idx)}>
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -252,6 +261,13 @@ export default function NuevaOrdenPage({ basePath = "/encargado" }: { basePath?:
           onCreated={onItemCreated}
         />
       )}
+
+      <EditarItemProveedorModal
+        open={editOpen}
+        onClose={() => setEditOpen(false)}
+        item={editItem}
+        onSaved={onItemEdited}
+      />
     </Fragment>
   );
 }
