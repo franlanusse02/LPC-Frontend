@@ -119,9 +119,20 @@ export default function NuevoConsumoPage({ basePath = "/encargado" }: { basePath
 
     setLoading(true);
     try {
+      let resolvedConsumidorId = Number(consumidorId);
+      if (consumidorId.startsWith("new:")) {
+        const saved: ConsumidorResponse = await post("/consumos/consumidores", {
+          nombre: consumidorId.slice(4),
+          comedorId: Number(comedorId),
+        }).then((r) => r.json());
+        resolvedConsumidorId = saved.id;
+        setConsumidores((prev) => [...prev, saved]);
+        setConsumidorId(String(saved.id));
+      }
+
       const req: CreateConsumoRequest = {
         puntoDeVentaId: Number(puntoDeVentaId),
-        consumidorId: Number(consumidorId),
+        consumidorId: resolvedConsumidorId,
         fecha,
         observaciones: observaciones || undefined,
         productos: lines.reduce(
@@ -166,7 +177,7 @@ export default function NuevoConsumoPage({ basePath = "/encargado" }: { basePath
             </CardTitle>
           </CardHeader>
           <CardContent className="p-6">
-            <div className="flex flex-col gap-8 lg:flex-row">
+            <div className="flex flex-col gap-8">
               {/* Left column */}
               <div className="flex-1 min-w-0 space-y-5">
                 <div className="space-y-1.5">
@@ -197,6 +208,7 @@ export default function NuevoConsumoPage({ basePath = "/encargado" }: { basePath
                     }}
                     placeholder={!comedorId ? "Seleccioná un comedor primero..." : "Seleccionar consumidor..."}
                     disabled={!comedorId}
+                    creatable
                     className="w-full"
                   />
                 </div>
