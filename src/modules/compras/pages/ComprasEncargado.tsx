@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useApi } from "@/hooks/useApi";
 import { cn, fmtCurrency } from "@/lib/utils";
 import { StatCard } from "@/modules/cierres/components/cierre-stat";
-import { ArrowLeft, Ban, ChevronDown, ChevronUp, Download, Plus } from "lucide-react";
+import { ArrowLeft, Ban, ChevronDown, ChevronUp, Download, MoreHorizontal, Pencil, Plus } from "lucide-react";
 import { Fragment, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { DataTable, SortableTh } from "@/components/data-table";
@@ -18,6 +18,14 @@ import { downloadPdf } from "@/lib/download";
 import { exportToXlsx, type ExportColumn } from "@/lib/exportXlsx";
 import { toast } from "sonner";
 import type { OrdenDeCompraResponse } from "@/domain/dto/orden-compra/OrdenDeCompraResponse";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { AnularFacturaModal } from "../components/AnularFacturaModal";
 
 const ESTADO_STYLES: Record<
   string,
@@ -31,13 +39,15 @@ const ESTADO_STYLES: Record<
 
 export default function ComprasEncargado() {
   const navigate = useNavigate();
-  const { get } = useApi();
+  const { get, patch, del } = useApi();
 
   const [facturas, setFacturas] = useState<FacturaProveedorResponse[]>([]);
   const [comedores, setComedores] = useState<ComedorResponse[]>([]);
   const [proveedores, setProveedores] = useState<{ id: number; nombre: string }[]>([]);
 
   const [ordenes, setOrdenes] = useState<OrdenDeCompraResponse[]>([]);
+  const [anularFactura, setAnularFactura] =
+    useState<FacturaProveedorResponse | null>(null);
 
   useEffect(() => {
     Promise.all([get("/facturas/proveedor/mis-facturas"), get("/comedores"), get("/proveedores")]).then(
@@ -60,6 +70,32 @@ export default function ComprasEncargado() {
       await downloadPdf(get, `/ordenes-de-compra/${o.id}/pdf`, `orden-${o.nroOrden}.pdf`);
     } catch {
       toast.error("No se pudo descargar el PDF");
+    }
+  };
+
+  const handleCancelarOrden = async (o: OrdenDeCompraResponse) => {
+    try {
+      const updated: OrdenDeCompraResponse = await patch(
+        `/ordenes-de-compra/${o.id}/cancelar`,
+        {},
+      ).then((r) => r.json());
+      setOrdenes((prev) => prev.map((x) => (x.id === o.id ? updated : x)));
+      toast("Orden cancelada");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "No se pudo cancelar la orden");
+    }
+  };
+
+  const handleAnularFactura = async (facturaId: number, motivo: string) => {
+    try {
+      const updated = await del(`/facturas/proveedor/${facturaId}`, {
+        body: JSON.stringify({ motivo }),
+      }).then((r) => r.json());
+      setFacturas((prev) => prev.map((f) => (f.id === facturaId ? updated : f)));
+      toast("Factura anulada");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "No se pudo anular la factura");
+      throw err;
     }
   };
 
@@ -191,7 +227,12 @@ export default function ComprasEncargado() {
               </div>
             </CardHeader>
             <CardContent className="p-0">
-              <OrdenesDeCompraTable ordenes={ordenes} onDownloadPdf={handleDownloadPdf} />
+              <OrdenesDeCompraTable
+                ordenes={ordenes}
+                onDownloadPdf={handleDownloadPdf}
+                onEdit={(o) => navigate(`/encargado/compras/ordenes/${o.id}/editar`)}
+                onCancelar={handleCancelarOrden}
+              />
             </CardContent>
           </Card>
         </TabsContent>
@@ -205,7 +246,7 @@ export default function ComprasEncargado() {
             </CardTitle>
             <Button
               size="sm"
-              onClick={() => navigate("/encargado/compras/nueva")}
+              onClick={() => navigate("/encargado/compras/facturas/nueva")}
               className="gap-2 px-4 py-2 text-sm font-semibold uppercase tracking-wide hover:scale-105 transition"
             >
               <Plus className="h-4 w-4" /> Nueva Factura
@@ -254,6 +295,7 @@ export default function ComprasEncargado() {
                 <SortableTh label="Estado" col="estado" {...sortProps} />
                 <th className="px-4 py-3">Medio de Pago</th>
                 <th className="px-4 py-3">Comentarios</th>
+                <th className="px-4 py-3 w-12" />
               </>
             }
              rows={
@@ -345,11 +387,42 @@ export default function ComprasEncargado() {
                              <span className="text-gray-300">—</span>
                            )}
                          </td>
+                         <td className="px-4 py-4" onClick={(e) => e.stopPropagation()}>
+                           {factura.estado === "PENDIENTE" && (
+                             <DropdownMenu>
+                               <DropdownMenuTrigger asChild>
+                                 <Button
+                                   variant="ghost"
+                                   size="icon"
+                                   className="h-8 w-8 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100 data-[state=open]:bg-gray-100"
+                                   aria-label="Acciones"
+                                 >
+                                   <MoreHorizontal className="h-4 w-4" />
+                                 </Button>
+                               </DropdownMenuTrigger>
+                               <DropdownMenuContent align="end" className="w-44 rounded-xl shadow-lg border-gray-100">
+                                 <DropdownMenuItem
+                                   onClick={() => navigate(`/encargado/compras/${factura.id}/editar`)}
+                                   className="gap-2.5 cursor-pointer rounded-lg text-gray-700 focus:text-gray-900"
+                                 >
+                                   <Pencil className="h-4 w-4 text-gray-400" /> Editar
+                                 </DropdownMenuItem>
+                                 <DropdownMenuSeparator className="my-1" />
+                                 <DropdownMenuItem
+                                   onClick={() => setAnularFactura(factura)}
+                                   className="gap-2.5 cursor-pointer rounded-lg text-red-600 focus:text-red-700 focus:bg-red-50"
+                                 >
+                                   <Ban className="h-4 w-4" /> Anular
+                                 </DropdownMenuItem>
+                               </DropdownMenuContent>
+                             </DropdownMenu>
+                           )}
+                         </td>
                        </tr>
 
                        {isExpanded && (
                          <tr className="bg-gray-50/60">
-                           <td colSpan={9} className="px-8 py-4">
+                           <td colSpan={10} className="px-8 py-4">
                              <div className="rounded-xl border border-gray-200 overflow-hidden shadow-sm">
                                <div className="grid grid-cols-2 gap-x-8 gap-y-3 sm:grid-cols-3 lg:grid-cols-4 p-4">
                                  {factura.numeroOperacion && (
@@ -431,6 +504,12 @@ export default function ComprasEncargado() {
       </Card>
         </TabsContent>
       </Tabs>
+      <AnularFacturaModal
+        open={!!anularFactura}
+        onClose={() => setAnularFactura(null)}
+        factura={anularFactura}
+        onConfirm={handleAnularFactura}
+      />
     </div>
   );
 }

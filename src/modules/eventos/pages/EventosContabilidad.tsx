@@ -25,6 +25,7 @@ import {
   FileX2,
   MoreHorizontal,
   Pencil,
+  Plus,
   Send,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -607,10 +608,8 @@ export default function EventosContabilidad() {
 
       <Card className="mx-auto max-w-7xl py-6 border-0 shadow-md rounded-xl">
         <CardHeader className="border-b px-6 py-4">
-          <div className="flex flex-row justify-between">
-            <CardTitle className="text-xl font-bold text-gray-800">Eventos</CardTitle>
-          </div>
-          <div className="pt-3">
+          <CardTitle className="text-xl font-bold text-gray-800">Eventos</CardTitle>
+          <div className="flex flex-row items-start justify-between gap-4 pt-3">
             <ListFilters
               filters={listFilters}
               onChange={setListFilters}
@@ -621,6 +620,13 @@ export default function EventosContabilidad() {
                 { value: "creadoEn", label: "Fecha de Carga" },
               ]}
             />
+            <Button
+              size="sm"
+              onClick={() => navigate("/contabilidad/eventos/nuevo")}
+              className="gap-2 px-4 py-2 text-sm font-semibold uppercase tracking-wide hover:scale-105 transition shrink-0"
+            >
+              <Plus className="h-4 w-4" /> Nuevo Evento
+            </Button>
           </div>
           <div className="flex gap-1 pt-3 border-t mt-3 overflow-x-auto">
             {availableTabs.map((tab) => (

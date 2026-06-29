@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useApi } from "@/hooks/useApi";
 import { cn, fmtCurrency } from "@/lib/utils";
-import { ArrowLeft, Ban, ChevronDown, ChevronUp, Download, Plus } from "lucide-react";
+import { ArrowLeft, Ban, ChevronDown, ChevronUp, Download, MoreHorizontal, Pencil, Plus } from "lucide-react";
 import { Fragment, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { DetailedCierreCajaResponse } from "@/domain/dto/cierre-caja/CierreCajaResponse";
@@ -12,12 +12,23 @@ import { MovimientoRow, AnuladosGroup } from "../components/MovimientoRow";
 import { CierresStatusFilter } from "../components/filters/CierresStatusFilter";
 import { useTableState } from "@/hooks/useTableState";
 import { exportToXlsx, type ExportColumn } from "@/lib/exportXlsx";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { AnularCierreModal } from "../components/anular-cierre-modal";
 
 export default function CierresPage() {
   const navigate = useNavigate();
-  const { get } = useApi();
+  const { get, del } = useApi();
 
   const [cierres, setCierres] = useState<DetailedCierreCajaResponse[]>([]);
+  const [anularModalOpen, setAnularModalOpen] = useState(false);
+  const [selectedCierre, setSelectedCierre] =
+    useState<DetailedCierreCajaResponse | null>(null);
 
   useEffect(() => {
     get("/cierres/mine")
@@ -50,6 +61,24 @@ export default function CierresPage() {
     sortKey: sort.key,
     sortDir: sort.dir,
     onSort: sort.handleSort,
+  };
+
+  const refetch = () => {
+    get("/cierres/mine").then((r) => r.json()).then(setCierres);
+  };
+
+  const handleAnular = async (id: number, motivo: string) => {
+    const res = await del(`/cierres/${id}`, {
+      body: JSON.stringify({ motivo }),
+    });
+    setSelectedCierre(null);
+    setAnularModalOpen(false);
+    if (res.ok) {
+      const updated = (await res.json()) as DetailedCierreCajaResponse;
+      setCierres((prev) => prev.map((c) => (c.id === id ? updated : c)));
+    } else {
+      refetch();
+    }
   };
 
   const exportColumns: ExportColumn<DetailedCierreCajaResponse>[] = [
@@ -134,6 +163,7 @@ export default function CierresPage() {
                 />
                 <th className="px-4 py-3 text-center">Estado</th>
                 <th className="px-4 py-3">Comentarios</th>
+                <th className="px-4 py-3 w-12" />
               </>
             }
             rows={
@@ -227,11 +257,50 @@ export default function CierresPage() {
                             <span className="text-gray-300">—</span>
                           )}
                         </td>
+                        <td className="px-4 py-4">
+                          {!isAnulado && (
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100 data-[state=open]:bg-gray-100"
+                                  aria-label="Acciones"
+                                >
+                                  <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent
+                                align="end"
+                                className="w-44 rounded-xl shadow-lg border-gray-100"
+                              >
+                                <DropdownMenuItem
+                                  onClick={() =>
+                                    navigate(`/encargado/cierres/${cierre.id}/editar`)
+                                  }
+                                  className="gap-2.5 cursor-pointer rounded-lg text-gray-700 focus:text-gray-900"
+                                >
+                                  <Pencil className="h-4 w-4 text-gray-400" /> Editar
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator className="my-1" />
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    setSelectedCierre(cierre);
+                                    setAnularModalOpen(true);
+                                  }}
+                                  className="gap-2.5 cursor-pointer rounded-lg text-red-600 focus:text-red-700 focus:bg-red-50"
+                                >
+                                  <Ban className="h-4 w-4" /> Anular
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          )}
+                        </td>
                       </tr>
 
                       {isExpanded && (
                         <tr className="bg-gray-50/60">
-                          <td colSpan={9} className="px-8 py-4">
+                          <td colSpan={10} className="px-8 py-4">
                             {movimientos.length === 0 ? (
                               <p className="text-sm italic text-gray-400">
                                 Sin movimientos registrados
@@ -282,6 +351,12 @@ export default function CierresPage() {
           />
         </CardContent>
       </Card>
+      <AnularCierreModal
+        open={anularModalOpen}
+        onClose={() => setAnularModalOpen(false)}
+        cierre={selectedCierre}
+        onConfirm={handleAnular}
+      />
     </div>
   );
 }

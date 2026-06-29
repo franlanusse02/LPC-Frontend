@@ -29,6 +29,7 @@ interface ListFiltersProps {
   sociedades?: SociedadResponse[];
   consumidores?: ConsumidorResponse[];
   showSociedad?: boolean;
+  showComedor?: boolean;
   showPuntoDeVenta?: boolean;
   dateFieldOptions?: DateFieldOption[];
 }
@@ -40,6 +41,7 @@ export function ListFilters({
   sociedades,
   consumidores,
   showSociedad = true,
+  showComedor = true,
   showPuntoDeVenta = true,
   dateFieldOptions,
 }: ListFiltersProps) {
@@ -112,14 +114,16 @@ export function ListFilters({
           className="w-48 h-8 text-sm"
         />
       )}
-      <Combobox
-        options={comedorOptions}
-        value={filters.comedorId}
-        onChange={(v) => set({ comedorId: v, puntoDeVentaIds: [], consumidorId: "" })}
-        placeholder="Todos los comedores"
-        clearable
-        className="w-52 h-8 text-sm"
-      />
+      {showComedor && (
+        <Combobox
+          options={comedorOptions}
+          value={filters.comedorId}
+          onChange={(v) => set({ comedorId: v, puntoDeVentaIds: [], consumidorId: "" })}
+          placeholder="Todos los comedores"
+          clearable
+          className="w-52 h-8 text-sm"
+        />
+      )}
       {consumidores && consumidorOptions.length > 0 && (
         <Combobox
           options={consumidorOptions}
