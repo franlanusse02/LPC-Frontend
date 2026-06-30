@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useApi } from "@/hooks/useApi";
 import { cn, fmtCurrency } from "@/lib/utils";
-import { ArrowLeft, Ban, Download, Plus } from "lucide-react";
+import { ArrowLeft, Ban, Download, MoreHorizontal, Pencil, Plus } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { DataTable, SortableTh } from "@/components/data-table";
@@ -13,10 +13,19 @@ import type { ConsumoResponse } from "@/domain/dto/consumo/ConsumoResponse";
 import type { ConsumidorResponse } from "@/domain/dto/consumo/ConsumidorResponse";
 import type { PuntoDeVentaResponse } from "@/domain/dto/pto-venta/PuntoDeVentaResponse";
 import type { ComedorResponse } from "@/domain/dto/comedor/ComedorResponse";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { AnularConsumoModal } from "../components/AnularConsumoModal";
+import { toast } from "sonner";
 
 export default function ConsumosEncargado() {
   const navigate = useNavigate();
-  const { get } = useApi();
+  const { get, del } = useApi();
 
   const [consumos, setConsumos] = useState<ConsumoResponse[]>([]);
   const [consumidores, setConsumidores] = useState<ConsumidorResponse[]>([]);
@@ -24,6 +33,9 @@ export default function ConsumosEncargado() {
     [],
   );
   const [comedores, setComedores] = useState<ComedorResponse[]>([]);
+  const [anularModalOpen, setAnularModalOpen] = useState(false);
+  const [selectedConsumo, setSelectedConsumo] =
+    useState<ConsumoResponse | null>(null);
 
   useEffect(() => {
     Promise.all([
@@ -75,6 +87,21 @@ export default function ConsumosEncargado() {
     sortKey: sort.key,
     sortDir: sort.dir,
     onSort: sort.handleSort,
+  };
+
+  const handleAnular = async (consumoId: number, motivo: string) => {
+    try {
+      const updated = await del(`/consumos/${consumoId}`, {
+        body: JSON.stringify({ motivo }),
+      }).then((r) => r.json());
+      setConsumos((prev) => prev.map((c) => (c.id === consumoId ? updated : c)));
+      toast("Consumo anulado");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "No se pudo anular el consumo");
+    } finally {
+      setSelectedConsumo(null);
+      setAnularModalOpen(false);
+    }
   };
 
   const exportColumns: ExportColumn<ConsumoResponse>[] = [
@@ -159,6 +186,7 @@ export default function ConsumosEncargado() {
                 />
                 <th className="px-4 py-3 text-center">Estado</th>
                 <th className="px-4 py-3">Observaciones</th>
+                <th className="px-4 py-3 w-12" />
               </>
             }
             rows={
@@ -227,6 +255,40 @@ export default function ConsumosEncargado() {
                           <span className="text-gray-300">—</span>
                         )}
                       </td>
+                      <td className="px-4 py-4" onClick={(e) => e.stopPropagation()}>
+                        {!isAnulado && (
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100 data-[state=open]:bg-gray-100"
+                                aria-label="Acciones"
+                              >
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-44 rounded-xl shadow-lg border-gray-100">
+                              <DropdownMenuItem
+                                onClick={() => navigate(`/encargado/consumos/${consumo.id}/editar`)}
+                                className="gap-2.5 cursor-pointer rounded-lg text-gray-700 focus:text-gray-900"
+                              >
+                                <Pencil className="h-4 w-4 text-gray-400" /> Editar
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator className="my-1" />
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  setSelectedConsumo(consumo);
+                                  setAnularModalOpen(true);
+                                }}
+                                className="gap-2.5 cursor-pointer rounded-lg text-red-600 focus:text-red-700 focus:bg-red-50"
+                              >
+                                <Ban className="h-4 w-4" /> Anular
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        )}
+                      </td>
                     </tr>
                   );
                 })}
@@ -235,6 +297,18 @@ export default function ConsumosEncargado() {
           />
         </CardContent>
       </Card>
+      <AnularConsumoModal
+        open={anularModalOpen}
+        onClose={() => setAnularModalOpen(false)}
+        consumo={selectedConsumo}
+        consumidorNombre={
+          selectedConsumo
+            ? (consumidorById[selectedConsumo.consumidorId]?.nombre ??
+              String(selectedConsumo.consumidorId))
+            : ""
+        }
+        onConfirm={handleAnular}
+      />
     </div>
   );
 }

@@ -17,7 +17,7 @@ import type { MedioPago } from "@/domain/enums/MedioPago";
 
 type PosLinea = { puntoDeVentaId: string; monto: string; touched?: boolean };
 
-export default function EditarFacturaPage() {
+export default function EditarFacturaPage({ basePath = "/contabilidad" }: { basePath?: string }) {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { get, patch } = useApi();
@@ -184,7 +184,7 @@ export default function EditarFacturaPage() {
       toast("Factura actualizada", {
         description: `Factura #${factura?.numero} actualizada exitosamente.`,
       });
-      navigate("/contabilidad/compras");
+      navigate(`${basePath}/compras`);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "No se pudo actualizar la factura");
     } finally {
@@ -206,7 +206,7 @@ export default function EditarFacturaPage() {
         <Button
           variant="ghost"
           className="mb-6 gap-2"
-          onClick={() => navigate("/contabilidad/compras")}
+          onClick={() => navigate(`${basePath}/compras`)}
         >
           <ArrowLeft className="h-4 w-4" />
           Volver a facturas

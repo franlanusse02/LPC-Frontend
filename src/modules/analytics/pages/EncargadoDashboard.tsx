@@ -96,6 +96,7 @@ export default function EncargadoDashboard() {
             onChange={setFilters}
             comedores={comedores}
             showSociedad={false}
+            showComedor={false}
           />
         </div>
 

@@ -10,6 +10,7 @@ import {
   Download,
   MoreHorizontal,
   Pencil,
+  Plus,
 } from "lucide-react";
 import { Fragment, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -226,12 +227,10 @@ export default function CierresContabilidad() {
 
       <Card className="mx-auto max-w-7xl py-6 border-0 shadow-md rounded-xl">
         <CardHeader className="border-b px-6 py-4">
-          <div className="flex flex-row justify-between">
-            <CardTitle className="text-xl font-bold text-gray-800">
-              Cierres
-            </CardTitle>
-          </div>
-          <div className="pt-3">
+          <CardTitle className="text-xl font-bold text-gray-800">
+            Cierres
+          </CardTitle>
+          <div className="flex flex-row items-start justify-between gap-4 pt-3">
             <ListFilters
               filters={listFilters}
               onChange={setListFilters}
@@ -242,6 +241,13 @@ export default function CierresContabilidad() {
                 { value: "createdAt", label: "Fecha de Carga" },
               ]}
             />
+            <Button
+              size="sm"
+              onClick={() => navigate("/contabilidad/cierres/nuevo")}
+              className="gap-2 px-4 py-2 text-sm font-semibold uppercase tracking-wide hover:scale-105 transition shrink-0"
+            >
+              <Plus className="h-4 w-4" /> Nuevo Cierre
+            </Button>
           </div>
         </CardHeader>
         <CardContent className="p-0">
