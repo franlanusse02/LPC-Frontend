@@ -24,7 +24,7 @@ import {
 
 type ServicioLine = { productoId: string; cantidad: string };
 
-export default function EditarEventoPage() {
+export default function EditarEventoPage({ basePath = "/contabilidad" }: { basePath?: string }) {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { get, patch } = useApi();
@@ -273,7 +273,7 @@ export default function EditarEventoPage() {
 
       await patch(`/eventos/${id}`, req);
       toast("Evento actualizado");
-      navigate("/contabilidad/eventos");
+      navigate(`${basePath}/eventos`);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "No se pudo actualizar el evento");
     } finally {
@@ -384,7 +384,7 @@ export default function EditarEventoPage() {
 
   return (
     <div className="mx-auto max-w-2xl px-6 py-6">
-      <Button variant="ghost" className="mb-6 gap-2" onClick={() => navigate("/contabilidad/eventos")}>
+      <Button variant="ghost" className="mb-6 gap-2" onClick={() => navigate(`${basePath}/eventos`)}>
         <ArrowLeft className="h-4 w-4" />
         Volver a eventos
       </Button>

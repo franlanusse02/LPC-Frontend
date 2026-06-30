@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useApi } from "@/hooks/useApi";
 import { cn, fmtCurrency } from "@/lib/utils";
-import { ArrowLeft, ChevronDown, ChevronUp, Download, Plus } from "lucide-react";
+import { ArrowLeft, Ban, ChevronDown, ChevronUp, Download, MoreHorizontal, Pencil, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { DataTable, SortableTh } from "@/components/data-table";
 import { EventosStatusFilter } from "../components/filters/EventosStatusFilter";
@@ -15,6 +15,15 @@ import type { EstadoEvento } from "@/domain/enums/EstadoEvento";
 import { EstadoEventoLabel } from "@/domain/enums/EstadoEvento";
 import type { ComedorResponse } from "@/domain/dto/comedor/ComedorResponse";
 import type { ComedorCaseKey } from "../config/comedorCases";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { AnularEventoModal } from "../components/AnularEventoModal";
+import { toast } from "sonner";
 
 type TabKey = "TODOS" | ComedorCaseKey;
 
@@ -207,11 +216,13 @@ function extraCells(evento: EventoResponse): ReactNode {
 
 export default function EventosEncargado() {
   const navigate = useNavigate();
-  const { get } = useApi();
+  const { get, patch } = useApi();
 
   const [eventos, setEventos] = useState<EventoResponse[]>([]);
   const [comedores, setComedores] = useState<ComedorResponse[]>([]);
   const [activeTab, setActiveTab] = useState<TabKey>("TODOS");
+  const [anularModalOpen, setAnularModalOpen] = useState(false);
+  const [selectedEvento, setSelectedEvento] = useState<EventoResponse | null>(null);
 
   useEffect(() => {
     Promise.all([get("/eventos/mis-cierres"), get("/comedores")]).then(
@@ -266,6 +277,19 @@ export default function EventosEncargado() {
   });
 
   const sortProps = { sortKey: sort.key, sortDir: sort.dir, onSort: sort.handleSort };
+
+  const handleAnular = async (eventoId: number, motivo: string) => {
+    try {
+      const updated: EventoResponse = await patch(`/eventos/${eventoId}/anular`, { motivo }).then((r) => r.json());
+      setEventos((prev) => prev.map((e) => (e.id === eventoId ? updated : e)));
+      toast("Evento anulado");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "No se pudo anular el evento");
+    } finally {
+      setSelectedEvento(null);
+      setAnularModalOpen(false);
+    }
+  };
 
   const exportColumns: ExportColumn<EventoResponse>[] = [
     { key: "fechaEvento", header: "Fecha" },
@@ -380,6 +404,7 @@ export default function EventosEncargado() {
                 <th className="px-4 py-3 text-right">Personas</th>
                 <SortableTh label="Monto" col="montoTotal" {...sortProps} className="text-right" />
                 <th className="px-4 py-3 text-center">Estado</th>
+                <th className="px-4 py-3 w-12" />
               </>
             }
             rows={
@@ -422,6 +447,40 @@ export default function EventosEncargado() {
                             {EstadoEventoLabel[evento.estado]}
                           </span>
                         </td>
+                        <td className="px-4 py-4" onClick={(e) => e.stopPropagation()}>
+                          {(evento.estado === "CARGA_PARCIAL" || evento.estado === "SOLICITADO") && (
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100 data-[state=open]:bg-gray-100"
+                                  aria-label="Acciones"
+                                >
+                                  <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end" className="w-44 rounded-xl shadow-lg border-gray-100">
+                                <DropdownMenuItem
+                                  onClick={() => navigate(`/encargado/eventos/${evento.id}/editar`)}
+                                  className="gap-2.5 cursor-pointer rounded-lg text-gray-700 focus:text-gray-900"
+                                >
+                                  <Pencil className="h-4 w-4 text-gray-400" /> Editar
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator className="my-1" />
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    setSelectedEvento(evento);
+                                    setAnularModalOpen(true);
+                                  }}
+                                  className="gap-2.5 cursor-pointer rounded-lg text-red-600 focus:text-red-700 focus:bg-red-50"
+                                >
+                                  <Ban className="h-4 w-4" /> Anular
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          )}
+                        </td>
                       </tr>
 
                       {isExpanded && (
@@ -441,6 +500,12 @@ export default function EventosEncargado() {
           />
         </CardContent>
       </Card>
+      <AnularEventoModal
+        open={anularModalOpen}
+        onClose={() => setAnularModalOpen(false)}
+        evento={selectedEvento}
+        onConfirm={handleAnular}
+      />
     </div>
   );
 }

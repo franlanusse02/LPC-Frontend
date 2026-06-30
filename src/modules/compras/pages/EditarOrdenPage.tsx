@@ -16,7 +16,7 @@ import type { ProveedorItemResponse } from "@/domain/dto/proveedor/ProveedorItem
 
 type ItemLine = { proveedorItemId: string; cantidad: string };
 
-export default function EditarOrdenPage() {
+export default function EditarOrdenPage({ basePath = "/contabilidad" }: { basePath?: string }) {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { get, patch } = useApi();
@@ -116,7 +116,7 @@ export default function EditarOrdenPage() {
       };
       await patch(`/ordenes-de-compra/${id}`, req);
       toast("Orden actualizada");
-      navigate("/contabilidad/compras");
+      navigate(`${basePath}/compras`);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "No se pudo actualizar la orden");
     } finally {
@@ -135,7 +135,7 @@ export default function EditarOrdenPage() {
   return (
     <Fragment>
       <div className="mx-auto max-w-4xl px-6 py-6">
-        <Button variant="ghost" className="mb-6 gap-2" onClick={() => navigate("/contabilidad/compras")}>
+        <Button variant="ghost" className="mb-6 gap-2" onClick={() => navigate(`${basePath}/compras`)}>
           <ArrowLeft className="h-4 w-4" /> Volver a compras
         </Button>
 

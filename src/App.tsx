@@ -38,6 +38,7 @@ import ProveedorItemsPage from "./modules/catalogo/pages/proveedor-items";
 import ConsumosEncargado from "./modules/consumos/pages/ConsumosEncargado";
 import NuevoConsumoPage from "./modules/consumos/pages/nuevo-consumo";
 import ConsumosContabilidad from "./modules/consumos/pages/ConsumosContabilidad";
+import EditarConsumoPage from "./modules/consumos/pages/EditarConsumoPage";
 import EventosEncargado from "./modules/eventos/pages/EventosEncargado";
 import NuevoEventoPage from "./modules/eventos/pages/nuevo-evento";
 import EventosContabilidad from "./modules/eventos/pages/EventosContabilidad";
@@ -86,7 +87,7 @@ export default function App() {
                 element={<ComprasEncargado />}
               />
               <Route
-                path="/encargado/compras/nueva"
+                path="/encargado/compras/facturas/nueva"
                 element={<NuevaFacturaPage />}
               />
               <Route
@@ -109,6 +110,26 @@ export default function App() {
                 path="/encargado/eventos/nuevo"
                 element={<NuevoEventoPage />}
               />
+              <Route
+                path="/encargado/cierres/:id/editar"
+                element={<EditarCierrePage basePath="/encargado" />}
+              />
+              <Route
+                path="/encargado/compras/:id/editar"
+                element={<EditarFacturaPage basePath="/encargado" />}
+              />
+              <Route
+                path="/encargado/compras/ordenes/:id/editar"
+                element={<EditarOrdenPage basePath="/encargado" />}
+              />
+              <Route
+                path="/encargado/eventos/:id/editar"
+                element={<EditarEventoPage basePath="/encargado" />}
+              />
+              <Route
+                path="/encargado/consumos/:id/editar"
+                element={<EditarConsumoPage basePath="/encargado" />}
+              />
             </Route>
           </Route>
 
@@ -119,7 +140,7 @@ export default function App() {
               <Route path="/carga-datos/cierres" element={<CierresCargaDatos />} />
               <Route path="/carga-datos/cierres/nuevo" element={<NuevoCierrePage basePath="/carga-datos" />} />
               <Route path="/carga-datos/compras" element={<ComprasCargaDatos />} />
-              <Route path="/carga-datos/compras/nueva" element={<NuevaFacturaPage basePath="/carga-datos" />} />
+              <Route path="/carga-datos/compras/facturas/nueva" element={<NuevaFacturaPage basePath="/carga-datos" />} />
               <Route path="/carga-datos/compras/ordenes/nueva" element={<NuevaOrdenPage basePath="/carga-datos" />} />
               <Route path="/carga-datos/consumos" element={<ConsumosCargaDatos />} />
               <Route path="/carga-datos/consumos/nuevo" element={<NuevoConsumoPage basePath="/carga-datos" />} />
@@ -160,6 +181,10 @@ export default function App() {
                 element={<ConsumosContabilidad />}
               />
               <Route
+                path="/contabilidad/consumos/:id/editar"
+                element={<EditarConsumoPage basePath="/contabilidad" />}
+              />
+              <Route
                 path="/contabilidad/eventos"
                 element={<EventosContabilidad />}
               />
@@ -167,6 +192,11 @@ export default function App() {
                 path="/contabilidad/eventos/:id/editar"
                 element={<EditarEventoPage />}
               />
+              <Route path="/contabilidad/compras/facturas/nueva" element={<NuevaFacturaPage basePath="/contabilidad" />} />
+              <Route path="/contabilidad/compras/ordenes/nueva" element={<NuevaOrdenPage basePath="/contabilidad" />} />
+              <Route path="/contabilidad/cierres/nuevo" element={<NuevoCierrePage basePath="/contabilidad" />} />
+              <Route path="/contabilidad/consumos/nuevo" element={<NuevoConsumoPage basePath="/contabilidad" />} />
+              <Route path="/contabilidad/eventos/nuevo" element={<NuevoEventoPage basePath="/contabilidad" />} />
               <Route
                 path="/contabilidad/importar"
                 element={<ImportarPage />}

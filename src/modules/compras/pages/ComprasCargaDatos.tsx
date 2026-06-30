@@ -144,7 +144,7 @@ export default function ComprasCargaDatos() {
             </CardTitle>
             <Button
               size="sm"
-              onClick={() => navigate("/carga-datos/compras/nueva")}
+              onClick={() => navigate("/carga-datos/compras/facturas/nueva")}
               className="gap-2 px-4 py-2 text-sm font-semibold uppercase tracking-wide hover:scale-105 transition"
             >
               <Plus className="h-4 w-4" /> Nueva Factura

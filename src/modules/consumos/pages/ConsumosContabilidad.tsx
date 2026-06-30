@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useApi } from "@/hooks/useApi";
 import { cn, fmtCurrency } from "@/lib/utils";
-import { ArrowLeft, Ban, Download, MoreHorizontal } from "lucide-react";
+import { ArrowLeft, Ban, Download, MoreHorizontal, Plus } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { DataTable, FilterPills, SortableTh } from "@/components/data-table";
@@ -262,12 +262,10 @@ export default function ConsumosContabilidad() {
 
       <Card className="mx-auto max-w-7xl py-6 border-0 shadow-md rounded-xl">
         <CardHeader className="border-b px-6 py-4">
-          <div className="flex flex-row justify-between">
-            <CardTitle className="text-xl font-bold text-gray-800">
-              Consumos
-            </CardTitle>
-          </div>
-          <div className="pt-3">
+          <CardTitle className="text-xl font-bold text-gray-800">
+            Consumos
+          </CardTitle>
+          <div className="flex flex-row items-start justify-between gap-4 pt-3">
             <ListFilters
               filters={listFilters}
               onChange={setListFilters}
@@ -279,6 +277,13 @@ export default function ConsumosContabilidad() {
                 { value: "creadoEn", label: "Fecha de Carga" },
               ]}
             />
+            <Button
+              size="sm"
+              onClick={() => navigate("/contabilidad/consumos/nuevo")}
+              className="gap-2 px-4 py-2 text-sm font-semibold uppercase tracking-wide hover:scale-105 transition shrink-0"
+            >
+              <Plus className="h-4 w-4" /> Nuevo Consumo
+            </Button>
           </div>
         </CardHeader>
         <CardContent className="p-0">
