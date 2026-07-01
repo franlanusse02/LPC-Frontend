@@ -27,12 +27,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { AnularCierreModal } from "@/modules/cierres/components/anular-cierre-modal";
+import { AnularCierreModal } from "@/modules/cierres/components/AnularCierreModal";
 import { useTableState } from "@/hooks/useTableState";
 import { useRowSelection } from "@/hooks/useRowSelection";
 import { BulkActionModal } from "@/components/BulkActionModal";
 import { handleBulkResponse } from "@/lib/bulk-utils";
-import { StatCard } from "../components/cierre-stat";
+import { StatCard } from "../components/CierreStat";
 import { ListFilters, type ListFilterState } from "@/components/ListFilters";
 import { defaultFilters } from "@/components/list-filter-defaults";
 import type { BulkActionResponse } from "@/domain/dto/shared/BulkActionResponse";

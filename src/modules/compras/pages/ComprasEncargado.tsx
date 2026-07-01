@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useApi } from "@/hooks/useApi";
 import { cn, fmtCurrency } from "@/lib/utils";
-import { StatCard } from "@/modules/cierres/components/cierre-stat";
+import { StatCard } from "@/modules/cierres/components/CierreStat";
 import { ArrowLeft, Ban, ChevronDown, ChevronUp, Download, MoreHorizontal, Pencil, Plus } from "lucide-react";
 import { Fragment, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -43,7 +43,7 @@ export default function ComprasEncargado() {
 
   const [facturas, setFacturas] = useState<FacturaProveedorResponse[]>([]);
   const [comedores, setComedores] = useState<ComedorResponse[]>([]);
-  const [proveedores, setProveedores] = useState<{ id: number; nombre: string }[]>([]);
+  const [proveedores, setProveedores] = useState<{ id: number; nombre: string; taxId: string }[]>([]);
 
   const [ordenes, setOrdenes] = useState<OrdenDeCompraResponse[]>([]);
   const [anularFactura, setAnularFactura] =
@@ -104,6 +104,11 @@ export default function ComprasEncargado() {
     [proveedores],
   );
 
+  const proveedorTaxById = useMemo(
+    () => Object.fromEntries(proveedores.map((p) => [p.id, p.taxId])),
+    [proveedores],
+  );
+
   const comedorNameById = useMemo(
     () => Object.fromEntries(comedores.map((c) => [c.id, c.nombre])),
     [comedores],
@@ -155,6 +160,7 @@ export default function ComprasEncargado() {
     { key: "id", header: "ID" },
     { key: "numero", header: "Nº Factura" },
     { key: (f) => proveedorNameById[f.proveedorId] ?? f.proveedorId, header: "Proveedor" },
+    { key: (f) => proveedorTaxById[f.proveedorId] ?? "", header: "CUIT" },
     { key: (f) => comedorNameById[f.comedorId] ?? f.comedorId, header: "Comedor" },
     { key: "fechaFactura", header: "Fecha Factura" },
     { key: "monto", header: "Monto" },
