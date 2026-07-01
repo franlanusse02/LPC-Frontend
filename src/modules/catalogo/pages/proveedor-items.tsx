@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Combobox } from "@/components/ui/combobox";
 import { DataTable } from "@/components/data-table";
-import { StatCard } from "@/modules/cierres/components/cierre-stat";
+import { StatCard } from "@/modules/cierres/components/CierreStat";
 import { NuevoItemProveedorModal } from "@/modules/compras/components/NuevoItemProveedorModal";
 import { EditarItemProveedorModal } from "../components/EditarItemProveedorModal";
 import { useApi } from "@/hooks/useApi";

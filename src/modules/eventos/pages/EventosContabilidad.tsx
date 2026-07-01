@@ -46,7 +46,7 @@ import { useTableState } from "@/hooks/useTableState";
 import { useRowSelection } from "@/hooks/useRowSelection";
 import { BulkActionModal } from "@/components/BulkActionModal";
 import { handleBulkResponse } from "@/lib/bulk-utils";
-import { StatCard } from "@/modules/cierres/components/cierre-stat";
+import { StatCard } from "@/modules/cierres/components/CierreStat";
 import type { BulkActionResponse } from "@/domain/dto/shared/BulkActionResponse";
 import type { EventoResponse } from "@/domain/dto/evento/EventoResponse";
 import type { EstadoEvento } from "@/domain/enums/EstadoEvento";

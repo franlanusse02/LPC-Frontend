@@ -23,7 +23,7 @@ import { handleBulkResponse } from "@/lib/bulk-utils";
 import { exportToXlsx, type ExportColumn } from "@/lib/exportXlsx";
 import type { BulkActionResponse } from "@/domain/dto/shared/BulkActionResponse";
 
-import { StatCard } from "@/modules/cierres/components/cierre-stat";
+import { StatCard } from "@/modules/cierres/components/CierreStat";
 import type { ConsumidorResponse } from "@/domain/dto/consumo/ConsumidorResponse";
 import type { PuntoDeVentaResponse } from "@/domain/dto/pto-venta/PuntoDeVentaResponse";
 import type { ComedorResponse } from "@/domain/dto/comedor/ComedorResponse";

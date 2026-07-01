@@ -9,8 +9,8 @@ import ContabilidadDashboard from "@/modules/analytics/pages/ContabilidadDashboa
 
 import CierresEncargado from "@/modules/cierres/pages/CierresEncargado";
 import CierresContabilidad from "@/modules/cierres/pages/CierresContabilidad";
-import NuevoCierrePage from "@/modules/cierres/pages/nuevo-cierre";
-import EditarCierrePage from "@/modules/cierres/pages/editar-cierre";
+import NuevoCierrePage from "@/modules/cierres/pages/NuevoCierrePage";
+import EditarCierrePage from "@/modules/cierres/pages/EditarCierrePage";
 
 import { AdminRoute } from "@/modules/identity/components/AdminRoute";
 import { ProtectedRoute } from "@/modules/identity/components/ProtectedRoute";
