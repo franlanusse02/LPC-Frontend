@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Pencil, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, Download, Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,7 @@ import { Combobox } from "@/components/ui/combobox";
 import { Spinner } from "@/components/ui/spinner";
 import { DataTable, SortableTh } from "@/components/data-table";
 import { useApi } from "@/hooks/useApi";
+import { exportToXlsx, type ExportColumn } from "@/lib/exportXlsx";
 import { ConfirmarAnulacion } from "../components/ConfirmarAnulacion";
 import type { ComedorResponse } from "@/domain/dto/comedor/ComedorResponse";
 
@@ -79,6 +80,24 @@ export default function ProductosPage() {
   });
 
   const comedorMap = new Map(comedores.map((c) => [c.id, c.nombre]));
+
+  const exportColumns: ExportColumn<any>[] = [
+    { key: (p) => comedorMap.get(p.comedorId) ?? p.comedorId, header: "Comedor" },
+    { key: "nombre", header: "Nombre" },
+    { key: "precio", header: "Precio" },
+    { key: "sapId", header: "SAP ID" },
+    { key: (p) => (p.activo ? "Activo" : "Inactivo"), header: "Estado" },
+  ];
+
+  const handleExport = () => {
+    const data = [...(productos ?? [])].sort((a, b) => {
+      const ca = comedorMap.get(a.comedorId) ?? "";
+      const cb = comedorMap.get(b.comedorId) ?? "";
+      const byComedor = ca.localeCompare(cb);
+      return byComedor !== 0 ? byComedor : a.nombre.localeCompare(b.nombre);
+    });
+    exportToXlsx({ data, columns: exportColumns, filename: "productos" });
+  };
 
   const openCreate = () => {
     setEditing(null);
@@ -170,9 +189,14 @@ export default function ProductosPage() {
                 Gestioná el catálogo de productos
               </p>
             </CardTitle>
-            <Button size="sm" onClick={openCreate} className="gap-2 font-bold">
-              <Plus className="h-4 w-4" /> NUEVO
-            </Button>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={handleExport}>
+                <Download className="h-4 w-4 mr-1.5" /> Exportar Excel
+              </Button>
+              <Button size="sm" onClick={openCreate} className="gap-2 font-bold">
+                <Plus className="h-4 w-4" /> NUEVO
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent className="p-0">
