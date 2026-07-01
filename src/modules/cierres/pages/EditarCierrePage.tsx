@@ -8,8 +8,8 @@ import type { DetailedCierreCajaResponse } from "@/domain/dto/cierre-caja/Cierre
 import {
   PaymentLineRow,
   type PaymentLine,
-} from "../components/payment-line-row";
-import { AnularMovimientoModal } from "../components/anular-movimiento-modal";
+} from "../components/PaymentLineRow";
+import { AnularMovimientoModal } from "../components/AnularMovimientoModal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -28,7 +28,7 @@ interface PuntoVenta {
   comedorId: number;
 }
 
-export default function EditarCierrePage() {
+export default function EditarCierrePage({ basePath = "/contabilidad" }: { basePath?: string }) {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { get, patch, post, del } = useApi();
@@ -225,7 +225,7 @@ export default function EditarCierrePage() {
       toast("Cierre actualizado", {
         description: "Los cambios se guardaron correctamente.",
       });
-      navigate("/contabilidad/cierres");
+      navigate(`${basePath}/cierres`);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "No se pudo actualizar el cierre");
     } finally {
@@ -247,7 +247,7 @@ export default function EditarCierrePage() {
         <Button
           variant="ghost"
           className="mb-6 gap-2"
-          onClick={() => navigate("/contabilidad/cierres")}
+          onClick={() => navigate(`${basePath}/cierres`)}
         >
           <ArrowLeft className="h-4 w-4" />
           Volver
@@ -410,7 +410,7 @@ export default function EditarCierrePage() {
         <div className="mt-6 flex justify-center gap-3">
           <Button
             variant="outline"
-            onClick={() => navigate("/contabilidad/cierres")}
+            onClick={() => navigate(`${basePath}/cierres`)}
             disabled={loading}
             className="px-8"
           >

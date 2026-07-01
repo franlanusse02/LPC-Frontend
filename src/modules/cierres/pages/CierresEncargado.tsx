@@ -19,7 +19,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { AnularCierreModal } from "../components/anular-cierre-modal";
+import { AnularCierreModal } from "../components/AnularCierreModal";
 
 export default function CierresPage() {
   const navigate = useNavigate();
