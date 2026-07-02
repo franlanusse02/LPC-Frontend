@@ -16,6 +16,11 @@ import { KpiCard } from "@/components/KpiCard";
 import { OrdenesDeCompraTable } from "../components/OrdenesDeCompraTable";
 import { downloadPdf } from "@/lib/download";
 import { exportToXlsx, type ExportColumn } from "@/lib/exportXlsx";
+import {
+  ListFilters,
+  type ListFilterState,
+} from "@/components/ListFilters";
+import { defaultFilters } from "@/components/list-filter-defaults";
 import { toast } from "sonner";
 import type { OrdenDeCompraResponse } from "@/domain/dto/orden-compra/OrdenDeCompraResponse";
 import {
@@ -48,6 +53,8 @@ export default function ComprasEncargado() {
   const [ordenes, setOrdenes] = useState<OrdenDeCompraResponse[]>([]);
   const [anularFactura, setAnularFactura] =
     useState<FacturaProveedorResponse | null>(null);
+
+  const [listFilters, setListFilters] = useState<ListFilterState>(defaultFilters);
 
   useEffect(() => {
     Promise.all([get("/facturas/proveedor/mis-facturas"), get("/comedores"), get("/proveedores")]).then(
@@ -124,7 +131,20 @@ export default function ComprasEncargado() {
     return map;
   }, [comedores]);
 
-  const { displayed, sort, expansion, filters } = useTableState(facturas, {
+  const facturasAfterDateFilter = useMemo(() => {
+    let list = [...facturas];
+    const getDate = listFilters.dateField === "creadoEn"
+      ? (f: FacturaProveedorResponse) =>
+          new Date(f.creadoEn).toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" })
+      : (f: FacturaProveedorResponse) => f.fechaFactura;
+    if (listFilters.desde) list = list.filter((f) => getDate(f) >= listFilters.desde);
+    if (listFilters.hasta) list = list.filter((f) => getDate(f) <= listFilters.hasta);
+    if (listFilters.comedorId) list = list.filter((f) => f.comedorId === Number(listFilters.comedorId));
+    if (listFilters.puntoDeVentaIds.length) list = list.filter((f) => (f.puntoDeVentaComedor ?? []).some((s) => listFilters.puntoDeVentaIds.includes(String(s.puntoDeVentaId))));
+    return list;
+  }, [facturas, listFilters]);
+
+  const { displayed, sort, expansion, filters } = useTableState(facturasAfterDateFilter, {
     searchFields: (f) => [
       f.numero,
       f.comentarios || "",
@@ -148,7 +168,15 @@ export default function ComprasEncargado() {
     .filter((f) => f.estado !== "ANULADA")
     .reduce((s, f) => s + (f.monto ?? 0), 0);
   const montoFiltrado = displayed.reduce((s, f) => s + (f.monto ?? 0), 0);
-  const isFiltered = displayed.length !== facturas.length;
+  const isFiltered = listFilters.desde !== "" || listFilters.hasta !== "" || listFilters.comedorId !== "" || listFilters.dateField !== "fechaFactura";
+
+  const analyticsFilters = useMemo(
+    () => ({
+      fechaInicio: listFilters.desde || undefined,
+      fechaFin: listFilters.hasta || undefined,
+    }),
+    [listFilters],
+  );
 
   const exportColumns: ExportColumn<FacturaProveedorResponse>[] = [
     { key: (f) => new Date(f.creadoEn).toLocaleString("es-AR", {
@@ -203,6 +231,7 @@ export default function ComprasEncargado() {
         <KpiCard
           title="Monto estimado OC"
           endpoint="/analytics/encargado/ordenes-compra/monto-estimado"
+          filters={analyticsFilters}
           format="currency"
           valueExtractor={(d) =>
             typeof d === "number" ? d : ((d as { total?: number })?.total ?? 0)
@@ -257,6 +286,19 @@ export default function ComprasEncargado() {
             >
               <Plus className="h-4 w-4" /> Nueva Factura
             </Button>
+          </div>
+          <div className="pt-3">
+            <ListFilters
+              filters={listFilters}
+              onChange={setListFilters}
+              comedores={comedores}
+              showSociedad={false}
+              showComedor={false}
+              dateFieldOptions={[
+                { value: "fechaFactura", label: "Fecha Factura" },
+                { value: "creadoEn", label: "Fecha de Carga" },
+              ]}
+            />
           </div>
         </CardHeader>
         <CardContent className="p-0">
