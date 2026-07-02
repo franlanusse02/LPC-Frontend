@@ -168,19 +168,23 @@ export default function ComprasContabilidad() {
   };
 
   useEffect(() => {
-    Promise.all([
-      get("/facturas/proveedor"),
-      get("/proveedores"),
-      get("/comedores"),
-    ]).then(([facturasRes, proveedoresRes, comedoresRes]) => {
-      facturasRes
-        .json()
-        .then((data: FacturaProveedorResponse[]) =>
-          setFacturas(Array.isArray(data) ? data : []),
-        );
-      proveedoresRes.json().then(setProveedores);
-      comedoresRes.json().then(setComedores);
-    });
+    get("/facturas/proveedor")
+      .then((r) => r.json())
+      .then((data: FacturaProveedorResponse[]) =>
+        setFacturas(Array.isArray(data) ? data : []),
+      );
+  }, [get]);
+
+  useEffect(() => {
+    get("/proveedores")
+      .then((r) => r.json())
+      .then(setProveedores);
+  }, [get]);
+
+  useEffect(() => {
+    get("/comedores")
+      .then((r) => r.json())
+      .then(setComedores);
   }, [get]);
 
   const proveedorNameById = useMemo(
@@ -290,6 +294,16 @@ export default function ComprasContabilidad() {
   const isFiltered = listFilters.desde !== "" || listFilters.hasta !== "" || listFilters.comedorId !== "" || listFilters.dateField !== "fechaFactura";
   const montoFiltrado = displayed.reduce((s, f) => s + (f.monto ?? 0), 0);
 
+  const analyticsFilters = useMemo(
+    () => ({
+      fechaInicio: listFilters.desde || undefined,
+      fechaFin: listFilters.hasta || undefined,
+      comedorId: listFilters.comedorId || undefined,
+      puntoDeVentaIds: listFilters.puntoDeVentaIds.length ? listFilters.puntoDeVentaIds : undefined,
+    }),
+    [listFilters],
+  );
+
   const refetchFacturas = () => {
     get("/facturas/proveedor")
       .then((r) => r.json())
@@ -396,6 +410,7 @@ export default function ComprasContabilidad() {
         <KpiCard
           title="Monto estimado OC"
           endpoint="/analytics/contabilidad/ordenes-compra/monto-estimado"
+          filters={analyticsFilters}
           format="currency"
           valueExtractor={(d) =>
             typeof d === "number" ? d : ((d as { total?: number })?.total ?? 0)
