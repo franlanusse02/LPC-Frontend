@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useMemo, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -30,6 +30,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { DataTable, SortableTh } from "@/components/data-table";
+import { Pagination } from "@/components/Pagination";
 import { EventosStatusFilter } from "../components/filters/EventosStatusFilter";
 import { AnularEventoModal } from "../components/AnularEventoModal";
 import { RealizarEventoModal } from "../components/RealizarEventoModal";
@@ -42,13 +43,15 @@ import {
   type CobrarEventoPayload,
 } from "../components/CobrarEventoModal";
 import { toast } from "sonner";
-import { useTableState } from "@/hooks/useTableState";
+import { useExpandableRows } from "@/hooks/useExpandableRows";
 import { useRowSelection } from "@/hooks/useRowSelection";
 import { BulkActionModal } from "@/components/BulkActionModal";
 import { handleBulkResponse } from "@/lib/bulk-utils";
 import { StatCard } from "@/modules/cierres/components/CierreStat";
 import type { BulkActionResponse } from "@/domain/dto/shared/BulkActionResponse";
+import type { Page } from "@/domain/dto/shared/Page";
 import type { EventoResponse } from "@/domain/dto/evento/EventoResponse";
+import type { EventoStatsResponse } from "@/domain/dto/evento/EventoStatsResponse";
 import type { EstadoEvento } from "@/domain/enums/EstadoEvento";
 import { EstadoEventoLabel } from "@/domain/enums/EstadoEvento";
 import { exportToXlsx, type ExportColumn } from "@/lib/exportXlsx";
@@ -59,8 +62,10 @@ import {
 } from "@/components/ListFilters";
 import { defaultFilters } from "@/components/list-filter-defaults";
 import type { ComedorCaseKey } from "../config/comedorCases";
+import { buildQuery } from "@/lib/query-string";
 
 type TabKey = "TODOS" | ComedorCaseKey;
+type StatusFilter = "all" | EstadoEvento;
 
 const TAB_LABELS: Record<TabKey, string> = {
   TODOS: "Todos",
@@ -342,9 +347,20 @@ export default function EventosContabilidad() {
   const navigate = useNavigate();
   const { get, post, patch } = useApi();
 
-  const [eventos, setEventos] = useState<EventoResponse[]>([]);
   const [comedores, setComedores] = useState<ComedorResponse[]>([]);
   const [activeTab, setActiveTab] = useState<TabKey>("TODOS");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
+  const [searchInput, setSearchInput] = useState("");
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(0);
+  const [size, setSize] = useState(20);
+  const [sortKey, setSortKey] = useState("fechaEvento");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
+
+  const [pageData, setPageData] = useState<Page<EventoResponse> | null>(null);
+  const [stats, setStats] = useState<EventoStatsResponse | null>(null);
+
+  const eventos = pageData?.content ?? [];
 
   const [selectedEvento, setSelectedEvento] = useState<EventoResponse | null>(null);
   const [anularOpen, setAnularOpen] = useState(false);
@@ -352,15 +368,18 @@ export default function EventosContabilidad() {
   const [emitirOpen, setEmitirOpen] = useState(false);
   const [cobrarOpen, setCobrarOpen] = useState(false);
 
-  const [listFilters, setListFilters] = useState<ListFilterState>({ ...defaultFilters, dateField: "fechaEvento" });
+  const [listFilters, setListFiltersRaw] = useState<ListFilterState>({ ...defaultFilters, dateField: "fechaEvento" });
 
   useEffect(() => {
-    Promise.all([get("/eventos"), get("/comedores")]).then(
-      ([eventosRes, comedoresRes]) => {
-        eventosRes.json().then((data) => setEventos(Array.isArray(data) ? data : []));
-        comedoresRes.json().then(setComedores);
-      },
-    );
+    const t = setTimeout(() => {
+      setSearch(searchInput);
+      setPage(0);
+    }, 300);
+    return () => clearTimeout(t);
+  }, [searchInput]);
+
+  useEffect(() => {
+    get("/comedores").then((r) => r.json()).then(setComedores);
   }, [get]);
 
   const comedorNameById = useMemo(
@@ -368,76 +387,96 @@ export default function EventosContabilidad() {
     [comedores],
   );
 
-  const eventosAfterDateFilter = useMemo(() => {
-    let list = [...eventos];
-    const getDate = listFilters.dateField === "creadoEn"
-      ? (e: EventoResponse) =>
-          new Date(e.creadoEn).toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" })
-      : (e: EventoResponse) => e.fechaEvento;
-    if (listFilters.desde) list = list.filter((e) => getDate(e) >= listFilters.desde);
-    if (listFilters.hasta) list = list.filter((e) => getDate(e) <= listFilters.hasta);
-    if (listFilters.comedorId) list = list.filter((e) => e.comedorId === Number(listFilters.comedorId));
-    if (listFilters.puntoDeVentaIds.length) list = list.filter((e) => listFilters.puntoDeVentaIds.includes(String(e.puntoDeVentaId)));
-    return list;
-  }, [eventos, listFilters]);
+  const handleFiltersChange = (next: ListFilterState) => {
+    setListFiltersRaw(next);
+    setPage(0);
+  };
+
+  const handleStatusChange = (next: StatusFilter) => {
+    setStatusFilter(next);
+    setPage(0);
+  };
+
+  const handleTabChange = (tab: TabKey) => {
+    setActiveTab(tab);
+    setPage(0);
+    selection.clear();
+  };
+
+  const handleSizeChange = (next: number) => {
+    setSize(next);
+    setPage(0);
+  };
+
+  const handleSort = (key: string) => {
+    if (key === sortKey) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    else {
+      setSortKey(key);
+      setSortDir("asc");
+    }
+    setPage(0);
+  };
+
+  const fetchList = useCallback(() => {
+    const qs = buildQuery({
+      puntoDeVentaIds: listFilters.puntoDeVentaIds,
+      comedorId: listFilters.comedorId || undefined,
+      estado: statusFilter === "all" ? undefined : statusFilter,
+      tipoComedor: activeTab === "TODOS" ? undefined : activeTab,
+      fechaInicio: listFilters.desde,
+      fechaFin: listFilters.hasta,
+      search: search || undefined,
+      page,
+      size,
+      sort: `${sortKey},${sortDir}`,
+    });
+    return get(`/eventos${qs}`).then((r) => r.json()).then(setPageData);
+  }, [get, listFilters.puntoDeVentaIds, listFilters.comedorId, listFilters.desde, listFilters.hasta, statusFilter, activeTab, search, page, size, sortKey, sortDir]);
+
+  const fetchStats = useCallback(() => {
+    const qs = buildQuery({
+      puntoDeVentaIds: listFilters.puntoDeVentaIds,
+      comedorId: listFilters.comedorId || undefined,
+      tipoComedor: activeTab === "TODOS" ? undefined : activeTab,
+      fechaInicio: listFilters.desde,
+      fechaFin: listFilters.hasta,
+      search: search || undefined,
+    });
+    return get(`/eventos/stats${qs}`).then((r) => r.json()).then(setStats);
+  }, [get, listFilters.puntoDeVentaIds, listFilters.comedorId, listFilters.desde, listFilters.hasta, activeTab, search]);
+
+  useEffect(() => {
+    fetchList();
+  }, [fetchList]);
+
+  useEffect(() => {
+    fetchStats();
+  }, [fetchStats]);
 
   const tabCounts = useMemo(() => {
-    const counts: Record<string, number> = { TODOS: eventosAfterDateFilter.length };
-    for (const e of eventosAfterDateFilter) {
-      counts[e.tipoComedor] = (counts[e.tipoComedor] || 0) + 1;
+    const counts: Record<string, number> = { TODOS: stats?.total ?? 0 };
+    for (const [tipo, count] of Object.entries(stats?.countsByTipo ?? {})) {
+      counts[tipo] = count;
     }
     return counts;
-  }, [eventosAfterDateFilter]);
+  }, [stats]);
 
   const availableTabs = useMemo(
-    () => TAB_ORDER.filter((k) => k === "TODOS" || (tabCounts[k] ?? 0) > 0),
-    [tabCounts],
+    () => TAB_ORDER.filter((k) => k === "TODOS" || (tabCounts[k] ?? 0) > 0 || k === activeTab),
+    [tabCounts, activeTab],
   );
-
-  const eventosForTab = useMemo(() => {
-    if (activeTab === "TODOS") return eventosAfterDateFilter;
-    return eventosAfterDateFilter.filter((e) => e.tipoComedor === activeTab);
-  }, [eventosAfterDateFilter, activeTab]);
 
   const hasExtraCols = activeTab !== "TODOS" && activeTab !== "DEFAULT";
 
-  const { displayed, sort, expansion, filters } = useTableState(eventosForTab, {
-    searchFields: (e) => [
-      comedorNameById[e.comedorId] ?? "",
-      e.fechaEvento,
-      e.observaciones ?? "",
-      String(ev(e, "solicitanteNombre") ?? ""),
-      String(ev(e, "funcionarioNombre") ?? ""),
-      String(ev(e, "razonSocial") ?? ""),
-    ],
-    statusField: "estado",
-    statusMapping: {
-      CARGA_PARCIAL: { filter: (e) => e.estado === "CARGA_PARCIAL" },
-      SOLICITADO: { filter: (e) => e.estado === "SOLICITADO" },
-      REALIZADO: { filter: (e) => e.estado === "REALIZADO" },
-      FACTURA_EMITIDA: { filter: (e) => e.estado === "FACTURA_EMITIDA" },
-      COBRADO: { filter: (e) => e.estado === "COBRADO" },
-      ANULADO: { filter: (e) => e.estado === "ANULADO" },
-    },
-    defaultSortKey: "fechaEvento",
-  });
+  const sortProps = { sortKey, sortDir, onSort: handleSort };
 
-  const sortProps = { sortKey: sort.key, sortDir: sort.dir, onSort: sort.handleSort };
-
-  const totalActivos = eventosForTab.filter((e) => e.anulacionId === null).length;
-  const totalAnulados = eventosForTab.filter((e) => e.anulacionId !== null).length;
-  const montoTotal = eventosForTab
-    .filter((e) => e.anulacionId === null)
-    .reduce((s, e) => s + (e.montoTotal ?? 0), 0);
-  const montoFiltrado = displayed
-    .filter((e) => e.anulacionId === null)
-    .reduce((s, e) => s + (e.montoTotal ?? 0), 0);
-  const isFiltered = displayed.length !== eventosForTab.length;
+  const isFiltered = !!stats && stats.montoTotalActivo !== stats.montoFiltradoActivo;
 
   const handleAction = async (action: () => Promise<EventoResponse>) => {
     try {
-      const updated = await action();
-      setEventos((prev) => prev.map((e) => (e.id === updated.id ? updated : e)));
+      await action();
+      fetchList();
+      fetchStats();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "No se pudo completar la operación");
       throw err;
@@ -492,6 +531,7 @@ export default function EventosContabilidad() {
     if (modal === "cobrar") setCobrarOpen(true);
   };
 
+  const expansion = useExpandableRows();
   const selection = useRowSelection();
 
   const [bulkRealizar, setBulkRealizar] = useState(false);
@@ -503,28 +543,23 @@ export default function EventosContabilidad() {
   const [bulkMedioPago, setBulkMedioPago] = useState("");
   const [bulkNumeroOp, setBulkNumeroOp] = useState("");
 
-  const selectedEventos = displayed.filter((e) => selection.selected.has(e.id));
+  const selectedEventos = eventos.filter((e) => selection.selected.has(e.id));
   const allSolicitado = selectedEventos.length > 0 && selectedEventos.every((e) => e.estado === "SOLICITADO");
   const allEmitible = selectedEventos.length > 0 && selectedEventos.every((e) => e.estado === "SOLICITADO" || e.estado === "REALIZADO");
   const allFacturaEmitida = selectedEventos.length > 0 && selectedEventos.every((e) => e.estado === "FACTURA_EMITIDA");
   const allAnulable = selectedEventos.length > 0 && selectedEventos.every((e) => e.estado === "SOLICITADO" || e.estado === "REALIZADO" || e.estado === "FACTURA_EMITIDA");
 
-  const selectableIds = displayed
+  const selectableIds = eventos
     .filter((e) => e.estado !== "ANULADO" && e.estado !== "COBRADO")
     .map((e) => e.id);
-
-  const refetchEventos = () => {
-    get("/eventos")
-      .then((r) => r.json())
-      .then((data) => setEventos(Array.isArray(data) ? data : []));
-  };
 
   const handleBulkRealizar = async () => {
     const res = await post("/eventos/bulk/realizar", { ids: [...selection.selected] })
       .then((r) => r.json() as Promise<BulkActionResponse>);
     handleBulkResponse(res, "Realización");
     selection.clear();
-    refetchEventos();
+    fetchList();
+    fetchStats();
   };
 
   const handleBulkEmitir = async () => {
@@ -538,7 +573,8 @@ export default function EventosContabilidad() {
     }).then((r) => r.json() as Promise<BulkActionResponse>);
     handleBulkResponse(res, "Emisión");
     selection.clear();
-    refetchEventos();
+    fetchList();
+    fetchStats();
   };
 
   const handleBulkCobrar = async () => {
@@ -550,7 +586,8 @@ export default function EventosContabilidad() {
     }).then((r) => r.json() as Promise<BulkActionResponse>);
     handleBulkResponse(res, "Cobro");
     selection.clear();
-    refetchEventos();
+    fetchList();
+    fetchStats();
     setBulkFechaPago("");
     setBulkMedioPago("");
     setBulkNumeroOp("");
@@ -563,7 +600,8 @@ export default function EventosContabilidad() {
     }).then((r) => r.json() as Promise<BulkActionResponse>);
     handleBulkResponse(res, "Anulación");
     selection.clear();
-    refetchEventos();
+    fetchList();
+    fetchStats();
     setBulkMotivo("");
   };
 
@@ -574,12 +612,12 @@ export default function EventosContabilidad() {
 
   const handleExport = () => {
     const data = (selection.count > 0
-      ? displayed.filter((e) => selection.selected.has(e.id))
-      : displayed
+      ? eventos.filter((e) => selection.selected.has(e.id))
+      : eventos
     ).filter((e) => e.estado !== "CARGA_PARCIAL");
     const segments = ["eventos"];
     if (activeTab !== "TODOS") segments.push(activeTab.toLowerCase());
-    if (filters.status !== "all") segments.push(filters.status.toLowerCase());
+    if (statusFilter !== "all") segments.push(statusFilter.toLowerCase());
     if (listFilters.desde) segments.push(`desde-${listFilters.desde}`);
     if (listFilters.hasta) segments.push(`hasta-${listFilters.hasta}`);
     exportToXlsx({ data, columns: exportColumns, filename: segments.join("-") });
@@ -595,13 +633,13 @@ export default function EventosContabilidad() {
       </div>
 
       <div className="mx-auto max-w-7xl grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5 pb-4">
-        <StatCard label="Total eventos" value={eventosForTab.length} />
-        <StatCard label="Activos" value={totalActivos} accent="emerald" />
-        <StatCard label="Anulados" value={totalAnulados} accent="red" />
-        <StatCard label="Monto total" value={fmtCurrency(montoTotal)} />
+        <StatCard label="Total eventos" value={stats?.total ?? 0} />
+        <StatCard label="Activos" value={stats?.activos ?? 0} accent="emerald" />
+        <StatCard label="Anulados" value={stats?.anulados ?? 0} accent="red" />
+        <StatCard label="Monto total" value={fmtCurrency(stats?.montoTotalActivo ?? 0)} />
         <StatCard
           label={isFiltered ? "Monto filtrado" : "Monto activo"}
-          value={fmtCurrency(montoFiltrado)}
+          value={fmtCurrency(stats?.montoFiltradoActivo ?? 0)}
           accent={isFiltered ? "blue" : undefined}
         />
       </div>
@@ -612,13 +650,9 @@ export default function EventosContabilidad() {
           <div className="flex flex-row items-start justify-between gap-4 pt-3">
             <ListFilters
               filters={listFilters}
-              onChange={setListFilters}
+              onChange={handleFiltersChange}
               comedores={comedores}
               showSociedad={false}
-              dateFieldOptions={[
-                { value: "fechaEvento", label: "Fecha Evento" },
-                { value: "creadoEn", label: "Fecha de Carga" },
-              ]}
             />
             <Button
               size="sm"
@@ -633,7 +667,7 @@ export default function EventosContabilidad() {
               <button
                 type="button"
                 key={tab}
-                onClick={() => { setActiveTab(tab); selection.clear(); }}
+                onClick={() => handleTabChange(tab)}
                 className={cn(
                   "px-4 py-2 text-sm font-medium rounded-md whitespace-nowrap transition-colors",
                   activeTab === tab
@@ -649,7 +683,7 @@ export default function EventosContabilidad() {
         </CardHeader>
         <CardContent className="p-0">
           <DataTable
-            displayedCount={displayed.length}
+            displayedCount={pageData?.numberOfElements ?? 0}
             selectionToolbar={
               selection.count > 0 ? (
                 <div className="flex items-center gap-3">
@@ -690,14 +724,14 @@ export default function EventosContabilidad() {
               <div className="flex flex-wrap items-center gap-2">
                 <input
                   type="text"
-                  value={filters.search}
-                  onChange={(e) => filters.setSearch(e.target.value)}
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
                   placeholder="Buscar..."
                   className="h-8 w-52 pl-3 pr-8 text-sm bg-gray-50 border border-gray-200 rounded-md"
                 />
                 <EventosStatusFilter
-                  value={filters.status as "all" | EstadoEvento}
-                  onChange={filters.setStatus}
+                  value={statusFilter}
+                  onChange={handleStatusChange}
                 />
               </div>
             }
@@ -729,7 +763,7 @@ export default function EventosContabilidad() {
             }
             rows={
               <>
-                {displayed.map((evento) => {
+                {eventos.map((evento) => {
                   const isExpanded = expansion.expandedRows.has(evento.id);
                   const estilos = ESTADO_STYLES[evento.estado];
                   const isAnulado = evento.estado === "ANULADO";
@@ -845,6 +879,14 @@ export default function EventosContabilidad() {
                 })}
               </>
             }
+          />
+          <Pagination
+            page={pageData?.number ?? 0}
+            size={pageData?.size ?? size}
+            totalPages={pageData?.totalPages ?? 0}
+            totalElements={pageData?.totalElements ?? 0}
+            onPageChange={setPage}
+            onSizeChange={handleSizeChange}
           />
         </CardContent>
       </Card>
