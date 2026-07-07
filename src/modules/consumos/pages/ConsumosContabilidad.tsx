@@ -10,10 +10,9 @@ import {
 import { useApi } from "@/hooks/useApi";
 import { cn, fmtCurrency } from "@/lib/utils";
 import { ArrowLeft, Ban, Download, MoreHorizontal, Plus } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { DataTable, FilterPills, SortableTh } from "@/components/data-table";
-import { Pagination } from "@/components/Pagination";
 import { ConsumosStatusFilter } from "../components/filters/ConsumosStatusFilter";
 import { AnularConsumoModal } from "../components/AnularConsumoModal";
 import { toast } from "sonner";
@@ -23,7 +22,6 @@ import { BulkActionModal } from "@/components/BulkActionModal";
 import { handleBulkResponse } from "@/lib/bulk-utils";
 import { exportToXlsx, type ExportColumn } from "@/lib/exportXlsx";
 import type { BulkActionResponse } from "@/domain/dto/shared/BulkActionResponse";
-import type { Page } from "@/domain/dto/shared/Page";
 
 import { StatCard } from "@/modules/cierres/components/CierreStat";
 import type { ConsumidorResponse } from "@/domain/dto/consumo/ConsumidorResponse";
@@ -34,18 +32,15 @@ import {
   type ListFilterState,
 } from "@/components/ListFilters";
 import { defaultFilters } from "@/components/list-filter-defaults";
-import { buildQuery } from "@/lib/query-string";
 
 import type { ConsumoResponse } from "@/domain/dto/consumo/ConsumoResponse";
-import type { ConsumoStatsResponse } from "@/domain/dto/consumo/ConsumoStatsResponse";
 import type { AgrupadosResponse } from "@/domain/dto/consumo/AgrupadosResponse";
-
-type StatusFilter = "all" | "active" | "anulado";
 
 export default function ConsumosContabilidad() {
   const navigate = useNavigate();
   const { get, post, del } = useApi();
 
+  const [consumos, setConsumos] = useState<ConsumoResponse[]>([]);
   const [consumidores, setConsumidores] = useState<ConsumidorResponse[]>([]);
   const [puntosDeVenta, setPuntosDeVenta] = useState<PuntoDeVentaResponse[]>(
     [],
@@ -57,40 +52,24 @@ export default function ConsumosContabilidad() {
   const [viewMode, setViewMode] = useState<"detailed" | "grouped">("detailed");
   const [agrupados, setAgrupados] = useState<AgrupadosResponse[]>([]);
 
-  const [listFilters, setListFiltersRaw] = useState<ListFilterState>({ ...defaultFilters, dateField: "fecha" });
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
-  const [searchInput, setSearchInput] = useState("");
-  const [search, setSearch] = useState("");
-  const [page, setPage] = useState(0);
-  const [size, setSize] = useState(20);
-  const [sortKey, setSortKey] = useState("fecha");
-  const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
-
-  const [pageData, setPageData] = useState<Page<ConsumoResponse> | null>(null);
-  const [stats, setStats] = useState<ConsumoStatsResponse | null>(null);
-
-  const consumos = pageData?.content ?? [];
-
-  useEffect(() => {
-    const t = setTimeout(() => {
-      setSearch(searchInput);
-      setPage(0);
-    }, 300);
-    return () => clearTimeout(t);
-  }, [searchInput]);
+  const [listFilters, setListFilters] = useState<ListFilterState>({ ...defaultFilters, dateField: "fecha" });
 
   useEffect(() => {
     Promise.all([
+      get("/consumos"),
       get("/consumos/consumidores/all"),
       get("/comedores/puntos-de-venta"),
       get("/comedores"),
       get("/consumos/agrupados"),
     ]).then(
-      ([consumidoresRes, pvRes, comedoresRes, agrupadosRes]) => {
+      ([consumosRes, consumidoresRes, pvRes, comedoresRes, agrupados]) => {
+        consumosRes
+          .json()
+          .then((data) => setConsumos(Array.isArray(data) ? data : []));
         consumidoresRes.json().then(setConsumidores);
         pvRes.json().then(setPuntosDeVenta);
         comedoresRes.json().then(setComedores);
-        agrupadosRes
+        agrupados
           .json()
           .then((data) => setAgrupados(Array.isArray(data) ? data : []));
       },
@@ -112,65 +91,43 @@ export default function ConsumosContabilidad() {
     [comedores],
   );
 
-  const handleFiltersChange = (next: ListFilterState) => {
-    setListFiltersRaw(next);
-    setPage(0);
-  };
-
-  const handleStatusChange = (next: StatusFilter) => {
-    setStatusFilter(next);
-    setPage(0);
-  };
-
-  const handleSizeChange = (next: number) => {
-    setSize(next);
-    setPage(0);
-  };
-
-  const handleSort = (key: string) => {
-    if (key === sortKey) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
-    else {
-      setSortKey(key);
-      setSortDir("asc");
+  const consumosAfterDateFilter = useMemo(() => {
+    let list = [...consumos];
+    const getDate = listFilters.dateField === "creadoEn"
+      ? (c: ConsumoResponse) =>
+          new Date(c.creadoEn).toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" })
+      : (c: ConsumoResponse) => c.fecha;
+    if (listFilters.desde) list = list.filter((c) => getDate(c) >= listFilters.desde);
+    if (listFilters.hasta) list = list.filter((c) => getDate(c) <= listFilters.hasta);
+    if (listFilters.comedorId) {
+      const cId = Number(listFilters.comedorId);
+      list = list.filter((c) => {
+        const cons = consumidorById[c.consumidorId];
+        return cons?.comedorId === cId;
+      });
     }
-    setPage(0);
-  };
+    if (listFilters.consumidorId) {
+      const cId = Number(listFilters.consumidorId);
+      list = list.filter((c) => c.consumidorId === cId);
+    }
+    if (listFilters.puntoDeVentaIds.length) list = list.filter((c) => listFilters.puntoDeVentaIds.includes(String(c.PuntoDeVentaId)));
+    return list;
+  }, [consumos, listFilters, consumidorById]);
 
-  const fetchList = useCallback(() => {
-    const qs = buildQuery({
-      comedorId: listFilters.comedorId || undefined,
-      consumidorId: listFilters.consumidorId || undefined,
-      puntoDeVentaIds: listFilters.puntoDeVentaIds,
-      anulado: statusFilter === "all" ? undefined : statusFilter === "anulado",
-      fechaInicio: listFilters.desde,
-      fechaFin: listFilters.hasta,
-      search: search || undefined,
-      page,
-      size,
-      sort: `${sortKey},${sortDir}`,
-    });
-    return get(`/consumos${qs}`).then((r) => r.json()).then(setPageData);
-  }, [get, listFilters.comedorId, listFilters.consumidorId, listFilters.puntoDeVentaIds, listFilters.desde, listFilters.hasta, statusFilter, search, page, size, sortKey, sortDir]);
-
-  const fetchStats = useCallback(() => {
-    const qs = buildQuery({
-      comedorId: listFilters.comedorId || undefined,
-      consumidorId: listFilters.consumidorId || undefined,
-      puntoDeVentaIds: listFilters.puntoDeVentaIds,
-      fechaInicio: listFilters.desde,
-      fechaFin: listFilters.hasta,
-      search: search || undefined,
-    });
-    return get(`/consumos/stats${qs}`).then((r) => r.json()).then(setStats);
-  }, [get, listFilters.comedorId, listFilters.consumidorId, listFilters.puntoDeVentaIds, listFilters.desde, listFilters.hasta, search]);
-
-  useEffect(() => {
-    fetchList();
-  }, [fetchList]);
-
-  useEffect(() => {
-    fetchStats();
-  }, [fetchStats]);
+  const { displayed, sort, filters } = useTableState(consumosAfterDateFilter, {
+    searchFields: (c) => [
+      consumidorById[c.consumidorId]?.nombre ?? "",
+      puntoDeVentaNameById[c.PuntoDeVentaId] ?? "",
+      c.fecha,
+      c.observaciones ?? "",
+    ],
+    statusField: "anulacion",
+    statusMapping: {
+      active: { filter: (c) => c.anulacion === null },
+      anulado: { filter: (c) => c.anulacion !== null },
+    },
+    defaultSortKey: "fecha",
+  });
 
   const groupedAfterDateFilter = useMemo(() => {
     let list = [...agrupados];
@@ -189,29 +146,40 @@ export default function ConsumosContabilidad() {
 
   const handleAnular = async (consumoId: number, motivo: string) => {
     try {
-      await del(`/consumos/${consumoId}`, {
+      const updated = await del(`/consumos/${consumoId}`, {
         body: JSON.stringify({ motivo }),
-      });
+      }).then((r) => r.json());
+      setConsumos((prev) =>
+        prev.map((c) => (c.id === consumoId ? updated : c)),
+      );
       toast("Consumo anulado");
-      fetchList();
-      fetchStats();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "No se pudo anular el consumo");
       throw err;
     }
   };
 
-  const sortProps = { sortKey, sortDir, onSort: handleSort };
+  const sortProps = {
+    sortKey: sort.key,
+    sortDir: sort.dir,
+    onSort: sort.handleSort,
+  };
 
   const selection = useRowSelection();
 
   const [bulkAnularOpen, setBulkAnularOpen] = useState(false);
   const [bulkMotivo, setBulkMotivo] = useState("");
 
-  const selectedConsumos = consumos.filter((c) => selection.selected.has(c.id));
+  const selectedConsumos = displayed.filter((c) => selection.selected.has(c.id));
   const allAnulable = selectedConsumos.length > 0 && selectedConsumos.every((c) => c.anulacion === null);
 
-  const selectableIds = consumos.filter((c) => c.anulacion === null).map((c) => c.id);
+  const selectableIds = displayed.filter((c) => c.anulacion === null).map((c) => c.id);
+
+  const refetchConsumos = () => {
+    get("/consumos")
+      .then((r) => r.json())
+      .then((data) => setConsumos(Array.isArray(data) ? data : []));
+  };
 
   const handleBulkAnular = async () => {
     const res = await post("/consumos/bulk/anular", {
@@ -220,8 +188,7 @@ export default function ConsumosContabilidad() {
     }).then((r) => r.json() as Promise<BulkActionResponse>);
     handleBulkResponse(res, "Anulación");
     selection.clear();
-    fetchList();
-    fetchStats();
+    refetchConsumos();
     setBulkMotivo("");
   };
 
@@ -246,10 +213,10 @@ export default function ConsumosContabilidad() {
 
   const handleExport = () => {
     const data = selection.count > 0
-      ? consumos.filter((c) => selection.selected.has(c.id))
-      : consumos;
+      ? displayed.filter((c) => selection.selected.has(c.id))
+      : displayed;
     const segments = ["consumos"];
-    if (statusFilter !== "all") segments.push(statusFilter);
+    if (filters.status !== "all") segments.push(filters.status);
     if (listFilters.comedorId) segments.push(`comedor-${listFilters.comedorId}`);
     if (listFilters.desde) segments.push(`desde-${listFilters.desde}`);
     if (listFilters.hasta) segments.push(`hasta-${listFilters.hasta}`);
@@ -262,7 +229,15 @@ export default function ConsumosContabilidad() {
     onSort: groupedSort.handleSort,
   };
 
-  const isFiltered = !!stats && stats.montoTotalActivo !== stats.montoFiltradoActivo;
+  const totalActivos = consumos.filter((c) => c.anulacion === null).length;
+  const totalAnulados = consumos.filter((c) => c.anulacion !== null).length;
+  const montoTotal = consumos
+    .filter((c) => c.anulacion === null)
+    .reduce((s, c) => s + c.total, 0);
+  const montoFiltrado = displayed
+    .filter((c) => c.anulacion === null)
+    .reduce((s, c) => s + c.total, 0);
+  const isFiltered = displayed.length !== consumos.length;
 
   return (
     <div className="px-4 sm:px-8 lg:px-18 py-8">
@@ -274,13 +249,13 @@ export default function ConsumosContabilidad() {
       </div>
 
       <div className="mx-auto max-w-7xl grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5 pb-4">
-        <StatCard label="Total consumos" value={stats?.total ?? 0} />
-        <StatCard label="Activos" value={stats?.activos ?? 0} accent="emerald" />
-        <StatCard label="Anulados" value={stats?.anulados ?? 0} accent="red" />
-        <StatCard label="Monto total" value={fmtCurrency(stats?.montoTotalActivo ?? 0)} />
+        <StatCard label="Total consumos" value={consumos.length} />
+        <StatCard label="Activos" value={totalActivos} accent="emerald" />
+        <StatCard label="Anulados" value={totalAnulados} accent="red" />
+        <StatCard label="Monto total" value={fmtCurrency(montoTotal)} />
         <StatCard
           label={isFiltered ? "Monto filtrado" : "Monto activo"}
-          value={fmtCurrency(stats?.montoFiltradoActivo ?? 0)}
+          value={fmtCurrency(montoFiltrado)}
           accent={isFiltered ? "blue" : undefined}
         />
       </div>
@@ -293,10 +268,14 @@ export default function ConsumosContabilidad() {
           <div className="flex flex-row items-start justify-between gap-4 pt-3">
             <ListFilters
               filters={listFilters}
-              onChange={handleFiltersChange}
+              onChange={setListFilters}
               comedores={comedores}
               consumidores={consumidores}
               showSociedad={false}
+              dateFieldOptions={[
+                { value: "fecha", label: "Fecha Consumo" },
+                { value: "creadoEn", label: "Fecha de Carga" },
+              ]}
             />
             <Button
               size="sm"
@@ -311,7 +290,7 @@ export default function ConsumosContabilidad() {
           <DataTable
             displayedCount={
               viewMode === "detailed"
-                ? (pageData?.numberOfElements ?? 0)
+                ? displayed.length
                 : groupedDisplayed.length
             }
             selectionToolbar={
@@ -359,14 +338,14 @@ export default function ConsumosContabilidad() {
                   <>
                     <input
                       type="text"
-                      value={searchInput}
-                      onChange={(e) => setSearchInput(e.target.value)}
+                      value={filters.search}
+                      onChange={(e) => filters.setSearch(e.target.value)}
                       placeholder="Buscar..."
                       className="h-8 w-52 pl-3 pr-8 text-sm bg-gray-50 border border-gray-200 rounded-md"
                     />
                     <ConsumosStatusFilter
-                      value={statusFilter}
-                      onChange={handleStatusChange}
+                      value={filters.status as "all" | "active" | "anulado"}
+                      onChange={filters.setStatus}
                     />
                   </>
                 )}
@@ -435,7 +414,7 @@ export default function ConsumosContabilidad() {
             rows={
               viewMode === "detailed" ? (
                 <>
-                  {consumos.map((consumo) => {
+                  {displayed.map((consumo) => {
                     const isAnulado = consumo.anulacion !== null;
                     const consumidor = consumidorById[consumo.consumidorId];
                     const comedorNombre = consumidor
@@ -583,16 +562,6 @@ export default function ConsumosContabilidad() {
               )
             }
           />
-          {viewMode === "detailed" && (
-            <Pagination
-              page={pageData?.number ?? 0}
-              size={pageData?.size ?? size}
-              totalPages={pageData?.totalPages ?? 0}
-              totalElements={pageData?.totalElements ?? 0}
-              onPageChange={setPage}
-              onSizeChange={handleSizeChange}
-            />
-          )}
         </CardContent>
       </Card>
 

@@ -1,29 +1,21 @@
-import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useApi } from "@/hooks/useApi";
-import { cn, fmtCurrency } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { ArrowLeft, ChevronDown, ChevronUp, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { DataTable, SortableTh } from "@/components/data-table";
-import { Pagination } from "@/components/Pagination";
 import { EventosStatusFilter } from "../components/filters/EventosStatusFilter";
-import { useExpandableRows } from "@/hooks/useExpandableRows";
+import { useTableState } from "@/hooks/useTableState";
 import type { EventoResponse } from "@/domain/dto/evento/EventoResponse";
-import type { EventoStatsResponse } from "@/domain/dto/evento/EventoStatsResponse";
-import type { Page } from "@/domain/dto/shared/Page";
 import type { EstadoEvento } from "@/domain/enums/EstadoEvento";
 import { EstadoEventoLabel } from "@/domain/enums/EstadoEvento";
 import type { ComedorResponse } from "@/domain/dto/comedor/ComedorResponse";
 import type { ComedorCaseKey } from "../config/comedorCases";
-import { StatCard } from "@/modules/cierres/components/CierreStat";
-import { ListFilters, type ListFilterState } from "@/components/ListFilters";
-import { defaultFilters } from "@/components/list-filter-defaults";
-import { buildQuery } from "@/lib/query-string";
 
 type TabKey = "TODOS" | ComedorCaseKey;
-type StatusFilter = "all" | EstadoEvento;
 
 const TAB_LABELS: Record<TabKey, string> = {
   TODOS: "Todos",
@@ -44,6 +36,8 @@ const ESTADO_STYLES: Record<EstadoEvento, { bg: string; text: string }> = {
   COBRADO: { bg: "bg-emerald-100", text: "text-emerald-700" },
   ANULADO: { bg: "bg-red-100", text: "text-red-600" },
 };
+
+const ev = (e: EventoResponse, k: string): unknown => (e as Record<string, unknown>)[k];
 
 function extraHeaders(tab: TabKey): ReactNode {
   switch (tab) {
@@ -129,32 +123,17 @@ export default function EventosCargaDatos() {
   const navigate = useNavigate();
   const { get } = useApi();
 
+  const [eventos, setEventos] = useState<EventoResponse[]>([]);
   const [comedores, setComedores] = useState<ComedorResponse[]>([]);
   const [activeTab, setActiveTab] = useState<TabKey>("TODOS");
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
-  const [searchInput, setSearchInput] = useState("");
-  const [search, setSearch] = useState("");
-  const [listFilters, setListFiltersRaw] = useState<ListFilterState>(defaultFilters);
-  const [page, setPage] = useState(0);
-  const [size, setSize] = useState(20);
-  const [sortKey, setSortKey] = useState("fechaEvento");
-  const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
-
-  const [pageData, setPageData] = useState<Page<EventoResponse> | null>(null);
-  const [stats, setStats] = useState<EventoStatsResponse | null>(null);
-
-  const eventos = pageData?.content ?? [];
 
   useEffect(() => {
-    const t = setTimeout(() => {
-      setSearch(searchInput);
-      setPage(0);
-    }, 300);
-    return () => clearTimeout(t);
-  }, [searchInput]);
-
-  useEffect(() => {
-    get("/comedores").then((r) => r.json()).then(setComedores);
+    Promise.all([get("/eventos/mis-cierres"), get("/comedores")]).then(
+      ([eventosRes, comedoresRes]) => {
+        eventosRes.json().then((data) => setEventos(Array.isArray(data) ? data : []));
+        comedoresRes.json().then(setComedores);
+      },
+    );
   }, [get]);
 
   const comedorNameById = useMemo(
@@ -162,91 +141,45 @@ export default function EventosCargaDatos() {
     [comedores],
   );
 
-  const handleFiltersChange = (next: ListFilterState) => {
-    setListFiltersRaw(next);
-    setPage(0);
-  };
-
-  const handleStatusChange = (next: StatusFilter) => {
-    setStatusFilter(next);
-    setPage(0);
-  };
-
-  const handleTabChange = (tab: TabKey) => {
-    setActiveTab(tab);
-    setPage(0);
-  };
-
-  const handleSizeChange = (next: number) => {
-    setSize(next);
-    setPage(0);
-  };
-
-  const handleSort = (key: string) => {
-    if (key === sortKey) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
-    else {
-      setSortKey(key);
-      setSortDir("asc");
-    }
-    setPage(0);
-  };
-
-  const fetchList = useCallback(() => {
-    const qs = buildQuery({
-      puntoDeVentaIds: listFilters.puntoDeVentaIds,
-      comedorId: listFilters.comedorId || undefined,
-      estado: statusFilter === "all" ? undefined : statusFilter,
-      tipoComedor: activeTab === "TODOS" ? undefined : activeTab,
-      fechaInicio: listFilters.desde,
-      fechaFin: listFilters.hasta,
-      search: search || undefined,
-      page,
-      size,
-      sort: `${sortKey},${sortDir}`,
-    });
-    return get(`/eventos/mis-cierres${qs}`).then((r) => r.json()).then(setPageData);
-  }, [get, listFilters.puntoDeVentaIds, listFilters.comedorId, listFilters.desde, listFilters.hasta, statusFilter, activeTab, search, page, size, sortKey, sortDir]);
-
-  const fetchStats = useCallback(() => {
-    const qs = buildQuery({
-      puntoDeVentaIds: listFilters.puntoDeVentaIds,
-      comedorId: listFilters.comedorId || undefined,
-      tipoComedor: activeTab === "TODOS" ? undefined : activeTab,
-      fechaInicio: listFilters.desde,
-      fechaFin: listFilters.hasta,
-      search: search || undefined,
-    });
-    return get(`/eventos/mis-cierres/stats${qs}`).then((r) => r.json()).then(setStats);
-  }, [get, listFilters.puntoDeVentaIds, listFilters.comedorId, listFilters.desde, listFilters.hasta, activeTab, search]);
-
-  useEffect(() => {
-    fetchList();
-  }, [fetchList]);
-
-  useEffect(() => {
-    fetchStats();
-  }, [fetchStats]);
-
   const tabCounts = useMemo(() => {
-    const counts: Record<string, number> = { TODOS: stats?.total ?? 0 };
-    for (const [tipo, count] of Object.entries(stats?.countsByTipo ?? {})) {
-      counts[tipo] = count;
+    const counts: Record<string, number> = { TODOS: eventos.length };
+    for (const e of eventos) {
+      counts[e.tipoComedor] = (counts[e.tipoComedor] || 0) + 1;
     }
     return counts;
-  }, [stats]);
+  }, [eventos]);
 
   const availableTabs = useMemo(
-    () => TAB_ORDER.filter((k) => k === "TODOS" || (tabCounts[k] ?? 0) > 0 || k === activeTab),
-    [tabCounts, activeTab],
+    () => TAB_ORDER.filter((k) => k === "TODOS" || (tabCounts[k] ?? 0) > 0),
+    [tabCounts],
   );
+
+  const eventosForTab = useMemo(() => {
+    if (activeTab === "TODOS") return eventos;
+    return eventos.filter((e) => e.tipoComedor === activeTab);
+  }, [eventos, activeTab]);
 
   const hasExtraCols = activeTab !== "TODOS" && activeTab !== "DEFAULT";
 
-  const sortProps = { sortKey, sortDir, onSort: handleSort };
+  const { displayed, sort, expansion, filters } = useTableState(eventosForTab, {
+    searchFields: (e) => [
+      comedorNameById[e.comedorId] ?? "",
+      e.fechaEvento,
+      String(ev(e, "solicitanteNombre") ?? ""),
+    ],
+    statusField: "estado",
+    statusMapping: {
+      CARGA_PARCIAL: { filter: (e) => e.estado === "CARGA_PARCIAL" },
+      SOLICITADO: { filter: (e) => e.estado === "SOLICITADO" },
+      REALIZADO: { filter: (e) => e.estado === "REALIZADO" },
+      FACTURA_EMITIDA: { filter: (e) => e.estado === "FACTURA_EMITIDA" },
+      COBRADO: { filter: (e) => e.estado === "COBRADO" },
+      ANULADO: { filter: (e) => e.estado === "ANULADO" },
+    },
+    defaultSortKey: "fechaEvento",
+  });
 
-  const expansion = useExpandableRows();
-
-  const isFiltered = !!stats && stats.montoTotalActivo !== stats.montoFiltradoActivo;
+  const sortProps = { sortKey: sort.key, sortDir: sort.dir, onSort: sort.handleSort };
 
   return (
     <div className="px-4 sm:px-8 lg:px-18 py-8">
@@ -256,19 +189,6 @@ export default function EventosCargaDatos() {
           Volver
         </Button>
       </div>
-
-      <div className="mx-auto max-w-7xl grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5 pb-4">
-        <StatCard label="Total eventos" value={stats?.total ?? 0} />
-        <StatCard label="Activos" value={stats?.activos ?? 0} accent="emerald" />
-        <StatCard label="Anulados" value={stats?.anulados ?? 0} accent="red" />
-        <StatCard label="Monto total" value={fmtCurrency(stats?.montoTotalActivo ?? 0)} />
-        <StatCard
-          label={isFiltered ? "Monto filtrado" : "Monto activo"}
-          value={fmtCurrency(stats?.montoFiltradoActivo ?? 0)}
-          accent={isFiltered ? "blue" : undefined}
-        />
-      </div>
-
       <Card className="mx-auto max-w-7xl py-6 border-0 shadow-md rounded-xl">
         <CardHeader className="border-b px-6 py-4">
           <div className="w-full flex flex-row justify-between">
@@ -281,21 +201,13 @@ export default function EventosCargaDatos() {
               <Plus className="h-4 w-4" /> Nuevo Evento
             </Button>
           </div>
-          <div className="pt-3">
-            <ListFilters
-              filters={listFilters}
-              onChange={handleFiltersChange}
-              comedores={comedores}
-              showSociedad={false}
-            />
-          </div>
           {availableTabs.length > 2 && (
             <div className="flex gap-1 pt-3 border-t mt-3 overflow-x-auto">
               {availableTabs.map((tab) => (
                 <button
                   type="button"
                   key={tab}
-                  onClick={() => handleTabChange(tab)}
+                  onClick={() => setActiveTab(tab)}
                   className={cn(
                     "px-4 py-2 text-sm font-medium rounded-md whitespace-nowrap transition-colors",
                     activeTab === tab
@@ -312,19 +224,19 @@ export default function EventosCargaDatos() {
         </CardHeader>
         <CardContent className="p-0">
           <DataTable
-            displayedCount={pageData?.numberOfElements ?? 0}
+            displayedCount={displayed.length}
             toolbarLeft={
               <div className="flex flex-wrap items-center gap-2">
                 <input
                   type="text"
-                  value={searchInput}
-                  onChange={(e) => setSearchInput(e.target.value)}
+                  value={filters.search}
+                  onChange={(e) => filters.setSearch(e.target.value)}
                   placeholder="Buscar..."
                   className="h-8 w-52 pl-3 pr-8 text-sm bg-gray-50 border border-gray-200 rounded-md"
                 />
                 <EventosStatusFilter
-                  value={statusFilter}
-                  onChange={handleStatusChange}
+                  value={filters.status as "all" | EstadoEvento}
+                  onChange={filters.setStatus}
                 />
               </div>
             }
@@ -340,7 +252,7 @@ export default function EventosCargaDatos() {
             }
             rows={
               <>
-                {eventos.map((evento) => {
+                {displayed.map((evento) => {
                   const isExpanded = expansion.expandedRows.has(evento.id);
                   const estilos = ESTADO_STYLES[evento.estado];
                   const isAnulado = evento.estado === "ANULADO";
@@ -414,14 +326,6 @@ export default function EventosCargaDatos() {
                 })}
               </>
             }
-          />
-          <Pagination
-            page={pageData?.number ?? 0}
-            size={pageData?.size ?? size}
-            totalPages={pageData?.totalPages ?? 0}
-            totalElements={pageData?.totalElements ?? 0}
-            onPageChange={setPage}
-            onSizeChange={handleSizeChange}
           />
         </CardContent>
       </Card>
