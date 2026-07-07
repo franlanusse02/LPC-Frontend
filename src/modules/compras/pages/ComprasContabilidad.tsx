@@ -23,25 +23,21 @@ import {
   Plus,
   Send,
 } from "lucide-react";
-import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { DataTable, SortableTh } from "@/components/data-table";
-import { Pagination } from "@/components/Pagination";
 import { FacturasStatusFilter } from "../components/filters/FacturasStatusFilter";
 import { EmitirFacturaModal } from "../components/EmitirFacturaModal";
 import { AnularFacturaModal } from "../components/AnularFacturaModal";
 import { PagarFacturaModal } from "../components/PagarFacturaModal";
 import { toast } from "sonner";
-import { useExpandableRows } from "@/hooks/useExpandableRows";
+import { useTableState } from "@/hooks/useTableState";
 import { useRowSelection } from "@/hooks/useRowSelection";
 import { BulkActionModal } from "@/components/BulkActionModal";
 import { handleBulkResponse } from "@/lib/bulk-utils";
 import type { BulkActionResponse } from "@/domain/dto/shared/BulkActionResponse";
-import type { Page } from "@/domain/dto/shared/Page";
 import { exportToXlsx, type ExportColumn } from "@/lib/exportXlsx";
 import type { FacturaProveedorResponse } from "@/domain/dto/compra/FacturaProveedorResponse";
-import type { FacturaProveedorStatsResponse } from "@/domain/dto/compra/FacturaProveedorStatsResponse";
-import type { OrdenDeCompraStatsResponse } from "@/domain/dto/orden-compra/OrdenDeCompraStatsResponse";
 import type { ComedorResponse } from "@/domain/dto/comedor/ComedorResponse";
 import {
   ListFilters,
@@ -53,7 +49,6 @@ import { KpiCard } from "@/components/KpiCard";
 import { OrdenesDeCompraTable } from "../components/OrdenesDeCompraTable";
 import { downloadPdf } from "@/lib/download";
 import type { OrdenDeCompraResponse } from "@/domain/dto/orden-compra/OrdenDeCompraResponse";
-import { buildQuery } from "@/lib/query-string";
 
 const ESTADO_STYLES: Record<
   string,
@@ -63,12 +58,6 @@ const ESTADO_STYLES: Record<
   EMITIDA: { label: "Emitida", bg: "bg-blue-100", text: "text-blue-700" },
   PAGADA: { label: "Pagada", bg: "bg-emerald-100", text: "text-emerald-700" },
   PENDIENTE: { label: "Pendiente", bg: "bg-amber-100", text: "text-amber-700" },
-};
-
-type StatusFilter = "all" | "PENDIENTE" | "EMITIDA" | "PAGADA" | "ANULADA";
-
-const SORT_KEY_TO_ENTITY: Record<string, string> = {
-  numero: "numeroFactura",
 };
 
 export default function ComprasContabilidad() {
@@ -82,104 +71,21 @@ export default function ComprasContabilidad() {
   const [pagarFactura, setPagarFactura] =
     useState<FacturaProveedorResponse | null>(null);
 
+  const [facturas, setFacturas] = useState<FacturaProveedorResponse[]>([]);
   const [proveedores, setProveedores] = useState<
     { id: number; nombre: string; taxId: string }[]
   >([]);
   const [comedores, setComedores] = useState<ComedorResponse[]>([]);
-  const [activeTab, setActiveTab] = useState<"facturas" | "ordenes">("facturas");
 
-  const [listFilters, setListFiltersRaw] = useState<ListFilterState>(defaultFilters);
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
-  const [searchInput, setSearchInput] = useState("");
-  const [search, setSearch] = useState("");
-  const [page, setPage] = useState(0);
-  const [size, setSize] = useState(20);
-  const [sortKey, setSortKey] = useState("fechaFactura");
-  const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
+  const [listFilters, setListFilters] = useState<ListFilterState>(defaultFilters);
 
-  const [pageData, setPageData] = useState<Page<FacturaProveedorResponse> | null>(null);
-  const [stats, setStats] = useState<FacturaProveedorStatsResponse | null>(null);
-
-  const facturas = pageData?.content ?? [];
-
-  const [ordenPageData, setOrdenPageData] = useState<Page<OrdenDeCompraResponse> | null>(null);
-  const [ordenStats, setOrdenStats] = useState<OrdenDeCompraStatsResponse | null>(null);
-  const [ordenStatusFilter, setOrdenStatusFilter] = useState<"all" | "PENDIENTE" | "APROBADA" | "ENVIADA" | "CANCELADA">("all");
-  const [ordenSearchInput, setOrdenSearchInput] = useState("");
-  const [ordenSearch, setOrdenSearch] = useState("");
-  const [ordenPage, setOrdenPage] = useState(0);
-  const [ordenSize, setOrdenSize] = useState(20);
-  const [ordenSortKey, setOrdenSortKey] = useState("fecha");
-  const [ordenSortDir, setOrdenSortDir] = useState<"asc" | "desc">("desc");
-
-  const ordenes = ordenPageData?.content ?? [];
+  const [ordenes, setOrdenes] = useState<OrdenDeCompraResponse[]>([]);
 
   useEffect(() => {
-    const t = setTimeout(() => {
-      setSearch(searchInput);
-      setPage(0);
-    }, 300);
-    return () => clearTimeout(t);
-  }, [searchInput]);
-
-  useEffect(() => {
-    const t = setTimeout(() => {
-      setOrdenSearch(ordenSearchInput);
-      setOrdenPage(0);
-    }, 300);
-    return () => clearTimeout(t);
-  }, [ordenSearchInput]);
-
-  const handleOrdenStatusChange = (next: "all" | "PENDIENTE" | "APROBADA" | "ENVIADA" | "CANCELADA") => {
-    setOrdenStatusFilter(next);
-    setOrdenPage(0);
-  };
-
-  const handleOrdenSizeChange = (next: number) => {
-    setOrdenSize(next);
-    setOrdenPage(0);
-  };
-
-  const handleOrdenSort = (key: string) => {
-    if (key === ordenSortKey) setOrdenSortDir((d) => (d === "asc" ? "desc" : "asc"));
-    else {
-      setOrdenSortKey(key);
-      setOrdenSortDir("asc");
-    }
-    setOrdenPage(0);
-  };
-
-  const fetchOrdenes = useCallback(() => {
-    const qs = buildQuery({
-      comedorId: listFilters.comedorId || undefined,
-      fechaInicio: listFilters.desde,
-      fechaFin: listFilters.hasta,
-      search: ordenSearch || undefined,
-      estado: ordenStatusFilter === "all" ? undefined : ordenStatusFilter,
-      page: ordenPage,
-      size: ordenSize,
-      sort: `${ordenSortKey},${ordenSortDir}`,
-    });
-    return get(`/ordenes-de-compra${qs}`).then((r) => r.json()).then(setOrdenPageData);
-  }, [get, listFilters.comedorId, listFilters.desde, listFilters.hasta, ordenSearch, ordenStatusFilter, ordenPage, ordenSize, ordenSortKey, ordenSortDir]);
-
-  const fetchOrdenStats = useCallback(() => {
-    const qs = buildQuery({
-      comedorId: listFilters.comedorId || undefined,
-      fechaInicio: listFilters.desde,
-      fechaFin: listFilters.hasta,
-      search: ordenSearch || undefined,
-    });
-    return get(`/ordenes-de-compra/stats${qs}`).then((r) => r.json()).then(setOrdenStats);
-  }, [get, listFilters.comedorId, listFilters.desde, listFilters.hasta, ordenSearch]);
-
-  useEffect(() => {
-    fetchOrdenes();
-  }, [fetchOrdenes]);
-
-  useEffect(() => {
-    fetchOrdenStats();
-  }, [fetchOrdenStats]);
+    get("/ordenes-de-compra")
+      .then((r) => r.json())
+      .then((data: OrdenDeCompraResponse[]) => setOrdenes(Array.isArray(data) ? data : []));
+  }, [get]);
 
   const handleDownloadPdf = async (o: OrdenDeCompraResponse) => {
     try {
@@ -195,70 +101,16 @@ export default function ComprasContabilidad() {
     successMsg: string,
   ) => {
     try {
-      await patch(`/ordenes-de-compra/${o.id}/${action}`, {});
+      const updated: OrdenDeCompraResponse = await patch(
+        `/ordenes-de-compra/${o.id}/${action}`,
+        {},
+      ).then((r) => r.json());
+      setOrdenes((prev) => prev.map((x) => (x.id === o.id ? updated : x)));
       toast(successMsg);
-      fetchOrdenes();
-      fetchOrdenStats();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "No se pudo realizar la acción");
     }
   };
-
-  const handleFiltersChange = (next: ListFilterState) => {
-    setListFiltersRaw(next);
-    setPage(0);
-  };
-
-  const handleStatusChange = (next: StatusFilter) => {
-    setStatusFilter(next);
-    setPage(0);
-  };
-
-  const handleSizeChange = (next: number) => {
-    setSize(next);
-    setPage(0);
-  };
-
-  const handleSort = (key: string) => {
-    if (key === sortKey) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
-    else {
-      setSortKey(key);
-      setSortDir("asc");
-    }
-    setPage(0);
-  };
-
-  const fetchList = useCallback(() => {
-    const qs = buildQuery({
-      comedorId: listFilters.comedorId || undefined,
-      fechaInicio: listFilters.desde,
-      fechaFin: listFilters.hasta,
-      search: search || undefined,
-      estado: statusFilter === "all" ? undefined : statusFilter,
-      page,
-      size,
-      sort: `${SORT_KEY_TO_ENTITY[sortKey] ?? sortKey},${sortDir}`,
-    });
-    return get(`/facturas/proveedor${qs}`).then((r) => r.json()).then(setPageData);
-  }, [get, listFilters.comedorId, listFilters.desde, listFilters.hasta, search, statusFilter, page, size, sortKey, sortDir]);
-
-  const fetchStats = useCallback(() => {
-    const qs = buildQuery({
-      comedorId: listFilters.comedorId || undefined,
-      fechaInicio: listFilters.desde,
-      fechaFin: listFilters.hasta,
-      search: search || undefined,
-    });
-    return get(`/facturas/proveedor/stats${qs}`).then((r) => r.json()).then(setStats);
-  }, [get, listFilters.comedorId, listFilters.desde, listFilters.hasta, search]);
-
-  useEffect(() => {
-    fetchList();
-  }, [fetchList]);
-
-  useEffect(() => {
-    fetchStats();
-  }, [fetchStats]);
 
   const handleEmitir = async (
     facturaId: number,
@@ -266,13 +118,14 @@ export default function ComprasContabilidad() {
     fechaPago: string | null,
   ) => {
     try {
-      await patch(`/facturas/proveedor/${facturaId}/emitir`, {
+      const updated = await patch(`/facturas/proveedor/${facturaId}/emitir`, {
         fechaEmision,
         fechaPago,
-      });
+      }).then((r) => r.json());
+      setFacturas((prev) =>
+        prev.map((f) => (f.id === facturaId ? updated : f)),
+      );
       toast("Factura emitida");
-      fetchList();
-      fetchStats();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "No se pudo emitir la factura");
       throw err;
@@ -281,12 +134,13 @@ export default function ComprasContabilidad() {
 
   const handleAnular = async (facturaId: number, motivo: string) => {
     try {
-      await del(`/facturas/proveedor/${facturaId}`, {
+      const updated = await del(`/facturas/proveedor/${facturaId}`, {
         body: JSON.stringify({ motivo }),
-      });
+      }).then((r) => r.json());
+      setFacturas((prev) =>
+        prev.map((f) => (f.id === facturaId ? updated : f)),
+      );
       toast("Factura anulada");
-      fetchList();
-      fetchStats();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "No se pudo anular la factura");
       throw err;
@@ -299,18 +153,27 @@ export default function ComprasContabilidad() {
     numeroOperacion: string,
   ) => {
     try {
-      await patch(`/facturas/proveedor/${facturaId}/pagar`, {
+      const updated = await patch(`/facturas/proveedor/${facturaId}/pagar`, {
         fechaPago,
         numeroOperacion,
-      });
+      }).then((r) => r.json());
+      setFacturas((prev) =>
+        prev.map((f) => (f.id === facturaId ? updated : f)),
+      );
       toast("Pago registrado");
-      fetchList();
-      fetchStats();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "No se pudo registrar el pago");
       throw err;
     }
   };
+
+  useEffect(() => {
+    get("/facturas/proveedor")
+      .then((r) => r.json())
+      .then((data: FacturaProveedorResponse[]) =>
+        setFacturas(Array.isArray(data) ? data : []),
+      );
+  }, [get]);
 
   useEffect(() => {
     get("/proveedores")
@@ -349,9 +212,39 @@ export default function ComprasContabilidad() {
     return map;
   }, [comedores]);
 
-  const sortProps = { sortKey, sortDir, onSort: handleSort };
+  const facturasAfterDateFilter = useMemo(() => {
+    let list = [...facturas];
+    const getDate = listFilters.dateField === "creadoEn"
+      ? (f: FacturaProveedorResponse) =>
+          new Date(f.creadoEn).toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" })
+      : (f: FacturaProveedorResponse) => f.fechaFactura;
+    if (listFilters.desde) list = list.filter((f) => getDate(f) >= listFilters.desde);
+    if (listFilters.hasta) list = list.filter((f) => getDate(f) <= listFilters.hasta);
+    if (listFilters.comedorId) list = list.filter((f) => f.comedorId === Number(listFilters.comedorId));
+    if (listFilters.puntoDeVentaIds.length) list = list.filter((f) => (f.puntoDeVentaComedor ?? []).some((s) => listFilters.puntoDeVentaIds.includes(String(s.puntoDeVentaId))));
+    return list;
+  }, [facturas, listFilters]);
 
-  const expansion = useExpandableRows();
+  const { displayed, sort, expansion, filters } = useTableState(facturasAfterDateFilter, {
+    searchFields: (f) => [
+      f.numero,
+      (proveedorNameById[f.proveedorId] ?? "").toLowerCase(),
+      (comedorNameById[f.comedorId] ?? "").toLowerCase(),
+      f.comentarios || "",
+      f.numeroOperacion || "",
+    ],
+    statusField: "estado",
+    statusMapping: {
+      PENDIENTE: { filter: (f) => f.estado === "PENDIENTE" },
+      EMITIDA: { filter: (f) => f.estado === "EMITIDA" },
+      PAGADA: { filter: (f) => f.estado === "PAGADA" },
+      ANULADA: { filter: (f) => f.estado === "ANULADA" },
+    },
+    defaultSortKey: "fechaFactura" as const,
+  });
+
+  const sortProps = { sortKey: sort.key, sortDir: sort.dir, onSort: sort.handleSort };
+
   const selection = useRowSelection();
 
   const [bulkEmitir, setBulkEmitir] = useState(false);
@@ -362,7 +255,7 @@ export default function ComprasContabilidad() {
   const [bulkNumeroOp, setBulkNumeroOp] = useState("");
   const [bulkMotivo, setBulkMotivo] = useState("");
 
-  const selectedFacturas = facturas.filter((f) => selection.selected.has(f.id));
+  const selectedFacturas = displayed.filter((f) => selection.selected.has(f.id));
 
   const bulkPagarPrefill = useMemo(() => {
     const ops = selectedFacturas.map((f) => f.numeroOperacion ?? "");
@@ -386,11 +279,20 @@ export default function ComprasContabilidad() {
   const allEmitida = selectedFacturas.length > 0 && selectedFacturas.every((f) => f.estado === "EMITIDA");
   const allAnulable = selectedFacturas.length > 0 && selectedFacturas.every((f) => f.estado === "PENDIENTE" || f.estado === "EMITIDA");
 
-  const selectableIds = facturas
+  const selectableIds = displayed
     .filter((f) => f.estado !== "ANULADA" && f.estado !== "PAGADA")
     .map((f) => f.id);
 
-  const isFiltered = !!stats && stats.montoTotalActivo !== stats.montoFiltradoActivo;
+  const totalActivos = facturas.filter((f) => f.estado !== "ANULADA").length;
+  const totalAnulados = facturas.filter((f) => f.estado === "ANULADA").length;
+  const montoTotal = facturas
+    .filter((f) => f.estado !== "ANULADA")
+    .reduce((s, f) => s + (f.monto ?? 0), 0);
+  const montoActivo = facturas
+    .filter((f) => f.estado !== "ANULADA")
+    .reduce((s, f) => s + (f.monto ?? 0), 0);
+  const isFiltered = listFilters.desde !== "" || listFilters.hasta !== "" || listFilters.comedorId !== "" || listFilters.dateField !== "fechaFactura";
+  const montoFiltrado = displayed.reduce((s, f) => s + (f.monto ?? 0), 0);
 
   const analyticsFilters = useMemo(
     () => ({
@@ -402,6 +304,14 @@ export default function ComprasContabilidad() {
     [listFilters],
   );
 
+  const refetchFacturas = () => {
+    get("/facturas/proveedor")
+      .then((r) => r.json())
+      .then((data: FacturaProveedorResponse[]) =>
+        setFacturas(Array.isArray(data) ? data : []),
+      );
+  };
+
   const handleBulkEmitir = async () => {
     const res = await post("/facturas/proveedor/bulk/emitir", {
       ids: [...selection.selected],
@@ -411,8 +321,7 @@ export default function ComprasContabilidad() {
     }).then((r) => r.json() as Promise<BulkActionResponse>);
     handleBulkResponse(res, "Emisión");
     selection.clear();
-    fetchList();
-    fetchStats();
+    refetchFacturas();
     setBulkFechaEmision("");
     setBulkFechaPago("");
     setBulkNumeroOp("");
@@ -426,8 +335,7 @@ export default function ComprasContabilidad() {
     }).then((r) => r.json() as Promise<BulkActionResponse>);
     handleBulkResponse(res, "Pago");
     selection.clear();
-    fetchList();
-    fetchStats();
+    refetchFacturas();
     setBulkFechaPago("");
     setBulkNumeroOp("");
   };
@@ -439,8 +347,7 @@ export default function ComprasContabilidad() {
     }).then((r) => r.json() as Promise<BulkActionResponse>);
     handleBulkResponse(res, "Anulación");
     selection.clear();
-    fetchList();
-    fetchStats();
+    refetchFacturas();
     setBulkMotivo("");
   };
 
@@ -471,10 +378,10 @@ export default function ComprasContabilidad() {
 
   const handleExport = () => {
     const data = selection.count > 0
-      ? facturas.filter((f) => selection.selected.has(f.id))
-      : facturas;
+      ? displayed.filter((f) => selection.selected.has(f.id))
+      : displayed;
     const segments = ["compras"];
-    if (statusFilter !== "all") segments.push(statusFilter);
+    if (filters.status !== "all") segments.push(filters.status);
     if (listFilters.comedorId) segments.push(`comedor-${listFilters.comedorId}`);
     if (listFilters.desde) segments.push(`desde-${listFilters.desde}`);
     if (listFilters.hasta) segments.push(`hasta-${listFilters.hasta}`);
@@ -490,38 +397,28 @@ export default function ComprasContabilidad() {
         </Button>
       </div>
 
-      {activeTab === "facturas" ? (
-        <div className="mx-auto max-w-7xl grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6 pb-4">
-          <StatCard label="Total facturas" value={stats?.total ?? 0} />
-          <StatCard label="Activas" value={(stats?.total ?? 0) - (stats?.anuladas ?? 0)} accent="emerald" />
-          <StatCard label="Anuladas" value={stats?.anuladas ?? 0} accent="red" />
-          <StatCard label="Monto total" value={fmtCurrency(stats?.montoTotalActivo ?? 0)} />
-          <StatCard
-            label={isFiltered ? "Monto filtrado" : "Monto activo"}
-            value={fmtCurrency(stats?.montoFiltradoActivo ?? 0)}
-            accent={isFiltered ? "blue" : undefined}
-          />
-          <KpiCard
-            title="Monto estimado OC"
-            endpoint="/analytics/contabilidad/ordenes-compra/monto-estimado"
-            filters={analyticsFilters}
-            format="currency"
-            valueExtractor={(d) =>
-              typeof d === "number" ? d : ((d as { total?: number })?.total ?? 0)
-            }
-          />
-        </div>
-      ) : (
-        <div className="mx-auto max-w-7xl grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5 pb-4">
-          <StatCard label="Total órdenes" value={ordenStats?.total ?? 0} />
-          <StatCard label="Pendientes" value={ordenStats?.pendientes ?? 0} accent="blue" />
-          <StatCard label="Enviadas" value={ordenStats?.enviadas ?? 0} accent="emerald" />
-          <StatCard label="Canceladas" value={ordenStats?.canceladas ?? 0} accent="red" />
-          <StatCard label="Monto total" value={fmtCurrency(ordenStats?.montoTotalActivo ?? 0)} />
-        </div>
-      )}
+      <div className="mx-auto max-w-7xl grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6 pb-4">
+        <StatCard label="Total facturas" value={facturas.length} />
+        <StatCard label="Activas" value={totalActivos} accent="emerald" />
+        <StatCard label="Anuladas" value={totalAnulados} accent="red" />
+        <StatCard label="Monto total" value={fmtCurrency(montoTotal)} />
+        <StatCard
+          label={isFiltered ? "Monto filtrado" : "Monto activo"}
+          value={fmtCurrency(isFiltered ? montoFiltrado : montoActivo)}
+          accent={isFiltered ? "blue" : undefined}
+        />
+        <KpiCard
+          title="Monto estimado OC"
+          endpoint="/analytics/contabilidad/ordenes-compra/monto-estimado"
+          filters={analyticsFilters}
+          format="currency"
+          valueExtractor={(d) =>
+            typeof d === "number" ? d : ((d as { total?: number })?.total ?? 0)
+          }
+        />
+      </div>
 
-      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "facturas" | "ordenes")} className="mx-auto max-w-7xl">
+      <Tabs defaultValue="facturas" className="mx-auto max-w-7xl">
         <TabsList className="mb-4 px-1">
           <TabsTrigger value="facturas">Facturas</TabsTrigger>
           <TabsTrigger value="ordenes">Órdenes de Compra</TabsTrigger>
@@ -551,19 +448,6 @@ export default function ComprasContabilidad() {
                 onAprobar={(o) => applyOrdenAction(o, "aprobar", "Orden aprobada")}
                 onEnviar={(o) => applyOrdenAction(o, "enviar", "Orden enviada")}
                 onCancelar={(o) => applyOrdenAction(o, "cancelar", "Orden cancelada")}
-                sortKey={ordenSortKey}
-                sortDir={ordenSortDir}
-                onSort={handleOrdenSort}
-                search={ordenSearchInput}
-                onSearchChange={setOrdenSearchInput}
-                status={ordenStatusFilter}
-                onStatusChange={handleOrdenStatusChange}
-                page={ordenPageData?.number ?? 0}
-                size={ordenPageData?.size ?? ordenSize}
-                totalPages={ordenPageData?.totalPages ?? 0}
-                totalElements={ordenPageData?.totalElements ?? 0}
-                onPageChange={setOrdenPage}
-                onSizeChange={handleOrdenSizeChange}
               />
             </CardContent>
           </Card>
@@ -578,9 +462,13 @@ export default function ComprasContabilidad() {
           <div className="flex flex-row items-start justify-between gap-4 pt-3">
             <ListFilters
               filters={listFilters}
-              onChange={handleFiltersChange}
+              onChange={setListFilters}
               comedores={comedores}
               showSociedad={false}
+              dateFieldOptions={[
+                { value: "fechaFactura", label: "Fecha Factura" },
+                { value: "creadoEn", label: "Fecha de Carga" },
+              ]}
             />
             <Button
               size="sm"
@@ -593,7 +481,7 @@ export default function ComprasContabilidad() {
         </CardHeader>
         <CardContent className="p-0">
           <DataTable
-            displayedCount={pageData?.numberOfElements ?? 0}
+            displayedCount={displayed.length}
             selectionToolbar={
               selection.count > 0 ? (
                 <div className="flex items-center gap-3">
@@ -630,15 +518,15 @@ export default function ComprasContabilidad() {
                 <div className="relative">
                   <input
                     type="text"
-                    value={searchInput}
-                    onChange={(e) => setSearchInput(e.target.value)}
+                    value={filters.search}
+                    onChange={(e) => filters.setSearch(e.target.value)}
                     placeholder="Buscar..."
                     className="h-8 w-52 pl-8 pr-8 text-sm bg-gray-50 border border-gray-200 rounded-md"
                   />
                 </div>
                 <FacturasStatusFilter
-                  value={statusFilter}
-                  onChange={handleStatusChange}
+                  value={filters.status as "all" | "PENDIENTE" | "EMITIDA" | "PAGADA" | "ANULADA"}
+                  onChange={filters.setStatus}
                 />
               </div>
             }
@@ -690,7 +578,7 @@ export default function ComprasContabilidad() {
             }
             rows={
               <>
-                {facturas.map((factura) => {
+                {displayed.map((factura) => {
                   const isExpanded = expansion.expandedRows.has(factura.id);
                   const isAnulada = factura.estado === "ANULADA";
                   const styles = ESTADO_STYLES[factura.estado];
@@ -916,14 +804,6 @@ export default function ComprasContabilidad() {
                 })}
               </>
             }
-          />
-          <Pagination
-            page={pageData?.number ?? 0}
-            size={pageData?.size ?? size}
-            totalPages={pageData?.totalPages ?? 0}
-            totalElements={pageData?.totalElements ?? 0}
-            onPageChange={setPage}
-            onSizeChange={handleSizeChange}
           />
         </CardContent>
       </Card>

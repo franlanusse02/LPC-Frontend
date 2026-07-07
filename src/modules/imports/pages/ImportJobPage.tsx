@@ -99,9 +99,9 @@ export default function ImportJobPage() {
     }
   };
 
-  const handleApplyRow = async (row: ImportRow) => {
+  const handleApplyRow = async (rowId: number) => {
     try {
-      await post(`${basePath}/rows/${row.id}/apply`, { version: row.version });
+      await post(`${basePath}/rows/${rowId}/apply`, {});
       toast("Fila aplicada");
       fetchJob();
       fetchRows();
@@ -110,9 +110,9 @@ export default function ImportJobPage() {
     }
   };
 
-  const handleDeleteRow = async (row: ImportRow) => {
+  const handleDeleteRow = async (rowId: number) => {
     try {
-      await del(`${basePath}/rows/${row.id}`, { body: JSON.stringify({ version: row.version }) });
+      await del(`${basePath}/rows/${rowId}`);
       toast("Fila eliminada");
       fetchJob();
       fetchRows();
@@ -121,9 +121,9 @@ export default function ImportJobPage() {
     }
   };
 
-  const handleRevalidate = async (row: ImportRow) => {
+  const handleRevalidate = async (rowId: number) => {
     try {
-      await post(`${basePath}/rows/${row.id}/revalidar`, { version: row.version });
+      await post(`${basePath}/rows/${rowId}/revalidar`, {});
       toast("Fila revalidada");
       fetchRows();
     } catch (err) {
@@ -296,7 +296,7 @@ export default function ImportJobPage() {
                                   size="icon"
                                   variant="ghost"
                                   className="h-7 w-7 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
-                                  onClick={() => handleApplyRow(row)}
+                                  onClick={() => handleApplyRow(row.id)}
                                   title="Aplicar"
                                 >
                                   <Check className="h-3.5 w-3.5" />
@@ -308,7 +308,7 @@ export default function ImportJobPage() {
                                     size="icon"
                                     variant="ghost"
                                     className="h-7 w-7 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                                    onClick={() => handleRevalidate(row)}
+                                    onClick={() => handleRevalidate(row.id)}
                                     title="Revalidar"
                                   >
                                     <Check className="h-3.5 w-3.5" />
@@ -317,7 +317,7 @@ export default function ImportJobPage() {
                                     size="icon"
                                     variant="ghost"
                                     className="h-7 w-7 text-red-500 hover:text-red-600 hover:bg-red-50"
-                                    onClick={() => handleDeleteRow(row)}
+                                    onClick={() => handleDeleteRow(row.id)}
                                     title="Eliminar"
                                   >
                                     <Trash2 className="h-3.5 w-3.5" />

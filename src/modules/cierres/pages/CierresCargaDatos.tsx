@@ -1,113 +1,55 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useApi } from "@/hooks/useApi";
-import { cn, fmtCurrency } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { ArrowLeft, Ban, ChevronDown, ChevronUp, Plus } from "lucide-react";
-import { Fragment, useCallback, useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { DetailedCierreCajaResponse } from "@/domain/dto/cierre-caja/CierreCajaResponse";
-import type { CierreCajaStatsResponse } from "@/domain/dto/cierre-caja/CierreCajaStatsResponse";
 import type { MovimientoResponse } from "@/domain/dto/movimiento/MovimientoResponse";
-import type { Page } from "@/domain/dto/shared/Page";
 import { DataTable, SortableTh } from "@/components/data-table";
-import { Pagination } from "@/components/Pagination";
 import { MovimientoRow, AnuladosGroup } from "../components/MovimientoRow";
 import { CierresStatusFilter } from "../components/filters/CierresStatusFilter";
-import { useExpandableRows } from "@/hooks/useExpandableRows";
-import { StatCard } from "../components/CierreStat";
-import { ListFilters, type ListFilterState } from "@/components/ListFilters";
-import { defaultFilters } from "@/components/list-filter-defaults";
-import type { ComedorResponse } from "@/domain/dto/comedor/ComedorResponse";
-import { buildQuery } from "@/lib/query-string";
-
-type StatusFilter = "all" | "active" | "anulado";
+import { useTableState } from "@/hooks/useTableState";
 
 export default function CierresCargaDatos() {
   const navigate = useNavigate();
   const { get } = useApi();
 
-  const [comedores, setComedores] = useState<ComedorResponse[]>([]);
-  const [listFilters, setListFiltersRaw] = useState<ListFilterState>({ ...defaultFilters, dateField: "fechaOperacion" });
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
-  const [page, setPage] = useState(0);
-  const [size, setSize] = useState(20);
-  const [sortKey, setSortKey] = useState("fechaOperacion");
-  const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
-
-  const [pageData, setPageData] = useState<Page<DetailedCierreCajaResponse> | null>(null);
-  const [stats, setStats] = useState<CierreCajaStatsResponse | null>(null);
-
-  const cierres = pageData?.content ?? [];
-
-  const handleFiltersChange = (next: ListFilterState) => {
-    setListFiltersRaw(next);
-    setPage(0);
-  };
-
-  const handleStatusChange = (next: StatusFilter) => {
-    setStatusFilter(next);
-    setPage(0);
-  };
-
-  const handleSizeChange = (next: number) => {
-    setSize(next);
-    setPage(0);
-  };
-
-  const handleSort = (key: string) => {
-    if (key === sortKey) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
-    else {
-      setSortKey(key);
-      setSortDir("asc");
-    }
-    setPage(0);
-  };
-
-  const fetchList = useCallback(() => {
-    const qs = buildQuery({
-      comedorId: listFilters.comedorId || undefined,
-      puntoDeVentaIds: listFilters.puntoDeVentaIds,
-      anulado: statusFilter === "all" ? undefined : statusFilter === "anulado",
-      fechaInicio: listFilters.desde,
-      fechaFin: listFilters.hasta,
-      page,
-      size,
-      sort: `${sortKey},${sortDir}`,
-    });
-    return get(`/cierres/mine${qs}`).then((r) => r.json()).then(setPageData);
-  }, [get, listFilters.comedorId, listFilters.puntoDeVentaIds, listFilters.desde, listFilters.hasta, statusFilter, page, size, sortKey, sortDir]);
-
-  const fetchStats = useCallback(() => {
-    const qs = buildQuery({
-      comedorId: listFilters.comedorId || undefined,
-      puntoDeVentaIds: listFilters.puntoDeVentaIds,
-      fechaInicio: listFilters.desde,
-      fechaFin: listFilters.hasta,
-    });
-    return get(`/cierres/mine/stats${qs}`).then((r) => r.json()).then(setStats);
-  }, [get, listFilters.comedorId, listFilters.puntoDeVentaIds, listFilters.desde, listFilters.hasta]);
+  const [cierres, setCierres] = useState<DetailedCierreCajaResponse[]>([]);
 
   useEffect(() => {
-    get("/comedores").then((r) => r.json()).then(setComedores);
+    get("/cierres/mine")
+      .then((r) => r.json())
+      .then(setCierres);
   }, [get]);
 
-  useEffect(() => {
-    fetchList();
-  }, [fetchList]);
-
-  useEffect(() => {
-    fetchStats();
-  }, [fetchStats]);
+  const { displayed, sort, expansion, filters } = useTableState(cierres, {
+    searchFields: (c) => [
+      c.comedor.nombre,
+      c.puntoDeVenta.nombre,
+      c.creadoPor.nombre,
+      c.fechaOperacion,
+      c.comentarios || "",
+    ],
+    statusField: "anulacionId",
+    statusMapping: {
+      active: { filter: (c) => !c.anulacionId },
+      anulado: { filter: (c) => !!c.anulacionId },
+    },
+    sortKeyMapping: {
+      comedor: (c) => c.comedor.nombre,
+      creadoPor: (c) => c.creadoPor.nombre,
+      puntoDeVenta: (c) => c.puntoDeVenta.nombre,
+    },
+    defaultSortKey: "fechaOperacion",
+  });
 
   const sortProps = {
-    sortKey,
-    sortDir,
-    onSort: handleSort,
+    sortKey: sort.key,
+    sortDir: sort.dir,
+    onSort: sort.handleSort,
   };
-
-  const expansion = useExpandableRows();
-
-  const isFiltered = !!stats && stats.montoTotalActivo !== stats.montoFiltradoActivo;
 
   return (
     <div className="px-4 sm:px-8 lg:px-18 py-8">
@@ -117,19 +59,6 @@ export default function CierresCargaDatos() {
           Volver
         </Button>
       </div>
-
-      <div className="mx-auto max-w-7xl grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5 pb-4">
-        <StatCard label="Total cierres" value={stats?.total ?? 0} />
-        <StatCard label="Activos" value={stats?.activos ?? 0} accent="emerald" />
-        <StatCard label="Anulados" value={stats?.anulados ?? 0} accent="red" />
-        <StatCard label="Monto total" value={fmtCurrency(stats?.montoTotalActivo ?? 0)} />
-        <StatCard
-          label={isFiltered ? "Monto filtrado" : "Monto activo"}
-          value={fmtCurrency(stats?.montoFiltradoActivo ?? 0)}
-          accent={isFiltered ? "blue" : undefined}
-        />
-      </div>
-
       <Card className="mx-auto max-w-7xl py-6 border-0 shadow-md rounded-xl">
         <CardHeader className="border-b px-6 py-4">
           <div className="w-full flex flex-row justify-between">
@@ -144,23 +73,15 @@ export default function CierresCargaDatos() {
               <Plus className="h-4 w-4" /> Nuevo Cierre
             </Button>
           </div>
-          <div className="pt-3">
-            <ListFilters
-              filters={listFilters}
-              onChange={handleFiltersChange}
-              comedores={comedores}
-              showSociedad={false}
-            />
-          </div>
         </CardHeader>
         <CardContent className="p-0">
           <DataTable
-            displayedCount={pageData?.numberOfElements ?? 0}
+            displayedCount={displayed.length}
             toolbarLeft={
               <div className="flex flex-wrap items-center gap-2">
                 <CierresStatusFilter
-                  value={statusFilter}
-                  onChange={handleStatusChange}
+                  value={filters.status as "all" | "active" | "anulado"}
+                  onChange={filters.setStatus}
                 />
               </div>
             }
@@ -168,9 +89,13 @@ export default function CierresCargaDatos() {
               <>
                 <th className="px-4 py-3 w-8" />
                 <SortableTh label="Fecha" col="fechaOperacion" {...sortProps} />
-                <th className="px-4 py-3">Comedor</th>
-                <th className="px-4 py-3">Creado por</th>
-                <th className="px-4 py-3">Punto de Venta</th>
+                <SortableTh label="Comedor" col="comedor" {...sortProps} />
+                <SortableTh label="Creado por" col="creadoPor" {...sortProps} />
+                <SortableTh
+                  label="Punto de Venta"
+                  col="puntoDeVenta"
+                  {...sortProps}
+                />
                 <SortableTh
                   label="Platos"
                   col="totalPlatosVendidos"
@@ -183,7 +108,7 @@ export default function CierresCargaDatos() {
             }
             rows={
               <>
-                {cierres.map((cierre) => {
+                {displayed.map((cierre) => {
                   const isExpanded = expansion.expandedRows.has(cierre.id);
                   const isAnulado = !!cierre.anulacionId;
                   const movimientos: MovimientoResponse[] =
@@ -318,14 +243,6 @@ export default function CierresCargaDatos() {
                 })}
               </>
             }
-          />
-          <Pagination
-            page={pageData?.number ?? 0}
-            size={pageData?.size ?? size}
-            totalPages={pageData?.totalPages ?? 0}
-            totalElements={pageData?.totalElements ?? 0}
-            onPageChange={setPage}
-            onSizeChange={handleSizeChange}
           />
         </CardContent>
       </Card>
