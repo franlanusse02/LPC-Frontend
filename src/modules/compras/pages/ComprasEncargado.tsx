@@ -185,6 +185,7 @@ export default function ComprasEncargado() {
     const qs = buildQuery({
       fechaInicio: listFilters.desde,
       fechaFin: listFilters.hasta,
+      dateField: listFilters.dateField,
       search: search || undefined,
       estado: statusFilter === "all" ? undefined : statusFilter,
       page,
@@ -192,16 +193,17 @@ export default function ComprasEncargado() {
       sort: `${SORT_KEY_TO_ENTITY[sortKey] ?? sortKey},${sortDir}`,
     });
     return get(`/facturas/proveedor/mis-facturas${qs}`).then((r) => r.json()).then(setPageData);
-  }, [get, listFilters.desde, listFilters.hasta, search, statusFilter, page, size, sortKey, sortDir]);
+  }, [get, listFilters.desde, listFilters.hasta, listFilters.dateField, search, statusFilter, page, size, sortKey, sortDir]);
 
   const fetchStats = useCallback(() => {
     const qs = buildQuery({
       fechaInicio: listFilters.desde,
       fechaFin: listFilters.hasta,
+      dateField: listFilters.dateField,
       search: search || undefined,
     });
     return get(`/facturas/proveedor/mis-facturas/stats${qs}`).then((r) => r.json()).then(setStats);
-  }, [get, listFilters.desde, listFilters.hasta, search]);
+  }, [get, listFilters.desde, listFilters.hasta, listFilters.dateField, search]);
 
   useEffect(() => {
     fetchList();
@@ -412,6 +414,10 @@ export default function ComprasEncargado() {
               comedores={comedores}
               showSociedad={false}
               showComedor={false}
+              dateFieldOptions={[
+                { value: "fechaFactura", label: "Fecha Factura" },
+                { value: "creadoEn", label: "Fecha de Carga" },
+              ]}
             />
           </div>
         </CardHeader>
