@@ -1,39 +1,64 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useApi } from "@/hooks/useApi";
-import { cn } from "@/lib/utils";
+import { cn, fmtCurrency } from "@/lib/utils";
 import { ArrowLeft, Ban, Plus } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { DataTable, SortableTh } from "@/components/data-table";
+import { Pagination } from "@/components/Pagination";
 import { ConsumosStatusFilter } from "../components/filters/ConsumosStatusFilter";
-import { useTableState } from "@/hooks/useTableState";
 import type { ConsumoResponse } from "@/domain/dto/consumo/ConsumoResponse";
+import type { ConsumoStatsResponse } from "@/domain/dto/consumo/ConsumoStatsResponse";
 import type { ConsumidorResponse } from "@/domain/dto/consumo/ConsumidorResponse";
 import type { PuntoDeVentaResponse } from "@/domain/dto/pto-venta/PuntoDeVentaResponse";
 import type { ComedorResponse } from "@/domain/dto/comedor/ComedorResponse";
+import type { Page } from "@/domain/dto/shared/Page";
+import { StatCard } from "@/modules/cierres/components/CierreStat";
+import { ListFilters, type ListFilterState } from "@/components/ListFilters";
+import { defaultFilters } from "@/components/list-filter-defaults";
+import { buildQuery } from "@/lib/query-string";
+
+type StatusFilter = "all" | "active" | "anulado";
 
 export default function ConsumosCargaDatos() {
   const navigate = useNavigate();
   const { get } = useApi();
 
-  const [consumos, setConsumos] = useState<ConsumoResponse[]>([]);
   const [consumidores, setConsumidores] = useState<ConsumidorResponse[]>([]);
   const [puntosDeVenta, setPuntosDeVenta] = useState<PuntoDeVentaResponse[]>(
     [],
   );
   const [comedores, setComedores] = useState<ComedorResponse[]>([]);
 
+  const [listFilters, setListFiltersRaw] = useState<ListFilterState>(defaultFilters);
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
+  const [searchInput, setSearchInput] = useState("");
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(0);
+  const [size, setSize] = useState(20);
+  const [sortKey, setSortKey] = useState("fecha");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
+
+  const [pageData, setPageData] = useState<Page<ConsumoResponse> | null>(null);
+  const [stats, setStats] = useState<ConsumoStatsResponse | null>(null);
+
+  const consumos = pageData?.content ?? [];
+
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setSearch(searchInput);
+      setPage(0);
+    }, 300);
+    return () => clearTimeout(t);
+  }, [searchInput]);
+
   useEffect(() => {
     Promise.all([
-      get("/consumos"),
       get("/consumos/consumidores/all"),
       get("/comedores/puntos-de-venta"),
       get("/comedores"),
-    ]).then(([consumosRes, consumidoresRes, pvRes, comedoresRes]) => {
-      consumosRes
-        .json()
-        .then((data) => setConsumos(Array.isArray(data) ? data : []));
+    ]).then(([consumidoresRes, pvRes, comedoresRes]) => {
       consumidoresRes.json().then(setConsumidores);
       pvRes.json().then(setPuntosDeVenta);
       comedoresRes.json().then(setComedores);
@@ -55,26 +80,69 @@ export default function ConsumosCargaDatos() {
     [comedores],
   );
 
-  const { displayed, sort, filters } = useTableState(consumos, {
-    searchFields: (c) => [
-      consumidorById[c.consumidorId]?.nombre ?? "",
-      puntoDeVentaNameById[c.PuntoDeVentaId] ?? "",
-      c.fecha,
-      c.observaciones ?? "",
-    ],
-    statusField: "anulacion",
-    statusMapping: {
-      active: { filter: (c) => c.anulacion === null },
-      anulado: { filter: (c) => c.anulacion !== null },
-    },
-    defaultSortKey: "fecha",
-  });
-
-  const sortProps = {
-    sortKey: sort.key,
-    sortDir: sort.dir,
-    onSort: sort.handleSort,
+  const handleFiltersChange = (next: ListFilterState) => {
+    setListFiltersRaw(next);
+    setPage(0);
   };
+
+  const handleStatusChange = (next: StatusFilter) => {
+    setStatusFilter(next);
+    setPage(0);
+  };
+
+  const handleSizeChange = (next: number) => {
+    setSize(next);
+    setPage(0);
+  };
+
+  const handleSort = (key: string) => {
+    if (key === sortKey) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    else {
+      setSortKey(key);
+      setSortDir("asc");
+    }
+    setPage(0);
+  };
+
+  const fetchList = useCallback(() => {
+    const qs = buildQuery({
+      comedorId: listFilters.comedorId || undefined,
+      consumidorId: listFilters.consumidorId || undefined,
+      puntoDeVentaIds: listFilters.puntoDeVentaIds,
+      anulado: statusFilter === "all" ? undefined : statusFilter === "anulado",
+      fechaInicio: listFilters.desde,
+      fechaFin: listFilters.hasta,
+      search: search || undefined,
+      page,
+      size,
+      sort: `${sortKey},${sortDir}`,
+    });
+    return get(`/consumos${qs}`).then((r) => r.json()).then(setPageData);
+  }, [get, listFilters.comedorId, listFilters.consumidorId, listFilters.puntoDeVentaIds, listFilters.desde, listFilters.hasta, statusFilter, search, page, size, sortKey, sortDir]);
+
+  const fetchStats = useCallback(() => {
+    const qs = buildQuery({
+      comedorId: listFilters.comedorId || undefined,
+      consumidorId: listFilters.consumidorId || undefined,
+      puntoDeVentaIds: listFilters.puntoDeVentaIds,
+      fechaInicio: listFilters.desde,
+      fechaFin: listFilters.hasta,
+      search: search || undefined,
+    });
+    return get(`/consumos/stats${qs}`).then((r) => r.json()).then(setStats);
+  }, [get, listFilters.comedorId, listFilters.consumidorId, listFilters.puntoDeVentaIds, listFilters.desde, listFilters.hasta, search]);
+
+  useEffect(() => {
+    fetchList();
+  }, [fetchList]);
+
+  useEffect(() => {
+    fetchStats();
+  }, [fetchStats]);
+
+  const sortProps = { sortKey, sortDir, onSort: handleSort };
+
+  const isFiltered = !!stats && stats.montoTotalActivo !== stats.montoFiltradoActivo;
 
   return (
     <div className="px-4 sm:px-8 lg:px-18 py-8">
@@ -84,6 +152,19 @@ export default function ConsumosCargaDatos() {
           Volver
         </Button>
       </div>
+
+      <div className="mx-auto max-w-7xl grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5 pb-4">
+        <StatCard label="Total consumos" value={stats?.total ?? 0} />
+        <StatCard label="Activos" value={stats?.activos ?? 0} accent="emerald" />
+        <StatCard label="Anulados" value={stats?.anulados ?? 0} accent="red" />
+        <StatCard label="Monto total" value={fmtCurrency(stats?.montoTotalActivo ?? 0)} />
+        <StatCard
+          label={isFiltered ? "Monto filtrado" : "Monto activo"}
+          value={fmtCurrency(stats?.montoFiltradoActivo ?? 0)}
+          accent={isFiltered ? "blue" : undefined}
+        />
+      </div>
+
       <Card className="mx-auto max-w-7xl py-6 border-0 shadow-md rounded-xl">
         <CardHeader className="border-b px-6 py-4">
           <div className="w-full flex flex-row justify-between">
@@ -98,22 +179,31 @@ export default function ConsumosCargaDatos() {
               <Plus className="h-4 w-4" /> Nuevo Consumo
             </Button>
           </div>
+          <div className="pt-3">
+            <ListFilters
+              filters={listFilters}
+              onChange={handleFiltersChange}
+              comedores={comedores}
+              consumidores={consumidores}
+              showSociedad={false}
+            />
+          </div>
         </CardHeader>
         <CardContent className="p-0">
           <DataTable
-            displayedCount={displayed.length}
+            displayedCount={pageData?.numberOfElements ?? 0}
             toolbarLeft={
               <div className="flex flex-wrap items-center gap-2">
                 <input
                   type="text"
-                  value={filters.search}
-                  onChange={(e) => filters.setSearch(e.target.value)}
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
                   placeholder="Buscar..."
                   className="h-8 w-52 pl-3 pr-8 text-sm bg-gray-50 border border-gray-200 rounded-md"
                 />
                 <ConsumosStatusFilter
-                  value={filters.status as "all" | "active" | "anulado"}
-                  onChange={filters.setStatus}
+                  value={statusFilter}
+                  onChange={handleStatusChange}
                 />
               </div>
             }
@@ -130,7 +220,7 @@ export default function ConsumosCargaDatos() {
             }
             rows={
               <>
-                {displayed.map((consumo) => {
+                {consumos.map((consumo) => {
                   const isAnulado = consumo.anulacion !== null;
                   const consumidor = consumidorById[consumo.consumidorId];
                   const comedorNombre = consumidor
@@ -196,6 +286,14 @@ export default function ConsumosCargaDatos() {
                 })}
               </>
             }
+          />
+          <Pagination
+            page={pageData?.number ?? 0}
+            size={pageData?.size ?? size}
+            totalPages={pageData?.totalPages ?? 0}
+            totalElements={pageData?.totalElements ?? 0}
+            onPageChange={setPage}
+            onSizeChange={handleSizeChange}
           />
         </CardContent>
       </Card>
