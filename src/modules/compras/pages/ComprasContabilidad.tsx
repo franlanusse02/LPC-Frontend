@@ -233,6 +233,7 @@ export default function ComprasContabilidad() {
       comedorId: listFilters.comedorId || undefined,
       fechaInicio: listFilters.desde,
       fechaFin: listFilters.hasta,
+      dateField: listFilters.dateField,
       search: search || undefined,
       estado: statusFilter === "all" ? undefined : statusFilter,
       page,
@@ -240,17 +241,18 @@ export default function ComprasContabilidad() {
       sort: `${SORT_KEY_TO_ENTITY[sortKey] ?? sortKey},${sortDir}`,
     });
     return get(`/facturas/proveedor${qs}`).then((r) => r.json()).then(setPageData);
-  }, [get, listFilters.comedorId, listFilters.desde, listFilters.hasta, search, statusFilter, page, size, sortKey, sortDir]);
+  }, [get, listFilters.comedorId, listFilters.desde, listFilters.hasta, listFilters.dateField, search, statusFilter, page, size, sortKey, sortDir]);
 
   const fetchStats = useCallback(() => {
     const qs = buildQuery({
       comedorId: listFilters.comedorId || undefined,
       fechaInicio: listFilters.desde,
       fechaFin: listFilters.hasta,
+      dateField: listFilters.dateField,
       search: search || undefined,
     });
     return get(`/facturas/proveedor/stats${qs}`).then((r) => r.json()).then(setStats);
-  }, [get, listFilters.comedorId, listFilters.desde, listFilters.hasta, search]);
+  }, [get, listFilters.comedorId, listFilters.desde, listFilters.hasta, listFilters.dateField, search]);
 
   useEffect(() => {
     fetchList();
@@ -581,6 +583,10 @@ export default function ComprasContabilidad() {
               onChange={handleFiltersChange}
               comedores={comedores}
               showSociedad={false}
+              dateFieldOptions={[
+                { value: "fechaFactura", label: "Fecha Factura" },
+                { value: "creadoEn", label: "Fecha de Carga" },
+              ]}
             />
             <Button
               size="sm"
