@@ -225,7 +225,7 @@ export default function ComprasCargaDatos() {
       </div>
 
       {activeTab === "facturas" ? (
-        <div className="mx-auto max-w-7xl grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5 pb-4">
+        <div className="mx-auto max-w-7xl grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-3 pb-4">
           <StatCard label="Total facturas" value={stats?.total ?? 0} />
           <StatCard label="Activas" value={(stats?.total ?? 0) - (stats?.anuladas ?? 0)} accent="emerald" />
           <StatCard label="Anuladas" value={stats?.anuladas ?? 0} accent="red" />
@@ -237,7 +237,7 @@ export default function ComprasCargaDatos() {
           />
         </div>
       ) : (
-        <div className="mx-auto max-w-7xl grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5 pb-4">
+        <div className="mx-auto max-w-7xl grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-3 pb-4">
           <StatCard label="Total órdenes" value={ordenStats?.total ?? 0} />
           <StatCard label="Pendientes" value={ordenStats?.pendientes ?? 0} accent="blue" />
           <StatCard label="Enviadas" value={ordenStats?.enviadas ?? 0} accent="emerald" />
