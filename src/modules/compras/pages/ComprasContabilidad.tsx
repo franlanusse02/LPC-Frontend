@@ -18,10 +18,13 @@ import {
   ChevronUp,
   CircleDollarSign,
   Download,
+  Loader2,
   MoreHorizontal,
   Pencil,
   Plus,
+  RotateCcw,
   Send,
+  Undo2,
 } from "lucide-react";
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -54,6 +57,7 @@ import { OrdenesDeCompraTable } from "../components/OrdenesDeCompraTable";
 import { downloadPdf } from "@/lib/download";
 import type { OrdenDeCompraResponse } from "@/domain/dto/orden-compra/OrdenDeCompraResponse";
 import { buildQuery } from "@/lib/query-string";
+import { useExportAll } from "@/hooks/useExportAll";
 
 const ESTADO_STYLES: Record<
   string,
@@ -101,6 +105,7 @@ export default function ComprasContabilidad() {
   const [stats, setStats] = useState<FacturaProveedorStatsResponse | null>(null);
 
   const facturas = pageData?.content ?? [];
+  const { exporting, fetchAll } = useExportAll<FacturaProveedorResponse>("/facturas/proveedor");
 
   const [ordenPageData, setOrdenPageData] = useState<Page<OrdenDeCompraResponse> | null>(null);
   const [ordenStats, setOrdenStats] = useState<OrdenDeCompraStatsResponse | null>(null);
@@ -314,6 +319,28 @@ export default function ComprasContabilidad() {
     }
   };
 
+  const handleRevertirPago = async (facturaId: number) => {
+    try {
+      await patch(`/facturas/proveedor/${facturaId}/revertir-pago`, {});
+      toast("Pago revertido");
+      fetchList();
+      fetchStats();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "No se pudo revertir el pago");
+    }
+  };
+
+  const handleDesanular = async (facturaId: number) => {
+    try {
+      await patch(`/facturas/proveedor/${facturaId}/desanular`, {});
+      toast("Factura desanulada");
+      fetchList();
+      fetchStats();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "No se pudo desanular la factura");
+    }
+  };
+
   useEffect(() => {
     get("/proveedores")
       .then((r) => r.json())
@@ -471,16 +498,32 @@ export default function ComprasContabilidad() {
     { key: "creadoPorNombre", header: "Creado por" },
   ];
 
-  const handleExport = () => {
-    const data = selection.count > 0
-      ? facturas.filter((f) => selection.selected.has(f.id))
-      : facturas;
+  const handleExport = async () => {
     const segments = ["compras"];
     if (statusFilter !== "all") segments.push(statusFilter);
     if (listFilters.comedorId) segments.push(`comedor-${listFilters.comedorId}`);
     if (listFilters.desde) segments.push(`desde-${listFilters.desde}`);
     if (listFilters.hasta) segments.push(`hasta-${listFilters.hasta}`);
-    exportToXlsx({ data, columns: exportColumns, filename: segments.join("-") });
+
+    if (selection.count > 0) {
+      const data = facturas.filter((f) => selection.selected.has(f.id));
+      exportToXlsx({ data, columns: exportColumns, filename: segments.join("-") });
+      return;
+    }
+
+    try {
+      const data = await fetchAll({
+        comedorId: listFilters.comedorId || undefined,
+        fechaInicio: listFilters.desde,
+        fechaFin: listFilters.hasta,
+        dateField: listFilters.dateField,
+        search: search || undefined,
+        estado: statusFilter === "all" ? undefined : statusFilter,
+      });
+      exportToXlsx({ data, columns: exportColumns, filename: segments.join("-") });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "No se pudo exportar");
+    }
   };
 
   return (
@@ -621,8 +664,8 @@ export default function ComprasContabilidad() {
                       <Ban className="h-3.5 w-3.5" /> Anular
                     </Button>
                   )}
-                  <Button variant="outline" size="sm" onClick={handleExport}>
-                    <Download className="size-4 mr-1.5" />
+                  <Button variant="outline" size="sm" onClick={handleExport} disabled={exporting}>
+                    {exporting ? <Loader2 className="size-4 mr-1.5 animate-spin" /> : <Download className="size-4 mr-1.5" />}
                     Exportar ({selection.count})
                   </Button>
                   <Button size="sm" variant="ghost" className="text-gray-500 text-xs" onClick={selection.clear}>
@@ -649,8 +692,8 @@ export default function ComprasContabilidad() {
               </div>
             }
             toolbarRight={
-              <Button variant="outline" size="sm" onClick={handleExport}>
-                <Download className="size-4 mr-1.5" />
+              <Button variant="outline" size="sm" onClick={handleExport} disabled={exporting}>
+                {exporting ? <Loader2 className="size-4 mr-1.5 animate-spin" /> : <Download className="size-4 mr-1.5" />}
                 {selection.count > 0 ? `Exportar (${selection.count})` : "Exportar Excel"}
               </Button>
             }
@@ -780,42 +823,51 @@ export default function ComprasContabilidad() {
                           className="px-4 py-4"
                           onClick={(e) => e.stopPropagation()}
                         >
-                          {factura.estado !== "ANULADA" && (
-                            <DropdownMenu>
-                              <DropdownMenuTrigger
-                                asChild
+                          <DropdownMenu>
+                            <DropdownMenuTrigger
+                              asChild
+                            >
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100"
+                                aria-label="Acciones"
                               >
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-8 w-8 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100"
-                                  aria-label="Acciones"
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent
+                              align="end"
+                              className="w-44 rounded-xl shadow-lg border-gray-100"
+                            >
+                              {factura.estado === "PENDIENTE" && (
+                                <DropdownMenuItem
+                                  onClick={() => setEmitirFactura(factura)}
+                                  className="gap-2.5 cursor-pointer rounded-lg text-blue-600 focus:text-blue-700 focus:bg-blue-50"
                                 >
-                                  <MoreHorizontal className="h-4 w-4" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent
-                                align="end"
-                                className="w-44 rounded-xl shadow-lg border-gray-100"
-                              >
-                                {factura.estado === "PENDIENTE" && (
-                                  <DropdownMenuItem
-                                    onClick={() => setEmitirFactura(factura)}
-                                    className="gap-2.5 cursor-pointer rounded-lg text-blue-600 focus:text-blue-700 focus:bg-blue-50"
-                                  >
-                                    <Send className="h-4 w-4" />
-                                    Emitir
-                                  </DropdownMenuItem>
-                                )}
-                                {factura.estado === "EMITIDA" && (
-                                  <DropdownMenuItem
-                                    onClick={() => setPagarFactura(factura)}
-                                    className="gap-2.5 cursor-pointer rounded-lg text-emerald-600 focus:text-emerald-700 focus:bg-emerald-50"
-                                  >
-                                    <CircleDollarSign className="h-4 w-4" />
-                                    Pagar
-                                  </DropdownMenuItem>
-                                )}
+                                  <Send className="h-4 w-4" />
+                                  Emitir
+                                </DropdownMenuItem>
+                              )}
+                              {factura.estado === "EMITIDA" && (
+                                <DropdownMenuItem
+                                  onClick={() => setPagarFactura(factura)}
+                                  className="gap-2.5 cursor-pointer rounded-lg text-emerald-600 focus:text-emerald-700 focus:bg-emerald-50"
+                                >
+                                  <CircleDollarSign className="h-4 w-4" />
+                                  Pagar
+                                </DropdownMenuItem>
+                              )}
+                              {factura.estado === "PAGADA" && (
+                                <DropdownMenuItem
+                                  onClick={() => handleRevertirPago(factura.id)}
+                                  className="gap-2.5 cursor-pointer rounded-lg text-amber-600 focus:text-amber-700 focus:bg-amber-50"
+                                >
+                                  <Undo2 className="h-4 w-4" />
+                                  Revertir Pago
+                                </DropdownMenuItem>
+                              )}
+                              {factura.estado !== "ANULADA" && (
                                 <DropdownMenuItem
                                   onClick={() =>
                                     navigate(
@@ -827,21 +879,30 @@ export default function ComprasContabilidad() {
                                   <Pencil className="h-4 w-4 text-gray-400" />
                                   Editar
                                 </DropdownMenuItem>
-                                {factura.estado !== "PAGADA" && (
-                                  <>
-                                    <DropdownMenuSeparator className="my-1" />
-                                    <DropdownMenuItem
-                                      onClick={() => setAnularFactura(factura)}
-                                      className="gap-2.5 cursor-pointer rounded-lg text-red-600 focus:text-red-700 focus:bg-red-50"
-                                    >
-                                      <Ban className="h-4 w-4" />
-                                      Anular
-                                    </DropdownMenuItem>
-                                  </>
-                                )}
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          )}
+                              )}
+                              {factura.estado !== "ANULADA" && factura.estado !== "PAGADA" && (
+                                <>
+                                  <DropdownMenuSeparator className="my-1" />
+                                  <DropdownMenuItem
+                                    onClick={() => setAnularFactura(factura)}
+                                    className="gap-2.5 cursor-pointer rounded-lg text-red-600 focus:text-red-700 focus:bg-red-50"
+                                  >
+                                    <Ban className="h-4 w-4" />
+                                    Anular
+                                  </DropdownMenuItem>
+                                </>
+                              )}
+                              {factura.estado === "ANULADA" && (
+                                <DropdownMenuItem
+                                  onClick={() => handleDesanular(factura.id)}
+                                  className="gap-2.5 cursor-pointer rounded-lg text-blue-600 focus:text-blue-700 focus:bg-blue-50"
+                                >
+                                  <RotateCcw className="h-4 w-4" />
+                                  Desanular
+                                </DropdownMenuItem>
+                              )}
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </td>
                       </tr>
 

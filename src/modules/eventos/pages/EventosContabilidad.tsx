@@ -23,6 +23,7 @@ import {
   CircleDollarSign,
   Download,
   FileX2,
+  Loader2,
   MoreHorizontal,
   Pencil,
   Plus,
@@ -63,6 +64,7 @@ import {
 import { defaultFilters } from "@/components/list-filter-defaults";
 import type { ComedorCaseKey } from "../config/comedorCases";
 import { buildQuery } from "@/lib/query-string";
+import { useExportAll } from "@/hooks/useExportAll";
 
 type TabKey = "TODOS" | ComedorCaseKey;
 type StatusFilter = "all" | EstadoEvento;
@@ -361,6 +363,7 @@ export default function EventosContabilidad() {
   const [stats, setStats] = useState<EventoStatsResponse | null>(null);
 
   const eventos = pageData?.content ?? [];
+  const { exporting, fetchAll } = useExportAll<EventoResponse>("/eventos");
 
   const [selectedEvento, setSelectedEvento] = useState<EventoResponse | null>(null);
   const [anularOpen, setAnularOpen] = useState(false);
@@ -610,17 +613,34 @@ export default function EventosContabilidad() {
     [activeTab, comedorNameById],
   );
 
-  const handleExport = () => {
-    const data = (selection.count > 0
-      ? eventos.filter((e) => selection.selected.has(e.id))
-      : eventos
-    ).filter((e) => e.estado !== "CARGA_PARCIAL");
+  const handleExport = async () => {
     const segments = ["eventos"];
     if (activeTab !== "TODOS") segments.push(activeTab.toLowerCase());
     if (statusFilter !== "all") segments.push(statusFilter.toLowerCase());
     if (listFilters.desde) segments.push(`desde-${listFilters.desde}`);
     if (listFilters.hasta) segments.push(`hasta-${listFilters.hasta}`);
-    exportToXlsx({ data, columns: exportColumns, filename: segments.join("-") });
+
+    if (selection.count > 0) {
+      const data = eventos.filter((e) => selection.selected.has(e.id) && e.estado !== "CARGA_PARCIAL");
+      exportToXlsx({ data, columns: exportColumns, filename: segments.join("-") });
+      return;
+    }
+
+    try {
+      const all = await fetchAll({
+        puntoDeVentaIds: listFilters.puntoDeVentaIds,
+        comedorId: listFilters.comedorId || undefined,
+        estado: statusFilter === "all" ? undefined : statusFilter,
+        tipoComedor: activeTab === "TODOS" ? undefined : activeTab,
+        fechaInicio: listFilters.desde,
+        fechaFin: listFilters.hasta,
+        search: search || undefined,
+      });
+      const data = all.filter((e) => e.estado !== "CARGA_PARCIAL");
+      exportToXlsx({ data, columns: exportColumns, filename: segments.join("-") });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "No se pudo exportar");
+    }
   };
 
   return (
@@ -710,8 +730,8 @@ export default function EventosContabilidad() {
                       <Ban className="h-3.5 w-3.5" /> Anular
                     </Button>
                   )}
-                  <Button variant="outline" size="sm" onClick={handleExport}>
-                    <Download className="size-4 mr-1.5" />
+                  <Button variant="outline" size="sm" onClick={handleExport} disabled={exporting}>
+                    {exporting ? <Loader2 className="size-4 mr-1.5 animate-spin" /> : <Download className="size-4 mr-1.5" />}
                     Exportar ({selection.count})
                   </Button>
                   <Button size="sm" variant="ghost" className="text-gray-500 text-xs" onClick={selection.clear}>
@@ -736,8 +756,8 @@ export default function EventosContabilidad() {
               </div>
             }
             toolbarRight={
-              <Button variant="outline" size="sm" onClick={handleExport}>
-                <Download className="size-4 mr-1.5" />
+              <Button variant="outline" size="sm" onClick={handleExport} disabled={exporting}>
+                {exporting ? <Loader2 className="size-4 mr-1.5 animate-spin" /> : <Download className="size-4 mr-1.5" />}
                 {selection.count > 0 ? `Exportar (${selection.count})` : "Exportar Excel"}
               </Button>
             }
