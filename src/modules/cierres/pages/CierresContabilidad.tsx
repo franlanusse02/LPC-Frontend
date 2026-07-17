@@ -8,6 +8,7 @@ import {
   ChevronDown,
   ChevronUp,
   Download,
+  Loader2,
   MoreHorizontal,
   Pencil,
   Plus,
@@ -43,6 +44,8 @@ import { exportToXlsx, type ExportColumn } from "@/lib/exportXlsx";
 import type { ComedorResponse } from "@/domain/dto/comedor/ComedorResponse";
 import { MediosPagoDict } from "@/domain/enums/MedioPago";
 import { buildQuery } from "@/lib/query-string";
+import { useExportAll } from "@/hooks/useExportAll";
+import { toast } from "sonner";
 
 type StatusFilter = "all" | "active" | "anulado";
 
@@ -62,6 +65,7 @@ export default function CierresContabilidad() {
   const [stats, setStats] = useState<CierreCajaStatsResponse | null>(null);
 
   const cierres = pageData?.content ?? [];
+  const { exporting, fetchAll } = useExportAll<DetailedCierreCajaResponse>("/cierres");
 
   const [anularCierreModalOpen, setAnularCierreModalOpen] = useState(false);
   const [selectedCierre, setSelectedCierre] =
@@ -204,10 +208,7 @@ export default function CierresContabilidad() {
     })),
   ];
 
-  const handleExport = () => {
-    const data = selection.count > 0
-      ? cierres.filter((c) => selection.selected.has(c.id))
-      : cierres;
+  const handleExport = async () => {
     const segments = ["cierres"];
     if (statusFilter !== "all") segments.push(statusFilter);
     if (listFilters.comedorId) {
@@ -216,7 +217,25 @@ export default function CierresContabilidad() {
     }
     if (listFilters.desde) segments.push(`desde-${listFilters.desde}`);
     if (listFilters.hasta) segments.push(`hasta-${listFilters.hasta}`);
-    exportToXlsx({ data, columns: exportColumns, filename: segments.join("-") });
+
+    if (selection.count > 0) {
+      const data = cierres.filter((c) => selection.selected.has(c.id));
+      exportToXlsx({ data, columns: exportColumns, filename: segments.join("-") });
+      return;
+    }
+
+    try {
+      const data = await fetchAll({
+        comedorId: listFilters.comedorId || undefined,
+        puntoDeVentaIds: listFilters.puntoDeVentaIds,
+        anulado: statusFilter === "all" ? undefined : statusFilter === "anulado",
+        fechaInicio: listFilters.desde,
+        fechaFin: listFilters.hasta,
+      });
+      exportToXlsx({ data, columns: exportColumns, filename: segments.join("-") });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "No se pudo exportar");
+    }
   };
 
   const isFiltered = !!stats && stats.montoTotalActivo !== stats.montoFiltradoActivo;
@@ -277,8 +296,8 @@ export default function CierresContabilidad() {
                       <Ban className="h-3.5 w-3.5" /> Anular
                     </Button>
                   )}
-                  <Button variant="outline" size="sm" onClick={handleExport}>
-                    <Download className="size-4 mr-1.5" />
+                  <Button variant="outline" size="sm" onClick={handleExport} disabled={exporting}>
+                    {exporting ? <Loader2 className="size-4 mr-1.5 animate-spin" /> : <Download className="size-4 mr-1.5" />}
                     Exportar ({selection.count})
                   </Button>
                   <Button size="sm" variant="ghost" className="text-gray-500 text-xs" onClick={selection.clear}>
@@ -296,8 +315,8 @@ export default function CierresContabilidad() {
               </div>
             }
             toolbarRight={
-              <Button variant="outline" size="sm" onClick={handleExport}>
-                <Download className="size-4 mr-1.5" />
+              <Button variant="outline" size="sm" onClick={handleExport} disabled={exporting}>
+                {exporting ? <Loader2 className="size-4 mr-1.5 animate-spin" /> : <Download className="size-4 mr-1.5" />}
                 {selection.count > 0 ? `Exportar (${selection.count})` : "Exportar Excel"}
               </Button>
             }

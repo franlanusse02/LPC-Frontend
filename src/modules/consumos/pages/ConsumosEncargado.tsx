@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useApi } from "@/hooks/useApi";
 import { cn, fmtCurrency } from "@/lib/utils";
-import { ArrowLeft, Ban, Download, MoreHorizontal, Pencil, Plus } from "lucide-react";
+import { ArrowLeft, Ban, Download, Loader2, MoreHorizontal, Pencil, Plus } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { DataTable, SortableTh } from "@/components/data-table";
@@ -28,6 +28,7 @@ import { StatCard } from "@/modules/cierres/components/CierreStat";
 import { ListFilters, type ListFilterState } from "@/components/ListFilters";
 import { defaultFilters } from "@/components/list-filter-defaults";
 import { buildQuery } from "@/lib/query-string";
+import { useExportAll } from "@/hooks/useExportAll";
 
 type StatusFilter = "all" | "active" | "anulado";
 
@@ -57,6 +58,7 @@ export default function ConsumosEncargado() {
   const [stats, setStats] = useState<ConsumoStatsResponse | null>(null);
 
   const consumos = pageData?.content ?? [];
+  const { exporting, fetchAll } = useExportAll<ConsumoResponse>("/consumos/mis-consumos");
 
   useEffect(() => {
     const t = setTimeout(() => {
@@ -185,10 +187,23 @@ export default function ConsumosEncargado() {
     { key: "observaciones", header: "Observaciones" },
   ];
 
-  const handleExport = () => {
+  const handleExport = async () => {
     const segments = ["mis-consumos"];
     if (statusFilter !== "all") segments.push(statusFilter);
-    exportToXlsx({ data: consumos, columns: exportColumns, filename: segments.join("-") });
+    try {
+      const data = await fetchAll({
+        comedorId: listFilters.comedorId || undefined,
+        consumidorId: listFilters.consumidorId || undefined,
+        puntoDeVentaIds: listFilters.puntoDeVentaIds,
+        anulado: statusFilter === "all" ? undefined : statusFilter === "anulado",
+        fechaInicio: listFilters.desde,
+        fechaFin: listFilters.hasta,
+        search: search || undefined,
+      });
+      exportToXlsx({ data, columns: exportColumns, filename: segments.join("-") });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "No se pudo exportar");
+    }
   };
 
   const isFiltered = !!stats && stats.montoTotalActivo !== stats.montoFiltradoActivo;
@@ -257,8 +272,8 @@ export default function ConsumosEncargado() {
               </div>
             }
             toolbarRight={
-              <Button variant="outline" size="sm" onClick={handleExport}>
-                <Download className="size-4 mr-1.5" />
+              <Button variant="outline" size="sm" onClick={handleExport} disabled={exporting}>
+                {exporting ? <Loader2 className="size-4 mr-1.5 animate-spin" /> : <Download className="size-4 mr-1.5" />}
                 Exportar Excel
               </Button>
             }

@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useApi } from "@/hooks/useApi";
 import { cn, fmtCurrency } from "@/lib/utils";
-import { ArrowLeft, Ban, Download, MoreHorizontal, Plus } from "lucide-react";
+import { ArrowLeft, Ban, Download, Loader2, MoreHorizontal, Plus } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { DataTable, FilterPills, SortableTh } from "@/components/data-table";
@@ -35,6 +35,7 @@ import {
 } from "@/components/ListFilters";
 import { defaultFilters } from "@/components/list-filter-defaults";
 import { buildQuery } from "@/lib/query-string";
+import { useExportAll } from "@/hooks/useExportAll";
 
 import type { ConsumoResponse } from "@/domain/dto/consumo/ConsumoResponse";
 import type { ConsumoStatsResponse } from "@/domain/dto/consumo/ConsumoStatsResponse";
@@ -70,6 +71,7 @@ export default function ConsumosContabilidad() {
   const [stats, setStats] = useState<ConsumoStatsResponse | null>(null);
 
   const consumos = pageData?.content ?? [];
+  const { exporting, fetchAll } = useExportAll<ConsumoResponse>("/consumos");
 
   useEffect(() => {
     const t = setTimeout(() => {
@@ -244,16 +246,33 @@ export default function ConsumosContabilidad() {
     { key: "actualizadoEn", header: "Actualizado en" },
   ];
 
-  const handleExport = () => {
-    const data = selection.count > 0
-      ? consumos.filter((c) => selection.selected.has(c.id))
-      : consumos;
+  const handleExport = async () => {
     const segments = ["consumos"];
     if (statusFilter !== "all") segments.push(statusFilter);
     if (listFilters.comedorId) segments.push(`comedor-${listFilters.comedorId}`);
     if (listFilters.desde) segments.push(`desde-${listFilters.desde}`);
     if (listFilters.hasta) segments.push(`hasta-${listFilters.hasta}`);
-    exportToXlsx({ data, columns: exportColumns, filename: segments.join("-") });
+
+    if (selection.count > 0) {
+      const data = consumos.filter((c) => selection.selected.has(c.id));
+      exportToXlsx({ data, columns: exportColumns, filename: segments.join("-") });
+      return;
+    }
+
+    try {
+      const data = await fetchAll({
+        comedorId: listFilters.comedorId || undefined,
+        consumidorId: listFilters.consumidorId || undefined,
+        puntoDeVentaIds: listFilters.puntoDeVentaIds,
+        anulado: statusFilter === "all" ? undefined : statusFilter === "anulado",
+        fechaInicio: listFilters.desde,
+        fechaFin: listFilters.hasta,
+        search: search || undefined,
+      });
+      exportToXlsx({ data, columns: exportColumns, filename: segments.join("-") });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "No se pudo exportar");
+    }
   };
 
   const groupedSortProps = {
@@ -331,8 +350,8 @@ export default function ConsumosContabilidad() {
                       Anular
                     </Button>
                   )}
-                  <Button variant="outline" size="sm" onClick={handleExport}>
-                    <Download className="size-4 mr-1.5" />
+                  <Button variant="outline" size="sm" onClick={handleExport} disabled={exporting}>
+                    {exporting ? <Loader2 className="size-4 mr-1.5 animate-spin" /> : <Download className="size-4 mr-1.5" />}
                     Exportar ({selection.count})
                   </Button>
                   <Button
@@ -374,8 +393,8 @@ export default function ConsumosContabilidad() {
             }
             toolbarRight={
               viewMode === "detailed" ? (
-                <Button variant="outline" size="sm" onClick={handleExport}>
-                  <Download className="size-4 mr-1.5" />
+                <Button variant="outline" size="sm" onClick={handleExport} disabled={exporting}>
+                  {exporting ? <Loader2 className="size-4 mr-1.5 animate-spin" /> : <Download className="size-4 mr-1.5" />}
                   {selection.count > 0 ? `Exportar (${selection.count})` : "Exportar Excel"}
                 </Button>
               ) : undefined
