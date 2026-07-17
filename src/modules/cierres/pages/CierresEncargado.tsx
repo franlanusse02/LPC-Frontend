@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useApi } from "@/hooks/useApi";
 import { cn, fmtCurrency } from "@/lib/utils";
-import { ArrowLeft, Ban, ChevronDown, ChevronUp, Download, MoreHorizontal, Pencil, Plus } from "lucide-react";
+import { ArrowLeft, Ban, ChevronDown, ChevronUp, Download, Loader2, MoreHorizontal, Pencil, Plus } from "lucide-react";
 import { Fragment, useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { DetailedCierreCajaResponse } from "@/domain/dto/cierre-caja/CierreCajaResponse";
@@ -28,6 +28,8 @@ import { ListFilters, type ListFilterState } from "@/components/ListFilters";
 import { defaultFilters } from "@/components/list-filter-defaults";
 import type { ComedorResponse } from "@/domain/dto/comedor/ComedorResponse";
 import { buildQuery } from "@/lib/query-string";
+import { useExportAll } from "@/hooks/useExportAll";
+import { toast } from "sonner";
 
 type StatusFilter = "all" | "active" | "anulado";
 
@@ -47,6 +49,7 @@ export default function CierresPage() {
   const [stats, setStats] = useState<CierreCajaStatsResponse | null>(null);
 
   const cierres = pageData?.content ?? [];
+  const { exporting, fetchAll } = useExportAll<DetailedCierreCajaResponse>("/cierres/mine");
 
   const [anularModalOpen, setAnularModalOpen] = useState(false);
   const [selectedCierre, setSelectedCierre] =
@@ -139,10 +142,21 @@ export default function CierresPage() {
     { key: "comentarios", header: "Comentarios" },
   ];
 
-  const handleExport = () => {
+  const handleExport = async () => {
     const segments = ["mis-cierres"];
     if (statusFilter !== "all") segments.push(statusFilter);
-    exportToXlsx({ data: cierres, columns: exportColumns, filename: segments.join("-") });
+    try {
+      const data = await fetchAll({
+        comedorId: listFilters.comedorId || undefined,
+        puntoDeVentaIds: listFilters.puntoDeVentaIds,
+        anulado: statusFilter === "all" ? undefined : statusFilter === "anulado",
+        fechaInicio: listFilters.desde,
+        fechaFin: listFilters.hasta,
+      });
+      exportToXlsx({ data, columns: exportColumns, filename: segments.join("-") });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "No se pudo exportar");
+    }
   };
 
   const isFiltered = !!stats && stats.montoTotalActivo !== stats.montoFiltradoActivo;
@@ -203,8 +217,8 @@ export default function CierresPage() {
               </div>
             }
             toolbarRight={
-              <Button variant="outline" size="sm" onClick={handleExport}>
-                <Download className="size-4 mr-1.5" />
+              <Button variant="outline" size="sm" onClick={handleExport} disabled={exporting}>
+                {exporting ? <Loader2 className="size-4 mr-1.5 animate-spin" /> : <Download className="size-4 mr-1.5" />}
                 Exportar Excel
               </Button>
             }

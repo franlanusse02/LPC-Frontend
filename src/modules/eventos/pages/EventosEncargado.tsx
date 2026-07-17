@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useApi } from "@/hooks/useApi";
 import { cn, fmtCurrency } from "@/lib/utils";
-import { ArrowLeft, Ban, ChevronDown, ChevronUp, Download, MoreHorizontal, Pencil, Plus } from "lucide-react";
+import { ArrowLeft, Ban, ChevronDown, ChevronUp, Download, Loader2, MoreHorizontal, Pencil, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { DataTable, SortableTh } from "@/components/data-table";
 import { Pagination } from "@/components/Pagination";
@@ -31,6 +31,7 @@ import { StatCard } from "@/modules/cierres/components/CierreStat";
 import { ListFilters, type ListFilterState } from "@/components/ListFilters";
 import { defaultFilters } from "@/components/list-filter-defaults";
 import { buildQuery } from "@/lib/query-string";
+import { useExportAll } from "@/hooks/useExportAll";
 
 type TabKey = "TODOS" | ComedorCaseKey;
 type StatusFilter = "all" | EstadoEvento;
@@ -241,6 +242,7 @@ export default function EventosEncargado() {
   const [stats, setStats] = useState<EventoStatsResponse | null>(null);
 
   const eventos = pageData?.content ?? [];
+  const { exporting, fetchAll } = useExportAll<EventoResponse>("/eventos/mis-cierres");
 
   const [anularModalOpen, setAnularModalOpen] = useState(false);
   const [selectedEvento, setSelectedEvento] = useState<EventoResponse | null>(null);
@@ -393,12 +395,25 @@ export default function EventosEncargado() {
     { key: "observaciones", header: "Observaciones" },
   ];
 
-  const handleExport = () => {
-    const data = eventos.filter((e) => e.estado !== "CARGA_PARCIAL");
+  const handleExport = async () => {
     const segments = ["mis-eventos"];
     if (activeTab !== "TODOS") segments.push(activeTab.toLowerCase());
     if (statusFilter !== "all") segments.push(statusFilter);
-    exportToXlsx({ data, columns: exportColumns, filename: segments.join("-") });
+    try {
+      const all = await fetchAll({
+        puntoDeVentaIds: listFilters.puntoDeVentaIds,
+        comedorId: listFilters.comedorId || undefined,
+        estado: statusFilter === "all" ? undefined : statusFilter,
+        tipoComedor: activeTab === "TODOS" ? undefined : activeTab,
+        fechaInicio: listFilters.desde,
+        fechaFin: listFilters.hasta,
+        search: search || undefined,
+      });
+      const data = all.filter((e) => e.estado !== "CARGA_PARCIAL");
+      exportToXlsx({ data, columns: exportColumns, filename: segments.join("-") });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "No se pudo exportar");
+    }
   };
 
   return (
@@ -482,8 +497,8 @@ export default function EventosEncargado() {
               </div>
             }
             toolbarRight={
-              <Button variant="outline" size="sm" onClick={handleExport}>
-                <Download className="size-4 mr-1.5" />
+              <Button variant="outline" size="sm" onClick={handleExport} disabled={exporting}>
+                {exporting ? <Loader2 className="size-4 mr-1.5 animate-spin" /> : <Download className="size-4 mr-1.5" />}
                 Exportar Excel
               </Button>
             }

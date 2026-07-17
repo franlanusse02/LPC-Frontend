@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useApi } from "@/hooks/useApi";
 import { cn, fmtCurrency } from "@/lib/utils";
 import { StatCard } from "@/modules/cierres/components/CierreStat";
-import { ArrowLeft, Ban, ChevronDown, ChevronUp, Download, MoreHorizontal, Pencil, Plus } from "lucide-react";
+import { ArrowLeft, Ban, ChevronDown, ChevronUp, Download, Loader2, MoreHorizontal, Pencil, Plus } from "lucide-react";
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { DataTable, SortableTh } from "@/components/data-table";
@@ -36,6 +36,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { AnularFacturaModal } from "../components/AnularFacturaModal";
 import { buildQuery } from "@/lib/query-string";
+import { useExportAll } from "@/hooks/useExportAll";
 
 const ESTADO_STYLES: Record<
   string,
@@ -77,6 +78,7 @@ export default function ComprasEncargado() {
   const [stats, setStats] = useState<FacturaProveedorStatsResponse | null>(null);
 
   const facturas = pageData?.content ?? [];
+  const { exporting, fetchAll } = useExportAll<FacturaProveedorResponse>("/facturas/proveedor/mis-facturas");
 
   useEffect(() => {
     const t = setTimeout(() => {
@@ -298,10 +300,21 @@ export default function ComprasEncargado() {
     { key: (f) => (f.puntoDeVentaComedor ?? []).map((s) => `${posNameById[s.puntoDeVentaId] ?? `Punto de venta #${s.puntoDeVentaId}`}: $${s.monto}`).join(", "), header: "Puntos de Venta" },
   ];
 
-  const handleExport = () => {
+  const handleExport = async () => {
     const segments = ["mis-compras"];
     if (statusFilter !== "all") segments.push(statusFilter);
-    exportToXlsx({ data: facturas, columns: exportColumns, filename: segments.join("-") });
+    try {
+      const data = await fetchAll({
+        fechaInicio: listFilters.desde,
+        fechaFin: listFilters.hasta,
+        dateField: listFilters.dateField,
+        search: search || undefined,
+        estado: statusFilter === "all" ? undefined : statusFilter,
+      });
+      exportToXlsx({ data, columns: exportColumns, filename: segments.join("-") });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "No se pudo exportar");
+    }
   };
 
   const isFiltered = !!stats && stats.montoTotalActivo !== stats.montoFiltradoActivo;
@@ -442,8 +455,8 @@ export default function ComprasEncargado() {
                </div>
              }
             toolbarRight={
-              <Button variant="outline" size="sm" onClick={handleExport}>
-                <Download className="size-4 mr-1.5" />
+              <Button variant="outline" size="sm" onClick={handleExport} disabled={exporting}>
+                {exporting ? <Loader2 className="size-4 mr-1.5 animate-spin" /> : <Download className="size-4 mr-1.5" />}
                 Exportar Excel
               </Button>
             }
