@@ -341,14 +341,14 @@ export default function NuevoEventoPage({ basePath = "/encargado" }: { basePath?
     adicionales: { value: adicionales, onChange: setAdicionales },
   };
 
-  const isBBVA = caseKey === "BBVA";
-  const requiredFieldsFilled = isBBVA || Object.entries(caseFields).every(
+  const allowsCargaParcial = caseKey === "BBVA" || caseKey === "GALICIA";
+  const requiredFieldsFilled = allowsCargaParcial || Object.entries(caseFields).every(
     ([k, spec]) => !spec.visible || !spec.required || !!fieldState[k]?.value,
   );
   const canSubmit =
     puntoDeVentaId &&
     fechaEvento &&
-    (caseKey === "UDESA" || isBBVA || cantidadPersonas) &&
+    (caseKey === "UDESA" || allowsCargaParcial || cantidadPersonas) &&
     requiredFieldsFilled;
 
   const pickerOptions: Record<string, { value: string; label: string; subtitle?: string }[]> = {

@@ -181,6 +181,7 @@ export default function ConsumosEncargado() {
     }, header: "Comedor" },
     { key: (c) => puntoDeVentaNameById[c.PuntoDeVentaId] ?? c.PuntoDeVentaId, header: "Punto de Venta" },
     { key: (c) => consumidorById[c.consumidorId]?.nombre ?? c.consumidorId, header: "Consumidor" },
+    { key: (c) => consumidorById[c.consumidorId]?.taxId ?? "", header: "DNI" },
     { key: (c) => c.productos.map((p) => `${p.producto.nombre} x${p.cantidad}`).join(", "), header: "Productos" },
     { key: "total", header: "Total" },
     { key: (c) => (c.anulacion !== null ? "Anulado" : "Activo"), header: "Estado" },
