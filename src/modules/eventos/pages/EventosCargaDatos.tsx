@@ -4,12 +4,15 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useApi } from "@/hooks/useApi";
 import { cn, fmtCurrency } from "@/lib/utils";
-import { ArrowLeft, ChevronDown, ChevronUp, Plus } from "lucide-react";
+import { ArrowLeft, ChevronDown, ChevronUp, Download, Loader2, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import { DataTable, SortableTh } from "@/components/data-table";
 import { Pagination } from "@/components/Pagination";
 import { EventosStatusFilter } from "../components/filters/EventosStatusFilter";
 import { useExpandableRows } from "@/hooks/useExpandableRows";
+import { exportToXlsx, type ExportColumn } from "@/lib/exportXlsx";
+import { useExportAll } from "@/hooks/useExportAll";
 import type { EventoResponse } from "@/domain/dto/evento/EventoResponse";
 import type { EventoStatsResponse } from "@/domain/dto/evento/EventoStatsResponse";
 import type { Page } from "@/domain/dto/shared/Page";
@@ -44,6 +47,90 @@ const ESTADO_STYLES: Record<EstadoEvento, { bg: string; text: string }> = {
   COBRADO: { bg: "bg-emerald-100", text: "text-emerald-700" },
   ANULADO: { bg: "bg-red-100", text: "text-red-600" },
 };
+
+const ev = (e: EventoResponse, k: string): unknown => (e as Record<string, unknown>)[k];
+
+function DetailField({ label, value }: { label: string; value: string | number | null | undefined }) {
+  if (value === null || value === undefined || value === "") return null;
+  return (
+    <div className="flex flex-col gap-0.5">
+      <span className="text-xs font-medium uppercase tracking-wide text-gray-400">{label}</span>
+      <span className="text-sm text-gray-700">{value}</span>
+    </div>
+  );
+}
+
+function EventoDetail({ evento, comedorName }: { evento: EventoResponse; comedorName: string }) {
+  return (
+    <div className="grid grid-cols-2 gap-x-8 gap-y-3 sm:grid-cols-3 lg:grid-cols-4">
+      <DetailField label="Comedor" value={comedorName} />
+      <DetailField label="Cantidad personas" value={evento.cantidadPersonas} />
+      <DetailField label="Medio de pago" value={evento.medioPago} />
+      <DetailField label="Observaciones" value={evento.observaciones} />
+
+      {evento.tipoComedor === "GALICIA" && (
+        <>
+          <DetailField label="Solicitante" value={evento.solicitanteNombre} />
+          <DetailField label="Email solicitante" value={evento.emailSolicitante} />
+          <DetailField label="Funcionario" value={evento.funcionarioNombre} />
+          <DetailField label="Responsable" value={evento.responsableNombre} />
+          <DetailField label="Centro de costo" value={evento.centroCosto} />
+          <DetailField label="Partida" value={evento.partida} />
+          <DetailField label="Precio unitario" value={evento.precioUnitario !== null ? fmtCurrency(evento.precioUnitario) : null} />
+          <DetailField label="Retenciones" value={evento.retenciones !== null ? fmtCurrency(evento.retenciones) : null} />
+          <DetailField label="Nro. operación" value={evento.numeroOperacion} />
+          <DetailField label="Razón social" value={evento.razonSocial} />
+          <DetailField label="Dest. facturación" value={evento.destinatarioFacturacion} />
+          <DetailField label="Tipo comprobante" value={evento.tipoComprobante} />
+          <DetailField label="Nro. comprobante" value={evento.numeroComprobante} />
+        </>
+      )}
+
+      {evento.tipoComedor === "BBVA" && (
+        <>
+          <DetailField label="Solicitante" value={evento.solicitanteNombre} />
+          <DetailField label="Email solicitante" value={evento.emailSolicitante} />
+          <DetailField label="Orden de compra" value={evento.ordenCompra} />
+          <DetailField label="Legajo" value={evento.legajo} />
+          <DetailField label="Recepción" value={evento.recepcion} />
+        </>
+      )}
+
+      {evento.tipoComedor === "TECHINT" && (
+        <>
+          <DetailField label="Nro. pedido" value={evento.numeroPedido} />
+          <DetailField label="Razón social" value={evento.razonSocial} />
+          <DetailField label="Concepto" value={evento.concepto} />
+          <DetailField label="Tipo comprobante" value={evento.tipoComprobante} />
+          <DetailField label="Nro. comprobante" value={evento.numeroComprobante} />
+        </>
+      )}
+
+      {evento.tipoComedor === "UDESA" && (
+        <>
+          <DetailField label="Solicitante" value={evento.solicitanteNombre} />
+          <DetailField label="Centro de costo" value={evento.centroCosto} />
+          <DetailField label="Área" value={evento.area} />
+          <DetailField label="Precio unitario" value={evento.precioUnitario !== null ? fmtCurrency(evento.precioUnitario) : null} />
+          <DetailField label="Adicionales" value={evento.adicionales !== null ? fmtCurrency(evento.adicionales) : null} />
+        </>
+      )}
+
+      {evento.servicios.length > 0 && (
+        <div className="col-span-full mt-2">
+          <span className="text-xs font-medium uppercase tracking-wide text-gray-400">Servicios</span>
+          <div className="mt-1 space-y-1">
+            {evento.servicios.map((s, i) => (
+              <div key={i} className="text-sm text-gray-700">
+                {s.producto.nombre} x{s.cantidad} — {fmtCurrency(s.precioUnitario * s.cantidad)}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 function extraHeaders(tab: TabKey): ReactNode {
   switch (tab) {
@@ -144,6 +231,7 @@ export default function EventosCargaDatos() {
   const [stats, setStats] = useState<EventoStatsResponse | null>(null);
 
   const eventos = pageData?.content ?? [];
+  const { exporting, fetchAll } = useExportAll<EventoResponse>("/eventos/mis-cierres");
 
   useEffect(() => {
     const t = setTimeout(() => {
@@ -248,6 +336,58 @@ export default function EventosCargaDatos() {
 
   const isFiltered = !!stats && stats.montoTotalActivo !== stats.montoFiltradoActivo;
 
+  const exportColumns: ExportColumn<EventoResponse>[] = [
+    { key: "fechaEvento", header: "Fecha" },
+    { key: (e) => comedorNameById[e.comedorId] ?? e.comedorId, header: "Comedor" },
+    { key: "tipoComedor", header: "Tipo" },
+    { key: "cantidadPersonas", header: "Personas" },
+    { key: "montoTotal", header: "Monto" },
+    { key: (e) => EstadoEventoLabel[e.estado], header: "Estado" },
+    { key: "medioPago", header: "Medio de Pago" },
+    { key: (e) => ev(e, "solicitanteNombre"), header: "Solicitante" },
+    { key: (e) => ev(e, "emailSolicitante"), header: "Email Solicitante" },
+    { key: (e) => ev(e, "funcionarioNombre"), header: "Funcionario" },
+    { key: (e) => ev(e, "responsableNombre"), header: "Responsable" },
+    { key: (e) => ev(e, "centroCosto"), header: "Centro de Costo" },
+    { key: (e) => ev(e, "partida"), header: "Partida" },
+    { key: (e) => ev(e, "area"), header: "Área" },
+    { key: (e) => ev(e, "legajo"), header: "Legajo" },
+    { key: (e) => ev(e, "recepcion"), header: "Recepción" },
+    { key: (e) => ev(e, "ordenCompra"), header: "Orden de Compra" },
+    { key: (e) => ev(e, "numeroPedido"), header: "Nº Pedido" },
+    { key: (e) => ev(e, "concepto"), header: "Concepto" },
+    { key: (e) => ev(e, "razonSocial"), header: "Razón Social" },
+    { key: (e) => ev(e, "destinatarioFacturacion"), header: "Dest. Facturación" },
+    { key: (e) => ev(e, "tipoComprobante"), header: "Tipo Comprobante" },
+    { key: (e) => ev(e, "numeroComprobante"), header: "Nº Comprobante" },
+    { key: (e) => ev(e, "numeroOperacion"), header: "Nº Operación" },
+    { key: (e) => ev(e, "precioUnitario"), header: "Precio Unitario" },
+    { key: (e) => ev(e, "retenciones"), header: "Retenciones" },
+    { key: (e) => ev(e, "adicionales"), header: "Adicionales" },
+    { key: "observaciones", header: "Observaciones" },
+  ];
+
+  const handleExport = async () => {
+    const segments = ["mis-eventos"];
+    if (activeTab !== "TODOS") segments.push(activeTab.toLowerCase());
+    if (statusFilter !== "all") segments.push(statusFilter);
+    try {
+      const all = await fetchAll({
+        puntoDeVentaIds: listFilters.puntoDeVentaIds,
+        comedorId: listFilters.comedorId || undefined,
+        estado: statusFilter === "all" ? undefined : statusFilter,
+        tipoComedor: activeTab === "TODOS" ? undefined : activeTab,
+        fechaInicio: listFilters.desde,
+        fechaFin: listFilters.hasta,
+        search: search || undefined,
+      });
+      const data = all.filter((e) => e.estado !== "CARGA_PARCIAL");
+      exportToXlsx({ data, columns: exportColumns, filename: segments.join("-") });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "No se pudo exportar");
+    }
+  };
+
   return (
     <div className="px-4 sm:px-8 lg:px-18 py-8">
       <div className="max-w-7xl mx-auto">
@@ -328,6 +468,12 @@ export default function EventosCargaDatos() {
                 />
               </div>
             }
+            toolbarRight={
+              <Button variant="outline" size="sm" onClick={handleExport} disabled={exporting}>
+                {exporting ? <Loader2 className="size-4 mr-1.5 animate-spin" /> : <Download className="size-4 mr-1.5" />}
+                Exportar Excel
+              </Button>
+            }
             columns={
               <>
                 <th className="px-4 py-3 w-8" />
@@ -381,30 +527,7 @@ export default function EventosCargaDatos() {
                         <tr className="bg-gray-50/60">
                           <td colSpan={20} className="px-8 py-5">
                             <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-                              <div className="grid grid-cols-2 gap-x-8 gap-y-3 sm:grid-cols-3 lg:grid-cols-4">
-                                <div className="flex flex-col gap-0.5">
-                                  <span className="text-xs font-medium uppercase tracking-wide text-gray-400">Comedor</span>
-                                  <span className="text-sm text-gray-700">{comedorName}</span>
-                                </div>
-                                {evento.cantidadPersonas !== null && evento.cantidadPersonas !== undefined && (
-                                  <div className="flex flex-col gap-0.5">
-                                    <span className="text-xs font-medium uppercase tracking-wide text-gray-400">Cantidad personas</span>
-                                    <span className="text-sm text-gray-700">{evento.cantidadPersonas}</span>
-                                  </div>
-                                )}
-                                {evento.medioPago && (
-                                  <div className="flex flex-col gap-0.5">
-                                    <span className="text-xs font-medium uppercase tracking-wide text-gray-400">Medio de pago</span>
-                                    <span className="text-sm text-gray-700">{evento.medioPago}</span>
-                                  </div>
-                                )}
-                                {evento.observaciones && (
-                                  <div className="flex flex-col gap-0.5">
-                                    <span className="text-xs font-medium uppercase tracking-wide text-gray-400">Observaciones</span>
-                                    <span className="text-sm text-gray-700">{evento.observaciones}</span>
-                                  </div>
-                                )}
-                              </div>
+                              <EventoDetail evento={evento} comedorName={comedorName} />
                             </div>
                           </td>
                         </tr>
