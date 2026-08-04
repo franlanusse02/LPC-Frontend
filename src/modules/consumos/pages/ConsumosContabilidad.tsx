@@ -238,6 +238,7 @@ export default function ConsumosContabilidad() {
     { key: (c) => { const cons = consumidorById[c.consumidorId]; return cons ? (comedorNameById[cons.comedorId] ?? cons.comedorId) : "—"; }, header: "Comedor" },
     { key: (c) => puntoDeVentaNameById[c.PuntoDeVentaId] ?? c.PuntoDeVentaId, header: "Punto de Venta" },
     { key: (c) => consumidorById[c.consumidorId]?.nombre ?? c.consumidorId, header: "Consumidor" },
+    { key: (c) => consumidorById[c.consumidorId]?.taxId ?? "—", header: "DNI" },
     { key: "fecha", header: "Fecha" },
     { key: "total", header: "Total" },
     { key: (c) => c.anulacion ? "Anulado" : "Activo", header: "Estado" },
