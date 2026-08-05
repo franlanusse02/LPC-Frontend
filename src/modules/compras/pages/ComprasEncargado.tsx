@@ -90,6 +90,8 @@ export default function ComprasEncargado() {
 
   const [ordenPageData, setOrdenPageData] = useState<Page<OrdenDeCompraResponse> | null>(null);
   const [ordenStats, setOrdenStats] = useState<OrdenDeCompraStatsResponse | null>(null);
+  const { exporting: exportingOrdenes, fetchAll: fetchAllOrdenes } =
+    useExportAll<OrdenDeCompraResponse>("/ordenes-de-compra/mis-ordenes");
   const [ordenStatusFilter, setOrdenStatusFilter] = useState<"all" | "PENDIENTE" | "APROBADA" | "ENVIADA" | "CANCELADA">("all");
   const [ordenSearchInput, setOrdenSearchInput] = useState("");
   const [ordenSearch, setOrdenSearch] = useState("");
@@ -317,6 +319,40 @@ export default function ComprasEncargado() {
     }
   };
 
+  const ordenExportColumns: ExportColumn<OrdenDeCompraResponse>[] = [
+    { key: "nroOrden", header: "Nº Orden" },
+    { key: "fecha", header: "Fecha" },
+    { key: "proveedorNombre", header: "Proveedor" },
+    { key: "comedorName", header: "Sucursal" },
+    { key: "sociedadNombre", header: "Empresa Solicitante" },
+    { key: "solicitante", header: "Solicitante" },
+    { key: "fechaEstimadaEntrega", header: "Fecha Estimada Entrega" },
+    { key: "fechaRecepcion", header: "Fecha Recepción" },
+    { key: "plazoEntrega", header: "Plazo Entrega" },
+    { key: "condicionEntrega", header: "Condición Entrega" },
+    { key: "tipoFactura", header: "Tipo Factura" },
+    { key: "estado", header: "Estado" },
+    { key: "subtotal", header: "Subtotal" },
+    { key: "descuento", header: "Descuento" },
+    { key: "total", header: "Total" },
+    { key: "observaciones", header: "Observaciones" },
+    { key: (o) => o.items.map((i) => `${i.nombre} x${i.cantidad}`).join(", "), header: "Items" },
+  ];
+
+  const handleExportOrdenes = async () => {
+    const segments = ["mis-ordenes-de-compra"];
+    if (ordenStatusFilter !== "all") segments.push(ordenStatusFilter);
+    try {
+      const data = await fetchAllOrdenes({
+        search: ordenSearch || undefined,
+        estado: ordenStatusFilter === "all" ? undefined : ordenStatusFilter,
+      });
+      exportToXlsx({ data, columns: ordenExportColumns, filename: segments.join("-") });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "No se pudo exportar");
+    }
+  };
+
   const isFiltered = !!stats && stats.montoTotalActivo !== stats.montoFiltradoActivo;
 
   return (
@@ -384,6 +420,12 @@ export default function ComprasEncargado() {
             <CardContent className="p-0">
               <OrdenesDeCompraTable
                 ordenes={ordenes}
+                toolbarRight={
+                  <Button variant="outline" size="sm" onClick={handleExportOrdenes} disabled={exportingOrdenes}>
+                    {exportingOrdenes ? <Loader2 className="size-4 mr-1.5 animate-spin" /> : <Download className="size-4 mr-1.5" />}
+                    Exportar Excel
+                  </Button>
+                }
                 onDownloadPdf={handleDownloadPdf}
                 onEdit={(o) => navigate(`/encargado/compras/ordenes/${o.id}/editar`)}
                 onCancelar={handleCancelarOrden}
