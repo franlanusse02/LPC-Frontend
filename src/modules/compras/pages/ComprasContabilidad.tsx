@@ -109,6 +109,8 @@ export default function ComprasContabilidad() {
 
   const [ordenPageData, setOrdenPageData] = useState<Page<OrdenDeCompraResponse> | null>(null);
   const [ordenStats, setOrdenStats] = useState<OrdenDeCompraStatsResponse | null>(null);
+  const { exporting: exportingOrdenes, fetchAll: fetchAllOrdenes } =
+    useExportAll<OrdenDeCompraResponse>("/ordenes-de-compra");
   const [ordenStatusFilter, setOrdenStatusFilter] = useState<"all" | "PENDIENTE" | "APROBADA" | "ENVIADA" | "CANCELADA">("all");
   const [ordenSearchInput, setOrdenSearchInput] = useState("");
   const [ordenSearch, setOrdenSearch] = useState("");
@@ -526,6 +528,48 @@ export default function ComprasContabilidad() {
     }
   };
 
+  const ordenExportColumns: ExportColumn<OrdenDeCompraResponse>[] = [
+    { key: "nroOrden", header: "Nº Orden" },
+    { key: "fecha", header: "Fecha" },
+    { key: "proveedorNombre", header: "Proveedor" },
+    { key: "proveedorCuit", header: "CUIT Proveedor" },
+    { key: "comedorName", header: "Sucursal" },
+    { key: "sociedadNombre", header: "Empresa Solicitante" },
+    { key: "sociedadCuit", header: "CUIT Empresa Solicitante" },
+    { key: "solicitante", header: "Solicitante" },
+    { key: "fechaEstimadaEntrega", header: "Fecha Estimada Entrega" },
+    { key: "fechaRecepcion", header: "Fecha Recepción" },
+    { key: "plazoEntrega", header: "Plazo Entrega" },
+    { key: "condicionEntrega", header: "Condición Entrega" },
+    { key: "tipoFactura", header: "Tipo Factura" },
+    { key: "estado", header: "Estado" },
+    { key: "subtotal", header: "Subtotal" },
+    { key: "descuento", header: "Descuento" },
+    { key: "total", header: "Total" },
+    { key: "observaciones", header: "Observaciones" },
+    { key: (o) => o.items.map((i) => `${i.nombre} x${i.cantidad}`).join(", "), header: "Items" },
+  ];
+
+  const handleExportOrdenes = async () => {
+    const segments = ["ordenes-de-compra"];
+    if (ordenStatusFilter !== "all") segments.push(ordenStatusFilter);
+    if (listFilters.comedorId) segments.push(`comedor-${listFilters.comedorId}`);
+    if (listFilters.desde) segments.push(`desde-${listFilters.desde}`);
+    if (listFilters.hasta) segments.push(`hasta-${listFilters.hasta}`);
+    try {
+      const data = await fetchAllOrdenes({
+        comedorId: listFilters.comedorId || undefined,
+        fechaInicio: listFilters.desde,
+        fechaFin: listFilters.hasta,
+        search: ordenSearch || undefined,
+        estado: ordenStatusFilter === "all" ? undefined : ordenStatusFilter,
+      });
+      exportToXlsx({ data, columns: ordenExportColumns, filename: segments.join("-") });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "No se pudo exportar");
+    }
+  };
+
   return (
     <div className="px-4 sm:px-8 lg:px-18 py-8">
       <div className="max-w-7xl mx-auto">
@@ -591,6 +635,12 @@ export default function ComprasContabilidad() {
             <CardContent className="p-0">
               <OrdenesDeCompraTable
                 ordenes={ordenes}
+                toolbarRight={
+                  <Button variant="outline" size="sm" onClick={handleExportOrdenes} disabled={exportingOrdenes}>
+                    {exportingOrdenes ? <Loader2 className="size-4 mr-1.5 animate-spin" /> : <Download className="size-4 mr-1.5" />}
+                    Exportar Excel
+                  </Button>
+                }
                 onDownloadPdf={handleDownloadPdf}
                 onEdit={(o) => navigate(`/contabilidad/compras/ordenes/${o.id}/editar`)}
                 onAprobar={(o) => applyOrdenAction(o, "aprobar", "Orden aprobada")}
