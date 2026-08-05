@@ -1,4 +1,5 @@
 import { Fragment } from "react";
+import type { ReactNode } from "react";
 import {
   Ban,
   CheckCircle2,
@@ -30,6 +31,7 @@ type StatusFilter = "all" | EstadoOrden;
 
 interface Props {
   ordenes: OrdenDeCompraResponse[];
+  toolbarRight?: ReactNode;
   onDownloadPdf: (o: OrdenDeCompraResponse) => void;
   onEdit?: (o: OrdenDeCompraResponse) => void;
   onAprobar?: (o: OrdenDeCompraResponse) => void;
@@ -52,6 +54,7 @@ interface Props {
 
 export function OrdenesDeCompraTable({
   ordenes,
+  toolbarRight,
   onDownloadPdf,
   onEdit,
   onAprobar,
@@ -91,6 +94,7 @@ export function OrdenesDeCompraTable({
             <OrdenesStatusFilter value={status} onChange={onStatusChange} />
           </div>
         }
+        toolbarRight={toolbarRight}
         columns={
           <>
             <th className="px-4 py-3 w-8" />
