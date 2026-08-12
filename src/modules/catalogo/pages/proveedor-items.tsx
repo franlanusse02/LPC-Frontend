@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Ban, Pencil, Plus } from "lucide-react";
+import { ArrowLeft, Ban, Download, Pencil, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,14 +10,24 @@ import { StatCard } from "@/modules/cierres/components/CierreStat";
 import { NuevoItemProveedorModal } from "@/modules/compras/components/NuevoItemProveedorModal";
 import { EditarItemProveedorModal } from "../components/EditarItemProveedorModal";
 import { useApi } from "@/hooks/useApi";
+import { useExportAll } from "@/hooks/useExportAll";
+import { exportToXlsx, type ExportColumn } from "@/lib/exportXlsx";
 import { cn, fmtCurrency } from "@/lib/utils";
 import type { ProveedorResponse } from "@/domain/dto/proveedor/ProveedorResponse";
 import type { ProveedorItemResponse } from "@/domain/dto/proveedor/ProveedorItemResponse";
 import type { PagedResponse } from "@/domain/dto/common/PagedResponse";
 
+const exportColumns: ExportColumn<ProveedorItemResponse>[] = [
+  { key: "codigo", header: "Codigo" },
+  { key: "nombre", header: "Articulo" },
+  { key: "proveedorNombre", header: "Proveedor" },
+  { key: "precioUnitario", header: "Precio" },
+];
+
 export default function ProveedorItemsPage() {
   const navigate = useNavigate();
   const { get, patch } = useApi();
+  const { exporting, fetchAll } = useExportAll<ProveedorItemResponse>("/articulos/codificacion/items");
 
   const [proveedores, setProveedores] = useState<ProveedorResponse[]>([]);
   const [proveedorId, setProveedorId] = useState("");
@@ -83,6 +93,20 @@ export default function ProveedorItemsPage() {
   const onSaved = (item: ProveedorItemResponse) =>
     setItems((prev) => prev.map((i) => (i.id === item.id ? item : i)));
 
+  const handleExport = async () => {
+    try {
+      const data = await fetchAll({});
+      exportToXlsx({
+        data,
+        columns: exportColumns,
+        filename: "articulos-proveedor",
+        sheetName: "Articulos Proveedor",
+      });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "No se pudo exportar el Excel");
+    }
+  };
+
   return (
     <div className="px-4 sm:px-8 lg:px-18 py-8">
       <div className="max-w-7xl mx-auto">
@@ -104,9 +128,20 @@ export default function ProveedorItemsPage() {
               <h1 className="text-xl font-bold text-gray-800 uppercase">Artículos Proveedor</h1>
               <p className="text-sm text-gray-500 mt-1">Gestioná los artículos de cada proveedor</p>
             </CardTitle>
-            <Button size="sm" onClick={() => setCreating(true)} disabled={!proveedorId} className="gap-2 font-bold">
-              <Plus className="h-4 w-4" /> NUEVO
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => void handleExport()}
+                disabled={exporting}
+                className="gap-2"
+              >
+                <Download className="h-4 w-4" /> {exporting ? "Exportando..." : "Exportar Excel"}
+              </Button>
+              <Button size="sm" onClick={() => setCreating(true)} disabled={!proveedorId} className="gap-2 font-bold">
+                <Plus className="h-4 w-4" /> NUEVO
+              </Button>
+            </div>
           </div>
           <div className="pt-3 flex flex-wrap items-center gap-2">
             <Combobox
