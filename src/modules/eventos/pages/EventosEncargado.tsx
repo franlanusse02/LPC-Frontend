@@ -293,7 +293,7 @@ export default function EventosEncargado() {
     setPage(0);
   };
 
-  const fetchList = useCallback(() => {
+  const fetchList = useCallback((signal?: AbortSignal) => {
     const qs = buildQuery({
       puntoDeVentaIds: listFilters.puntoDeVentaIds,
       comedorId: listFilters.comedorId || undefined,
@@ -306,7 +306,7 @@ export default function EventosEncargado() {
       size,
       sort: `${sortKey},${sortDir}`,
     });
-    return get(`/eventos/mis-cierres${qs}`).then((r) => r.json()).then(setPageData);
+    return get(`/eventos/mis-cierres${qs}`, { signal }).then((r) => r.json()).then(setPageData);
   }, [get, listFilters.puntoDeVentaIds, listFilters.comedorId, listFilters.desde, listFilters.hasta, statusFilter, activeTab, search, page, size, sortKey, sortDir]);
 
   const fetchStats = useCallback(() => {
@@ -322,7 +322,11 @@ export default function EventosEncargado() {
   }, [get, listFilters.puntoDeVentaIds, listFilters.comedorId, listFilters.desde, listFilters.hasta, activeTab, search]);
 
   useEffect(() => {
-    fetchList();
+    const controller = new AbortController();
+    fetchList(controller.signal).catch((err) => {
+      if (err instanceof Error && err.name !== "AbortError") console.error(err);
+    });
+    return () => controller.abort();
   }, [fetchList]);
 
   useEffect(() => {
