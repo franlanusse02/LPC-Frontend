@@ -686,6 +686,7 @@ export default function EventosContabilidad() {
               onChange={handleFiltersChange}
               comedores={comedores}
               showSociedad={false}
+              showComedor={false}
             />
             <Button
               size="sm"
