@@ -625,10 +625,13 @@ export default function EventosContabilidad() {
     if (listFilters.hasta) segments.push(`hasta-${listFilters.hasta}`);
 
     if (selection.count > 0) {
-      const data = eventos.filter(
-        (e) => selection.selected.has(e.id) && (statusFilter === "CARGA_PARCIAL" || e.estado !== "CARGA_PARCIAL"),
-      );
-      exportToXlsx({ data, columns: exportColumns, filename: segments.join("-") });
+      const data = eventos.filter((e) => selection.selected.has(e.id));
+      exportToXlsx({
+        data,
+        columns: exportColumns,
+        filename: segments.join("-"),
+        highlightRow: (e) => e.estado === "CARGA_PARCIAL",
+      });
       return;
     }
 
@@ -642,8 +645,12 @@ export default function EventosContabilidad() {
         fechaFin: listFilters.hasta,
         search: search || undefined,
       });
-      const data = all.filter((e) => statusFilter === "CARGA_PARCIAL" || e.estado !== "CARGA_PARCIAL");
-      exportToXlsx({ data, columns: exportColumns, filename: segments.join("-") });
+      exportToXlsx({
+        data: all,
+        columns: exportColumns,
+        filename: segments.join("-"),
+        highlightRow: (e) => e.estado === "CARGA_PARCIAL",
+      });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "No se pudo exportar");
     }
