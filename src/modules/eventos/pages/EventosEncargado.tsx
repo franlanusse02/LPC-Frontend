@@ -409,8 +409,12 @@ export default function EventosEncargado() {
         fechaFin: listFilters.hasta,
         search: search || undefined,
       });
-      const data = all.filter((e) => e.estado !== "CARGA_PARCIAL");
-      exportToXlsx({ data, columns: exportColumns, filename: segments.join("-") });
+      exportToXlsx({
+        data: all,
+        columns: exportColumns,
+        filename: segments.join("-"),
+        highlightRow: (e) => e.estado === "CARGA_PARCIAL",
+      });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "No se pudo exportar");
     }
