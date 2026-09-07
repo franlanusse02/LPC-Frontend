@@ -420,7 +420,7 @@ export default function EventosContabilidad() {
     setPage(0);
   };
 
-  const fetchList = useCallback(() => {
+  const fetchList = useCallback((signal?: AbortSignal) => {
     const qs = buildQuery({
       puntoDeVentaIds: listFilters.puntoDeVentaIds,
       comedorId: listFilters.comedorId || undefined,
@@ -433,7 +433,7 @@ export default function EventosContabilidad() {
       size,
       sort: `${sortKey},${sortDir}`,
     });
-    return get(`/eventos${qs}`).then((r) => r.json()).then(setPageData);
+    return get(`/eventos${qs}`, { signal }).then((r) => r.json()).then(setPageData);
   }, [get, listFilters.puntoDeVentaIds, listFilters.comedorId, listFilters.desde, listFilters.hasta, statusFilter, activeTab, search, page, size, sortKey, sortDir]);
 
   const fetchStats = useCallback(() => {
@@ -449,7 +449,11 @@ export default function EventosContabilidad() {
   }, [get, listFilters.puntoDeVentaIds, listFilters.comedorId, listFilters.desde, listFilters.hasta, activeTab, search]);
 
   useEffect(() => {
-    fetchList();
+    const controller = new AbortController();
+    fetchList(controller.signal).catch((err) => {
+      if (err instanceof Error && err.name !== "AbortError") console.error(err);
+    });
+    return () => controller.abort();
   }, [fetchList]);
 
   useEffect(() => {
@@ -621,8 +625,13 @@ export default function EventosContabilidad() {
     if (listFilters.hasta) segments.push(`hasta-${listFilters.hasta}`);
 
     if (selection.count > 0) {
-      const data = eventos.filter((e) => selection.selected.has(e.id) && e.estado !== "CARGA_PARCIAL");
-      exportToXlsx({ data, columns: exportColumns, filename: segments.join("-") });
+      const data = eventos.filter((e) => selection.selected.has(e.id));
+      exportToXlsx({
+        data,
+        columns: exportColumns,
+        filename: segments.join("-"),
+        highlightRow: (e) => e.estado === "CARGA_PARCIAL",
+      });
       return;
     }
 
@@ -636,8 +645,12 @@ export default function EventosContabilidad() {
         fechaFin: listFilters.hasta,
         search: search || undefined,
       });
-      const data = all.filter((e) => e.estado !== "CARGA_PARCIAL");
-      exportToXlsx({ data, columns: exportColumns, filename: segments.join("-") });
+      exportToXlsx({
+        data: all,
+        columns: exportColumns,
+        filename: segments.join("-"),
+        highlightRow: (e) => e.estado === "CARGA_PARCIAL",
+      });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "No se pudo exportar");
     }
@@ -866,7 +879,7 @@ export default function EventosContabilidad() {
                                     <FileX2 className="h-4 w-4" /> Eliminar PDF
                                   </DropdownMenuItem>
                                 )}
-                                {evento.estado === "SOLICITADO" && (
+                                {(evento.estado === "CARGA_PARCIAL" || evento.estado === "SOLICITADO") && (
                                   <DropdownMenuItem
                                     onClick={() => navigate(`/contabilidad/eventos/${evento.id}/editar`)}
                                     className="gap-2.5 cursor-pointer rounded-lg text-gray-700 focus:text-gray-900"

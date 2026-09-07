@@ -21,3 +21,13 @@ node_modules/
 .DS_Store
 # Claude Code
 .claude/
+
+# Ticket-mode meta files (local dev workflow, not part of the shipped project)
+AGENTS.md
+TICKETS.md
+QUESTS.md
+QUESTS.archive.md
+TESTING.md
+UPDATES.md
+FrontendAssumptions.md
+HANDOUT.md
