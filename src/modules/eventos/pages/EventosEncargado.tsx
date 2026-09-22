@@ -264,6 +264,14 @@ export default function EventosEncargado() {
     [comedores],
   );
 
+  const puntoDeVentaNameById = useMemo(
+    () =>
+      Object.fromEntries(
+        comedores.flatMap((c) => (c.puntosDeVenta ?? []).map((p) => [p.id, p.nombre])),
+      ) as Record<number, string>,
+    [comedores],
+  );
+
   const handleFiltersChange = (next: ListFilterState) => {
     setListFiltersRaw(next);
     setPage(0);
@@ -371,6 +379,7 @@ export default function EventosEncargado() {
   const exportColumns: ExportColumn<EventoResponse>[] = [
     { key: "fechaEvento", header: "Fecha" },
     { key: (e) => comedorNameById[e.comedorId] ?? e.comedorId, header: "Comedor" },
+    { key: (e) => puntoDeVentaNameById[e.puntoDeVentaId] ?? e.puntoDeVentaId, header: "Punto De Venta" },
     { key: "tipoComedor", header: "Tipo" },
     { key: "cantidadPersonas", header: "Personas" },
     { key: "montoTotal", header: "Monto" },
@@ -397,6 +406,7 @@ export default function EventosEncargado() {
     { key: (e) => ev(e, "retenciones"), header: "Retenciones" },
     { key: (e) => ev(e, "adicionales"), header: "Adicionales" },
     { key: "observaciones", header: "Observaciones" },
+    { key: (e) => e.creadoPorNombre, header: "Creador" },
   ];
 
   const handleExport = async () => {
