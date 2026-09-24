@@ -20,6 +20,8 @@ import { KpiCard } from "@/components/KpiCard";
 import { OrdenesDeCompraTable } from "../components/OrdenesDeCompraTable";
 import { downloadPdf } from "@/lib/download";
 import { exportToXlsx, type ExportColumn } from "@/lib/exportXlsx";
+import { flattenWithLines, groupedColumns, isParentRow } from "@/lib/exportGrouped";
+import type { OrdenDeCompraItemResponse } from "@/domain/dto/orden-compra/OrdenDeCompraItemResponse";
 import {
   ListFilters,
   type ListFilterState,
@@ -339,6 +341,23 @@ export default function ComprasEncargado() {
     { key: (o) => o.items.map((i) => `${i.nombre} x${i.cantidad}`).join(", "), header: "Items" },
   ];
 
+  // One bold row per orden (with its totals), then one row per item repeating
+  // the orden's identifying columns. See lib/exportGrouped.ts.
+  const ordenGroupedColumns = groupedColumns<OrdenDeCompraResponse, OrdenDeCompraItemResponse>(
+    ordenExportColumns,
+    {
+      replace: "Items",
+      repeat: ["Nº Orden", "Fecha", "Proveedor", "Sucursal"],
+      lineColumns: [
+        { header: "Código", value: (i) => i.codigo },
+        { header: "Item", value: (i) => i.nombre },
+        { header: "Cantidad", value: (i) => i.cantidad },
+        { header: "Precio unitario", value: (i) => i.precioUnitario },
+        { header: "Subtotal item", value: (i) => i.total },
+      ],
+    },
+  );
+
   const handleExportOrdenes = async () => {
     const segments = ["mis-ordenes-de-compra"];
     if (ordenStatusFilter !== "all") segments.push(ordenStatusFilter);
@@ -347,7 +366,12 @@ export default function ComprasEncargado() {
         search: ordenSearch || undefined,
         estado: ordenStatusFilter === "all" ? undefined : ordenStatusFilter,
       });
-      exportToXlsx({ data, columns: ordenExportColumns, filename: segments.join("-") });
+      exportToXlsx({
+        data: flattenWithLines(data, (o) => o.items),
+        columns: ordenGroupedColumns,
+        filename: segments.join("-"),
+        boldRow: isParentRow,
+      });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "No se pudo exportar");
     }
