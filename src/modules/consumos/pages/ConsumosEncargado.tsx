@@ -10,6 +10,12 @@ import { Pagination } from "@/components/Pagination";
 import { ConsumosStatusFilter } from "../components/filters/ConsumosStatusFilter";
 import { exportToXlsx, type ExportColumn } from "@/lib/exportXlsx";
 import type { ConsumoResponse } from "@/domain/dto/consumo/ConsumoResponse";
+import {
+  flattenConsumos,
+  soloConsumo,
+  subtotal,
+  type ConsumoExportRow,
+} from "@/modules/consumos/exportRows";
 import type { ConsumoStatsResponse } from "@/domain/dto/consumo/ConsumoStatsResponse";
 import type { ConsumidorResponse } from "@/domain/dto/consumo/ConsumidorResponse";
 import type { PuntoDeVentaResponse } from "@/domain/dto/pto-venta/PuntoDeVentaResponse";
@@ -173,19 +179,24 @@ export default function ConsumosEncargado() {
     }
   };
 
-  const exportColumns: ExportColumn<ConsumoResponse>[] = [
-    { key: "fecha", header: "Fecha" },
-    { key: (c) => {
+  // One bold row per consumo (with its total), then one row per product that
+  // repeats the consumo's identifying columns. See exportRows.ts.
+  const exportColumns: ExportColumn<ConsumoExportRow>[] = [
+    { key: (r) => r.consumo.fecha, header: "Fecha" },
+    { key: ({ consumo: c }) => {
       const cons = consumidorById[c.consumidorId];
       return cons ? (comedorNameById[cons.comedorId] ?? cons.comedorId) : "";
     }, header: "Comedor" },
-    { key: (c) => puntoDeVentaNameById[c.PuntoDeVentaId] ?? c.PuntoDeVentaId, header: "Punto de Venta" },
-    { key: (c) => consumidorById[c.consumidorId]?.nombre ?? c.consumidorId, header: "Consumidor" },
-    { key: (c) => consumidorById[c.consumidorId]?.taxId ?? "", header: "DNI" },
-    { key: (c) => c.productos.map((p) => `${p.producto.nombre} x${p.cantidad}`).join(", "), header: "Productos" },
-    { key: "total", header: "Total" },
-    { key: (c) => (c.anulacion !== null ? "Anulado" : "Activo"), header: "Estado" },
-    { key: "observaciones", header: "Observaciones" },
+    { key: ({ consumo: c }) => puntoDeVentaNameById[c.PuntoDeVentaId] ?? c.PuntoDeVentaId, header: "Punto de Venta" },
+    { key: ({ consumo: c }) => consumidorById[c.consumidorId]?.nombre ?? c.consumidorId, header: "Consumidor" },
+    { key: ({ consumo: c }) => consumidorById[c.consumidorId]?.taxId ?? "", header: "DNI" },
+    { key: (r) => r.producto?.producto.nombre ?? null, header: "Producto" },
+    { key: (r) => r.producto?.cantidad ?? null, header: "Cantidad" },
+    { key: (r) => r.producto?.precioUnitario ?? null, header: "Precio unitario" },
+    { key: (r) => (r.producto ? subtotal(r.producto) : null), header: "Subtotal" },
+    { key: (r) => soloConsumo(r, (c) => c.total), header: "Total" },
+    { key: (r) => soloConsumo(r, (c) => (c.anulacion !== null ? "Anulado" : "Activo")), header: "Estado" },
+    { key: (r) => soloConsumo(r, (c) => c.observaciones), header: "Observaciones" },
   ];
 
   const handleExport = async () => {
@@ -201,7 +212,12 @@ export default function ConsumosEncargado() {
         fechaFin: listFilters.hasta,
         search: search || undefined,
       });
-      exportToXlsx({ data, columns: exportColumns, filename: segments.join("-") });
+      exportToXlsx({
+        data: flattenConsumos(data),
+        columns: exportColumns,
+        filename: segments.join("-"),
+        boldRow: (r) => r.producto === null,
+      });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "No se pudo exportar");
     }

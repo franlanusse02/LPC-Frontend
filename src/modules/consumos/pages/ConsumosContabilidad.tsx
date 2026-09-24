@@ -38,6 +38,12 @@ import { buildQuery } from "@/lib/query-string";
 import { useExportAll } from "@/hooks/useExportAll";
 
 import type { ConsumoResponse } from "@/domain/dto/consumo/ConsumoResponse";
+import {
+  flattenConsumos,
+  soloConsumo,
+  subtotal,
+  type ConsumoExportRow,
+} from "@/modules/consumos/exportRows";
 import type { ConsumoStatsResponse } from "@/domain/dto/consumo/ConsumoStatsResponse";
 import type { AgrupadosResponse } from "@/domain/dto/consumo/AgrupadosResponse";
 
@@ -227,25 +233,38 @@ export default function ConsumosContabilidad() {
     setBulkMotivo("");
   };
 
-  const exportColumns: ExportColumn<ConsumoResponse>[] = [
-    { key: (c) => new Date(c.creadoEn).toLocaleString("es-AR", {
+  // One bold row per consumo (with its total), then one row per product that
+  // repeats the consumo's identifying columns. See exportRows.ts.
+  const exportColumns: ExportColumn<ConsumoExportRow>[] = [
+    { key: (r) => soloConsumo(r, (c) => new Date(c.creadoEn).toLocaleString("es-AR", {
       timeZone: "America/Argentina/Buenos_Aires",
       day: "2-digit", month: "2-digit", year: "numeric",
       hour: "2-digit", minute: "2-digit", second: "2-digit",
       hour12: false,
-    }), header: "Fecha de Carga" },
-    { key: "id", header: "ID" },
-    { key: (c) => { const cons = consumidorById[c.consumidorId]; return cons ? (comedorNameById[cons.comedorId] ?? cons.comedorId) : "—"; }, header: "Comedor" },
-    { key: (c) => puntoDeVentaNameById[c.PuntoDeVentaId] ?? c.PuntoDeVentaId, header: "Punto de Venta" },
-    { key: (c) => consumidorById[c.consumidorId]?.nombre ?? c.consumidorId, header: "Consumidor" },
-    { key: (c) => consumidorById[c.consumidorId]?.taxId ?? "—", header: "DNI" },
-    { key: "fecha", header: "Fecha" },
-    { key: "total", header: "Total" },
-    { key: (c) => c.anulacion ? "Anulado" : "Activo", header: "Estado" },
-    { key: "observaciones", header: "Observaciones" },
-    { key: (c) => c.productos.map((p) => `${p.producto.nombre} x${p.cantidad}`).join(", "), header: "Productos" },
-    { key: "actualizadoEn", header: "Actualizado en" },
+    })), header: "Fecha de Carga" },
+    { key: (r) => r.consumo.id, header: "ID" },
+    { key: ({ consumo: c }) => { const cons = consumidorById[c.consumidorId]; return cons ? (comedorNameById[cons.comedorId] ?? cons.comedorId) : "—"; }, header: "Comedor" },
+    { key: ({ consumo: c }) => puntoDeVentaNameById[c.PuntoDeVentaId] ?? c.PuntoDeVentaId, header: "Punto de Venta" },
+    { key: ({ consumo: c }) => consumidorById[c.consumidorId]?.nombre ?? c.consumidorId, header: "Consumidor" },
+    { key: ({ consumo: c }) => consumidorById[c.consumidorId]?.taxId ?? "—", header: "DNI" },
+    { key: (r) => r.consumo.fecha, header: "Fecha" },
+    { key: (r) => r.producto?.producto.nombre ?? null, header: "Producto" },
+    { key: (r) => r.producto?.cantidad ?? null, header: "Cantidad" },
+    { key: (r) => r.producto?.precioUnitario ?? null, header: "Precio unitario" },
+    { key: (r) => (r.producto ? subtotal(r.producto) : null), header: "Subtotal" },
+    { key: (r) => soloConsumo(r, (c) => c.total), header: "Total" },
+    { key: (r) => soloConsumo(r, (c) => (c.anulacion ? "Anulado" : "Activo")), header: "Estado" },
+    { key: (r) => soloConsumo(r, (c) => c.observaciones), header: "Observaciones" },
+    { key: (r) => soloConsumo(r, (c) => c.actualizadoEn), header: "Actualizado en" },
   ];
+
+  const exportConsumos = (consumos: ConsumoResponse[], filename: string) =>
+    exportToXlsx({
+      data: flattenConsumos(consumos),
+      columns: exportColumns,
+      filename,
+      boldRow: (r) => r.producto === null,
+    });
 
   const handleExport = async () => {
     const segments = ["consumos"];
@@ -256,7 +275,7 @@ export default function ConsumosContabilidad() {
 
     if (selection.count > 0) {
       const data = consumos.filter((c) => selection.selected.has(c.id));
-      exportToXlsx({ data, columns: exportColumns, filename: segments.join("-") });
+      exportConsumos(data, segments.join("-"));
       return;
     }
 
@@ -270,7 +289,7 @@ export default function ConsumosContabilidad() {
         fechaFin: listFilters.hasta,
         search: search || undefined,
       });
-      exportToXlsx({ data, columns: exportColumns, filename: segments.join("-") });
+      exportConsumos(data, segments.join("-"));
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "No se pudo exportar");
     }
