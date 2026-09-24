@@ -268,6 +268,18 @@ const eField = (key: string, header: string): ExportColumn<EventoResponse> => ({
 function buildExportColumns(
   tab: TabKey,
   comedorNameById: Record<number, string>,
+  puntoDeVentaNameById: Record<number, string>,
+): ExportColumn<EventoResponse>[] {
+  return [
+    ...buildTabColumns(tab, comedorNameById, puntoDeVentaNameById),
+    { key: (e) => e.creadoPorNombre, header: "Creador" },
+  ];
+}
+
+function buildTabColumns(
+  tab: TabKey,
+  comedorNameById: Record<number, string>,
+  puntoDeVentaNameById: Record<number, string>,
 ): ExportColumn<EventoResponse>[] {
   const fmtDate = (e: EventoResponse) =>
     new Date(e.creadoEn).toLocaleString("es-AR", {
@@ -281,6 +293,7 @@ function buildExportColumns(
     { key: fmtDate, header: "Fecha de Carga" },
     { key: "id", header: "ID" },
     { key: (e) => comedorNameById[e.comedorId] ?? e.comedorId, header: "Comedor" },
+    { key: (e) => puntoDeVentaNameById[e.puntoDeVentaId] ?? e.puntoDeVentaId, header: "Punto De Venta" },
     { key: "estado", header: "Estado" },
     { key: "fechaEvento", header: "Fecha Evento" },
     { key: "cantidadPersonas", header: "Personas" },
@@ -387,6 +400,14 @@ export default function EventosContabilidad() {
 
   const comedorNameById = useMemo(
     () => Object.fromEntries(comedores.map((c) => [c.id, c.nombre])),
+    [comedores],
+  );
+
+  const puntoDeVentaNameById = useMemo(
+    () =>
+      Object.fromEntries(
+        comedores.flatMap((c) => (c.puntosDeVenta ?? []).map((p) => [p.id, p.nombre])),
+      ) as Record<number, string>,
     [comedores],
   );
 
@@ -613,8 +634,8 @@ export default function EventosContabilidad() {
   };
 
   const exportColumns = useMemo(
-    () => buildExportColumns(activeTab, comedorNameById),
-    [activeTab, comedorNameById],
+    () => buildExportColumns(activeTab, comedorNameById, puntoDeVentaNameById),
+    [activeTab, comedorNameById, puntoDeVentaNameById],
   );
 
   const handleExport = async () => {
