@@ -56,6 +56,8 @@ import type { EventoStatsResponse } from "@/domain/dto/evento/EventoStatsRespons
 import type { EstadoEvento } from "@/domain/enums/EstadoEvento";
 import { EstadoEventoLabel } from "@/domain/enums/EstadoEvento";
 import { exportToXlsx, type ExportColumn } from "@/lib/exportXlsx";
+import { flattenWithLines, groupedColumns, isParentRow } from "@/lib/exportGrouped";
+import type { ProductoConsumoResponse } from "@/domain/dto/consumo/ProductoConsumoResponse";
 import type { ComedorResponse } from "@/domain/dto/comedor/ComedorResponse";
 import {
   ListFilters,
@@ -633,10 +635,35 @@ export default function EventosContabilidad() {
     setBulkMotivo("");
   };
 
+  // One bold row per evento (with its Monto Total), then one row per servicio
+  // repeating the evento's identifying columns. Line headers avoid Galicia's
+  // own "Precio Unitario" column. See lib/exportGrouped.ts.
   const exportColumns = useMemo(
-    () => buildExportColumns(activeTab, comedorNameById, puntoDeVentaNameById),
+    () =>
+      groupedColumns<EventoResponse, ProductoConsumoResponse>(
+        buildExportColumns(activeTab, comedorNameById, puntoDeVentaNameById),
+        {
+          replace: "Servicios",
+          repeat: ["ID", "Comedor", "Punto De Venta", "Fecha Evento"],
+          lineColumns: [
+            { header: "Servicio", value: (s) => s.producto.nombre },
+            { header: "Cantidad", value: (s) => s.cantidad },
+            { header: "Precio servicio", value: (s) => s.precioUnitario },
+            { header: "Subtotal servicio", value: (s) => Math.round(s.cantidad * s.precioUnitario * 100) / 100 },
+          ],
+        },
+      ),
     [activeTab, comedorNameById, puntoDeVentaNameById],
   );
+
+  const exportEventos = (data: EventoResponse[], filename: string) =>
+    exportToXlsx({
+      data: flattenWithLines(data, (e) => e.servicios),
+      columns: exportColumns,
+      filename,
+      boldRow: isParentRow,
+      highlightRow: (r) => isParentRow(r) && r.parent.estado === "CARGA_PARCIAL",
+    });
 
   const handleExport = async () => {
     const segments = ["eventos"];
@@ -647,12 +674,7 @@ export default function EventosContabilidad() {
 
     if (selection.count > 0) {
       const data = eventos.filter((e) => selection.selected.has(e.id));
-      exportToXlsx({
-        data,
-        columns: exportColumns,
-        filename: segments.join("-"),
-        highlightRow: (e) => e.estado === "CARGA_PARCIAL",
-      });
+      exportEventos(data, segments.join("-"));
       return;
     }
 
@@ -666,12 +688,7 @@ export default function EventosContabilidad() {
         fechaFin: listFilters.hasta,
         search: search || undefined,
       });
-      exportToXlsx({
-        data: all,
-        columns: exportColumns,
-        filename: segments.join("-"),
-        highlightRow: (e) => e.estado === "CARGA_PARCIAL",
-      });
+      exportEventos(all, segments.join("-"));
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "No se pudo exportar");
     }
