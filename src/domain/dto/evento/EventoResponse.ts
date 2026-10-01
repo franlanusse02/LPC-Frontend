@@ -23,6 +23,7 @@ type EventoBase = {
   creadoEn: string;
   actualizadoEn: string;
   creadoPorId: number | null;
+  creadoPorNombre: string | null;
   anulacionId: number | null;
 };
 

@@ -12,7 +12,11 @@ interface ExportConfig<T> {
   sheetName?: string;
   /** Rows for which this returns `true` get a red fill in the sheet. */
   highlightRow?: (item: T) => boolean;
+  /** Rows for which this returns `true` are written in bold. */
+  boldRow?: (item: T) => boolean;
 }
+
+const BOLD_ROW_STYLE = { font: { bold: true } } as const;
 
 const RED_ROW_STYLE = {
   fill: { patternType: "solid", fgColor: { rgb: "FFFF0000" } },
@@ -38,6 +42,7 @@ export function exportToXlsx<T>({
   filename,
   sheetName = "Datos",
   highlightRow,
+  boldRow,
 }: ExportConfig<T>) {
   const columns = filterNullColumns(data, allColumns);
   const header = columns.map((c) => c.header);
@@ -48,17 +53,20 @@ export function exportToXlsx<T>({
   );
   const ws = XLSX.utils.aoa_to_sheet([header, ...rows]);
 
-  if (highlightRow) {
-    data.forEach((item, i) => {
-      if (!highlightRow(item)) return;
-      const r = i + 1; // row 0 is the header
-      for (let c = 0; c < columns.length; c++) {
-        const addr = XLSX.utils.encode_cell({ r, c });
-        const cell = (ws[addr] ??= { t: "s", v: "" });
-        cell.s = { ...(cell.s ?? {}), ...RED_ROW_STYLE };
-      }
-    });
-  }
+  const styleRow = (i: number, style: { font?: object; fill?: object }) => {
+    const r = i + 1; // row 0 is the header
+    for (let c = 0; c < columns.length; c++) {
+      const addr = XLSX.utils.encode_cell({ r, c });
+      const cell = (ws[addr] ??= { t: "s", v: "" });
+      const prev = cell.s ?? {};
+      cell.s = { ...prev, ...style, font: { ...(prev.font ?? {}), ...(style.font ?? {}) } };
+    }
+  };
+
+  data.forEach((item, i) => {
+    if (boldRow?.(item)) styleRow(i, BOLD_ROW_STYLE);
+    if (highlightRow?.(item)) styleRow(i, RED_ROW_STYLE);
+  });
 
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, sheetName);

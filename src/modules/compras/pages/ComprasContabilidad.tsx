@@ -42,7 +42,10 @@ import { handleBulkResponse } from "@/lib/bulk-utils";
 import type { BulkActionResponse } from "@/domain/dto/shared/BulkActionResponse";
 import type { Page } from "@/domain/dto/shared/Page";
 import { exportToXlsx, type ExportColumn } from "@/lib/exportXlsx";
+import { flattenWithLines, groupedColumns, isParentRow } from "@/lib/exportGrouped";
+import type { OrdenDeCompraItemResponse } from "@/domain/dto/orden-compra/OrdenDeCompraItemResponse";
 import type { FacturaProveedorResponse } from "@/domain/dto/compra/FacturaProveedorResponse";
+import type { FacturaPuntoDeVentaMontoResponse } from "@/domain/dto/compra/FacturaPuntoDeVentaMontoResponse";
 import type { FacturaProveedorStatsResponse } from "@/domain/dto/compra/FacturaProveedorStatsResponse";
 import type { OrdenDeCompraStatsResponse } from "@/domain/dto/orden-compra/OrdenDeCompraStatsResponse";
 import type { ComedorResponse } from "@/domain/dto/comedor/ComedorResponse";
@@ -496,9 +499,31 @@ export default function ComprasContabilidad() {
     { key: "numeroOperacion", header: "Nº Operación" },
     { key: "bancoNombre", header: "Banco" },
     { key: "comentarios", header: "Comentarios" },
-    { key: (f) => (f.puntoDeVentaComedor ?? []).map((s) => `${posNameById[s.puntoDeVentaId] ?? `Punto de venta #${s.puntoDeVentaId}`}: $${s.monto}`).join(", "), header: "Puntos de Venta" },
+    { key: (f) => (f.puntoDeVentaComedor ?? []).map((s) => posNameById[s.puntoDeVentaId] ?? `Punto de venta #${s.puntoDeVentaId}`).join(", "), header: "Puntos de Venta" },
     { key: "creadoPorNombre", header: "Creado por" },
   ];
+
+  // One bold row per factura (with its Monto), then one row per punto de venta
+  // split repeating the factura's identifying columns. See lib/exportGrouped.ts.
+  const facturaGroupedColumns = groupedColumns<FacturaProveedorResponse, FacturaPuntoDeVentaMontoResponse>(
+    exportColumns,
+    {
+      replace: "Puntos de Venta",
+      repeat: ["ID", "Nº Factura", "Proveedor", "Comedor"],
+      lineColumns: [
+        { header: "Punto de Venta", value: (s) => posNameById[s.puntoDeVentaId] ?? `Punto de venta #${s.puntoDeVentaId}` },
+        { header: "Monto PdV", value: (s) => s.monto },
+      ],
+    },
+  );
+
+  const exportFacturas = (data: FacturaProveedorResponse[], filename: string) =>
+    exportToXlsx({
+      data: flattenWithLines(data, (f) => f.puntoDeVentaComedor ?? []),
+      columns: facturaGroupedColumns,
+      filename,
+      boldRow: isParentRow,
+    });
 
   const handleExport = async () => {
     const segments = ["compras"];
@@ -509,7 +534,7 @@ export default function ComprasContabilidad() {
 
     if (selection.count > 0) {
       const data = facturas.filter((f) => selection.selected.has(f.id));
-      exportToXlsx({ data, columns: exportColumns, filename: segments.join("-") });
+      exportFacturas(data, segments.join("-"));
       return;
     }
 
@@ -522,7 +547,7 @@ export default function ComprasContabilidad() {
         search: search || undefined,
         estado: statusFilter === "all" ? undefined : statusFilter,
       });
-      exportToXlsx({ data, columns: exportColumns, filename: segments.join("-") });
+      exportFacturas(data, segments.join("-"));
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "No se pudo exportar");
     }
@@ -550,6 +575,23 @@ export default function ComprasContabilidad() {
     { key: (o) => o.items.map((i) => `${i.nombre} x${i.cantidad}`).join(", "), header: "Items" },
   ];
 
+  // One bold row per orden (with its totals), then one row per item repeating
+  // the orden's identifying columns. See lib/exportGrouped.ts.
+  const ordenGroupedColumns = groupedColumns<OrdenDeCompraResponse, OrdenDeCompraItemResponse>(
+    ordenExportColumns,
+    {
+      replace: "Items",
+      repeat: ["Nº Orden", "Fecha", "Proveedor", "Sucursal"],
+      lineColumns: [
+        { header: "Código", value: (i) => i.codigo },
+        { header: "Item", value: (i) => i.nombre },
+        { header: "Cantidad", value: (i) => i.cantidad },
+        { header: "Precio unitario", value: (i) => i.precioUnitario },
+        { header: "Subtotal item", value: (i) => i.total },
+      ],
+    },
+  );
+
   const handleExportOrdenes = async () => {
     const segments = ["ordenes-de-compra"];
     if (ordenStatusFilter !== "all") segments.push(ordenStatusFilter);
@@ -564,7 +606,12 @@ export default function ComprasContabilidad() {
         search: ordenSearch || undefined,
         estado: ordenStatusFilter === "all" ? undefined : ordenStatusFilter,
       });
-      exportToXlsx({ data, columns: ordenExportColumns, filename: segments.join("-") });
+      exportToXlsx({
+        data: flattenWithLines(data, (o) => o.items),
+        columns: ordenGroupedColumns,
+        filename: segments.join("-"),
+        boldRow: isParentRow,
+      });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "No se pudo exportar");
     }
