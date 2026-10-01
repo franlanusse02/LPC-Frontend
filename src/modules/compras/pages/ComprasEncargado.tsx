@@ -11,6 +11,7 @@ import { Pagination } from "@/components/Pagination";
 import { useExpandableRows } from "@/hooks/useExpandableRows";
 import { FacturasStatusFilter } from "../components/filters/FacturasStatusFilter";
 import type { FacturaProveedorResponse } from "@/domain/dto/compra/FacturaProveedorResponse";
+import type { FacturaPuntoDeVentaMontoResponse } from "@/domain/dto/compra/FacturaPuntoDeVentaMontoResponse";
 import type { FacturaProveedorStatsResponse } from "@/domain/dto/compra/FacturaProveedorStatsResponse";
 import type { OrdenDeCompraStatsResponse } from "@/domain/dto/orden-compra/OrdenDeCompraStatsResponse";
 import type { Page } from "@/domain/dto/shared/Page";
@@ -301,8 +302,30 @@ export default function ComprasEncargado() {
     { key: "medioPago", header: "Medio de Pago" },
     { key: "numeroOperacion", header: "Nº Operación" },
     { key: "comentarios", header: "Comentarios" },
-    { key: (f) => (f.puntoDeVentaComedor ?? []).map((s) => `${posNameById[s.puntoDeVentaId] ?? `Punto de venta #${s.puntoDeVentaId}`}: $${s.monto}`).join(", "), header: "Puntos de Venta" },
+    { key: (f) => (f.puntoDeVentaComedor ?? []).map((s) => posNameById[s.puntoDeVentaId] ?? `Punto de venta #${s.puntoDeVentaId}`).join(", "), header: "Puntos de Venta" },
   ];
+
+  // One bold row per factura (with its Monto), then one row per punto de venta
+  // split repeating the factura's identifying columns. See lib/exportGrouped.ts.
+  const facturaGroupedColumns = groupedColumns<FacturaProveedorResponse, FacturaPuntoDeVentaMontoResponse>(
+    exportColumns,
+    {
+      replace: "Puntos de Venta",
+      repeat: ["ID", "Nº Factura", "Proveedor", "Comedor"],
+      lineColumns: [
+        { header: "Punto de Venta", value: (s) => posNameById[s.puntoDeVentaId] ?? `Punto de venta #${s.puntoDeVentaId}` },
+        { header: "Monto PdV", value: (s) => s.monto },
+      ],
+    },
+  );
+
+  const exportFacturas = (data: FacturaProveedorResponse[], filename: string) =>
+    exportToXlsx({
+      data: flattenWithLines(data, (f) => f.puntoDeVentaComedor ?? []),
+      columns: facturaGroupedColumns,
+      filename,
+      boldRow: isParentRow,
+    });
 
   const handleExport = async () => {
     const segments = ["mis-compras"];
@@ -315,7 +338,7 @@ export default function ComprasEncargado() {
         search: search || undefined,
         estado: statusFilter === "all" ? undefined : statusFilter,
       });
-      exportToXlsx({ data, columns: exportColumns, filename: segments.join("-") });
+      exportFacturas(data, segments.join("-"));
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "No se pudo exportar");
     }
