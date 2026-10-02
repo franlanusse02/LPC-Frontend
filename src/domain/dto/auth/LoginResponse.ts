@@ -1,7 +1,7 @@
 export type LoginResponse = {
   token: string;
-  cuil: string;
+  id: number;
+  cuil: number;
   nombre: string;
   rol: string;
 };
-

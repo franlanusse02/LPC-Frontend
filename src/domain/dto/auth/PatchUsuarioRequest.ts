@@ -1,6 +1,5 @@
+// Only what belongs to the account; cuil and nombre are edited on the legajo.
 export type PatchUsuarioRequest = {
-  nombre?: string;
   rol?: string;
   password?: string;
-  cuil?: number;
 };
