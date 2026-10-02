@@ -19,6 +19,7 @@ import { AuthListener } from "@/modules/identity/components/AuthListener";
 import ComedoresPage from "./modules/catalogo/pages/comedores";
 import PuntosDeVentaPage from "./modules/catalogo/pages/puntos-de-venta";
 import UsuariosPage from "./modules/catalogo/pages/usuarios";
+import LegajosPage from "./modules/rrhh/pages/legajos";
 import ProductosPage from "./modules/catalogo/pages/productos";
 import ConsumidoresPage from "./modules/catalogo/pages/consumidores";
 import ProveedoresPage from "./modules/catalogo/pages/proveedores";
@@ -66,6 +67,7 @@ export default function App() {
             <Route element={<RootLayout />}>
               <Route path="/" element={<AdminDashboard />} />
               <Route path="/usuarios" element={<UsuariosPage />} />
+              <Route path="/legajos" element={<LegajosPage />} />
               <Route path="/sociedades" element={<SociedadesPage />} />
             </Route>
           </Route>
