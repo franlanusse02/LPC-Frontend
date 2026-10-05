@@ -509,7 +509,7 @@ export default function ComprasContabilidad() {
     exportColumns,
     {
       replace: "Puntos de Venta",
-      repeat: ["ID", "Nº Factura", "Proveedor", "Comedor"],
+      repeat: ["ID", "Nº Factura", "Proveedor", "Comedor", "Fecha Factura"],
       lineColumns: [
         { header: "Punto de Venta", value: (s) => posNameById[s.puntoDeVentaId] ?? `Punto de venta #${s.puntoDeVentaId}` },
         { header: "Monto PdV", value: (s) => s.monto },
