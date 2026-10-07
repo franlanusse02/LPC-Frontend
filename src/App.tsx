@@ -46,6 +46,10 @@ import EventosContabilidad from "./modules/eventos/pages/EventosContabilidad";
 import EditarEventoPage from "./modules/eventos/pages/EditarEventoPage";
 import ImportarPage from "./modules/imports/pages/ImportarPage";
 import ImportJobPage from "./modules/imports/pages/ImportJobPage";
+import CajasChicasPage from "./modules/caja-chica/pages/CajasChicasPage";
+import ConceptosCajaChicaPage from "./modules/caja-chica/pages/ConceptosCajaChicaPage";
+import CajaChicaDetallePage from "./modules/caja-chica/pages/CajaChicaDetallePage";
+import CargarCajaChicaPage from "./modules/caja-chica/pages/CargarCajaChicaPage";
 
 import CargaDatosDashboard from "@/modules/analytics/pages/CargaDatosDashboard";
 import CierresCargaDatos from "./modules/cierres/pages/CierresCargaDatos";
@@ -69,6 +73,7 @@ export default function App() {
               <Route path="/usuarios" element={<UsuariosPage />} />
               <Route path="/legajos" element={<LegajosPage />} />
               <Route path="/sociedades" element={<SociedadesPage />} />
+              <Route path="/caja-chica/conceptos" element={<ConceptosCajaChicaPage />} />
             </Route>
           </Route>
 
@@ -214,6 +219,10 @@ export default function App() {
           {/* Catalogo — any authenticated user */}
           <Route element={<ProtectedRoute />}>
             <Route element={<RootLayout />}>
+              {/* Caja chica: per-caja access is enforced by the backend */}
+              <Route path="/caja-chica" element={<CajasChicasPage />} />
+              <Route path="/caja-chica/cargar" element={<CargarCajaChicaPage />} />
+              <Route path="/caja-chica/:id" element={<CajaChicaDetallePage />} />
               <Route path="/catalogo/comedores" element={<ComedoresPage />} />
               <Route
                 path="/catalogo/puntos-de-venta"
