@@ -26,6 +26,7 @@ import {
   Upload,
   DatabaseZap,
   IdCard,
+  Wallet,
 } from "lucide-react";
 
 export default function AdminDashboard() {
@@ -72,6 +73,16 @@ export default function AdminDashboard() {
               <DatabaseZap className="h-5 w-5 text-gray-500 shrink-0" />
               <span className="text-sm font-medium text-gray-700">
                 Vista Carga Datos
+              </span>
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => navigate("/caja-chica")}
+              className="flex items-center justify-start gap-3 h-14 px-4 rounded-lg border-gray-200 hover:bg-gray-50 hover:border-gray-300"
+            >
+              <Wallet className="h-5 w-5 text-gray-500 shrink-0" />
+              <span className="text-sm font-medium text-gray-700">
+                Caja Chica
               </span>
             </Button>
           </CardContent>

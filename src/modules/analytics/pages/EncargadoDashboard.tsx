@@ -11,6 +11,7 @@ import {
   PackagePlus,
   ClipboardList,
   BanknoteArrowUp,
+  Wallet,
 } from "lucide-react";
 import { useApi } from "@/hooks/useApi";
 import { KpiCard } from "@/components/KpiCard";
@@ -27,6 +28,7 @@ const ACCESO_ITEMS: ModuleButton[] = [
   { icon: PackagePlus, label: "Cargar Compras", to: "/encargado/compras" },
   { icon: CalendarPlus, label: "Cargar Eventos", to: "/encargado/eventos" },
   { icon: ClipboardList, label: "Cargar Consumos", to: "/encargado/consumos" },
+  { icon: Wallet, label: "Caja Chica", to: "/caja-chica" },
 ];
 
 export default function EncargadoDashboard() {

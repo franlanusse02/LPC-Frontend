@@ -23,6 +23,7 @@ import {
   FileText,
   FolderTree,
   BookOpen,
+  Wallet,
 } from "lucide-react";
 import TotalesContabilidad from "@/modules/analytics/components/totales";
 import { ModuleButtonGrid, type ModuleButton } from "@/modules/analytics/components/ModuleButtonGrid";
@@ -40,6 +41,7 @@ const ACCESO_ITEMS: ModuleButton[] = [
   { icon: PackagePlus, label: "Ver Compras", to: "/contabilidad/compras" },
   { icon: CalendarPlus, label: "Ver Eventos", to: "/contabilidad/eventos" },
   { icon: ClipboardList, label: "Ver Consumos", to: "/contabilidad/consumos" },
+  { icon: Wallet, label: "Caja Chica", to: "/caja-chica" },
 ];
 
 const CONFIG_ITEMS: ModuleButton[] = [
