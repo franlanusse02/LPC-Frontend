@@ -40,17 +40,24 @@ const FILTROS_VACIOS: Filtros = {
 
 const formatFecha = (iso: string) => iso.split("-").reverse().join("/");
 
+// Keyed by id so jumping to a contraparte caja starts from a clean state.
 export default function CajaChicaDetallePage() {
   const { id } = useParams();
+  return <CajaChicaDetalle key={id} id={id} />;
+}
+
+function CajaChicaDetalle({ id }: { id: string | undefined }) {
   const navigate = useNavigate();
   const { session } = useAuth();
   const { get, post, patch } = useApi();
   const isAdmin = session?.rol === "ADMIN";
+  const puedeReflejar = isAdmin || session?.rol === "CONTABILIDAD";
   const usuarioId = session ? decodeJwtSub(session.token) : null;
 
   const [caja, setCaja] = useState<CajaChicaResponse | null>(null);
   const [noEncontrada, setNoEncontrada] = useState(false);
   const [conceptos, setConceptos] = useState<ConceptoCajaChicaResponse[]>([]);
+  const [otrasCajas, setOtrasCajas] = useState<CajaChicaResponse[]>([]);
   const [pageData, setPageData] = useState<MovimientoCajaChicaPage | null>(null);
   const [page, setPage] = useState(0);
   const [size, setSize] = useState(50);
@@ -95,6 +102,15 @@ export default function CajaChicaDetallePage() {
   }, [cargarCaja, get]);
 
   useEffect(() => {
+    if (!puedeReflejar) return;
+    get("/cajas-chicas")
+      .then((r) => r.json())
+      .then((cajas: CajaChicaResponse[]) =>
+        setOtrasCajas(cajas.filter((c) => c.activa && String(c.id) !== id)),
+      );
+  }, [get, id, puedeReflejar]);
+
+  useEffect(() => {
     cargarMovimientos();
   }, [cargarMovimientos]);
 
@@ -105,7 +121,11 @@ export default function CajaChicaDetallePage() {
 
   const handleNuevo = async (body: CreateMovimientoCajaChicaRequest) => {
     await post(`/cajas-chicas/${id}/movimientos`, body);
-    toast.success(body.tipo === "INGRESO" ? "Ingreso cargado" : "Egreso cargado");
+    const destino = otrasCajas.find((c) => c.id === body.cajaContraparteId);
+    toast.success(
+      (body.tipo === "INGRESO" ? "Ingreso cargado" : "Egreso cargado") +
+        (destino ? ` y reflejado en ${destino.nombre}` : ""),
+    );
     setNuevoOpen(false);
     await Promise.all([cargarCaja(), cargarMovimientos()]);
   };
@@ -279,7 +299,18 @@ export default function CajaChicaDetallePage() {
                   className={`border-b ${m.anulado ? "bg-gray-50 text-gray-400" : "hover:bg-gray-50/60"}`}
                 >
                   <td className="px-6 py-3 text-sm whitespace-nowrap">{formatFecha(m.fecha)}</td>
-                  <td className="px-6 py-3 text-sm font-medium">{m.conceptoNombre}</td>
+                  <td className="px-6 py-3 text-sm font-medium">
+                    {m.conceptoNombre}
+                    {m.contraparteCajaId && (
+                      <button
+                        type="button"
+                        className="block text-xs font-normal text-blue-600 hover:underline"
+                        onClick={() => navigate(`/caja-chica/${m.contraparteCajaId}`)}
+                      >
+                        {m.tipo === "EGRESO" ? "→ a" : "← de"} {m.contraparteCajaNombre}
+                      </button>
+                    )}
+                  </td>
                   <td className="px-6 py-3 text-sm">
                     {m.detalle}
                     {m.anulado && (
@@ -346,6 +377,7 @@ export default function CajaChicaDetallePage() {
               conceptos={conceptos}
               onSubmit={handleNuevo}
               onCancel={() => setNuevoOpen(false)}
+              contrapartes={puedeReflejar ? otrasCajas : undefined}
             />
           </div>
         </div>
@@ -359,6 +391,8 @@ export default function CajaChicaDetallePage() {
               {anulando.tipo === "INGRESO" ? "Ingreso" : "Egreso"} de {formatMonto(anulando.monto)}{" "}
               del {formatFecha(anulando.fecha)} ({anulando.conceptoNombre}). Deja de contar en el
               saldo.
+              {anulando.contraparteCajaNombre &&
+                ` También se anula su contraparte en ${anulando.contraparteCajaNombre}.`}
             </p>
             <label className="mb-1 block text-sm font-medium">Motivo</label>
             <Input value={motivo} onChange={(e) => setMotivo(e.target.value)} autoFocus />
