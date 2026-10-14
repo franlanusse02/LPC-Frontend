@@ -16,15 +16,18 @@ type Props = {
   onSubmit: (body: CreateMovimientoCajaChicaRequest) => Promise<void>;
   onCancel?: () => void;
   disabled?: boolean;
+  // Other cajas this movimiento can be reflected into; omit to hide the option.
+  contrapartes?: { id: number; nombre: string }[];
 };
 
 // Shared by the caja detail dialog and the CARGA_DATOS screen.
-export function MovimientoCajaChicaForm({ conceptos, onSubmit, onCancel, disabled }: Props) {
+export function MovimientoCajaChicaForm({ conceptos, onSubmit, onCancel, disabled, contrapartes }: Props) {
   const [tipo, setTipo] = useState<TipoMovimientoCajaChica>("EGRESO");
   const [monto, setMonto] = useState("");
   const [fecha, setFecha] = useState(hoy);
   const [conceptoId, setConceptoId] = useState("");
   const [detalle, setDetalle] = useState("");
+  const [contraparteId, setContraparteId] = useState("");
   const [saving, setSaving] = useState(false);
 
   const activos = conceptos.filter((c) => c.activo);
@@ -57,10 +60,12 @@ export function MovimientoCajaChicaForm({ conceptos, onSubmit, onCancel, disable
         fecha,
         conceptoId: concepto.id,
         detalle: detalle.trim() || null,
+        cajaContraparteId: contraparteId ? Number(contraparteId) : null,
       });
       setMonto("");
       setConceptoId("");
       setDetalle("");
+      setContraparteId("");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "No se pudo guardar el movimiento.");
     } finally {
@@ -132,6 +137,22 @@ export function MovimientoCajaChicaForm({ conceptos, onSubmit, onCancel, disable
           className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
         />
       </div>
+      {contrapartes && contrapartes.length > 0 && (
+        <div>
+          <label className="mb-1 block text-sm font-medium">
+            Reflejar como {tipo === "EGRESO" ? "ingreso" : "egreso"} en{" "}
+            <span className="text-gray-400">(opcional)</span>
+          </label>
+          <Combobox
+            options={contrapartes.map((c) => ({ value: String(c.id), label: c.nombre }))}
+            value={contraparteId}
+            onChange={setContraparteId}
+            placeholder="Ninguna otra caja"
+            clearable
+            className="w-full"
+          />
+        </div>
+      )}
       <div className="flex justify-end gap-2 pt-1">
         {onCancel && (
           <Button variant="outline" onClick={onCancel}>
