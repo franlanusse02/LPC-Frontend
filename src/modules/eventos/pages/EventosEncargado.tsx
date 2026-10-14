@@ -424,7 +424,8 @@ export default function EventosEncargado() {
         search: search || undefined,
       });
       exportToXlsx({
-        data: all,
+        // Anulados only go in the export when the user is looking at the Anulados view.
+        data: statusFilter === "ANULADO" ? all : all.filter((e) => e.estado !== "ANULADO"),
         columns: exportColumns,
         filename: segments.join("-"),
         highlightRow: (e) => e.estado === "CARGA_PARCIAL",

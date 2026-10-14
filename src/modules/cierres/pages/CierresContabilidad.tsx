@@ -208,6 +208,14 @@ export default function CierresContabilidad() {
     })),
   ];
 
+  // Anulados only go in the export when the user is looking at the Anulados view.
+  const exportCierres = (data: DetailedCierreCajaResponse[], filename: string) =>
+    exportToXlsx({
+      data: statusFilter === "anulado" ? data : data.filter((c) => !c.anulacionId),
+      columns: exportColumns,
+      filename,
+    });
+
   const handleExport = async () => {
     const segments = ["cierres"];
     if (statusFilter !== "all") segments.push(statusFilter);
@@ -220,7 +228,7 @@ export default function CierresContabilidad() {
 
     if (selection.count > 0) {
       const data = cierres.filter((c) => selection.selected.has(c.id));
-      exportToXlsx({ data, columns: exportColumns, filename: segments.join("-") });
+      exportCierres(data, segments.join("-"));
       return;
     }
 
@@ -232,7 +240,7 @@ export default function CierresContabilidad() {
         fechaInicio: listFilters.desde,
         fechaFin: listFilters.hasta,
       });
-      exportToXlsx({ data, columns: exportColumns, filename: segments.join("-") });
+      exportCierres(data, segments.join("-"));
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "No se pudo exportar");
     }

@@ -517,9 +517,13 @@ export default function ComprasContabilidad() {
     },
   );
 
+  // Anuladas only go in the export when the user is looking at the Anuladas view.
   const exportFacturas = (data: FacturaProveedorResponse[], filename: string) =>
     exportToXlsx({
-      data: flattenWithLines(data, (f) => f.puntoDeVentaComedor ?? []),
+      data: flattenWithLines(
+        statusFilter === "ANULADA" ? data : data.filter((f) => f.estado !== "ANULADA"),
+        (f) => f.puntoDeVentaComedor ?? [],
+      ),
       columns: facturaGroupedColumns,
       filename,
       boldRow: isParentRow,
@@ -606,8 +610,12 @@ export default function ComprasContabilidad() {
         search: ordenSearch || undefined,
         estado: ordenStatusFilter === "all" ? undefined : ordenStatusFilter,
       });
+      // Canceladas only go in the export when the user is looking at the Canceladas view.
       exportToXlsx({
-        data: flattenWithLines(data, (o) => o.items),
+        data: flattenWithLines(
+          ordenStatusFilter === "CANCELADA" ? data : data.filter((o) => o.estado !== "CANCELADA"),
+          (o) => o.items,
+        ),
         columns: ordenGroupedColumns,
         filename: segments.join("-"),
         boldRow: isParentRow,

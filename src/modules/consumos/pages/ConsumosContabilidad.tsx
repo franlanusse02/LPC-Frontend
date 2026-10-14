@@ -258,9 +258,10 @@ export default function ConsumosContabilidad() {
     { key: (r) => soloConsumo(r, (c) => c.actualizadoEn), header: "Actualizado en" },
   ];
 
+  // Anulados only go in the export when the user is looking at the Anulados view.
   const exportConsumos = (consumos: ConsumoResponse[], filename: string) =>
     exportToXlsx({
-      data: flattenConsumos(consumos),
+      data: flattenConsumos(statusFilter === "anulado" ? consumos : consumos.filter((c) => !c.anulacion)),
       columns: exportColumns,
       filename,
       boldRow: (r) => r.producto === null,

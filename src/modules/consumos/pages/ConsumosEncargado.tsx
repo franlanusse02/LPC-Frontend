@@ -213,7 +213,8 @@ export default function ConsumosEncargado() {
         search: search || undefined,
       });
       exportToXlsx({
-        data: flattenConsumos(data),
+        // Anulados only go in the export when the user is looking at the Anulados view.
+        data: flattenConsumos(statusFilter === "anulado" ? data : data.filter((c) => !c.anulacion)),
         columns: exportColumns,
         filename: segments.join("-"),
         boldRow: (r) => r.producto === null,

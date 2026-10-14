@@ -153,7 +153,11 @@ export default function CierresPage() {
         fechaInicio: listFilters.desde,
         fechaFin: listFilters.hasta,
       });
-      exportToXlsx({ data, columns: exportColumns, filename: segments.join("-") });
+      exportToXlsx({
+        data: statusFilter === "anulado" ? data : data.filter((c) => !c.anulacionId),
+        columns: exportColumns,
+        filename: segments.join("-"),
+      });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "No se pudo exportar");
     }

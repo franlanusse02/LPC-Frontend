@@ -656,9 +656,13 @@ export default function EventosContabilidad() {
     [activeTab, comedorNameById, puntoDeVentaNameById],
   );
 
+  // Anulados only go in the export when the user is looking at the Anulados view.
   const exportEventos = (data: EventoResponse[], filename: string) =>
     exportToXlsx({
-      data: flattenWithLines(data, (e) => e.servicios),
+      data: flattenWithLines(
+        statusFilter === "ANULADO" ? data : data.filter((e) => e.estado !== "ANULADO"),
+        (e) => e.servicios,
+      ),
       columns: exportColumns,
       filename,
       boldRow: isParentRow,
