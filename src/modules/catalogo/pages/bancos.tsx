@@ -26,8 +26,8 @@ export default function BancosPage() {
 
   useEffect(() => {
     Promise.all([
-      get("/bancos").then((r) => r.json()),
-      get("/sociedades").then((r) => r.json()),
+      get("/catalogo/bancos").then((r) => r.json()),
+      get("/catalogo/sociedades").then((r) => r.json()),
     ]).then(([bancosData, sociedadesData]) => {
       setBancos(bancosData);
       setSociedades(sociedadesData);
@@ -56,8 +56,8 @@ export default function BancosPage() {
     try {
       const body = { nombre: nombre.trim(), sociedadId: Number(sociedadId) };
       const res = editing
-        ? await patch(`/bancos/${editing.id}`, body)
-        : await post("/bancos", body);
+        ? await patch(`/catalogo/bancos/${editing.id}`, body)
+        : await post("/catalogo/bancos", body);
       const saved = await res.json();
       setBancos((prev) =>
         editing

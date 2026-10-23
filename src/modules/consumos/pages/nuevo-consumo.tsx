@@ -40,9 +40,9 @@ export default function NuevoConsumoPage({ basePath = "/encargado" }: { basePath
 
   useEffect(() => {
     Promise.all([
-      get("/comedores").then((r) => r.json()),
+      get("/catalogo/comedores").then((r) => r.json()),
       get("/consumos/consumidores/all").then((r) => r.json()),
-      get("/comedores/puntos-de-venta").then((r) => r.json()),
+      get("/catalogo/comedores/puntos-de-venta").then((r) => r.json()),
       get("/consumos/productos").then((r) => r.json()),
     ]).then(([comedoresData, consumidoresData, pvData, productosData]) => {
       setComedores(comedoresData);

@@ -65,7 +65,7 @@ export default function CierresContabilidad() {
   const [stats, setStats] = useState<CierreCajaStatsResponse | null>(null);
 
   const cierres = pageData?.content ?? [];
-  const { exporting, fetchAll } = useExportAll<DetailedCierreCajaResponse>("/cierres");
+  const { exporting, fetchAll } = useExportAll<DetailedCierreCajaResponse>("/tesoreria/cierres");
 
   const [anularCierreModalOpen, setAnularCierreModalOpen] = useState(false);
   const [selectedCierre, setSelectedCierre] =
@@ -106,7 +106,7 @@ export default function CierresContabilidad() {
       size,
       sort: `${sortKey},${sortDir}`,
     });
-    return get(`/cierres${qs}`).then((r) => r.json()).then(setPageData);
+    return get(`/tesoreria/cierres${qs}`).then((r) => r.json()).then(setPageData);
   }, [get, listFilters.comedorId, listFilters.puntoDeVentaIds, listFilters.desde, listFilters.hasta, statusFilter, page, size, sortKey, sortDir]);
 
   const fetchStats = useCallback(() => {
@@ -116,11 +116,11 @@ export default function CierresContabilidad() {
       fechaInicio: listFilters.desde,
       fechaFin: listFilters.hasta,
     });
-    return get(`/cierres/stats${qs}`).then((r) => r.json()).then(setStats);
+    return get(`/tesoreria/cierres/stats${qs}`).then((r) => r.json()).then(setStats);
   }, [get, listFilters.comedorId, listFilters.puntoDeVentaIds, listFilters.desde, listFilters.hasta]);
 
   useEffect(() => {
-    get("/comedores").then((r) => r.json()).then(setComedores);
+    get("/catalogo/comedores").then((r) => r.json()).then(setComedores);
   }, [get]);
 
   useEffect(() => {
@@ -132,7 +132,7 @@ export default function CierresContabilidad() {
   }, [fetchStats]);
 
   const handleAnularCierre = async (id: number, motivo: string) => {
-    const res = await del(`/cierres/${id}`, { body: JSON.stringify({ motivo }) });
+    const res = await del(`/tesoreria/cierres/${id}`, { body: JSON.stringify({ motivo }) });
     setSelectedCierre(null);
     setAnularCierreModalOpen(false);
     if (res.ok) {
@@ -159,7 +159,7 @@ export default function CierresContabilidad() {
   const selectableIds = cierres.filter((c) => !c.anulacionId).map((c) => c.id);
 
   const handleBulkAnular = async () => {
-    const res = await post("/cierres/bulk/anular", {
+    const res = await post("/tesoreria/cierres/bulk/anular", {
       ids: [...selection.selected],
       motivo: bulkMotivo,
     }).then((r) => r.json() as Promise<BulkActionResponse>);

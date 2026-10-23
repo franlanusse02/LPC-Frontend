@@ -51,12 +51,12 @@ export function NuevoItemProveedorModal({ open, onClose, proveedorId, onCreated 
     setGrupo(""); setFamilia(""); setCodigo(""); setCodigoLocked(false);
     setNombre(""); setUnidadMedida(""); setPrecioUnitario("");
     setSearchTerm(""); setResults([]); setShowResults(false);
-    get("/articulos/codificacion/grupos").then((r) => r.json()).then(setGrupos);
+    get("/compras/articulos/codificacion/grupos").then((r) => r.json()).then(setGrupos);
   }, [open, get]);
 
   useEffect(() => {
     if (!grupo) { setFamilias([]); return; }
-    get(`/articulos/codificacion/grupos/${grupo}/familias`)
+    get(`/compras/articulos/codificacion/grupos/${grupo}/familias`)
       .then((r) => r.json())
       .then(setFamilias);
   }, [grupo, get]);
@@ -68,7 +68,7 @@ export function NuevoItemProveedorModal({ open, onClose, proveedorId, onCreated 
     let ignore = false;
     setSearching(true);
     const t = setTimeout(() => {
-      get(`/articulos/codificacion/buscar?q=${encodeURIComponent(q)}`)
+      get(`/compras/articulos/codificacion/buscar?q=${encodeURIComponent(q)}`)
         .then((r) => r.json())
         .then((d: CatalogoArticuloResponse[]) => { if (!ignore) setResults(Array.isArray(d) ? d : []); })
         .catch(() => { if (!ignore) setResults([]); })
@@ -88,7 +88,7 @@ export function NuevoItemProveedorModal({ open, onClose, proveedorId, onCreated 
     setFamilia(value);
     setCodigoLocked(false);
     if (!grupo || !value) { setCodigo(""); return; }
-    get(`/articulos/codificacion/next-codigo?grupo=${grupo}&familia=${value}`)
+    get(`/compras/articulos/codificacion/next-codigo?grupo=${grupo}&familia=${value}`)
       .then((r) => r.json())
       .then((d: { codigo: string }) => setCodigo(d.codigo))
       .catch(() => setCodigo(""));
@@ -119,7 +119,7 @@ export function NuevoItemProveedorModal({ open, onClose, proveedorId, onCreated 
         precioUnitario: Number(precioUnitario),
       };
       const saved: ProveedorItemResponse = await post(
-        `/proveedores/${proveedorId}/items`,
+        `/compras/proveedores/${proveedorId}/items`,
         body,
       ).then((r) => r.json());
       toast("Artículo creado", { description: `${saved.codigo ?? ""} ${saved.nombre}`.trim() });

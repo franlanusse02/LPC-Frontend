@@ -28,7 +28,7 @@ export default function ConceptosCajaChicaPage() {
   const [activo, setActivo] = useState(true);
 
   useEffect(() => {
-    get("/cajas-chicas/conceptos")
+    get("/tesoreria/cajas-chicas/conceptos")
       .then((r) => r.json())
       .then(setConceptos);
   }, [get]);
@@ -69,11 +69,11 @@ export default function ConceptosCajaChicaPage() {
           requiereDetalle,
           activo,
         };
-        reemplazar(await (await patch(`/cajas-chicas/conceptos/${editing.id}`, body)).json());
+        reemplazar(await (await patch(`/tesoreria/cajas-chicas/conceptos/${editing.id}`, body)).json());
         toast.success("Concepto actualizado");
       } else {
         const body: CreateConceptoCajaChicaRequest = { nombre: nombre.trim(), requiereDetalle };
-        reemplazar(await (await post("/cajas-chicas/conceptos", body)).json());
+        reemplazar(await (await post("/tesoreria/cajas-chicas/conceptos", body)).json());
         toast.success("Concepto creado");
       }
       setModalOpen(false);

@@ -35,7 +35,7 @@ export default function ConsumidoresPage() {
   useEffect(() => {
     Promise.all([
       get("/consumos/consumidores/all").then((r) => r.json()),
-      get("/comedores").then((r) => r.json()),
+      get("/catalogo/comedores").then((r) => r.json()),
     ]).then(([consumidoresData, comedoresData]) => {
       setConsumidores(consumidoresData);
       setComedores(comedoresData);

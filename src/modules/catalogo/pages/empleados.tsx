@@ -41,8 +41,8 @@ export default function EmpleadosPage() {
 
   useEffect(() => {
     Promise.all([
-      get("/comedores/empleados").then((r) => r.json()),
-      get("/comedores").then((r) => r.json()),
+      get("/catalogo/comedores/empleados").then((r) => r.json()),
+      get("/catalogo/comedores").then((r) => r.json()),
     ]).then(([empleadosData, comedoresData]) => {
       setEmpleados(empleadosData);
       setComedores(comedoresData);
@@ -55,8 +55,8 @@ export default function EmpleadosPage() {
       return;
     }
     Promise.all([
-      get(`/comedores/centros-costo?comedorId=${comedorId}`).then((r) => r.json()),
-      get(`/comedores/partidas?comedorId=${comedorId}`).then((r) => r.json()),
+      get(`/catalogo/comedores/centros-costo?comedorId=${comedorId}`).then((r) => r.json()),
+      get(`/catalogo/comedores/partidas?comedorId=${comedorId}`).then((r) => r.json()),
     ]).then(([ccData, pData]) => {
       setComedorDeps({ centrosCosto: ccData, partidas: pData });
     });
@@ -132,8 +132,8 @@ export default function EmpleadosPage() {
         partidaId: partidaId ? Number(partidaId) : null,
       };
       const res = editing
-        ? await patch(`/comedores/empleados/${editing.id}`, body)
-        : await post("/comedores/empleados", body);
+        ? await patch(`/catalogo/comedores/empleados/${editing.id}`, body)
+        : await post("/catalogo/comedores/empleados", body);
       const saved = (await res.json()) as EmpleadoComedorResponse;
       setEmpleados((prev) =>
         editing
@@ -152,7 +152,7 @@ export default function EmpleadosPage() {
   const handleDelete = async () => {
     if (!deleteTarget) return;
     try {
-      await del(`/comedores/empleados/${deleteTarget.id}`);
+      await del(`/catalogo/comedores/empleados/${deleteTarget.id}`);
       setEmpleados((prev) => (prev ?? []).filter((e) => e.id !== deleteTarget.id));
       toast.success("Empleado eliminado");
       setDeleteTarget(null);

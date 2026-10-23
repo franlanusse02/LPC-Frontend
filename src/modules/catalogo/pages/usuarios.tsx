@@ -68,8 +68,8 @@ export default function UsuariosPage() {
 
   useEffect(() => {
     Promise.all([
-      get("/usuarios").then((r) => r.json()),
-      get("/legajos").then((r) => r.json()),
+      get("/identity/usuarios").then((r) => r.json()),
+      get("/rrhh/legajos").then((r) => r.json()),
     ]).then(([usuariosData, legajosData]) => {
       setUsuarios(usuariosData);
       setLegajos(legajosData);
@@ -126,12 +126,12 @@ export default function UsuariosPage() {
     try {
       if (editing) {
         const body: PatchUsuarioRequest = { rol, ...(password ? { password } : {}) };
-        const saved = (await (await patch(`/usuarios/${editing.id}`, body)).json()) as UsuarioResponse;
+        const saved = (await (await patch(`/identity/usuarios/${editing.id}`, body)).json()) as UsuarioResponse;
         setUsuarios((prev) => prev.map((u) => (u.id === saved.id ? saved : u)));
         toast.success("Usuario actualizado");
       } else {
         const body: RegisterRequest = { legajoId: Number(legajoId), rol, password };
-        const res = await post("/usuarios/register", body);
+        const res = await post("/identity/usuarios/register", body);
         const saved = (await res.json()) as UsuarioResponse;
         setUsuarios((prev) => [...prev.filter((u) => u.id !== saved.id), saved]);
         setLegajoUsuario(Number(legajoId), saved.id);
@@ -149,7 +149,7 @@ export default function UsuariosPage() {
   const handleDelete = async () => {
     if (!deleting) return;
     try {
-      await del(`/usuarios/${deleting.id}`);
+      await del(`/identity/usuarios/${deleting.id}`);
       setUsuarios((prev) => prev.filter((u) => u.id !== deleting.id));
       setLegajos((prev) => prev.map((l) => (l.usuarioId === deleting.id ? { ...l, usuarioId: null } : l)));
       toast.success("Usuario eliminado");

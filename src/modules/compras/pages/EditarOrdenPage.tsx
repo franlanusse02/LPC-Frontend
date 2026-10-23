@@ -38,7 +38,7 @@ export default function EditarOrdenPage({ basePath = "/contabilidad" }: { basePa
 
   useEffect(() => {
     if (!id) return;
-    get(`/ordenes-de-compra/${id}`).then((r) => r.json()).then(setOrden);
+    get(`/compras/ordenes-de-compra/${id}`).then((r) => r.json()).then(setOrden);
   }, [id, get]);
 
   useEffect(() => {
@@ -52,7 +52,7 @@ export default function EditarOrdenPage({ basePath = "/contabilidad" }: { basePa
     setDescuento(orden.descuento ? String(orden.descuento) : "");
     setObservaciones(orden.observaciones ?? "");
     setLines(orden.items.map((i) => ({ proveedorItemId: String(i.proveedorItemId), cantidad: String(i.cantidad) })));
-    get(`/proveedores/${orden.proveedorId}/items`)
+    get(`/compras/proveedores/${orden.proveedorId}/items`)
       .then((r) => r.json())
       .then((data: ProveedorItemResponse[]) => setItems(Array.isArray(data) ? data : []));
   }, [orden, get]);
@@ -114,7 +114,7 @@ export default function EditarOrdenPage({ basePath = "/contabilidad" }: { basePa
         observaciones: observaciones.trim() || null,
         items: lines.map((l) => ({ proveedorItemId: Number(l.proveedorItemId), cantidad: Number(l.cantidad) })),
       };
-      await patch(`/ordenes-de-compra/${id}`, req);
+      await patch(`/compras/ordenes-de-compra/${id}`, req);
       toast("Orden actualizada");
       navigate(`${basePath}/compras`);
     } catch (err) {

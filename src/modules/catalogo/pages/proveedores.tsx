@@ -28,7 +28,7 @@ export default function ProveedoresPage() {
   const [nuevoPunto, setNuevoPunto] = useState("");
 
   useEffect(() => {
-    get("/proveedores").then((r) => r.json()).then((data) => {
+    get("/compras/proveedores").then((r) => r.json()).then((data) => {
       setProveedores(data);
       setLoading(false);
     });
@@ -43,8 +43,8 @@ export default function ProveedoresPage() {
     try {
       const body = { nombre: nombre.trim(), taxId: taxId.trim(), formaDePagoPredeterminada: formaPago || null, puntosDeVenta: selectedPuntos };
       const res = editing
-        ? await patch(`/proveedores/${editing.id}`, body)
-        : await post("/proveedores", body);
+        ? await patch(`/compras/proveedores/${editing.id}`, body)
+        : await post("/compras/proveedores", body);
       const saved = (await res.json());
       setProveedores((prev) => editing ? prev.map((p) => (p.id === saved.id ? saved : p)) : [...prev, saved]);
       toast.success(editing ? "Proveedor actualizado" : "Proveedor creado");

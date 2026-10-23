@@ -59,7 +59,7 @@ export default function NuevaFacturaPage({ basePath = "/encargado" }: { basePath
   const [posLineas, setPosLineas] = useState<PosLinea[]>([]);
 
   useEffect(() => {
-    Promise.all([get("/proveedores"), get("/comedores")]).then(
+    Promise.all([get("/compras/proveedores"), get("/catalogo/comedores")]).then(
       ([proveedores, comedores]) => {
         proveedores.json().then(setProveedores);
         comedores.json().then(setComedores);
@@ -179,7 +179,7 @@ export default function NuevaFacturaPage({ basePath = "/encargado" }: { basePath
         medioPago: medioPago || undefined,
       };
 
-      await post("/facturas/proveedor", req);
+      await post("/compras/facturas/proveedor", req);
 
       toast("Factura creada", {
         description: `Factura ${numero} creada exitosamente.`,

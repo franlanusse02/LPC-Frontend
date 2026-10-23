@@ -47,7 +47,7 @@ export function EditarItemProveedorModal({ open, onClose, item, onSaved }: Props
         precioUnitario: Number(precioUnitario),
       };
       const saved: ProveedorItemResponse = await patch(
-        `/proveedores/${item.proveedorId}/items/${item.id}`,
+        `/compras/proveedores/${item.proveedorId}/items/${item.id}`,
         body,
       ).then((r) => r.json());
       toast("Artículo actualizado");

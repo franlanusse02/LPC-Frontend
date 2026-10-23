@@ -77,8 +77,8 @@ export default function ConsumosEncargado() {
   useEffect(() => {
     Promise.all([
       get("/consumos/consumidores/all"),
-      get("/comedores/puntos-de-venta"),
-      get("/comedores"),
+      get("/catalogo/comedores/puntos-de-venta"),
+      get("/catalogo/comedores"),
     ]).then(([consumidoresRes, pvRes, comedoresRes]) => {
       consumidoresRes.json().then(setConsumidores);
       pvRes.json().then(setPuntosDeVenta);

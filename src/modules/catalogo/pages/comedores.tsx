@@ -32,8 +32,8 @@ export default function ComedoresPage() {
 
   useEffect(() => {
     Promise.all([
-      get("/comedores").then((r) => r.json()),
-      get("/sociedades").then((r) => r.json()),
+      get("/catalogo/comedores").then((r) => r.json()),
+      get("/catalogo/sociedades").then((r) => r.json()),
     ]).then(([comedoresData, sociedadesData]) => {
       setComedores(comedoresData);
       setSociedades(sociedadesData);
@@ -82,8 +82,8 @@ export default function ComedoresPage() {
     try {
       const body = { nombre: nombre.trim(), sociedadId: Number(sociedadId) };
       const res = editing
-        ? await patch(`/comedores/${editing.id}`, body)
-        : await post("/comedores", body);
+        ? await patch(`/catalogo/comedores/${editing.id}`, body)
+        : await post("/catalogo/comedores", body);
       const saved = (await res.json()) as ComedorResponse;
       setComedores((prev) =>
         editing

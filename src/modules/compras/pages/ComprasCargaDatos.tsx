@@ -114,12 +114,12 @@ export default function ComprasCargaDatos() {
       size: ordenSize,
       sort: `${ordenSortKey},${ordenSortDir}`,
     });
-    return get(`/ordenes-de-compra/mis-ordenes${qs}`).then((r) => r.json()).then(setOrdenPageData);
+    return get(`/compras/ordenes-de-compra/mis-ordenes${qs}`).then((r) => r.json()).then(setOrdenPageData);
   }, [get, ordenSearch, ordenStatusFilter, ordenPage, ordenSize, ordenSortKey, ordenSortDir]);
 
   const fetchOrdenStats = useCallback(() => {
     const qs = buildQuery({ search: ordenSearch || undefined });
-    return get(`/ordenes-de-compra/mis-ordenes/stats${qs}`).then((r) => r.json()).then(setOrdenStats);
+    return get(`/compras/ordenes-de-compra/mis-ordenes/stats${qs}`).then((r) => r.json()).then(setOrdenStats);
   }, [get, ordenSearch]);
 
   useEffect(() => {
@@ -131,11 +131,11 @@ export default function ComprasCargaDatos() {
   }, [fetchOrdenStats]);
 
   useEffect(() => {
-    get("/comedores").then((r) => r.json()).then(setComedores);
+    get("/catalogo/comedores").then((r) => r.json()).then(setComedores);
   }, [get]);
 
   useEffect(() => {
-    get("/proveedores").then((r) => r.json()).then(setProveedores);
+    get("/compras/proveedores").then((r) => r.json()).then(setProveedores);
   }, [get]);
 
   const handleStatusChange = (next: StatusFilter) => {
@@ -165,12 +165,12 @@ export default function ComprasCargaDatos() {
       size,
       sort: `${SORT_KEY_TO_ENTITY[sortKey] ?? sortKey},${sortDir}`,
     });
-    return get(`/facturas/proveedor/mis-facturas${qs}`).then((r) => r.json()).then(setPageData);
+    return get(`/compras/facturas/proveedor/mis-facturas${qs}`).then((r) => r.json()).then(setPageData);
   }, [get, search, statusFilter, page, size, sortKey, sortDir]);
 
   const fetchStats = useCallback(() => {
     const qs = buildQuery({ search: search || undefined });
-    return get(`/facturas/proveedor/mis-facturas/stats${qs}`).then((r) => r.json()).then(setStats);
+    return get(`/compras/facturas/proveedor/mis-facturas/stats${qs}`).then((r) => r.json()).then(setStats);
   }, [get, search]);
 
   useEffect(() => {
@@ -183,7 +183,7 @@ export default function ComprasCargaDatos() {
 
   const handleDownloadPdf = async (o: OrdenDeCompraResponse) => {
     try {
-      await downloadPdf(get, `/ordenes-de-compra/${o.id}/pdf`, `orden-${o.nroOrden}.pdf`);
+      await downloadPdf(get, `/compras/ordenes-de-compra/${o.id}/pdf`, `orden-${o.nroOrden}.pdf`);
     } catch {
       toast.error("No se pudo descargar el PDF");
     }

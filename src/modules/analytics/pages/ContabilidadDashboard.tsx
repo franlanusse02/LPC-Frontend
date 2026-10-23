@@ -67,7 +67,7 @@ export default function ContabilidadDashboard() {
   const [filters, setFilters] = useState<ListFilterState>(defaultFilters);
 
   useEffect(() => {
-    Promise.all([get("/comedores"), get("/sociedades")]).then(
+    Promise.all([get("/catalogo/comedores"), get("/catalogo/sociedades")]).then(
       ([comedoresRes, sociedadesRes]) => {
         comedoresRes.json().then(setComedores);
         sociedadesRes.json().then(setSociedades);

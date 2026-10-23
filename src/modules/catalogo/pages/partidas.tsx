@@ -33,8 +33,8 @@ export default function PartidasPage() {
 
   useEffect(() => {
     Promise.all([
-      get("/comedores/partidas").then((r) => r.json()),
-      get("/comedores").then((r) => r.json()),
+      get("/catalogo/comedores/partidas").then((r) => r.json()),
+      get("/catalogo/comedores").then((r) => r.json()),
     ]).then(([data, comedoresData]) => {
       setItems(data);
       setComedores(comedoresData);
@@ -76,8 +76,8 @@ export default function PartidasPage() {
     setSaving(true);
     try {
       const res = editing
-        ? await patch(`/comedores/partidas/${editing.id}`, { nombre: nombre.trim() })
-        : await post("/comedores/partidas", { nombre: nombre.trim(), comedorId: Number(comedorId) });
+        ? await patch(`/catalogo/comedores/partidas/${editing.id}`, { nombre: nombre.trim() })
+        : await post("/catalogo/comedores/partidas", { nombre: nombre.trim(), comedorId: Number(comedorId) });
       const saved = (await res.json()) as PartidaResponse;
       setItems((prev) =>
         editing ? (prev ?? []).map((i) => (i.id === saved.id ? saved : i)) : [...(prev ?? []), saved],
@@ -93,7 +93,7 @@ export default function PartidasPage() {
 
   const handleToggleActivo = async (item: PartidaResponse) => {
     try {
-      const res = await patch(`/comedores/partidas/${item.id}`, { activo: !item.activo });
+      const res = await patch(`/catalogo/comedores/partidas/${item.id}`, { activo: !item.activo });
       const saved = (await res.json()) as PartidaResponse;
       setItems((prev) => (prev ?? []).map((i) => (i.id === saved.id ? saved : i)));
       toast.success(saved.activo ? "Activada" : "Desactivada");

@@ -49,7 +49,7 @@ export default function CierresPage() {
   const [stats, setStats] = useState<CierreCajaStatsResponse | null>(null);
 
   const cierres = pageData?.content ?? [];
-  const { exporting, fetchAll } = useExportAll<DetailedCierreCajaResponse>("/cierres/mine");
+  const { exporting, fetchAll } = useExportAll<DetailedCierreCajaResponse>("/tesoreria/cierres/mine");
 
   const [anularModalOpen, setAnularModalOpen] = useState(false);
   const [selectedCierre, setSelectedCierre] =
@@ -90,7 +90,7 @@ export default function CierresPage() {
       size,
       sort: `${sortKey},${sortDir}`,
     });
-    return get(`/cierres/mine${qs}`).then((r) => r.json()).then(setPageData);
+    return get(`/tesoreria/cierres/mine${qs}`).then((r) => r.json()).then(setPageData);
   }, [get, listFilters.comedorId, listFilters.puntoDeVentaIds, listFilters.desde, listFilters.hasta, statusFilter, page, size, sortKey, sortDir]);
 
   const fetchStats = useCallback(() => {
@@ -100,11 +100,11 @@ export default function CierresPage() {
       fechaInicio: listFilters.desde,
       fechaFin: listFilters.hasta,
     });
-    return get(`/cierres/mine/stats${qs}`).then((r) => r.json()).then(setStats);
+    return get(`/tesoreria/cierres/mine/stats${qs}`).then((r) => r.json()).then(setStats);
   }, [get, listFilters.comedorId, listFilters.puntoDeVentaIds, listFilters.desde, listFilters.hasta]);
 
   useEffect(() => {
-    get("/comedores").then((r) => r.json()).then(setComedores);
+    get("/catalogo/comedores").then((r) => r.json()).then(setComedores);
   }, [get]);
 
   useEffect(() => {
@@ -124,7 +124,7 @@ export default function CierresPage() {
   const expansion = useExpandableRows();
 
   const handleAnular = async (id: number, motivo: string) => {
-    await del(`/cierres/${id}`, { body: JSON.stringify({ motivo }) });
+    await del(`/tesoreria/cierres/${id}`, { body: JSON.stringify({ motivo }) });
     setSelectedCierre(null);
     setAnularModalOpen(false);
     fetchList();

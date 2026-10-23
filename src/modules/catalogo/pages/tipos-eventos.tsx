@@ -37,7 +37,7 @@ export default function TiposEventoPage() {
   useEffect(() => {
     Promise.all([
       get("/eventos/tipos").then((r) => r.json()),
-      get("/comedores").then((r) => r.json()),
+      get("/catalogo/comedores").then((r) => r.json()),
     ]).then(([tiposData, comedoresData]) => {
       setTipos(
         tiposData.sort((a: any, b: any) => a.nombre.localeCompare(b.nombre)),

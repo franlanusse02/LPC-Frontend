@@ -47,7 +47,7 @@ export default function LoginPage() {
       }
 
       // Login is a public endpoint — plain fetch, no auth header needed
-      const res = await fetch(`${BASE_URL}/usuarios/login`, {
+      const res = await fetch(`${BASE_URL}/identity/usuarios/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ cuil, password }),

@@ -43,7 +43,7 @@ export default function NuevoCierrePage({ basePath = "/encargado" }: { basePath?
   const [usedMedios, setUsedMedios] = useState<string[]>([]);
 
   useEffect(() => {
-    Promise.all([get("/comedores"), get("/comedores/puntos-de-venta")]).then(
+    Promise.all([get("/catalogo/comedores"), get("/catalogo/comedores/puntos-de-venta")]).then(
       ([comedores, puntosDeVenta]) => {
         comedores.json().then(setComedores);
         puntosDeVenta.json().then(setPuntosDeVenta);
@@ -102,7 +102,7 @@ export default function NuevoCierrePage({ basePath = "/encargado" }: { basePath?
 
     setLoading(true);
     try {
-      const cierre = await post("/cierres", {
+      const cierre = await post("/tesoreria/cierres", {
         puntoVentaId: Number(puntoVentaId),
         fechaOperacion,
         totalPlatosVendidos: platosVendidos,
@@ -111,7 +111,7 @@ export default function NuevoCierrePage({ basePath = "/encargado" }: { basePath?
 
       await Promise.all(
         validLines.map((line) =>
-          post("/movimientos", {
+          post("/tesoreria/movimientos", {
             cierreCajaId: cierre.id,
             medioPago: line.medioPago,
             monto: Number(line.monto),

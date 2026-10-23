@@ -81,7 +81,7 @@ export default function NuevaOrdenPage({ basePath = "/encargado" }: { basePath?:
   const req = isPlantillaMode ? "" : " *";
 
   useEffect(() => {
-    Promise.all([get("/proveedores"), get("/comedores"), get("/sociedades")]).then(
+    Promise.all([get("/compras/proveedores"), get("/catalogo/comedores"), get("/catalogo/sociedades")]).then(
       ([p, c, s]) => {
         p.json().then(setProveedores);
         c.json().then(setComedores);
@@ -95,7 +95,7 @@ export default function NuevaOrdenPage({ basePath = "/encargado" }: { basePath?:
     if (!proveedorId) { setItems([]); setLines([]); return; }
     let ignore = false;
     setLines([]);
-    get(`/proveedores/${proveedorId}/items`)
+    get(`/compras/proveedores/${proveedorId}/items`)
       .then((r) => r.json())
       .then((data: ProveedorItemResponse[]) => {
         if (ignore) return;
@@ -251,7 +251,7 @@ export default function NuevaOrdenPage({ basePath = "/encargado" }: { basePath?:
   const openSheet = () => {
     setSheetOpen(true);
     setPlantillasLoading(true);
-    get("/ordenes-de-compra/plantillas")
+    get("/compras/ordenes-de-compra/plantillas")
       .then((r) => r.json())
       .then((d: PlantillaOrdenDeCompraResponse[]) => setPlantillas(Array.isArray(d) ? d : []))
       .catch((err) => toast.error(err instanceof Error ? err.message : "No se pudieron cargar las plantillas"))
@@ -297,10 +297,10 @@ export default function NuevaOrdenPage({ basePath = "/encargado" }: { basePath?:
     try {
       const req = buildPlantillaRequest(plantillaNombre.trim());
       if (mode.kind === "plantilla-editar") {
-        await put(`/ordenes-de-compra/plantillas/${mode.id}`, req);
+        await put(`/compras/ordenes-de-compra/plantillas/${mode.id}`, req);
         toast("Plantilla actualizada", { description: req.nombre });
       } else {
-        await post("/ordenes-de-compra/plantillas", req);
+        await post("/compras/ordenes-de-compra/plantillas", req);
         toast("Plantilla creada", { description: req.nombre });
       }
       resetForm();
@@ -326,7 +326,7 @@ export default function NuevaOrdenPage({ basePath = "/encargado" }: { basePath?:
         sociedadId: Number(sociedadId),
         comedorId: Number(comedorId),
       };
-      await post("/ordenes-de-compra", req);
+      await post("/compras/ordenes-de-compra", req);
       toast("Orden de compra creada");
       navigate(`${basePath}/compras`);
     } catch (err) {

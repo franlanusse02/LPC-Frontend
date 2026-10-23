@@ -90,8 +90,8 @@ export default function ConsumosContabilidad() {
   useEffect(() => {
     Promise.all([
       get("/consumos/consumidores/all"),
-      get("/comedores/puntos-de-venta"),
-      get("/comedores"),
+      get("/catalogo/comedores/puntos-de-venta"),
+      get("/catalogo/comedores"),
       get("/consumos/agrupados"),
     ]).then(
       ([consumidoresRes, pvRes, comedoresRes, agrupadosRes]) => {

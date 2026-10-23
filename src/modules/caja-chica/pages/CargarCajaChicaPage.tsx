@@ -22,14 +22,14 @@ export default function CargarCajaChicaPage() {
   const [cajaId, setCajaId] = useState("");
 
   useEffect(() => {
-    get("/cajas-chicas/para-carga")
+    get("/tesoreria/cajas-chicas/para-carga")
       .then((r) => r.json())
       .then((data: CajaChicaParaCargaResponse[]) => {
         setCajas(data);
         if (data.length === 1) setCajaId(String(data[0].id));
       })
       .catch(() => setCajas([]));
-    get("/cajas-chicas/conceptos")
+    get("/tesoreria/cajas-chicas/conceptos")
       .then((r) => r.json())
       .then(setConceptos);
   }, [get]);
@@ -38,7 +38,7 @@ export default function CargarCajaChicaPage() {
     if (!cajaId) {
       throw new Error("Elegí la caja chica.");
     }
-    await post(`/cajas-chicas/${cajaId}/movimientos`, body);
+    await post(`/tesoreria/cajas-chicas/${cajaId}/movimientos`, body);
     const caja = cajas?.find((c) => String(c.id) === cajaId);
     toast.success(
       `${body.tipo === "INGRESO" ? "Ingreso" : "Egreso"} cargado en ${caja?.nombre ?? "la caja"}`,

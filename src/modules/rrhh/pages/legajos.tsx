@@ -53,8 +53,8 @@ export default function LegajosPage() {
 
   useEffect(() => {
     Promise.all([
-      get("/legajos").then((r) => r.json()),
-      get("/comedores").then((r) => r.json()),
+      get("/rrhh/legajos").then((r) => r.json()),
+      get("/catalogo/comedores").then((r) => r.json()),
     ]).then(([legajosData, comedoresData]) => {
       setLegajos(legajosData);
       setComedores(comedoresData);
@@ -109,7 +109,7 @@ export default function LegajosPage() {
           nombre: nombre.trim(),
           ...(comedorId ? { comedorId: Number(comedorId) } : {}),
         };
-        reemplazar((await (await patch(`/legajos/${editing.id}`, body)).json()) as LegajoResponse);
+        reemplazar((await (await patch(`/rrhh/legajos/${editing.id}`, body)).json()) as LegajoResponse);
         toast.success("Legajo actualizado");
       } else {
         const body: LegajoRequest = {
@@ -117,7 +117,7 @@ export default function LegajosPage() {
           nombre: nombre.trim(),
           comedorId: comedorId ? Number(comedorId) : null,
         };
-        const res = await post("/legajos", body);
+        const res = await post("/rrhh/legajos", body);
         reemplazar((await res.json()) as LegajoResponse);
         // 200 = this cuil belonged to a deleted legajo, which came back with its files.
         toast.success(res.status === 200 ? "Legajo reactivado" : "Legajo creado");
@@ -133,7 +133,7 @@ export default function LegajosPage() {
   const handleDelete = async () => {
     if (!deleting) return;
     try {
-      await del(`/legajos/${deleting.id}`);
+      await del(`/rrhh/legajos/${deleting.id}`);
       setLegajos((prev) => (prev ?? []).filter((l) => l.id !== deleting.id));
       toast.success(deleting.usuarioId ? "Legajo y usuario eliminados" : "Legajo eliminado");
     } catch (err) {
@@ -162,7 +162,7 @@ export default function LegajosPage() {
       const form = new FormData();
       form.append("nombre", archivoNombre.trim());
       form.append("file", archivo);
-      const res = await postFile(`/legajos/${archivosDe.id}/archivos`, form);
+      const res = await postFile(`/rrhh/legajos/${archivosDe.id}/archivos`, form);
       reemplazar((await res.json()) as LegajoResponse);
       toast.success("Archivo subido");
       setArchivoNombre("");
@@ -179,7 +179,7 @@ export default function LegajosPage() {
     try {
       await downloadPdf(
         get,
-        `/legajos/${l.id}/archivos/contenido?nombre=${encodeURIComponent(nombreArchivo)}`,
+        `/rrhh/legajos/${l.id}/archivos/contenido?nombre=${encodeURIComponent(nombreArchivo)}`,
         nombreArchivo + extension(l.archivos[nombreArchivo]),
       );
     } catch (err) {
@@ -189,7 +189,7 @@ export default function LegajosPage() {
 
   const handleQuitar = async (l: LegajoResponse, nombreArchivo: string) => {
     try {
-      const res = await del(`/legajos/${l.id}/archivos?nombre=${encodeURIComponent(nombreArchivo)}`);
+      const res = await del(`/rrhh/legajos/${l.id}/archivos?nombre=${encodeURIComponent(nombreArchivo)}`);
       reemplazar((await res.json()) as LegajoResponse);
       toast.success("Archivo eliminado");
     } catch (err) {

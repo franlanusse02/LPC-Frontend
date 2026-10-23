@@ -242,7 +242,7 @@ export default function EventosCargaDatos() {
   }, [searchInput]);
 
   useEffect(() => {
-    get("/comedores").then((r) => r.json()).then(setComedores);
+    get("/catalogo/comedores").then((r) => r.json()).then(setComedores);
   }, [get]);
 
   const comedorNameById = useMemo(

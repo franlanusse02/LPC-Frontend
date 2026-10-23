@@ -46,7 +46,7 @@ export default function ProductosPage() {
   useEffect(() => {
     Promise.all([
       get("/consumos/productos").then((r) => r.json()),
-      get("/comedores").then((r) => r.json()),
+      get("/catalogo/comedores").then((r) => r.json()),
     ]).then(([productosData, comedoresData]) => {
       setProductos(productosData);
       setComedores(comedoresData);

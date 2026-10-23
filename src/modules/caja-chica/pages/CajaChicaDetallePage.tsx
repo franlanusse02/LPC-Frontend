@@ -69,7 +69,7 @@ function CajaChicaDetalle({ id }: { id: string | undefined }) {
 
   const cargarCaja = useCallback(
     () =>
-      get(`/cajas-chicas/${id}`)
+      get(`/tesoreria/cajas-chicas/${id}`)
         .then((r) => r.json())
         .then(setCaja)
         .catch(() => setNoEncontrada(true)),
@@ -86,7 +86,7 @@ function CajaChicaDetalle({ id }: { id: string | undefined }) {
     if (filtros.hasta) params.set("hasta", filtros.hasta);
     if (filtros.tipo) params.set("tipo", filtros.tipo);
     if (filtros.conceptoId) params.set("conceptoId", filtros.conceptoId);
-    return get(`/cajas-chicas/${id}/movimientos?${params}`)
+    return get(`/tesoreria/cajas-chicas/${id}/movimientos?${params}`)
       .then((r) => r.json())
       .then(setPageData)
       .catch((err) =>
@@ -96,14 +96,14 @@ function CajaChicaDetalle({ id }: { id: string | undefined }) {
 
   useEffect(() => {
     cargarCaja();
-    get("/cajas-chicas/conceptos")
+    get("/tesoreria/cajas-chicas/conceptos")
       .then((r) => r.json())
       .then(setConceptos);
   }, [cargarCaja, get]);
 
   useEffect(() => {
     if (!puedeReflejar) return;
-    get("/cajas-chicas")
+    get("/tesoreria/cajas-chicas")
       .then((r) => r.json())
       .then((cajas: CajaChicaResponse[]) =>
         setOtrasCajas(cajas.filter((c) => c.activa && String(c.id) !== id)),
@@ -120,7 +120,7 @@ function CajaChicaDetalle({ id }: { id: string | undefined }) {
   };
 
   const handleNuevo = async (body: CreateMovimientoCajaChicaRequest) => {
-    await post(`/cajas-chicas/${id}/movimientos`, body);
+    await post(`/tesoreria/cajas-chicas/${id}/movimientos`, body);
     const destino = otrasCajas.find((c) => c.id === body.cajaContraparteId);
     toast.success(
       (body.tipo === "INGRESO" ? "Ingreso cargado" : "Egreso cargado") +
@@ -138,7 +138,7 @@ function CajaChicaDetalle({ id }: { id: string | undefined }) {
     }
     setSavingAnular(true);
     try {
-      await patch(`/cajas-chicas/movimientos/${anulando.id}/anular`, { motivo: motivo.trim() });
+      await patch(`/tesoreria/cajas-chicas/movimientos/${anulando.id}/anular`, { motivo: motivo.trim() });
       toast.success("Movimiento anulado");
       setAnulando(null);
       await Promise.all([cargarCaja(), cargarMovimientos()]);

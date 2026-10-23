@@ -65,7 +65,7 @@ export default function NuevoEventoPage({ basePath = "/encargado" }: { basePath?
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    get("/comedores").then((r) => r.json()).then(setComedores);
+    get("/catalogo/comedores").then((r) => r.json()).then(setComedores);
   }, [get]);
 
   const selectedComedor = comedores.find((c) => c.id === Number(comedorId));
@@ -83,11 +83,11 @@ export default function NuevoEventoPage({ basePath = "/encargado" }: { basePath?
       return;
     }
     Promise.all([
-      get(`/comedores/empleados?comedorId=${comedorId}`).then((r) => r.json()),
-      get(`/comedores/empleados/funcionarios?comedorId=${comedorId}`).then((r) => r.json()),
-      get(`/comedores/centros-costo?comedorId=${comedorId}`).then((r) => r.json()),
-      get(`/comedores/partidas?comedorId=${comedorId}`).then((r) => r.json()),
-      get(`/comedores/razon-social?comedorId=${comedorId}`).then((r) => r.json()),
+      get(`/catalogo/comedores/empleados?comedorId=${comedorId}`).then((r) => r.json()),
+      get(`/catalogo/comedores/empleados/funcionarios?comedorId=${comedorId}`).then((r) => r.json()),
+      get(`/catalogo/comedores/centros-costo?comedorId=${comedorId}`).then((r) => r.json()),
+      get(`/catalogo/comedores/partidas?comedorId=${comedorId}`).then((r) => r.json()),
+      get(`/catalogo/comedores/razon-social?comedorId=${comedorId}`).then((r) => r.json()),
       get(`/consumos/productos?comedorId=${comedorId}`).then((r) => r.json()),
     ]).then(([emp, func, cc, part, rs, prod]) => {
       setComedorDeps({ empleados: emp, funcionarios: func, centrosCosto: cc, partidas: part, razonesSociales: rs, productos: prod });

@@ -38,7 +38,7 @@ export default function EncargadoDashboard() {
   const [filters, setFilters] = useState<ListFilterState>(defaultFilters);
 
   useEffect(() => {
-    get("/comedores")
+    get("/catalogo/comedores")
       .then((r) => r.json())
       .then(setComedores);
   }, [get]);

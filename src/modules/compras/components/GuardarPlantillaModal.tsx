@@ -41,7 +41,7 @@ export function GuardarPlantillaModal({ open, onClose, buildRequest }: Props) {
     setSaving(true);
     setError(null);
     try {
-      await post("/ordenes-de-compra/plantillas", buildRequest(nombre.trim()));
+      await post("/compras/ordenes-de-compra/plantillas", buildRequest(nombre.trim()));
       toast("Plantilla guardada", { description: nombre.trim() });
       onClose();
     } catch (err) {

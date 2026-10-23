@@ -74,7 +74,7 @@ export default function CierresCargaDatos() {
       size,
       sort: `${sortKey},${sortDir}`,
     });
-    return get(`/cierres/mine${qs}`).then((r) => r.json()).then(setPageData);
+    return get(`/tesoreria/cierres/mine${qs}`).then((r) => r.json()).then(setPageData);
   }, [get, listFilters.comedorId, listFilters.puntoDeVentaIds, listFilters.desde, listFilters.hasta, statusFilter, page, size, sortKey, sortDir]);
 
   const fetchStats = useCallback(() => {
@@ -84,11 +84,11 @@ export default function CierresCargaDatos() {
       fechaInicio: listFilters.desde,
       fechaFin: listFilters.hasta,
     });
-    return get(`/cierres/mine/stats${qs}`).then((r) => r.json()).then(setStats);
+    return get(`/tesoreria/cierres/mine/stats${qs}`).then((r) => r.json()).then(setStats);
   }, [get, listFilters.comedorId, listFilters.puntoDeVentaIds, listFilters.desde, listFilters.hasta]);
 
   useEffect(() => {
-    get("/comedores").then((r) => r.json()).then(setComedores);
+    get("/catalogo/comedores").then((r) => r.json()).then(setComedores);
   }, [get]);
 
   useEffect(() => {

@@ -33,7 +33,7 @@ export function PlantillasSheet({ open, onOpenChange, plantillas, loading, onDel
   const handleDelete = async () => {
     if (!toDelete) return;
     try {
-      await del(`/ordenes-de-compra/plantillas/${toDelete.id}`);
+      await del(`/compras/ordenes-de-compra/plantillas/${toDelete.id}`);
       onDeleted(toDelete.id);
       toast("Plantilla eliminada", { description: toDelete.nombre });
     } catch (err) {

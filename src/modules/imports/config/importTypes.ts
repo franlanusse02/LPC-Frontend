@@ -8,7 +8,7 @@ export type ImportTypeConfig = {
 export const IMPORT_TYPES: ImportTypeConfig[] = [
   {
     key: "empleados-comedor",
-    endpoint: "/import/empleados-comedor",
+    endpoint: "/catalogo/import/empleados-comedor",
     label: "Empleados",
     columns: [
       { key: "nombre", label: "Nombre" },
@@ -20,7 +20,7 @@ export const IMPORT_TYPES: ImportTypeConfig[] = [
   },
   {
     key: "proveedores",
-    endpoint: "/import/proveedores",
+    endpoint: "/compras/import/proveedores",
     label: "Proveedores",
     columns: [
       { key: "nombre", label: "Nombre" },
@@ -31,7 +31,7 @@ export const IMPORT_TYPES: ImportTypeConfig[] = [
   },
   {
     key: "facturas",
-    endpoint: "/import/facturas",
+    endpoint: "/compras/import/facturas",
     label: "Facturas",
     columns: [
       { key: "numeroFactura", label: "N° Factura" },
@@ -44,7 +44,7 @@ export const IMPORT_TYPES: ImportTypeConfig[] = [
   },
   {
     key: "consumidores",
-    endpoint: "/import/consumidores",
+    endpoint: "/consumos/import/consumidores",
     label: "Consumidores",
     columns: [
       { key: "nombre", label: "Nombre" },
@@ -55,7 +55,7 @@ export const IMPORT_TYPES: ImportTypeConfig[] = [
   },
   {
     key: "productos",
-    endpoint: "/import/productos",
+    endpoint: "/consumos/import/productos",
     label: "Productos",
     columns: [
       { key: "comedorNombre", label: "Comedor" },
@@ -67,7 +67,7 @@ export const IMPORT_TYPES: ImportTypeConfig[] = [
   },
   {
     key: "razones-sociales",
-    endpoint: "/import/razones-sociales",
+    endpoint: "/catalogo/import/razones-sociales",
     label: "Razones Sociales",
     columns: [
       { key: "comedorNombre", label: "Comedor" },
@@ -77,7 +77,7 @@ export const IMPORT_TYPES: ImportTypeConfig[] = [
   },
   {
     key: "centros-costo-partidas",
-    endpoint: "/import/centros-costo-partidas",
+    endpoint: "/catalogo/import/centros-costo-partidas",
     label: "Centros de Costo y Partidas",
     columns: [
       { key: "ccComedorNombre", label: "Comedor (CC)" },

@@ -34,8 +34,8 @@ export default function RazonesSocialesPage() {
 
   useEffect(() => {
     Promise.all([
-      get("/comedores/razon-social").then((r) => r.json()),
-      get("/comedores").then((r) => r.json()),
+      get("/catalogo/comedores/razon-social").then((r) => r.json()),
+      get("/catalogo/comedores").then((r) => r.json()),
     ]).then(([razonesData, comedoresData]) => {
       setRazones(razonesData);
       setComedores(comedoresData);
@@ -93,8 +93,8 @@ export default function RazonesSocialesPage() {
         taxId: taxId ? Number(taxId) : null,
       };
       const res = editing
-        ? await patch(`/comedores/razon-social/${editing.id}`, body)
-        : await post("/comedores/razon-social", body);
+        ? await patch(`/catalogo/comedores/razon-social/${editing.id}`, body)
+        : await post("/catalogo/comedores/razon-social", body);
       const saved = (await res.json()) as RazonSocialComedorResponse;
       setRazones((prev) =>
         editing
@@ -113,7 +113,7 @@ export default function RazonesSocialesPage() {
   const handleDelete = async () => {
     if (!deleteTarget) return;
     try {
-      await del(`/comedores/razon-social/${deleteTarget.id}`);
+      await del(`/catalogo/comedores/razon-social/${deleteTarget.id}`);
       setRazones((prev) => (prev ?? []).filter((r) => r.id !== deleteTarget.id));
       toast.success("Razón social eliminada");
       setDeleteTarget(null);

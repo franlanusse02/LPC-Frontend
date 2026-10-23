@@ -51,9 +51,9 @@ export default function EditarFacturaPage({ basePath = "/contabilidad" }: { base
   useEffect(() => {
     if (!id) return;
     Promise.all([
-      get(`/facturas/proveedor/${id}`),
-      get("/proveedores"),
-      get("/comedores"),
+      get(`/compras/facturas/proveedor/${id}`),
+      get("/compras/proveedores"),
+      get("/catalogo/comedores"),
     ]).then(([facturaRes, proveedoresRes, comedoresRes]) => {
       facturaRes.json().then(setFactura);
       proveedoresRes.json().then(setProveedores);
@@ -179,7 +179,7 @@ export default function EditarFacturaPage({ basePath = "/contabilidad" }: { base
                 : undefined,
           };
 
-      await patch(`/facturas/proveedor/${id}`, req);
+      await patch(`/compras/facturas/proveedor/${id}`, req);
 
       toast("Factura actualizada", {
         description: `Factura #${factura?.numero} actualizada exitosamente.`,

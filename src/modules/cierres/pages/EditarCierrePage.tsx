@@ -62,9 +62,9 @@ export default function EditarCierrePage({ basePath = "/contabilidad" }: { baseP
     if (!id) return;
     setInitialLoading(true);
     Promise.all([
-      get(`/cierres/detailed/${id}`),
-      get("/comedores"),
-      get("/comedores/puntos-de-venta"),
+      get(`/tesoreria/cierres/detailed/${id}`),
+      get("/catalogo/comedores"),
+      get("/catalogo/comedores/puntos-de-venta"),
     ]).then(async ([cierreRes, comedoresRes, puntosRes]) => {
       const cierreData = (await cierreRes.json()) as DetailedCierreCajaResponse;
       const comedoresData = (await comedoresRes.json()) as Comedor[];
@@ -193,7 +193,7 @@ export default function EditarCierrePage({ basePath = "/contabilidad" }: { baseP
       if (pendingAnulaciones.length > 0) {
         await Promise.all(
           pendingAnulaciones.map(({ id, motivo }) =>
-            del(`/movimientos/${id}`, {
+            del(`/tesoreria/movimientos/${id}`, {
               body: JSON.stringify({ motivo }),
             }),
           ),
@@ -201,7 +201,7 @@ export default function EditarCierrePage({ basePath = "/contabilidad" }: { baseP
       }
 
       // Patch cierre
-      await patch(`/cierres/${id}`, {
+      await patch(`/tesoreria/cierres/${id}`, {
         puntoDeVentaId: Number(puntoVentaId),
         fechaOperacion,
         totalPlatosVendidos: Number(platosVendidos),
@@ -213,7 +213,7 @@ export default function EditarCierrePage({ basePath = "/contabilidad" }: { baseP
       if (validNewLines.length > 0) {
         await Promise.all(
           validNewLines.map((line) =>
-            post("/movimientos", {
+            post("/tesoreria/movimientos", {
               cierreCajaId: Number(id),
               medioPago: line.medioPago,
               monto: Number(line.monto),

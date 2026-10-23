@@ -108,12 +108,12 @@ export default function ComprasContabilidad() {
   const [stats, setStats] = useState<FacturaProveedorStatsResponse | null>(null);
 
   const facturas = pageData?.content ?? [];
-  const { exporting, fetchAll } = useExportAll<FacturaProveedorResponse>("/facturas/proveedor");
+  const { exporting, fetchAll } = useExportAll<FacturaProveedorResponse>("/compras/facturas/proveedor");
 
   const [ordenPageData, setOrdenPageData] = useState<Page<OrdenDeCompraResponse> | null>(null);
   const [ordenStats, setOrdenStats] = useState<OrdenDeCompraStatsResponse | null>(null);
   const { exporting: exportingOrdenes, fetchAll: fetchAllOrdenes } =
-    useExportAll<OrdenDeCompraResponse>("/ordenes-de-compra");
+    useExportAll<OrdenDeCompraResponse>("/compras/ordenes-de-compra");
   const [ordenStatusFilter, setOrdenStatusFilter] = useState<"all" | "PENDIENTE" | "APROBADA" | "ENVIADA" | "CANCELADA">("all");
   const [ordenSearchInput, setOrdenSearchInput] = useState("");
   const [ordenSearch, setOrdenSearch] = useState("");
@@ -170,7 +170,7 @@ export default function ComprasContabilidad() {
       size: ordenSize,
       sort: `${ordenSortKey},${ordenSortDir}`,
     });
-    return get(`/ordenes-de-compra${qs}`).then((r) => r.json()).then(setOrdenPageData);
+    return get(`/compras/ordenes-de-compra${qs}`).then((r) => r.json()).then(setOrdenPageData);
   }, [get, listFilters.comedorId, listFilters.desde, listFilters.hasta, ordenSearch, ordenStatusFilter, ordenPage, ordenSize, ordenSortKey, ordenSortDir]);
 
   const fetchOrdenStats = useCallback(() => {
@@ -180,7 +180,7 @@ export default function ComprasContabilidad() {
       fechaFin: listFilters.hasta,
       search: ordenSearch || undefined,
     });
-    return get(`/ordenes-de-compra/stats${qs}`).then((r) => r.json()).then(setOrdenStats);
+    return get(`/compras/ordenes-de-compra/stats${qs}`).then((r) => r.json()).then(setOrdenStats);
   }, [get, listFilters.comedorId, listFilters.desde, listFilters.hasta, ordenSearch]);
 
   useEffect(() => {
@@ -193,7 +193,7 @@ export default function ComprasContabilidad() {
 
   const handleDownloadPdf = async (o: OrdenDeCompraResponse) => {
     try {
-      await downloadPdf(get, `/ordenes-de-compra/${o.id}/pdf`, `orden-${o.nroOrden}.pdf`);
+      await downloadPdf(get, `/compras/ordenes-de-compra/${o.id}/pdf`, `orden-${o.nroOrden}.pdf`);
     } catch {
       toast.error("No se pudo descargar el PDF");
     }
@@ -205,7 +205,7 @@ export default function ComprasContabilidad() {
     successMsg: string,
   ) => {
     try {
-      await patch(`/ordenes-de-compra/${o.id}/${action}`, {});
+      await patch(`/compras/ordenes-de-compra/${o.id}/${action}`, {});
       toast(successMsg);
       fetchOrdenes();
       fetchOrdenStats();
@@ -250,7 +250,7 @@ export default function ComprasContabilidad() {
       size,
       sort: `${SORT_KEY_TO_ENTITY[sortKey] ?? sortKey},${sortDir}`,
     });
-    return get(`/facturas/proveedor${qs}`).then((r) => r.json()).then(setPageData);
+    return get(`/compras/facturas/proveedor${qs}`).then((r) => r.json()).then(setPageData);
   }, [get, listFilters.comedorId, listFilters.desde, listFilters.hasta, listFilters.dateField, search, statusFilter, page, size, sortKey, sortDir]);
 
   const fetchStats = useCallback(() => {
@@ -261,7 +261,7 @@ export default function ComprasContabilidad() {
       dateField: listFilters.dateField,
       search: search || undefined,
     });
-    return get(`/facturas/proveedor/stats${qs}`).then((r) => r.json()).then(setStats);
+    return get(`/compras/facturas/proveedor/stats${qs}`).then((r) => r.json()).then(setStats);
   }, [get, listFilters.comedorId, listFilters.desde, listFilters.hasta, listFilters.dateField, search]);
 
   useEffect(() => {
@@ -278,7 +278,7 @@ export default function ComprasContabilidad() {
     fechaPago: string | null,
   ) => {
     try {
-      await patch(`/facturas/proveedor/${facturaId}/emitir`, {
+      await patch(`/compras/facturas/proveedor/${facturaId}/emitir`, {
         fechaEmision,
         fechaPago,
       });
@@ -293,7 +293,7 @@ export default function ComprasContabilidad() {
 
   const handleAnular = async (facturaId: number, motivo: string) => {
     try {
-      await del(`/facturas/proveedor/${facturaId}`, {
+      await del(`/compras/facturas/proveedor/${facturaId}`, {
         body: JSON.stringify({ motivo }),
       });
       toast("Factura anulada");
@@ -311,7 +311,7 @@ export default function ComprasContabilidad() {
     numeroOperacion: string,
   ) => {
     try {
-      await patch(`/facturas/proveedor/${facturaId}/pagar`, {
+      await patch(`/compras/facturas/proveedor/${facturaId}/pagar`, {
         fechaPago,
         numeroOperacion,
       });
@@ -326,7 +326,7 @@ export default function ComprasContabilidad() {
 
   const handleRevertirPago = async (facturaId: number) => {
     try {
-      await patch(`/facturas/proveedor/${facturaId}/revertir-pago`, {});
+      await patch(`/compras/facturas/proveedor/${facturaId}/revertir-pago`, {});
       toast("Pago revertido");
       fetchList();
       fetchStats();
@@ -337,7 +337,7 @@ export default function ComprasContabilidad() {
 
   const handleDesanular = async (facturaId: number) => {
     try {
-      await patch(`/facturas/proveedor/${facturaId}/desanular`, {});
+      await patch(`/compras/facturas/proveedor/${facturaId}/desanular`, {});
       toast("Factura desanulada");
       fetchList();
       fetchStats();
@@ -347,13 +347,13 @@ export default function ComprasContabilidad() {
   };
 
   useEffect(() => {
-    get("/proveedores")
+    get("/compras/proveedores")
       .then((r) => r.json())
       .then(setProveedores);
   }, [get]);
 
   useEffect(() => {
-    get("/comedores")
+    get("/catalogo/comedores")
       .then((r) => r.json())
       .then(setComedores);
   }, [get]);
@@ -437,7 +437,7 @@ export default function ComprasContabilidad() {
   );
 
   const handleBulkEmitir = async () => {
-    const res = await post("/facturas/proveedor/bulk/emitir", {
+    const res = await post("/compras/facturas/proveedor/bulk/emitir", {
       ids: [...selection.selected],
       fechaEmision: bulkFechaEmision || null,
       fechaPago: bulkFechaPago || null,
@@ -453,7 +453,7 @@ export default function ComprasContabilidad() {
   };
 
   const handleBulkPagar = async () => {
-    const res = await post("/facturas/proveedor/bulk/pagar", {
+    const res = await post("/compras/facturas/proveedor/bulk/pagar", {
       ids: [...selection.selected],
       fechaPago: bulkFechaPago || null,
       numeroOperacion: bulkNumeroOp.trim() || null,
@@ -467,7 +467,7 @@ export default function ComprasContabilidad() {
   };
 
   const handleBulkAnular = async () => {
-    const res = await post("/facturas/proveedor/bulk/anular", {
+    const res = await post("/compras/facturas/proveedor/bulk/anular", {
       ids: [...selection.selected],
       motivo: bulkMotivo,
     }).then((r) => r.json() as Promise<BulkActionResponse>);

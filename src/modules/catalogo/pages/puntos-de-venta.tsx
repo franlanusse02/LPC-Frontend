@@ -32,8 +32,8 @@ export default function PuntosDeVentaPage() {
 
   useEffect(() => {
     Promise.all([
-      get("/comedores/puntos-de-venta").then((r) => r.json()),
-      get("/comedores").then((r) => r.json()),
+      get("/catalogo/comedores/puntos-de-venta").then((r) => r.json()),
+      get("/catalogo/comedores").then((r) => r.json()),
     ]).then(([puntosData, comedoresData]) => {
       setPuntos(puntosData);
       setComedores(comedoresData);
@@ -84,8 +84,8 @@ export default function PuntosDeVentaPage() {
     try {
       const body = { nombre: nombre.trim(), comedorId: Number(comedorId) };
       const res = editing
-        ? await patch(`/comedores/puntos-de-venta/${editing.id}`, body)
-        : await post("/comedores/puntos-de-venta", body);
+        ? await patch(`/catalogo/comedores/puntos-de-venta/${editing.id}`, body)
+        : await post("/catalogo/comedores/puntos-de-venta", body);
       const saved = (await res.json()) as PuntoDeVentaResponse;
       setPuntos((prev) =>
         editing

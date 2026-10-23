@@ -54,9 +54,9 @@ export default function EditarConsumoPage({ basePath = "/contabilidad" }: { base
     if (!id) return;
     setInitialLoading(true);
     Promise.all([
-      get("/comedores").then((r) => r.json()),
+      get("/catalogo/comedores").then((r) => r.json()),
       get("/consumos/consumidores/all").then((r) => r.json()),
-      get("/comedores/puntos-de-venta").then((r) => r.json()),
+      get("/catalogo/comedores/puntos-de-venta").then((r) => r.json()),
       get("/consumos/productos").then((r) => r.json()),
       get(`/consumos/${id}`).then((r) => r.json()),
     ]).then(

@@ -33,8 +33,8 @@ export default function CentrosCostoPage() {
 
   useEffect(() => {
     Promise.all([
-      get("/comedores/centros-costo").then((r) => r.json()),
-      get("/comedores").then((r) => r.json()),
+      get("/catalogo/comedores/centros-costo").then((r) => r.json()),
+      get("/catalogo/comedores").then((r) => r.json()),
     ]).then(([data, comedoresData]) => {
       setItems(data);
       setComedores(comedoresData);
@@ -76,8 +76,8 @@ export default function CentrosCostoPage() {
     setSaving(true);
     try {
       const res = editing
-        ? await patch(`/comedores/centros-costo/${editing.id}`, { nombre: nombre.trim() })
-        : await post("/comedores/centros-costo", { nombre: nombre.trim(), comedorId: Number(comedorId) });
+        ? await patch(`/catalogo/comedores/centros-costo/${editing.id}`, { nombre: nombre.trim() })
+        : await post("/catalogo/comedores/centros-costo", { nombre: nombre.trim(), comedorId: Number(comedorId) });
       const saved = (await res.json()) as CentroCostoResponse;
       setItems((prev) =>
         editing ? (prev ?? []).map((i) => (i.id === saved.id ? saved : i)) : [...(prev ?? []), saved],
@@ -93,7 +93,7 @@ export default function CentrosCostoPage() {
 
   const handleToggleActivo = async (item: CentroCostoResponse) => {
     try {
-      const res = await patch(`/comedores/centros-costo/${item.id}`, { activo: !item.activo });
+      const res = await patch(`/catalogo/comedores/centros-costo/${item.id}`, { activo: !item.activo });
       const saved = (await res.json()) as CentroCostoResponse;
       setItems((prev) => (prev ?? []).map((i) => (i.id === saved.id ? saved : i)));
       toast.success(saved.activo ? "Activado" : "Desactivado");

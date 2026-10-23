@@ -48,7 +48,7 @@ export default function CajasChicasPage() {
   const [accesosDe, setAccesosDe] = useState<CajaChicaResponse | null>(null);
 
   useEffect(() => {
-    get("/cajas-chicas")
+    get("/tesoreria/cajas-chicas")
       .then((r) => r.json())
       .then(setCajas)
       .catch((err) => {
@@ -56,8 +56,8 @@ export default function CajasChicasPage() {
         toast.error(err instanceof Error ? err.message : "No se pudieron cargar las cajas.");
       });
     if (isAdmin) {
-      get("/comedores").then((r) => r.json()).then(setComedores);
-      get("/usuarios").then((r) => r.json()).then(setUsuarios);
+      get("/catalogo/comedores").then((r) => r.json()).then(setComedores);
+      get("/identity/usuarios").then((r) => r.json()).then(setUsuarios);
     }
   }, [get, isAdmin]);
 
@@ -114,7 +114,7 @@ export default function CajasChicasPage() {
     try {
       if (editing) {
         const body: PatchCajaChicaRequest = { nombre: nombre.trim(), activa };
-        reemplazar(await (await patch(`/cajas-chicas/${editing.id}`, body)).json());
+        reemplazar(await (await patch(`/tesoreria/cajas-chicas/${editing.id}`, body)).json());
         toast.success("Caja actualizada");
       } else {
         const body: CreateCajaChicaRequest = {
@@ -123,7 +123,7 @@ export default function CajasChicasPage() {
           titularUsuarioId: dueno === "CUENTA" ? Number(titularId) : null,
           accesoUsuarioIds: accesoIds.map(Number),
         };
-        reemplazar(await (await post("/cajas-chicas", body)).json());
+        reemplazar(await (await post("/tesoreria/cajas-chicas", body)).json());
         toast.success("Caja creada");
       }
       setModalOpen(false);
@@ -139,7 +139,7 @@ export default function CajasChicasPage() {
     setSaving(true);
     try {
       const body: SetAccesosRequest = { usuarioIds: accesoIds.map(Number) };
-      reemplazar(await (await put(`/cajas-chicas/${accesosDe.id}/accesos`, body)).json());
+      reemplazar(await (await put(`/tesoreria/cajas-chicas/${accesosDe.id}/accesos`, body)).json());
       toast.success("Accesos actualizados");
       setAccesosDe(null);
     } catch (err) {

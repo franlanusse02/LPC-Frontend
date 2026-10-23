@@ -29,7 +29,7 @@ export default function SociedadesPage() {
   const [cuit, setCuit] = useState("");
 
   useEffect(() => {
-    get("/sociedades")
+    get("/catalogo/sociedades")
       .then((r) => r.json())
       .then((data) => {
         setSociedades(data);
@@ -79,8 +79,8 @@ export default function SociedadesPage() {
         cuit: cuit.trim(),
       };
       const res = editing
-        ? await patch(`/sociedades/${editing.id}`, body)
-        : await post("/sociedades", body);
+        ? await patch(`/catalogo/sociedades/${editing.id}`, body)
+        : await post("/catalogo/sociedades", body);
       const saved = (await res.json()) as SociedadResponse;
       setSociedades((prev) =>
         editing ? prev.map((s) => (s.id === saved.id ? saved : s)) : [...prev, saved],

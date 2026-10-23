@@ -27,7 +27,7 @@ const exportColumns: ExportColumn<ProveedorItemResponse>[] = [
 export default function ProveedorItemsPage() {
   const navigate = useNavigate();
   const { get, patch } = useApi();
-  const { exporting, fetchAll } = useExportAll<ProveedorItemResponse>("/articulos/codificacion/items");
+  const { exporting, fetchAll } = useExportAll<ProveedorItemResponse>("/compras/articulos/codificacion/items");
 
   const [proveedores, setProveedores] = useState<ProveedorResponse[]>([]);
   const [proveedorId, setProveedorId] = useState("");
@@ -37,12 +37,12 @@ export default function ProveedorItemsPage() {
   const [editing, setEditing] = useState<ProveedorItemResponse | null>(null);
 
   useEffect(() => {
-    get("/proveedores").then((r) => r.json()).then(setProveedores);
+    get("/compras/proveedores").then((r) => r.json()).then(setProveedores);
   }, [get]);
 
   useEffect(() => {
     if (!proveedorId) return;
-    get(`/proveedores/${proveedorId}/items`)
+    get(`/compras/proveedores/${proveedorId}/items`)
       .then((r) => r.json())
       .then((data: ProveedorItemResponse[]) => setItems(Array.isArray(data) ? data : []));
   }, [proveedorId, get]);
@@ -53,7 +53,7 @@ export default function ProveedorItemsPage() {
     const q = search.trim();
     if (q.length < 2) { setItems([]); return; }
     const t = setTimeout(() => {
-      get(`/articulos/codificacion/items?q=${encodeURIComponent(q)}&page=0`)
+      get(`/compras/articulos/codificacion/items?q=${encodeURIComponent(q)}&page=0`)
         .then((r) => r.json())
         .then((d: PagedResponse<ProveedorItemResponse>) =>
           setItems(Array.isArray(d?.content) ? d.content : []));
@@ -79,7 +79,7 @@ export default function ProveedorItemsPage() {
   const handleDesactivar = async (item: ProveedorItemResponse) => {
     try {
       const updated: ProveedorItemResponse = await patch(
-        `/proveedores/${item.proveedorId}/items/${item.id}/desactivar`,
+        `/compras/proveedores/${item.proveedorId}/items/${item.id}/desactivar`,
         {},
       ).then((r) => r.json());
       setItems((prev) => prev.map((i) => (i.id === updated.id ? updated : i)));
