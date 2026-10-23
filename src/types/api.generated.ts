@@ -4,7 +4,7 @@
  */
 
 export interface paths {
-    "/api/usuarios/register": {
+    "/tesoreria/cajas-chicas/{id}/accesos": {
         parameters: {
             query?: never;
             header?: never;
@@ -12,15 +12,15 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        put?: never;
-        post: operations["register"];
+        put: operations["setAccesos"];
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api/usuarios/login": {
+    "/compras/ordenes-de-compra/plantillas/{id}": {
         parameters: {
             query?: never;
             header?: never;
@@ -28,47 +28,15 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        put?: never;
-        post: operations["login"];
-        delete?: never;
+        put: operations["updatePlantilla"];
+        post?: never;
+        delete: operations["deletePlantilla"];
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api/sociedades": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["findAll"];
-        put?: never;
-        post: operations["create"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/proveedores": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getAll"];
-        put?: never;
-        post: operations["create_1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/movimientos": {
+    "/tesoreria/movimientos": {
         parameters: {
             query?: never;
             header?: never;
@@ -84,631 +52,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/import/proveedores": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["upload"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/import/proveedores/jobs/{jobId}/rows/{rowId}/revalidar": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["revalidar"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/import/proveedores/jobs/{jobId}/rows/{rowId}/desasignar": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["release"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/import/proveedores/jobs/{jobId}/rows/{rowId}/asignar": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["assign"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/import/proveedores/jobs/{jobId}/rows/{rowId}/apply": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["applyRow"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/import/proveedores/jobs/{jobId}/cancel": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["cancel"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/import/proveedores/jobs/{jobId}/apply": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["applyReady"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/import/facturas": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["upload_1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/import/facturas/jobs/{jobId}/rows/{rowId}/revalidar": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["revalidar_1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/import/facturas/jobs/{jobId}/rows/{rowId}/desasignar": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["release_1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/import/facturas/jobs/{jobId}/rows/{rowId}/asignar": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["assign_1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/import/facturas/jobs/{jobId}/rows/{rowId}/apply": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["applyRow_1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/import/facturas/jobs/{jobId}/cancel": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["cancel_1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/import/facturas/jobs/{jobId}/apply": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["applyReady_1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/import/empleados-comedor": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["upload_2"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/import/empleados-comedor/jobs/{jobId}/rows/{rowId}/revalidar": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["revalidar_2"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/import/empleados-comedor/jobs/{jobId}/rows/{rowId}/desasignar": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["release_2"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/import/empleados-comedor/jobs/{jobId}/rows/{rowId}/asignar": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["assign_2"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/import/empleados-comedor/jobs/{jobId}/rows/{rowId}/apply": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["applyRow_2"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/import/empleados-comedor/jobs/{jobId}/cancel": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["cancel_2"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/import/empleados-comedor/jobs/{jobId}/apply": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["applyReady_2"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/import/consumidores": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["upload_3"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/import/consumidores/jobs/{jobId}/rows/{rowId}/revalidar": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["revalidar_3"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/import/consumidores/jobs/{jobId}/rows/{rowId}/desasignar": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["release_3"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/import/consumidores/jobs/{jobId}/rows/{rowId}/asignar": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["assign_3"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/import/consumidores/jobs/{jobId}/rows/{rowId}/apply": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["applyRow_3"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/import/consumidores/jobs/{jobId}/cancel": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["cancel_3"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/import/consumidores/jobs/{jobId}/apply": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["applyReady_3"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/facturas/proveedor": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getAll_1"];
-        put?: never;
-        post: operations["create_2"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/eventos": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getAll_2"];
-        put?: never;
-        post: operations["create_3"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/eventos/tipos": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getAll_3"];
-        put?: never;
-        post: operations["create_4"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/consumos": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["findAll_1"];
-        put?: never;
-        post: operations["create_5"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/consumos/productos": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["findAll_2"];
-        put?: never;
-        post: operations["create_6"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/consumos/consumidores": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["create_7"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/consumos/batch-udesa": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["batchUdesa"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/comedores": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getComedores"];
-        put?: never;
-        post: operations["crearComedor"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/comedores/{comedorId}/razon-social": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["findAllByComedorId"];
-        put?: never;
-        post: operations["create_8"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/comedores/puntos-de-venta": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getPuntosDeVenta"];
-        put?: never;
-        post: operations["create_9"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/comedores/empleados": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["findAll_4"];
-        put?: never;
-        post: operations["create_10"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/cierres": {
+    "/tesoreria/cierres": {
         parameters: {
             query?: never;
             header?: never;
@@ -724,14 +68,1278 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/bancos": {
+    "/tesoreria/cierres/bulk/anular": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: operations["findAll_5"];
+        get?: never;
+        put?: never;
+        post: operations["bulkAnular"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/tesoreria/cajas-chicas": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getCajas"];
+        put?: never;
+        post: operations["createCaja"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/tesoreria/cajas-chicas/{cajaId}/movimientos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getMovimientos"];
+        put?: never;
+        post: operations["createMovimiento_1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/tesoreria/cajas-chicas/conceptos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getConceptos"];
+        put?: never;
+        post: operations["createConcepto"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/rrhh/legajos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listar"];
+        put?: never;
+        post: operations["crear"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/rrhh/legajos/{id}/archivos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["subirArchivo"];
+        delete: operations["quitarArchivo"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/identity/usuarios/register": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["register"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/identity/usuarios/login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["login"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/eventos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getAll"];
+        put?: never;
+        post: operations["create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/eventos/bulk/realizar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["bulkRealizar"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/eventos/bulk/emitir": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["bulkEmitir"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/eventos/bulk/cobrar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["bulkCobrar"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/eventos/bulk/anular": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["bulkAnular_1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/consumos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["findAll"];
+        put?: never;
+        post: operations["create_1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/consumos/productos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["findAll_1"];
+        put?: never;
+        post: operations["create_2"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/consumos/import/productos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["upload"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/consumos/import/productos/jobs/{jobId}/rows/{rowId}/revalidar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["revalidarRow"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/consumos/import/productos/jobs/{jobId}/rows/{rowId}/desasignar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["releaseRow"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/consumos/import/productos/jobs/{jobId}/rows/{rowId}/asignar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["assignRow"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/consumos/import/productos/jobs/{jobId}/rows/{rowId}/apply": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["applyRow"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/consumos/import/productos/jobs/{jobId}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["cancelJob"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/consumos/import/productos/jobs/{jobId}/apply-ready": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["applyReady"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/consumos/import/consumidores": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["upload_1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/consumos/import/consumidores/jobs/{jobId}/rows/{rowId}/revalidar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["revalidar"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/consumos/import/consumidores/jobs/{jobId}/rows/{rowId}/desasignar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["release"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/consumos/import/consumidores/jobs/{jobId}/rows/{rowId}/asignar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["assign"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/consumos/import/consumidores/jobs/{jobId}/rows/{rowId}/apply": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["applyRow_1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/consumos/import/consumidores/jobs/{jobId}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["cancel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/consumos/import/consumidores/jobs/{jobId}/apply-ready": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["applyReady_1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/consumos/consumidores": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["create_3"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/consumos/bulk/anular": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["bulkAnular_2"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/consumos/batch-udesa": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["batchUdesa"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compras/proveedores": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getAll_1"];
+        put?: never;
+        post: operations["create_4"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compras/proveedores/{proveedorId}/items": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getAll_2"];
+        put?: never;
+        post: operations["create_5"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compras/ordenes-de-compra": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getAll_3"];
+        put?: never;
+        post: operations["create_6"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compras/ordenes-de-compra/plantillas": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getMisPlantillas"];
+        put?: never;
+        post: operations["createPlantilla"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compras/import/proveedores": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["upload_2"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compras/import/proveedores/jobs/{jobId}/rows/{rowId}/revalidar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["revalidar_1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compras/import/proveedores/jobs/{jobId}/rows/{rowId}/desasignar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["release_1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compras/import/proveedores/jobs/{jobId}/rows/{rowId}/asignar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["assign_1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compras/import/proveedores/jobs/{jobId}/rows/{rowId}/apply": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["applyRow_2"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compras/import/proveedores/jobs/{jobId}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["cancel_1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compras/import/proveedores/jobs/{jobId}/apply-ready": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["applyReady_2"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compras/import/facturas": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["upload_3"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compras/import/facturas/jobs/{jobId}/rows/{rowId}/revalidar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["revalidar_2"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compras/import/facturas/jobs/{jobId}/rows/{rowId}/desasignar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["release_2"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compras/import/facturas/jobs/{jobId}/rows/{rowId}/asignar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["assign_2"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compras/import/facturas/jobs/{jobId}/rows/{rowId}/apply": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["applyRow_3"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compras/import/facturas/jobs/{jobId}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["cancel_2"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compras/import/facturas/jobs/{jobId}/apply-ready": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["applyReady_3"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compras/facturas/proveedor": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getAll_4"];
+        put?: never;
+        post: operations["create_7"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compras/facturas/proveedor/bulk/pagar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["bulkPagar"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compras/facturas/proveedor/bulk/emitir": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["bulkEmitir_1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compras/facturas/proveedor/bulk/anular": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["bulkAnular_3"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/catalogo/sociedades": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["findAll_2"];
+        put?: never;
+        post: operations["create_8"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/catalogo/import/razones-sociales": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["upload_4"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/catalogo/import/razones-sociales/jobs/{jobId}/rows/{rowId}/revalidar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["revalidar_3"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/catalogo/import/razones-sociales/jobs/{jobId}/rows/{rowId}/desasignar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["release_3"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/catalogo/import/razones-sociales/jobs/{jobId}/rows/{rowId}/asignar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["assign_3"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/catalogo/import/razones-sociales/jobs/{jobId}/rows/{rowId}/apply": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["applyRow_4"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/catalogo/import/razones-sociales/jobs/{jobId}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["cancel_3"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/catalogo/import/razones-sociales/jobs/{jobId}/apply-ready": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["applyReady_4"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/catalogo/import/empleados-comedor": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["upload_5"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/catalogo/import/empleados-comedor/jobs/{jobId}/rows/{rowId}/revalidar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["revalidar_4"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/catalogo/import/empleados-comedor/jobs/{jobId}/rows/{rowId}/desasignar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["release_4"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/catalogo/import/empleados-comedor/jobs/{jobId}/rows/{rowId}/asignar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["assign_4"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/catalogo/import/empleados-comedor/jobs/{jobId}/rows/{rowId}/apply": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["applyRow_5"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/catalogo/import/empleados-comedor/jobs/{jobId}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["cancel_4"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/catalogo/import/empleados-comedor/jobs/{jobId}/apply-ready": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["applyReady_5"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/catalogo/import/centros-costo-partidas": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["upload_6"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/catalogo/import/centros-costo-partidas/jobs/{jobId}/rows/{rowId}/revalidar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["revalidar_5"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/catalogo/import/centros-costo-partidas/jobs/{jobId}/rows/{rowId}/desasignar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["release_5"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/catalogo/import/centros-costo-partidas/jobs/{jobId}/rows/{rowId}/asignar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["assign_5"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/catalogo/import/centros-costo-partidas/jobs/{jobId}/rows/{rowId}/apply": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["applyRow_6"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/catalogo/import/centros-costo-partidas/jobs/{jobId}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["cancel_5"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/catalogo/import/centros-costo-partidas/jobs/{jobId}/apply-ready": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["applyReady_6"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/catalogo/comedores": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getComedores"];
+        put?: never;
+        post: operations["crearComedor"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/catalogo/comedores/razon-social": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["findAllByComedorId"];
+        put?: never;
+        post: operations["create_9"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/catalogo/comedores/puntos-de-venta": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getPuntosDeVenta"];
+        put?: never;
+        post: operations["create_10"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/catalogo/comedores/partidas": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["findAll_3"];
         put?: never;
         post: operations["create_11"];
         delete?: never;
@@ -740,423 +1348,55 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/usuarios/{cuil}": {
+    "/catalogo/comedores/empleados": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: operations["getByCuil"];
+        get: operations["findAll_4"];
         put?: never;
-        post?: never;
-        delete: operations["eliminar"];
-        options?: never;
-        head?: never;
-        patch: operations["patch"];
-        trace?: never;
-    };
-    "/api/sociedades/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["findById"];
-        put?: never;
-        post?: never;
+        post: operations["create_12"];
         delete?: never;
         options?: never;
         head?: never;
-        patch: operations["patch_1"];
+        patch?: never;
         trace?: never;
     };
-    "/api/proveedores/{id}": {
+    "/catalogo/comedores/centros-costo": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: operations["getById"];
+        get: operations["findAll_5"];
         put?: never;
-        post?: never;
+        post: operations["create_13"];
         delete?: never;
         options?: never;
         head?: never;
-        patch: operations["patch_2"];
+        patch?: never;
         trace?: never;
     };
-    "/api/proveedores/{id}/agregar-punto-venta": {
+    "/catalogo/bancos": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        get: operations["findAll_6"];
         put?: never;
-        post?: never;
+        post: operations["create_14"];
         delete?: never;
         options?: never;
         head?: never;
-        patch: operations["addPuntoDeVenta"];
+        patch?: never;
         trace?: never;
     };
-    "/api/import/proveedores/jobs/{jobId}/rows/{rowId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        delete: operations["deleteRow"];
-        options?: never;
-        head?: never;
-        patch: operations["patchRow"];
-        trace?: never;
-    };
-    "/api/import/facturas/jobs/{jobId}/rows/{rowId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        delete: operations["deleteRow_1"];
-        options?: never;
-        head?: never;
-        patch: operations["patchRow_1"];
-        trace?: never;
-    };
-    "/api/import/empleados-comedor/jobs/{jobId}/rows/{rowId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        delete: operations["deleteRow_2"];
-        options?: never;
-        head?: never;
-        patch: operations["patchRow_2"];
-        trace?: never;
-    };
-    "/api/import/consumidores/jobs/{jobId}/rows/{rowId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        delete: operations["deleteRow_3"];
-        options?: never;
-        head?: never;
-        patch: operations["patchRow_3"];
-        trace?: never;
-    };
-    "/api/facturas/proveedor/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getById_1"];
-        put?: never;
-        post?: never;
-        delete: operations["anular"];
-        options?: never;
-        head?: never;
-        patch: operations["editar"];
-        trace?: never;
-    };
-    "/api/facturas/proveedor/{id}/pagar": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch: operations["pagar"];
-        trace?: never;
-    };
-    "/api/facturas/proveedor/{id}/emitir": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch: operations["emitir"];
-        trace?: never;
-    };
-    "/api/eventos/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getById_2"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch: operations["editEvento"];
-        trace?: never;
-    };
-    "/api/eventos/{id}/realizar": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch: operations["marcarRealizado"];
-        trace?: never;
-    };
-    "/api/eventos/{id}/pagado": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch: operations["marcarPago"];
-        trace?: never;
-    };
-    "/api/eventos/{id}/emitir": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch: operations["emitirFactura"];
-        trace?: never;
-    };
-    "/api/eventos/{id}/eliminar-factura-pdf": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch: operations["eliminarFacturaPdf"];
-        trace?: never;
-    };
-    "/api/eventos/{id}/anular": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch: operations["anularEvento"];
-        trace?: never;
-    };
-    "/api/eventos/{id}/adjuntar-factura-pdf": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch: operations["adjuntarFacturaPdf"];
-        trace?: never;
-    };
-    "/api/eventos/tipos/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getById_3"];
-        put?: never;
-        post?: never;
-        delete: operations["delete"];
-        options?: never;
-        head?: never;
-        patch: operations["patch_3"];
-        trace?: never;
-    };
-    "/api/consumos/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["findById_1"];
-        put?: never;
-        post?: never;
-        delete: operations["anular_1"];
-        options?: never;
-        head?: never;
-        patch: operations["patch_4"];
-        trace?: never;
-    };
-    "/api/consumos/productos/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getById_4"];
-        put?: never;
-        post?: never;
-        delete: operations["delete_1"];
-        options?: never;
-        head?: never;
-        patch: operations["patch_5"];
-        trace?: never;
-    };
-    "/api/consumos/consumidores/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["findById_2"];
-        put?: never;
-        post?: never;
-        delete: operations["delete_2"];
-        options?: never;
-        head?: never;
-        patch: operations["patch_6"];
-        trace?: never;
-    };
-    "/api/comedores/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getComedorById"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch: operations["patch_7"];
-        trace?: never;
-    };
-    "/api/comedores/{comedorId}/razon-social/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["findById_3"];
-        put?: never;
-        post?: never;
-        delete: operations["delete_3"];
-        options?: never;
-        head?: never;
-        patch: operations["patch_8"];
-        trace?: never;
-    };
-    "/api/comedores/puntos-de-venta/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getPuntoDeVentaById"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch: operations["patch_9"];
-        trace?: never;
-    };
-    "/api/comedores/empleados/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["findById_4"];
-        put?: never;
-        post?: never;
-        delete: operations["delete_4"];
-        options?: never;
-        head?: never;
-        patch: operations["patch_10"];
-        trace?: never;
-    };
-    "/api/cierres/{id}": {
+    "/tesoreria/cierres/{id}": {
         parameters: {
             query?: never;
             header?: never;
@@ -1172,7 +1412,647 @@ export interface paths {
         patch: operations["patchCierreCaja"];
         trace?: never;
     };
-    "/api/bancos/{id}": {
+    "/tesoreria/cajas-chicas/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getCaja"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["patchCaja"];
+        trace?: never;
+    };
+    "/tesoreria/cajas-chicas/movimientos/{id}/anular": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["anularMovimiento"];
+        trace?: never;
+    };
+    "/tesoreria/cajas-chicas/conceptos/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["patchConcepto"];
+        trace?: never;
+    };
+    "/rrhh/legajos/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["obtener"];
+        put?: never;
+        post?: never;
+        delete: operations["eliminar"];
+        options?: never;
+        head?: never;
+        patch: operations["patch"];
+        trace?: never;
+    };
+    "/identity/usuarios/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getById"];
+        put?: never;
+        post?: never;
+        delete: operations["eliminar_1"];
+        options?: never;
+        head?: never;
+        patch: operations["patch_1"];
+        trace?: never;
+    };
+    "/eventos/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getById_1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["editEvento"];
+        trace?: never;
+    };
+    "/eventos/{id}/realizar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["marcarRealizado"];
+        trace?: never;
+    };
+    "/eventos/{id}/pagado": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["marcarPago"];
+        trace?: never;
+    };
+    "/eventos/{id}/emitir": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["emitirFactura"];
+        trace?: never;
+    };
+    "/eventos/{id}/eliminar-factura-pdf": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["eliminarFacturaPdf"];
+        trace?: never;
+    };
+    "/eventos/{id}/anular": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["anularEvento"];
+        trace?: never;
+    };
+    "/eventos/{id}/adjuntar-factura-pdf": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["adjuntarFacturaPdf"];
+        trace?: never;
+    };
+    "/consumos/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["findById"];
+        put?: never;
+        post?: never;
+        delete: operations["anular"];
+        options?: never;
+        head?: never;
+        patch: operations["patch_2"];
+        trace?: never;
+    };
+    "/consumos/productos/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getById_2"];
+        put?: never;
+        post?: never;
+        delete: operations["delete"];
+        options?: never;
+        head?: never;
+        patch: operations["patch_3"];
+        trace?: never;
+    };
+    "/consumos/import/productos/jobs/{jobId}/rows/{rowId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["deleteRow"];
+        options?: never;
+        head?: never;
+        patch: operations["patchRow"];
+        trace?: never;
+    };
+    "/consumos/import/consumidores/jobs/{jobId}/rows/{rowId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["deleteRow_1"];
+        options?: never;
+        head?: never;
+        patch: operations["patchRow_1"];
+        trace?: never;
+    };
+    "/consumos/consumidores/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["findById_1"];
+        put?: never;
+        post?: never;
+        delete: operations["delete_1"];
+        options?: never;
+        head?: never;
+        patch: operations["patch_4"];
+        trace?: never;
+    };
+    "/compras/proveedores/{proveedorId}/items/{itemId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["patch_5"];
+        trace?: never;
+    };
+    "/compras/proveedores/{proveedorId}/items/{itemId}/desactivar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["desactivar"];
+        trace?: never;
+    };
+    "/compras/proveedores/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getById_3"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["patch_6"];
+        trace?: never;
+    };
+    "/compras/proveedores/{id}/agregar-punto-venta": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["addPuntoDeVenta"];
+        trace?: never;
+    };
+    "/compras/ordenes-de-compra/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getById_4"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["patch_7"];
+        trace?: never;
+    };
+    "/compras/ordenes-de-compra/{id}/enviar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["enviar"];
+        trace?: never;
+    };
+    "/compras/ordenes-de-compra/{id}/cancelar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["cancelar"];
+        trace?: never;
+    };
+    "/compras/ordenes-de-compra/{id}/aprobar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["aprobar"];
+        trace?: never;
+    };
+    "/compras/import/proveedores/jobs/{jobId}/rows/{rowId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["deleteRow_2"];
+        options?: never;
+        head?: never;
+        patch: operations["patchRow_2"];
+        trace?: never;
+    };
+    "/compras/import/facturas/jobs/{jobId}/rows/{rowId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["deleteRow_3"];
+        options?: never;
+        head?: never;
+        patch: operations["patchRow_3"];
+        trace?: never;
+    };
+    "/compras/facturas/proveedor/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getById_5"];
+        put?: never;
+        post?: never;
+        delete: operations["anular_1"];
+        options?: never;
+        head?: never;
+        patch: operations["editar"];
+        trace?: never;
+    };
+    "/compras/facturas/proveedor/{id}/revertir-pago": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["revertirPago"];
+        trace?: never;
+    };
+    "/compras/facturas/proveedor/{id}/pagar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["pagar"];
+        trace?: never;
+    };
+    "/compras/facturas/proveedor/{id}/emitir": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["emitir"];
+        trace?: never;
+    };
+    "/compras/facturas/proveedor/{id}/desanular": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["desanular"];
+        trace?: never;
+    };
+    "/catalogo/sociedades/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["findById_2"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["patch_8"];
+        trace?: never;
+    };
+    "/catalogo/import/razones-sociales/jobs/{jobId}/rows/{rowId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["deleteRow_4"];
+        options?: never;
+        head?: never;
+        patch: operations["patchRow_4"];
+        trace?: never;
+    };
+    "/catalogo/import/empleados-comedor/jobs/{jobId}/rows/{rowId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["deleteRow_5"];
+        options?: never;
+        head?: never;
+        patch: operations["patchRow_5"];
+        trace?: never;
+    };
+    "/catalogo/import/centros-costo-partidas/jobs/{jobId}/rows/{rowId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["deleteRow_6"];
+        options?: never;
+        head?: never;
+        patch: operations["patchRow_6"];
+        trace?: never;
+    };
+    "/catalogo/comedores/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getComedorById"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["patch_9"];
+        trace?: never;
+    };
+    "/catalogo/comedores/razon-social/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["findById_3"];
+        put?: never;
+        post?: never;
+        delete: operations["delete_2"];
+        options?: never;
+        head?: never;
+        patch: operations["patch_10"];
+        trace?: never;
+    };
+    "/catalogo/comedores/puntos-de-venta/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getPuntoDeVentaById"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["patch_11"];
+        trace?: never;
+    };
+    "/catalogo/comedores/partidas/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["findById_4"];
+        put?: never;
+        post?: never;
+        delete: operations["delete_3"];
+        options?: never;
+        head?: never;
+        patch: operations["patch_12"];
+        trace?: never;
+    };
+    "/catalogo/comedores/empleados/{id}": {
         parameters: {
             query?: never;
             header?: never;
@@ -1182,61 +2062,45 @@ export interface paths {
         get: operations["findById_5"];
         put?: never;
         post?: never;
-        delete?: never;
+        delete: operations["delete_4"];
         options?: never;
         head?: never;
-        patch: operations["patch_11"];
+        patch: operations["patch_13"];
         trace?: never;
     };
-    "/api/usuarios": {
+    "/catalogo/comedores/centros-costo/{id}": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: operations["listarTodos"];
+        get: operations["findById_6"];
         put?: never;
         post?: never;
-        delete?: never;
+        delete: operations["delete_5"];
         options?: never;
         head?: never;
-        patch?: never;
+        patch: operations["patch_14"];
         trace?: never;
     };
-    "/api/usuarios/me": {
+    "/catalogo/bancos/{id}": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: operations["getMe"];
+        get: operations["findById_7"];
         put?: never;
         post?: never;
         delete?: never;
         options?: never;
         head?: never;
-        patch?: never;
+        patch: operations["patch_15"];
         trace?: never;
     };
-    "/api/proveedores/{id}/get-puntos-venta": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getPuntosVenta"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/movimientos/anulacion/{movimientoId}": {
+    "/tesoreria/movimientos/anulacion/{movimientoId}": {
         parameters: {
             query?: never;
             header?: never;
@@ -1252,14 +2116,14 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/import/proveedores/jobs": {
+    "/tesoreria/cierres/stats": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: operations["listJobs"];
+        get: operations["getStats"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1268,327 +2132,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/import/proveedores/jobs/{jobId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getJob"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/import/proveedores/jobs/{jobId}/rows": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getRows"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/import/facturas/jobs": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["listJobs_1"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/import/facturas/jobs/{jobId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getJob_1"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/import/facturas/jobs/{jobId}/rows": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getRows_1"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/import/empleados-comedor/jobs": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["listJobs_2"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/import/empleados-comedor/jobs/{jobId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getJob_2"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/import/empleados-comedor/jobs/{jobId}/rows": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getRows_2"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/import/consumidores/jobs": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["listJobs_3"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/import/consumidores/jobs/{jobId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getJob_3"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/import/consumidores/jobs/{jobId}/rows": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getRows_3"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/facturas/proveedor/{id}/anulacion": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getAnulacion"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/facturas/proveedor/mis-facturas": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getMyFacturas"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/eventos/{id}/anulacion": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getAnulacion_1"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/eventos/tipos/activos": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getAllActive"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/eventos/mis-cierres": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getMyCierres"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/consumos/{id}/anulacion": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getAnulacion_2"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/consumos/dates": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["findAllByDate"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/consumos/consumidores/all": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["findAll_3"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/consumos/agrupados": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["findAllGroupedByComedorAndDate"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/cierres/mine": {
+    "/tesoreria/cierres/mine": {
         parameters: {
             query?: never;
             header?: never;
@@ -1604,7 +2148,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/cierres/detailed/{id}": {
+    "/tesoreria/cierres/mine/stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getMineStats"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/tesoreria/cierres/detailed/{id}": {
         parameters: {
             query?: never;
             header?: never;
@@ -1620,7 +2180,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/cierres/anulacion/{cierreId}": {
+    "/tesoreria/cierres/anulacion/{cierreId}": {
         parameters: {
             query?: never;
             header?: never;
@@ -1636,7 +2196,839 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/analytics/mi-porcentaje-compra": {
+    "/tesoreria/cajas-chicas/para-carga": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getCajasParaCarga"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/rrhh/legajos/{id}/archivos/contenido": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["descargarArchivo"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/identity/usuarios": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listarTodos"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/identity/usuarios/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getMe"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/eventos/{id}/anulacion": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getAnulacion"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/eventos/stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getStats_1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/eventos/mis-cierres": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getMyCierres"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/eventos/mis-cierres/stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getMyCierresStats"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/consumos/{id}/anulacion": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getAnulacion_1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/consumos/stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getStats_2"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/consumos/mis-consumos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getAllByMe"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/consumos/mis-consumos/stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getMineStats_1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/consumos/import/productos/jobs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listJobs"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/consumos/import/productos/jobs/{jobId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getJob"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/consumos/import/productos/jobs/{jobId}/rows": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getRows"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/consumos/import/consumidores/jobs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listJobs_1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/consumos/import/consumidores/jobs/{jobId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getJob_1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/consumos/import/consumidores/jobs/{jobId}/rows": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getRows_1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/consumos/dates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["findAllByDate"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/consumos/consumidores/all": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["findAll_7"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/consumos/agrupados": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["findAllGroupedByComedorAndDate"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compras/proveedores/{id}/get-puntos-venta": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getPuntosVenta"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compras/ordenes-de-compra/{id}/pdf": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getPdf"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compras/ordenes-de-compra/stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getStats_3"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compras/ordenes-de-compra/mis-ordenes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getMyOrdenes"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compras/ordenes-de-compra/mis-ordenes/stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getMyOrdenesStats"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compras/import/proveedores/jobs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listJobs_2"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compras/import/proveedores/jobs/{jobId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getJob_2"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compras/import/proveedores/jobs/{jobId}/rows": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getRows_2"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compras/import/facturas/jobs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listJobs_3"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compras/import/facturas/jobs/{jobId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getJob_3"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compras/import/facturas/jobs/{jobId}/rows": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getRows_3"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compras/facturas/proveedor/{id}/anulacion": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getAnulacion_2"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compras/facturas/proveedor/stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getStats_4"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compras/facturas/proveedor/mis-facturas": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getMyFacturas"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compras/facturas/proveedor/mis-facturas/stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getMyFacturasStats"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compras/articulos/codificacion/next-codigo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["nextCodigo"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compras/articulos/codificacion/items": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["items"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compras/articulos/codificacion/grupos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["grupos"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compras/articulos/codificacion/grupos/{grupoCodigo}/familias": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["familias"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compras/articulos/codificacion/buscar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["buscar"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/catalogo/import/razones-sociales/jobs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listJobs_4"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/catalogo/import/razones-sociales/jobs/{jobId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getJob_4"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/catalogo/import/razones-sociales/jobs/{jobId}/rows": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getRows_4"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/catalogo/import/empleados-comedor/jobs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listJobs_5"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/catalogo/import/empleados-comedor/jobs/{jobId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getJob_5"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/catalogo/import/empleados-comedor/jobs/{jobId}/rows": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getRows_5"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/catalogo/import/centros-costo-partidas/jobs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listJobs_6"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/catalogo/import/centros-costo-partidas/jobs/{jobId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getJob_6"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/catalogo/import/centros-costo-partidas/jobs/{jobId}/rows": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getRows_6"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/catalogo/comedores/empleados/funcionarios": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["findFuncionarios"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/analytics/mis-totales": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getMisTotales"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/analytics/mi-porcentaje-compra": {
         parameters: {
             query?: never;
             header?: never;
@@ -1652,7 +3044,39 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/analytics/contabilidad/totales": {
+    "/analytics/encargado/ordenes-compra/monto-estimado": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getEncargadoEstimadoOrdenesCompra"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/analytics/encargado/eventos/count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getEventosCountEncargado"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/analytics/contabilidad/totales": {
         parameters: {
             query?: never;
             header?: never;
@@ -1668,7 +3092,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/analytics/contabilidad/porcentaje-compra": {
+    "/analytics/contabilidad/porcentaje-compra": {
         parameters: {
             query?: never;
             header?: never;
@@ -1684,7 +3108,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/movimientos/{movimientoId}": {
+    "/analytics/contabilidad/ordenes-compra/monto-estimado": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getEstimadoOrdenesCompra"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/tesoreria/movimientos/{movimientoId}": {
         parameters: {
             query?: never;
             header?: never;
@@ -1694,13 +3134,13 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
-        delete: operations["anularMovimiento"];
+        delete: operations["anularMovimiento_1"];
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api/cierres/{cierreId}": {
+    "/tesoreria/cierres/{cierreId}": {
         parameters: {
             query?: never;
             header?: never;
@@ -1720,16 +3160,248 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        SetAccesosRequest: {
+            usuarioIds: number[];
+        };
+        CajaChicaResponse: {
+            /** Format: int64 */
+            id?: number;
+            nombre?: string;
+            /** Format: int64 */
+            comedorId?: number;
+            comedorName?: string;
+            /** Format: int64 */
+            titularUsuarioId?: number;
+            titularNombre?: string;
+            activa?: boolean;
+            saldo?: number;
+            /** Format: date-time */
+            creadoEn?: string;
+            accesos?: components["schemas"]["UsuarioAccesoResponse"][];
+        };
+        UsuarioAccesoResponse: {
+            /** Format: int64 */
+            usuarioId?: number;
+            nombre?: string;
+        };
+        CreateOrdenDeCompraItemRequest: {
+            /** Format: int64 */
+            proveedorItemId: number;
+            cantidad: number;
+        };
+        SavePlantillaOrdenDeCompraRequest: {
+            nombre: string;
+            /** Format: int64 */
+            sociedadId?: number;
+            /** Format: int64 */
+            comedorId?: number;
+            /** Format: int64 */
+            proveedorId: number;
+            solicitante?: string;
+            plazoEntrega?: string;
+            condicionEntrega?: string;
+            tipoFactura?: string;
+            descuento?: number;
+            observaciones?: string;
+            items: components["schemas"]["CreateOrdenDeCompraItemRequest"][];
+        };
+        PlantillaOrdenDeCompraItemResponse: {
+            /** Format: int64 */
+            proveedorItemId?: number;
+            nombre?: string;
+            codigo?: string;
+            cantidad?: number;
+            activo?: boolean;
+        };
+        PlantillaOrdenDeCompraResponse: {
+            /** Format: int64 */
+            id?: number;
+            nombre?: string;
+            /** Format: int64 */
+            sociedadId?: number;
+            sociedadNombre?: string;
+            /** Format: int64 */
+            comedorId?: number;
+            comedorName?: string;
+            /** Format: int64 */
+            proveedorId?: number;
+            proveedorNombre?: string;
+            solicitante?: string;
+            plazoEntrega?: string;
+            condicionEntrega?: string;
+            tipoFactura?: string;
+            descuento?: number;
+            observaciones?: string;
+            /** Format: date-time */
+            creadoEn?: string;
+            /** Format: date-time */
+            actualizadoEn?: string;
+            items?: components["schemas"]["PlantillaOrdenDeCompraItemResponse"][];
+        };
+        CreateMovimientoRequest: {
+            monto: number;
+            /** @enum {string} */
+            medioPago: "CREDITO" | "DEBITO" | "EFECTIVO" | "CUENTA_CORRIENTE" | "MERCADO_PAGO" | "TRANSFERENCIA_BANCARIA" | "ECHEQ" | "CHEQUE_FISICO" | "OPERACION_INTERNA" | "NAVE" | "PAGO_ONLINE" | "REMITOS" | "TICKET_ACCESO";
+            /** Format: int64 */
+            cierreCajaId: number;
+            comentarios?: string;
+        };
+        MovimientoResponse: {
+            /** Format: int64 */
+            id?: number;
+            monto?: number;
+            /** @enum {string} */
+            medioPago?: "CREDITO" | "DEBITO" | "EFECTIVO" | "CUENTA_CORRIENTE" | "MERCADO_PAGO" | "TRANSFERENCIA_BANCARIA" | "ECHEQ" | "CHEQUE_FISICO" | "OPERACION_INTERNA" | "NAVE" | "PAGO_ONLINE" | "REMITOS" | "TICKET_ACCESO";
+            /** Format: date-time */
+            fechaHora?: string;
+            /** Format: int64 */
+            cierreCajaId?: number;
+            /** Format: int64 */
+            anulacionId?: number;
+            comentarios?: string;
+        };
+        CreateCierreCajaRequest: {
+            /** Format: int64 */
+            puntoVentaId: number;
+            /** Format: date */
+            fechaOperacion: string;
+            /** Format: int64 */
+            totalPlatosVendidos: number;
+            comentarios?: string;
+        };
+        CierreCajaResponse: {
+            /** Format: int64 */
+            id?: number;
+            /** Format: int64 */
+            puntoDeVentaId?: number;
+            /** Format: date */
+            fechaOperacion?: string;
+            /** Format: int64 */
+            creadoPorId?: number;
+            montoTotal?: number;
+            /** Format: int64 */
+            totalPlatosVendidos?: number;
+            /** Format: date-time */
+            createdAt?: string;
+            comentarios?: string;
+            /** Format: int64 */
+            anulacionId?: number;
+            movimientosIds?: number[];
+        };
+        BulkAnularRequest: {
+            ids: number[];
+            motivo: string;
+        };
+        BulkActionError: {
+            /** Format: int64 */
+            id?: number;
+            mensaje?: string;
+        };
+        BulkActionResponse: {
+            /** Format: int32 */
+            total?: number;
+            /** Format: int32 */
+            exitosas?: number;
+            /** Format: int32 */
+            fallidas?: number;
+            errores?: components["schemas"]["BulkActionError"][];
+        };
+        CreateCajaChicaRequest: {
+            nombre: string;
+            /** Format: int64 */
+            comedorId?: number;
+            /** Format: int64 */
+            titularUsuarioId?: number;
+            accesoUsuarioIds?: number[];
+        };
+        CreateMovimientoCajaChicaRequest: {
+            /** @enum {string} */
+            tipo: "INGRESO" | "EGRESO";
+            monto: number;
+            /** Format: date */
+            fecha: string;
+            /** Format: int64 */
+            conceptoId: number;
+            detalle?: string;
+            /** Format: int64 */
+            cajaContraparteId?: number;
+        };
+        MovimientoCajaChicaResponse: {
+            /** Format: int64 */
+            id?: number;
+            /** Format: int64 */
+            cajaChicaId?: number;
+            /** @enum {string} */
+            tipo?: "INGRESO" | "EGRESO";
+            monto?: number;
+            /** Format: date */
+            fecha?: string;
+            /** Format: int64 */
+            conceptoId?: number;
+            conceptoNombre?: string;
+            detalle?: string;
+            /** Format: int64 */
+            creadoPorId?: number;
+            creadoPorNombre?: string;
+            /** Format: date-time */
+            creadoEn?: string;
+            anulado?: boolean;
+            motivoAnulacion?: string;
+            anuladoPorNombre?: string;
+            /** Format: date-time */
+            fechaAnulacion?: string;
+            /** Format: int64 */
+            contraparteId?: number;
+            /** Format: int64 */
+            contraparteCajaId?: number;
+            contraparteCajaNombre?: string;
+        };
+        CreateConceptoCajaChicaRequest: {
+            nombre: string;
+            requiereDetalle?: boolean;
+        };
+        ConceptoCajaChicaResponse: {
+            /** Format: int64 */
+            id?: number;
+            nombre?: string;
+            requiereDetalle?: boolean;
+            activo?: boolean;
+        };
+        LegajoRequest: {
+            /** Format: int64 */
+            taxId: number;
+            nombre: string;
+            /** Format: int64 */
+            comedorId?: number;
+        };
+        LegajoResponse: {
+            /** Format: int64 */
+            id?: number;
+            /** Format: int64 */
+            taxId?: number;
+            nombre?: string;
+            /** Format: int64 */
+            comedorId?: number;
+            comedorNombre?: string;
+            archivos?: {
+                [key: string]: string;
+            };
+            /** Format: int64 */
+            usuarioId?: number;
+        };
         RegisterRequest: {
             /** Format: int64 */
-            cuil: number;
-            nombre: string;
+            legajoId?: number;
+            /** Format: int64 */
+            cuil?: number;
             /** @enum {string} */
-            rol: "ENCARGADO" | "CONTABILIDAD" | "ADMIN";
+            rol: "ENCARGADO" | "CONTABILIDAD" | "ADMIN" | "CARGA_DATOS";
             password: string;
         };
         LoginResponse: {
             token?: string;
+            /** Format: int64 */
+            id?: number;
             /** Format: int64 */
             cuil?: number;
             nombre?: string;
@@ -1740,63 +3412,449 @@ export interface components {
             cuil: number;
             password: string;
         };
-        CreateSociedadRequest: {
-            nombre: string;
-            direccion: string;
-            cuit: string;
+        CreateEventoBBVARequest: {
+            tipoComedor: "CreateEventoBBVARequest";
+        } & (Omit<components["schemas"]["CreateEventoRequestBase"], "tipoComedor"> & {
+            /** Format: int64 */
+            puntoDeVentaId: number;
+            /** Format: date */
+            fechaEvento: string;
+            /** Format: int32 */
+            cantidadPersonas?: number;
+            montoTotal?: number;
+            /** @enum {string} */
+            medioPago?: "CREDITO" | "DEBITO" | "EFECTIVO" | "CUENTA_CORRIENTE" | "MERCADO_PAGO" | "TRANSFERENCIA_BANCARIA" | "ECHEQ" | "CHEQUE_FISICO" | "OPERACION_INTERNA" | "NAVE" | "PAGO_ONLINE" | "REMITOS" | "TICKET_ACCESO";
+            observaciones?: string;
+            servicios?: {
+                [key: string]: number;
+            };
+            /** Format: int64 */
+            solicitanteId?: number;
+            solicitanteNombre?: string;
+            emailSolicitante?: string;
+            ordenCompra?: string;
+            /** Format: int64 */
+            legajoId?: number;
+            legajoNombre?: string;
+            /** Format: int64 */
+            recepcionId?: number;
+            recepcionNombre?: string;
+        });
+        CreateEventoGaliciaRequest: {
+            tipoComedor: "CreateEventoGaliciaRequest";
+        } & (Omit<components["schemas"]["CreateEventoRequestBase"], "tipoComedor"> & {
+            /** Format: int64 */
+            puntoDeVentaId: number;
+            /** Format: date */
+            fechaEvento: string;
+            /** Format: int32 */
+            cantidadPersonas?: number;
+            montoTotal?: number;
+            /** @enum {string} */
+            medioPago?: "CREDITO" | "DEBITO" | "EFECTIVO" | "CUENTA_CORRIENTE" | "MERCADO_PAGO" | "TRANSFERENCIA_BANCARIA" | "ECHEQ" | "CHEQUE_FISICO" | "OPERACION_INTERNA" | "NAVE" | "PAGO_ONLINE" | "REMITOS" | "TICKET_ACCESO";
+            observaciones?: string;
+            servicios?: {
+                [key: string]: number;
+            };
+            /** Format: int64 */
+            solicitanteId?: number;
+            solicitanteNombre?: string;
+            emailSolicitante?: string;
+            /** Format: int64 */
+            funcionarioId?: number;
+            funcionarioNombre?: string;
+            /** Format: int64 */
+            responsableId?: number;
+            responsableNombre?: string;
+            /** Format: int64 */
+            centroCostoId?: number;
+            centroCostoNombre?: string;
+            /** Format: int64 */
+            partidaId?: number;
+            partidaNombre?: string;
+            precioUnitario?: number;
+            retenciones?: number;
+            numeroOperacion?: string;
+            /** Format: int64 */
+            razonSocialId?: number;
+            destinatarioFacturacion?: string;
+            tipoComprobante?: string;
+            numeroComprobante?: string;
+        });
+        CreateEventoRequestBase: {
+            tipoComedor: string;
         };
-        SociedadResponse: {
+        CreateEventoTechintRequest: {
+            tipoComedor: "CreateEventoTechintRequest";
+        } & (Omit<components["schemas"]["CreateEventoRequestBase"], "tipoComedor"> & {
+            /** Format: int64 */
+            puntoDeVentaId: number;
+            /** Format: date */
+            fechaEvento: string;
+            /** Format: int32 */
+            cantidadPersonas?: number;
+            montoTotal?: number;
+            /** @enum {string} */
+            medioPago?: "CREDITO" | "DEBITO" | "EFECTIVO" | "CUENTA_CORRIENTE" | "MERCADO_PAGO" | "TRANSFERENCIA_BANCARIA" | "ECHEQ" | "CHEQUE_FISICO" | "OPERACION_INTERNA" | "NAVE" | "PAGO_ONLINE" | "REMITOS" | "TICKET_ACCESO";
+            observaciones?: string;
+            servicios?: {
+                [key: string]: number;
+            };
+            numeroPedido?: string;
+            /** Format: int64 */
+            razonSocialId?: number;
+            concepto?: string;
+            tipoComprobante?: string;
+            numeroComprobante?: string;
+        });
+        CreateEventoUDESARequest: {
+            tipoComedor: "CreateEventoUDESARequest";
+        } & (Omit<components["schemas"]["CreateEventoRequestBase"], "tipoComedor"> & {
+            /** Format: int64 */
+            puntoDeVentaId: number;
+            /** Format: date */
+            fechaEvento: string;
+            /** Format: int32 */
+            cantidadPersonas?: number;
+            montoTotal?: number;
+            /** @enum {string} */
+            medioPago?: "CREDITO" | "DEBITO" | "EFECTIVO" | "CUENTA_CORRIENTE" | "MERCADO_PAGO" | "TRANSFERENCIA_BANCARIA" | "ECHEQ" | "CHEQUE_FISICO" | "OPERACION_INTERNA" | "NAVE" | "PAGO_ONLINE" | "REMITOS" | "TICKET_ACCESO";
+            observaciones?: string;
+            servicios?: {
+                [key: string]: number;
+            };
+            /** Format: int64 */
+            solicitanteId?: number;
+            solicitanteNombre?: string;
+            /** Format: int64 */
+            centroCostoId?: number;
+            centroCostoNombre?: string;
+            /** Format: int64 */
+            areaId?: number;
+            areaNombre?: string;
+            precioUnitario?: number;
+            adicionales?: number;
+        });
+        EventoBBVAResponse: {
+            tipoComedor: "EventoBBVAResponse";
+        } & (Omit<components["schemas"]["EventoResponseBase"], "tipoComedor"> & {
             /** Format: int64 */
             id?: number;
-            nombre?: string;
-            direccion?: string;
-            cuit?: string;
-        };
-        CreateProveedorRequest: {
-            nombre: string;
-            taxId: string;
-            /** @enum {string} */
-            formaDePagoPredeterminada?: "CREDITO" | "DEBITO" | "EFECTIVO" | "CUENTA_CORRIENTE" | "MERCADO_PAGO" | "TRANSFERENCIA_BANCARIA" | "ECHEQ" | "CHEQUE_FISICO" | "OPERACION_INTERNA" | "NAVE" | "PAGO_ONLINE" | "CONSUMOS_TECHINT";
-            puntosDeVenta?: number[];
-        };
-        ProveedorResponse: {
             /** Format: int64 */
-            id?: number;
-            nombre?: string;
-            taxId?: string;
-            /** @enum {string} */
-            formaDePagoPredeterminada?: "CREDITO" | "DEBITO" | "EFECTIVO" | "CUENTA_CORRIENTE" | "MERCADO_PAGO" | "TRANSFERENCIA_BANCARIA" | "ECHEQ" | "CHEQUE_FISICO" | "OPERACION_INTERNA" | "NAVE" | "PAGO_ONLINE" | "CONSUMOS_TECHINT";
-            puntosDeVenta?: number[];
-        };
-        CreateMovimientoRequest: {
-            monto: number;
-            /** @enum {string} */
-            medioPago: "CREDITO" | "DEBITO" | "EFECTIVO" | "CUENTA_CORRIENTE" | "MERCADO_PAGO" | "TRANSFERENCIA_BANCARIA" | "ECHEQ" | "CHEQUE_FISICO" | "OPERACION_INTERNA" | "NAVE" | "PAGO_ONLINE" | "CONSUMOS_TECHINT";
+            puntoDeVentaId?: number;
             /** Format: int64 */
-            cierreCajaId: number;
-            comentarios?: string;
-        };
-        MovimientoResponse: {
-            /** Format: int64 */
-            id?: number;
-            monto?: number;
+            comedorId?: number;
             /** @enum {string} */
-            medioPago?: "CREDITO" | "DEBITO" | "EFECTIVO" | "CUENTA_CORRIENTE" | "MERCADO_PAGO" | "TRANSFERENCIA_BANCARIA" | "ECHEQ" | "CHEQUE_FISICO" | "OPERACION_INTERNA" | "NAVE" | "PAGO_ONLINE" | "CONSUMOS_TECHINT";
+            estado?: "CARGA_PARCIAL" | "SOLICITADO" | "REALIZADO" | "FACTURA_EMITIDA" | "COBRADO" | "ANULADO";
+            /** @enum {string} */
+            medioPago?: "CREDITO" | "DEBITO" | "EFECTIVO" | "CUENTA_CORRIENTE" | "MERCADO_PAGO" | "TRANSFERENCIA_BANCARIA" | "ECHEQ" | "CHEQUE_FISICO" | "OPERACION_INTERNA" | "NAVE" | "PAGO_ONLINE" | "REMITOS" | "TICKET_ACCESO";
+            /** Format: date */
+            fechaEvento?: string;
+            /** Format: date */
+            fechaEmision?: string;
+            /** Format: date */
+            fechaPago?: string;
+            /** Format: int32 */
+            cantidadPersonas?: number;
+            montoTotal?: number;
+            observaciones?: string;
+            servicios?: components["schemas"]["ProductoConsumoResponse"][];
+            facturaPdfObjectKey?: string;
+            facturaPdfNombreArchivo?: string;
+            facturaPdfContentType?: string;
+            /** Format: int64 */
+            facturaPdfByteSize?: number;
             /** Format: date-time */
-            fechaHora?: string;
+            facturaPdfSubidoEn?: string;
+            /** Format: date-time */
+            creadoEn?: string;
+            /** Format: date-time */
+            actualizadoEn?: string;
             /** Format: int64 */
-            cierreCajaId?: number;
+            creadoPorId?: number;
+            creadoPorNombre?: string;
             /** Format: int64 */
             anulacionId?: number;
-            comentarios?: string;
+            /** Format: int64 */
+            solicitanteId?: number;
+            solicitanteNombre?: string;
+            emailSolicitante?: string;
+            ordenCompra?: string;
+            /** Format: int64 */
+            legajoId?: number;
+            legajo?: string;
+            /** Format: int64 */
+            recepcionId?: number;
+            recepcion?: string;
+        });
+        EventoGaliciaResponse: {
+            tipoComedor: "EventoGaliciaResponse";
+        } & (Omit<components["schemas"]["EventoResponseBase"], "tipoComedor"> & {
+            /** Format: int64 */
+            id?: number;
+            /** Format: int64 */
+            puntoDeVentaId?: number;
+            /** Format: int64 */
+            comedorId?: number;
+            /** @enum {string} */
+            estado?: "CARGA_PARCIAL" | "SOLICITADO" | "REALIZADO" | "FACTURA_EMITIDA" | "COBRADO" | "ANULADO";
+            /** @enum {string} */
+            medioPago?: "CREDITO" | "DEBITO" | "EFECTIVO" | "CUENTA_CORRIENTE" | "MERCADO_PAGO" | "TRANSFERENCIA_BANCARIA" | "ECHEQ" | "CHEQUE_FISICO" | "OPERACION_INTERNA" | "NAVE" | "PAGO_ONLINE" | "REMITOS" | "TICKET_ACCESO";
+            /** Format: date */
+            fechaEvento?: string;
+            /** Format: date */
+            fechaEmision?: string;
+            /** Format: date */
+            fechaPago?: string;
+            /** Format: int32 */
+            cantidadPersonas?: number;
+            montoTotal?: number;
+            observaciones?: string;
+            servicios?: components["schemas"]["ProductoConsumoResponse"][];
+            facturaPdfObjectKey?: string;
+            facturaPdfNombreArchivo?: string;
+            facturaPdfContentType?: string;
+            /** Format: int64 */
+            facturaPdfByteSize?: number;
+            /** Format: date-time */
+            facturaPdfSubidoEn?: string;
+            /** Format: date-time */
+            creadoEn?: string;
+            /** Format: date-time */
+            actualizadoEn?: string;
+            /** Format: int64 */
+            creadoPorId?: number;
+            creadoPorNombre?: string;
+            /** Format: int64 */
+            anulacionId?: number;
+            /** Format: int64 */
+            solicitanteId?: number;
+            solicitanteNombre?: string;
+            emailSolicitante?: string;
+            /** Format: int64 */
+            funcionarioId?: number;
+            funcionarioNombre?: string;
+            /** Format: int64 */
+            responsableId?: number;
+            responsableNombre?: string;
+            centroCosto?: string;
+            partida?: string;
+            precioUnitario?: number;
+            retenciones?: number;
+            numeroOperacion?: string;
+            /** Format: int64 */
+            razonSocialId?: number;
+            razonSocial?: string;
+            destinatarioFacturacion?: string;
+            tipoComprobante?: string;
+            numeroComprobante?: string;
+        });
+        EventoResponseBase: {
+            tipoComedor: string;
+        };
+        EventoTechintResponse: {
+            tipoComedor: "EventoTechintResponse";
+        } & (Omit<components["schemas"]["EventoResponseBase"], "tipoComedor"> & {
+            /** Format: int64 */
+            id?: number;
+            /** Format: int64 */
+            puntoDeVentaId?: number;
+            /** Format: int64 */
+            comedorId?: number;
+            /** @enum {string} */
+            estado?: "CARGA_PARCIAL" | "SOLICITADO" | "REALIZADO" | "FACTURA_EMITIDA" | "COBRADO" | "ANULADO";
+            /** @enum {string} */
+            medioPago?: "CREDITO" | "DEBITO" | "EFECTIVO" | "CUENTA_CORRIENTE" | "MERCADO_PAGO" | "TRANSFERENCIA_BANCARIA" | "ECHEQ" | "CHEQUE_FISICO" | "OPERACION_INTERNA" | "NAVE" | "PAGO_ONLINE" | "REMITOS" | "TICKET_ACCESO";
+            /** Format: date */
+            fechaEvento?: string;
+            /** Format: date */
+            fechaEmision?: string;
+            /** Format: date */
+            fechaPago?: string;
+            /** Format: int32 */
+            cantidadPersonas?: number;
+            montoTotal?: number;
+            observaciones?: string;
+            servicios?: components["schemas"]["ProductoConsumoResponse"][];
+            facturaPdfObjectKey?: string;
+            facturaPdfNombreArchivo?: string;
+            facturaPdfContentType?: string;
+            /** Format: int64 */
+            facturaPdfByteSize?: number;
+            /** Format: date-time */
+            facturaPdfSubidoEn?: string;
+            /** Format: date-time */
+            creadoEn?: string;
+            /** Format: date-time */
+            actualizadoEn?: string;
+            /** Format: int64 */
+            creadoPorId?: number;
+            creadoPorNombre?: string;
+            /** Format: int64 */
+            anulacionId?: number;
+            numeroPedido?: string;
+            /** Format: int64 */
+            razonSocialId?: number;
+            razonSocial?: string;
+            concepto?: string;
+            tipoComprobante?: string;
+            numeroComprobante?: string;
+        });
+        EventoUDESAResponse: {
+            tipoComedor: "EventoUDESAResponse";
+        } & (Omit<components["schemas"]["EventoResponseBase"], "tipoComedor"> & {
+            /** Format: int64 */
+            id?: number;
+            /** Format: int64 */
+            puntoDeVentaId?: number;
+            /** Format: int64 */
+            comedorId?: number;
+            /** @enum {string} */
+            estado?: "CARGA_PARCIAL" | "SOLICITADO" | "REALIZADO" | "FACTURA_EMITIDA" | "COBRADO" | "ANULADO";
+            /** @enum {string} */
+            medioPago?: "CREDITO" | "DEBITO" | "EFECTIVO" | "CUENTA_CORRIENTE" | "MERCADO_PAGO" | "TRANSFERENCIA_BANCARIA" | "ECHEQ" | "CHEQUE_FISICO" | "OPERACION_INTERNA" | "NAVE" | "PAGO_ONLINE" | "REMITOS" | "TICKET_ACCESO";
+            /** Format: date */
+            fechaEvento?: string;
+            /** Format: date */
+            fechaEmision?: string;
+            /** Format: date */
+            fechaPago?: string;
+            /** Format: int32 */
+            cantidadPersonas?: number;
+            montoTotal?: number;
+            observaciones?: string;
+            servicios?: components["schemas"]["ProductoConsumoResponse"][];
+            facturaPdfObjectKey?: string;
+            facturaPdfNombreArchivo?: string;
+            facturaPdfContentType?: string;
+            /** Format: int64 */
+            facturaPdfByteSize?: number;
+            /** Format: date-time */
+            facturaPdfSubidoEn?: string;
+            /** Format: date-time */
+            creadoEn?: string;
+            /** Format: date-time */
+            actualizadoEn?: string;
+            /** Format: int64 */
+            creadoPorId?: number;
+            creadoPorNombre?: string;
+            /** Format: int64 */
+            anulacionId?: number;
+            /** Format: int64 */
+            solicitanteId?: number;
+            solicitanteNombre?: string;
+            /** Format: int64 */
+            centroCostoId?: number;
+            centroCosto?: string;
+            /** Format: int64 */
+            areaId?: number;
+            area?: string;
+            precioUnitario?: number;
+            adicionales?: number;
+        });
+        ProductoConsumoResponse: {
+            producto?: components["schemas"]["ProductoResponse"];
+            precioUnitario?: number;
+            /** Format: int32 */
+            cantidad?: number;
+        };
+        ProductoResponse: {
+            /** Format: int64 */
+            productoId?: number;
+            /** Format: int64 */
+            comedorId?: number;
+            nombre?: string;
+            precio?: number;
+            activo?: boolean;
+            sapId?: string;
+        };
+        BulkIdsRequest: {
+            ids: number[];
+        };
+        AdjuntarFacturaPdfRequest: {
+            facturaPdfObjectKey: string;
+            facturaPdfNombreArchivo: string;
+            facturaPdfContentType: string;
+            /** Format: int64 */
+            facturaPdfByteSize: number;
+        };
+        BulkEmitirFacturaEventoRequest: {
+            ids: number[];
+            /** Format: date */
+            fechaEmision?: string;
+            /** Format: date */
+            fechaPago?: string;
+            numeroComprobante?: string;
+            tipoComprobante?: string;
+            adjuntarFacturaPdfRequest?: components["schemas"]["AdjuntarFacturaPdfRequest"];
+        };
+        BulkRegistrarPagoEventoRequest: {
+            ids: number[];
+            /** Format: date */
+            fechaPago?: string;
+            /** @enum {string} */
+            medioPago?: "CREDITO" | "DEBITO" | "EFECTIVO" | "CUENTA_CORRIENTE" | "MERCADO_PAGO" | "TRANSFERENCIA_BANCARIA" | "ECHEQ" | "CHEQUE_FISICO" | "OPERACION_INTERNA" | "NAVE" | "PAGO_ONLINE" | "REMITOS" | "TICKET_ACCESO";
+            numeroOperacion?: string;
+        };
+        CreateConsumoRequest: {
+            /** Format: int64 */
+            puntoDeVentaId: number;
+            /** Format: date */
+            fecha: string;
+            /** Format: int64 */
+            consumidorId: number;
+            observaciones?: string;
+            productos: {
+                [key: string]: number;
+            };
+        };
+        AnulacionConsumoResponse: {
+            /** Format: int64 */
+            id?: number;
+            anuladoPor?: components["schemas"]["UsuarioResponse"];
+            /** Format: date-time */
+            fechaAnulacion?: string;
+            motivoAnulacion?: string;
+        };
+        ConsumoResponse: {
+            /** Format: int64 */
+            id?: number;
+            /** Format: int64 */
+            PuntoDeVentaId?: number;
+            /** Format: date */
+            fecha?: string;
+            /** Format: int64 */
+            consumidorId?: number;
+            observaciones?: string;
+            total?: number;
+            productos?: components["schemas"]["ProductoConsumoResponse"][];
+            /** Format: date-time */
+            creadoEn?: string;
+            /** Format: date-time */
+            actualizadoEn?: string;
+            anulacion?: components["schemas"]["AnulacionConsumoResponse"];
+        };
+        UsuarioResponse: {
+            /** Format: int64 */
+            id?: number;
+            /** Format: int64 */
+            cuil?: number;
+            nombre?: string;
+            /** @enum {string} */
+            rol?: "ENCARGADO" | "CONTABILIDAD" | "ADMIN" | "CARGA_DATOS";
+        };
+        CreateProductoRequest: {
+            /** Format: int64 */
+            comedorId: number;
+            nombre: string;
+            precio: number;
+            sapId?: string;
         };
         ImportJobResponse: {
             /** Format: int64 */
             id?: number;
-            tipo?: string;
             /** @enum {string} */
             estado?: "PENDIENTE" | "PROCESANDO" | "COMPLETADO" | "CANCELADO";
-            nombreArchivo?: string;
             /** Format: int32 */
             totalFilas?: number;
             /** Format: int32 */
@@ -1807,12 +3865,243 @@ export interface components {
             filasInvalidas?: number;
             /** Format: int32 */
             filasAplicadas?: number;
+            /** Format: int64 */
+            creadoPorId?: number;
             /** Format: date-time */
             creadoEn?: string;
+            nombreArchivo?: string;
         };
         ImportRowVersionRequest: {
             /** Format: int64 */
             version?: number;
+        };
+        ImportRowProductoResponse: {
+            /** Format: int64 */
+            id?: number;
+            /** Format: int32 */
+            rowIndex?: number;
+            /** @enum {string} */
+            estado?: "READY" | "INVALID" | "CONFLICT" | "APPLIED";
+            /** Format: int64 */
+            version?: number;
+            /** @enum {string} */
+            estadoAsignacion?: "SIN_ASIGNAR" | "ASIGNADA";
+            /** Format: int64 */
+            asignadoAId?: number;
+            asignadoANombre?: string;
+            /** Format: date-time */
+            asignadoEn?: string;
+            /** Format: int64 */
+            actualizadoPorId?: number;
+            /** Format: date-time */
+            actualizadoEn?: string;
+            /** Format: int64 */
+            aplicadoPorId?: number;
+            /** Format: date-time */
+            aplicadoEn?: string;
+            errors?: string;
+            comedorNombre?: string;
+            /** Format: int64 */
+            comedorId?: number;
+            nombre?: string;
+            precio?: number;
+            sapId?: string;
+            activo?: boolean;
+            /** Format: int64 */
+            productoIdAplicado?: number;
+        };
+        ImportRowConsumidorResponse: {
+            /** Format: int64 */
+            id?: number;
+            /** Format: int32 */
+            rowIndex?: number;
+            /** @enum {string} */
+            estado?: "READY" | "INVALID" | "CONFLICT" | "APPLIED";
+            /** Format: int64 */
+            version?: number;
+            /** @enum {string} */
+            estadoAsignacion?: "SIN_ASIGNAR" | "ASIGNADA";
+            /** Format: int64 */
+            asignadoAId?: number;
+            asignadoANombre?: string;
+            /** Format: date-time */
+            asignadoEn?: string;
+            /** Format: int64 */
+            actualizadoPorId?: number;
+            /** Format: date-time */
+            actualizadoEn?: string;
+            /** Format: int64 */
+            aplicadoPorId?: number;
+            /** Format: date-time */
+            aplicadoEn?: string;
+            errors?: string;
+            comedorNombre?: string;
+            /** Format: int64 */
+            comedorId?: number;
+            nombre?: string;
+            taxId?: string;
+            posicion?: string;
+            /** Format: int64 */
+            consumidorIdAplicado?: number;
+        };
+        CreateConsumidorRequest: {
+            /** Format: int64 */
+            comedorId: number;
+            nombre: string;
+            /** Format: int64 */
+            taxId?: number;
+            posicion?: string;
+        };
+        ConsumidorResponse: {
+            /** Format: int64 */
+            id?: number;
+            /** Format: int64 */
+            comedorId?: number;
+            nombre?: string;
+            /** Format: int64 */
+            taxId?: number;
+            posicion?: string;
+            activo?: boolean;
+        };
+        BatchConsumoUdesaRequest: {
+            /** Format: date */
+            fecha: string;
+            /** Format: int64 */
+            productoId: number;
+            /** Format: int64 */
+            comedorId: number;
+            payload: components["schemas"]["BatchConsumoUdesaRowRequest"][];
+        };
+        BatchConsumoUdesaRowRequest: {
+            /** Format: int64 */
+            taxId: number;
+            /** Format: date */
+            fecha: string;
+            nombre: string;
+            puntoDeVentaNombre: string;
+            posicion?: string;
+            /** Format: int64 */
+            rowNumber?: number;
+        };
+        BatchConsumoUdesaResponse: {
+            /** Format: date */
+            fecha?: string;
+            /** Format: int32 */
+            totalRows?: number;
+            /** Format: int64 */
+            createdCount?: number;
+            /** Format: int64 */
+            errorCount?: number;
+            results?: components["schemas"]["BatchConsumoUdesaRowResult"][];
+        };
+        BatchConsumoUdesaRowResult: {
+            /** Format: int32 */
+            rowIndex?: number;
+            /** Format: int64 */
+            taxId?: number;
+            nombre?: string;
+            status?: string;
+            message?: string;
+            consumo?: components["schemas"]["ConsumoResponse"];
+        };
+        CreateProveedorRequest: {
+            nombre: string;
+            taxId: string;
+            /** @enum {string} */
+            formaDePagoPredeterminada?: "CREDITO" | "DEBITO" | "EFECTIVO" | "CUENTA_CORRIENTE" | "MERCADO_PAGO" | "TRANSFERENCIA_BANCARIA" | "ECHEQ" | "CHEQUE_FISICO" | "OPERACION_INTERNA" | "NAVE" | "PAGO_ONLINE" | "REMITOS" | "TICKET_ACCESO";
+            puntosDeVenta?: number[];
+        };
+        ProveedorResponse: {
+            /** Format: int64 */
+            id?: number;
+            nombre?: string;
+            taxId?: string;
+            /** @enum {string} */
+            formaDePagoPredeterminada?: "CREDITO" | "DEBITO" | "EFECTIVO" | "CUENTA_CORRIENTE" | "MERCADO_PAGO" | "TRANSFERENCIA_BANCARIA" | "ECHEQ" | "CHEQUE_FISICO" | "OPERACION_INTERNA" | "NAVE" | "PAGO_ONLINE" | "REMITOS" | "TICKET_ACCESO";
+            puntosDeVenta?: number[];
+        };
+        CreateProveedorItemRequest: {
+            codigo?: string;
+            nombre: string;
+            unidadMedida?: string;
+            precioUnitario: number;
+        };
+        ProveedorItemResponse: {
+            /** Format: int64 */
+            id?: number;
+            /** Format: int64 */
+            proveedorId?: number;
+            codigo?: string;
+            nombre?: string;
+            unidadMedida?: string;
+            precioUnitario?: number;
+            activo?: boolean;
+        };
+        CreateOrdenDeCompraRequest: {
+            /** Format: date */
+            fecha: string;
+            /** Format: date */
+            fechaEstimadaEntrega?: string;
+            solicitante: string;
+            /** Format: int64 */
+            sociedadId: number;
+            /** Format: int64 */
+            comedorId: number;
+            /** Format: int64 */
+            proveedorId: number;
+            plazoEntrega?: string;
+            condicionEntrega?: string;
+            tipoFactura?: string;
+            descuento?: number;
+            observaciones?: string;
+            items: components["schemas"]["CreateOrdenDeCompraItemRequest"][];
+        };
+        OrdenDeCompraItemResponse: {
+            /** Format: int64 */
+            proveedorItemId?: number;
+            codigo?: string;
+            nombre?: string;
+            cantidad?: number;
+            precioUnitario?: number;
+            total?: number;
+        };
+        OrdenDeCompraResponse: {
+            /** Format: int64 */
+            id?: number;
+            nroOrden?: string;
+            /** Format: date */
+            fecha?: string;
+            /** Format: date */
+            fechaEstimadaEntrega?: string;
+            /** Format: date */
+            fechaRecepcion?: string;
+            solicitante?: string;
+            /** Format: int64 */
+            sociedadId?: number;
+            sociedadNombre?: string;
+            sociedadCuit?: string;
+            /** Format: int64 */
+            comedorId?: number;
+            comedorName?: string;
+            /** Format: int64 */
+            proveedorId?: number;
+            proveedorNombre?: string;
+            proveedorCuit?: string;
+            plazoEntrega?: string;
+            condicionEntrega?: string;
+            tipoFactura?: string;
+            /** @enum {string} */
+            estado?: "PENDIENTE" | "APROBADA" | "ENVIADA" | "CANCELADA";
+            subtotal?: number;
+            descuento?: number;
+            total?: number;
+            observaciones?: string;
+            archivoPdf?: string;
+            /** Format: int64 */
+            creadoPorId?: number;
+            /** Format: date-time */
+            creadoEn?: string;
+            items?: components["schemas"]["OrdenDeCompraItemResponse"][];
         };
         ImportRowProveedorResponse: {
             /** Format: int64 */
@@ -1901,79 +4190,11 @@ export interface components {
             bancoId?: number;
             formaPagoRaw?: string;
             /** @enum {string} */
-            medioPago?: "CREDITO" | "DEBITO" | "EFECTIVO" | "CUENTA_CORRIENTE" | "MERCADO_PAGO" | "TRANSFERENCIA_BANCARIA" | "ECHEQ" | "CHEQUE_FISICO" | "OPERACION_INTERNA" | "NAVE" | "PAGO_ONLINE" | "CONSUMOS_TECHINT";
+            medioPago?: "CREDITO" | "DEBITO" | "EFECTIVO" | "CUENTA_CORRIENTE" | "MERCADO_PAGO" | "TRANSFERENCIA_BANCARIA" | "ECHEQ" | "CHEQUE_FISICO" | "OPERACION_INTERNA" | "NAVE" | "PAGO_ONLINE" | "REMITOS" | "TICKET_ACCESO";
             /** @enum {string} */
             estadoFacturaFinal?: "PENDIENTE" | "EMITIDA" | "PAGADA" | "ANULADA";
             /** Format: int64 */
             facturaIdAplicada?: number;
-        };
-        ImportRowEmpleadoResponse: {
-            /** Format: int64 */
-            id?: number;
-            /** Format: int32 */
-            rowIndex?: number;
-            /** @enum {string} */
-            estado?: "READY" | "INVALID" | "CONFLICT" | "APPLIED";
-            /** Format: int64 */
-            version?: number;
-            /** @enum {string} */
-            estadoAsignacion?: "SIN_ASIGNAR" | "ASIGNADA";
-            /** Format: int64 */
-            asignadoAId?: number;
-            asignadoANombre?: string;
-            /** Format: date-time */
-            asignadoEn?: string;
-            /** Format: int64 */
-            actualizadoPorId?: number;
-            /** Format: date-time */
-            actualizadoEn?: string;
-            /** Format: int64 */
-            aplicadoPorId?: number;
-            /** Format: date-time */
-            aplicadoEn?: string;
-            errors?: string;
-            comedorNombre?: string;
-            /** Format: int64 */
-            comedorId?: number;
-            nombre?: string;
-            email?: string;
-            taxId?: string;
-            /** Format: int64 */
-            empleadoIdAplicado?: number;
-        };
-        ImportRowConsumidorResponse: {
-            /** Format: int64 */
-            id?: number;
-            /** Format: int32 */
-            rowIndex?: number;
-            /** @enum {string} */
-            estado?: "READY" | "INVALID" | "CONFLICT" | "APPLIED";
-            /** Format: int64 */
-            version?: number;
-            /** @enum {string} */
-            estadoAsignacion?: "SIN_ASIGNAR" | "ASIGNADA";
-            /** Format: int64 */
-            asignadoAId?: number;
-            asignadoANombre?: string;
-            /** Format: date-time */
-            asignadoEn?: string;
-            /** Format: int64 */
-            actualizadoPorId?: number;
-            /** Format: date-time */
-            actualizadoEn?: string;
-            /** Format: int64 */
-            aplicadoPorId?: number;
-            /** Format: date-time */
-            aplicadoEn?: string;
-            errors?: string;
-            comedorNombre?: string;
-            /** Format: int64 */
-            comedorId?: number;
-            nombre?: string;
-            taxId?: string;
-            posicion?: string;
-            /** Format: int64 */
-            consumidorIdAplicado?: number;
         };
         CreateFacturaProveedorRequest: {
             numero: string;
@@ -1990,7 +4211,7 @@ export interface components {
             comentarios?: string;
             numeroOperacion?: string;
             /** @enum {string} */
-            medioPago?: "CREDITO" | "DEBITO" | "EFECTIVO" | "CUENTA_CORRIENTE" | "MERCADO_PAGO" | "TRANSFERENCIA_BANCARIA" | "ECHEQ" | "CHEQUE_FISICO" | "OPERACION_INTERNA" | "NAVE" | "PAGO_ONLINE" | "CONSUMOS_TECHINT";
+            medioPago?: "CREDITO" | "DEBITO" | "EFECTIVO" | "CUENTA_CORRIENTE" | "MERCADO_PAGO" | "TRANSFERENCIA_BANCARIA" | "ECHEQ" | "CHEQUE_FISICO" | "OPERACION_INTERNA" | "NAVE" | "PAGO_ONLINE" | "REMITOS" | "TICKET_ACCESO";
             /** Format: int64 */
             bancoId?: number;
         };
@@ -2027,7 +4248,7 @@ export interface components {
             comentarios?: string;
             numeroOperacion?: string;
             /** @enum {string} */
-            medioPago?: "CREDITO" | "DEBITO" | "EFECTIVO" | "CUENTA_CORRIENTE" | "MERCADO_PAGO" | "TRANSFERENCIA_BANCARIA" | "ECHEQ" | "CHEQUE_FISICO" | "OPERACION_INTERNA" | "NAVE" | "PAGO_ONLINE" | "CONSUMOS_TECHINT";
+            medioPago?: "CREDITO" | "DEBITO" | "EFECTIVO" | "CUENTA_CORRIENTE" | "MERCADO_PAGO" | "TRANSFERENCIA_BANCARIA" | "ECHEQ" | "CHEQUE_FISICO" | "OPERACION_INTERNA" | "NAVE" | "PAGO_ONLINE" | "REMITOS" | "TICKET_ACCESO";
             /** Format: int64 */
             bancoId?: number;
             bancoNombre?: string;
@@ -2041,236 +4262,138 @@ export interface components {
             puntoDeVentaId?: number;
             monto?: number;
         };
-        CreateEventoRequest: {
-            /** Format: int64 */
-            puntoDeVentaId: number;
-            /** Format: int64 */
-            tipoEventoId: number;
+        BulkPagarFacturaRequest: {
+            ids: number[];
             /** Format: date */
-            fechaEvento: string;
-            /** Format: int64 */
-            solicitanteId?: number;
-            emailSolicitante?: string;
-            /** Format: int64 */
-            funcionarioId?: number;
-            /** Format: int64 */
-            responsableId?: number;
-            /** Format: int32 */
-            cantidadPersonas?: number;
-            montoTotal?: number;
+            fechaPago?: string;
             numeroOperacion?: string;
-            centroCosto?: string;
-            razonSocial?: string;
-            /** @enum {string} */
-            medioPago?: "CREDITO" | "DEBITO" | "EFECTIVO" | "CUENTA_CORRIENTE" | "MERCADO_PAGO" | "TRANSFERENCIA_BANCARIA" | "ECHEQ" | "CHEQUE_FISICO" | "OPERACION_INTERNA" | "NAVE" | "PAGO_ONLINE" | "CONSUMOS_TECHINT";
-            destinatarioFacturacion?: string;
-            tipoComprobante?: string;
-            numeroComprobante?: string;
-            observaciones?: string;
-            retenciones?: number;
         };
-        EventoResponse: {
-            /** Format: int64 */
-            id?: number;
-            /** Format: int64 */
-            puntoDeVentaId?: number;
-            /** Format: int64 */
-            comedorId?: number;
-            /** Format: int64 */
-            tipoEventoId?: number;
-            tipoEventoNombre?: string;
-            /** @enum {string} */
-            estado?: "SOLICITADO" | "REALIZADO" | "FACTURA_EMITIDA" | "COBRADO" | "ANULADO";
-            /** @enum {string} */
-            medioPago?: "CREDITO" | "DEBITO" | "EFECTIVO" | "CUENTA_CORRIENTE" | "MERCADO_PAGO" | "TRANSFERENCIA_BANCARIA" | "ECHEQ" | "CHEQUE_FISICO" | "OPERACION_INTERNA" | "NAVE" | "PAGO_ONLINE" | "CONSUMOS_TECHINT";
-            /** Format: date */
-            fechaEvento?: string;
+        BulkEmitirFacturaRequest: {
+            ids: number[];
             /** Format: date */
             fechaEmision?: string;
             /** Format: date */
             fechaPago?: string;
-            /** Format: int64 */
-            solicitanteId?: number;
-            solicitanteNombre?: string;
-            emailSolicitante?: string;
-            /** Format: int64 */
-            funcionarioId?: number;
-            funcionarioNombre?: string;
-            /** Format: int64 */
-            responsableId?: number;
-            responsableNombre?: string;
-            /** Format: int32 */
-            cantidadPersonas?: number;
-            precioUnitario?: number;
-            montoTotal?: number;
             numeroOperacion?: string;
-            centroCosto?: string;
-            razonSocial?: string;
-            destinatarioFacturacion?: string;
-            tipoComprobante?: string;
-            numeroComprobante?: string;
-            observaciones?: string;
-            retenciones?: number;
-            facturaPdfObjectKey?: string;
-            facturaPdfNombreArchivo?: string;
-            facturaPdfContentType?: string;
-            /** Format: int64 */
-            facturaPdfByteSize?: number;
-            /** Format: date-time */
-            facturaPdfSubidoEn?: string;
-            /** Format: date-time */
-            creadoEn?: string;
-            /** Format: date-time */
-            actualizadoEn?: string;
-            /** Format: int64 */
-            creadoPorId?: number;
-            /** Format: int64 */
-            anulacionId?: number;
         };
-        CreateTipoEventoRequest: {
-            /** Format: int64 */
-            comedorId: number;
-            precio?: number;
+        CreateSociedadRequest: {
             nombre: string;
-            sapId?: string;
+            direccion: string;
+            cuit: string;
         };
-        TipoEventoResponse: {
+        SociedadResponse: {
             /** Format: int64 */
             id?: number;
-            /** Format: int64 */
-            comedorId?: number;
             nombre?: string;
-            activo?: boolean;
-            precio?: number;
-            sapId?: string;
+            direccion?: string;
+            cuit?: string;
         };
-        CreateConsumoRequest: {
-            /** Format: int64 */
-            puntoDeVentaId: number;
-            /** Format: date */
-            fecha: string;
-            /** Format: int64 */
-            consumidorId: number;
-            observaciones?: string;
-            productos: {
-                [key: string]: number;
-            };
-        };
-        AnulacionConsumoResponse: {
+        ImportRowRazonSocialResponse: {
             /** Format: int64 */
             id?: number;
-            anuladoPor?: components["schemas"]["UsuarioResponse"];
-            /** Format: date-time */
-            fechaAnulacion?: string;
-            motivoAnulacion?: string;
-        };
-        ConsumoResponse: {
-            /** Format: int64 */
-            id?: number;
-            /** Format: int64 */
-            PuntoDeVentaId?: number;
-            /** Format: date */
-            fecha?: string;
-            /** Format: int64 */
-            consumidorId?: number;
-            observaciones?: string;
-            total?: number;
-            productos?: components["schemas"]["ProductoConsumoResponse"][];
-            /** Format: date-time */
-            creadoEn?: string;
-            /** Format: date-time */
-            actualizadoEn?: string;
-            anulacion?: components["schemas"]["AnulacionConsumoResponse"];
-        };
-        ProductoConsumoResponse: {
-            producto?: components["schemas"]["ProductoResponse"];
-            precioUnitario?: number;
-            /** Format: int32 */
-            cantidad?: number;
-        };
-        ProductoResponse: {
-            /** Format: int64 */
-            productoId?: number;
-            /** Format: int64 */
-            comedorId?: number;
-            nombre?: string;
-            precio?: number;
-            activo?: boolean;
-            sapId?: string;
-        };
-        UsuarioResponse: {
-            /** Format: int64 */
-            cuil?: number;
-            nombre?: string;
-            /** @enum {string} */
-            rol?: "ENCARGADO" | "CONTABILIDAD" | "ADMIN";
-        };
-        CreateProductoRequest: {
-            /** Format: int64 */
-            comedorId: number;
-            nombre: string;
-            precio: number;
-            sapId?: string;
-        };
-        CreateConsumidorRequest: {
-            /** Format: int64 */
-            comedorId: number;
-            nombre: string;
-            /** Format: int64 */
-            taxId?: number;
-            posicion?: string;
-        };
-        ConsumidorResponse: {
-            /** Format: int64 */
-            id?: number;
-            /** Format: int64 */
-            comedorId?: number;
-            nombre?: string;
-            /** Format: int64 */
-            taxId?: number;
-            posicion?: string;
-            activo?: boolean;
-        };
-        BatchConsumoUdesaRequest: {
-            /** Format: date */
-            fecha: string;
-            /** Format: int64 */
-            productoId: number;
-            /** Format: int64 */
-            comedorId: number;
-            payload: components["schemas"]["BatchConsumoUdesaRowRequest"][];
-        };
-        BatchConsumoUdesaRowRequest: {
-            /** Format: int64 */
-            taxId: number;
-            /** Format: date */
-            fecha: string;
-            nombre: string;
-            puntoDeVentaNombre: string;
-            posicion?: string;
-            /** Format: int64 */
-            rowNumber?: number;
-        };
-        BatchConsumoUdesaResponse: {
-            /** Format: date */
-            fecha?: string;
-            /** Format: int32 */
-            totalRows?: number;
-            /** Format: int64 */
-            createdCount?: number;
-            /** Format: int64 */
-            errorCount?: number;
-            results?: components["schemas"]["BatchConsumoUdesaRowResult"][];
-        };
-        BatchConsumoUdesaRowResult: {
             /** Format: int32 */
             rowIndex?: number;
+            /** @enum {string} */
+            estado?: "READY" | "INVALID" | "CONFLICT" | "APPLIED";
             /** Format: int64 */
-            taxId?: number;
+            version?: number;
+            /** @enum {string} */
+            estadoAsignacion?: "SIN_ASIGNAR" | "ASIGNADA";
+            /** Format: int64 */
+            asignadoAId?: number;
+            asignadoANombre?: string;
+            /** Format: date-time */
+            asignadoEn?: string;
+            /** Format: int64 */
+            actualizadoPorId?: number;
+            /** Format: date-time */
+            actualizadoEn?: string;
+            /** Format: int64 */
+            aplicadoPorId?: number;
+            /** Format: date-time */
+            aplicadoEn?: string;
+            errors?: string;
+            comedorNombre?: string;
+            /** Format: int64 */
+            comedorId?: number;
             nombre?: string;
-            status?: string;
-            message?: string;
-            consumo?: components["schemas"]["ConsumoResponse"];
+            taxId?: string;
+            /** Format: int64 */
+            razonSocialIdAplicado?: number;
+        };
+        ImportRowEmpleadoResponse: {
+            /** Format: int64 */
+            id?: number;
+            /** Format: int32 */
+            rowIndex?: number;
+            /** @enum {string} */
+            estado?: "READY" | "INVALID" | "CONFLICT" | "APPLIED";
+            /** Format: int64 */
+            version?: number;
+            /** @enum {string} */
+            estadoAsignacion?: "SIN_ASIGNAR" | "ASIGNADA";
+            /** Format: int64 */
+            asignadoAId?: number;
+            asignadoANombre?: string;
+            /** Format: date-time */
+            asignadoEn?: string;
+            /** Format: int64 */
+            actualizadoPorId?: number;
+            /** Format: date-time */
+            actualizadoEn?: string;
+            /** Format: int64 */
+            aplicadoPorId?: number;
+            /** Format: date-time */
+            aplicadoEn?: string;
+            errors?: string;
+            comedorNombre?: string;
+            /** Format: int64 */
+            comedorId?: number;
+            nombre?: string;
+            email?: string;
+            taxId?: string;
+            centroCosto?: string;
+            partida?: string;
+            /** Format: int64 */
+            empleadoIdAplicado?: number;
+        };
+        ImportRowCentroCostoPartidaResponse: {
+            /** Format: int64 */
+            id?: number;
+            /** Format: int32 */
+            rowIndex?: number;
+            /** @enum {string} */
+            estado?: "READY" | "INVALID" | "CONFLICT" | "APPLIED";
+            /** Format: int64 */
+            version?: number;
+            /** @enum {string} */
+            estadoAsignacion?: "SIN_ASIGNAR" | "ASIGNADA";
+            /** Format: int64 */
+            asignadoAId?: number;
+            asignadoANombre?: string;
+            /** Format: date-time */
+            asignadoEn?: string;
+            /** Format: int64 */
+            actualizadoPorId?: number;
+            /** Format: date-time */
+            actualizadoEn?: string;
+            /** Format: int64 */
+            aplicadoPorId?: number;
+            /** Format: date-time */
+            aplicadoEn?: string;
+            errors?: string;
+            ccComedorNombre?: string;
+            /** Format: int64 */
+            ccComedorId?: number;
+            ccNombre?: string;
+            /** Format: int64 */
+            ccIdAplicado?: number;
+            partidaComedorNombre?: string;
+            /** Format: int64 */
+            partidaComedorId?: number;
+            partidaNombre?: string;
+            /** Format: int64 */
+            partidaIdAplicado?: number;
         };
         CreateComedorRequest: {
             nombre: string;
@@ -2314,15 +4437,31 @@ export interface components {
             /** Format: int64 */
             comedorId: number;
         };
+        CreatePartidaRequest: {
+            nombre: string;
+            /** Format: int64 */
+            comedorId: number;
+        };
+        PartidaResponse: {
+            /** Format: int64 */
+            id?: number;
+            nombre?: string;
+            /** Format: int64 */
+            comedorId?: number;
+            activo?: boolean;
+        };
         CreateEmpleadoComedorRequest: {
             /** Format: int64 */
             comedorId: number;
             nombre: string;
+            /** Format: email */
             email?: string;
             /** Format: int64 */
             taxId?: number;
-            centroCosto?: string;
-            partida?: string;
+            /** Format: int64 */
+            centroCostoId?: number;
+            /** Format: int64 */
+            partidaId?: number;
         };
         EmpleadoComedorResponse: {
             /** Format: int64 */
@@ -2334,34 +4473,25 @@ export interface components {
             /** Format: int64 */
             taxId?: number;
             activo?: boolean;
-        };
-        CreateCierreCajaRequest: {
             /** Format: int64 */
-            puntoVentaId: number;
-            /** Format: date */
-            fechaOperacion: string;
+            centroCostoId?: number;
+            centroCostoNombre?: string;
             /** Format: int64 */
-            totalPlatosVendidos: number;
-            comentarios?: string;
+            partidaId?: number;
+            partidaNombre?: string;
         };
-        CierreCajaResponse: {
+        CreateCentroCostoRequest: {
+            nombre: string;
+            /** Format: int64 */
+            comedorId: number;
+        };
+        CentroCostoResponse: {
             /** Format: int64 */
             id?: number;
+            nombre?: string;
             /** Format: int64 */
-            puntoDeVentaId?: number;
-            /** Format: date */
-            fechaOperacion?: string;
-            /** Format: int64 */
-            creadoPorId?: number;
-            montoTotal?: number;
-            /** Format: int64 */
-            totalPlatosVendidos?: number;
-            /** Format: date-time */
-            createdAt?: string;
-            comentarios?: string;
-            /** Format: int64 */
-            anulacionId?: number;
-            movimientosIds?: number[];
+            comedorId?: number;
+            activo?: boolean;
         };
         CreateBancoRequest: {
             nombre: string;
@@ -2376,104 +4506,196 @@ export interface components {
             sociedadId?: number;
             sociedadNombre?: string;
         };
+        PatchCierreCajaRequest: {
+            /** Format: date */
+            fechaOperacion: string;
+            /** Format: int64 */
+            comedorId: number;
+            /** Format: int64 */
+            puntoDeVentaId: number;
+            /** Format: int64 */
+            totalPlatosVendidos: number;
+            comentarios?: string;
+        };
+        PatchCajaChicaRequest: {
+            nombre?: string;
+            activa?: boolean;
+        };
+        AnularMovimientoCajaChicaRequest: {
+            motivo: string;
+        };
+        PatchConceptoCajaChicaRequest: {
+            nombre?: string;
+            requiereDetalle?: boolean;
+            activo?: boolean;
+        };
+        PatchLegajoRequest: {
+            /** Format: int64 */
+            taxId?: number;
+            nombre?: string;
+            /** Format: int64 */
+            comedorId?: number;
+        };
         PatchUsuarioRequest: {
             nombre?: string;
             /** @enum {string} */
-            rol?: "ENCARGADO" | "CONTABILIDAD" | "ADMIN";
+            rol?: "ENCARGADO" | "CONTABILIDAD" | "ADMIN" | "CARGA_DATOS";
             password?: string;
             /** Format: int64 */
             cuil?: number;
         };
-        PatchSociedadRequest: {
-            nombre: string;
-            direccion: string;
-            cuit: string;
-        };
-        PatchProveedorRequest: {
-            nombre: string;
-            taxId: string;
+        PatchEventoBBVARequest: {
+            tipoComedor: "PatchEventoBBVARequest";
+        } & (Omit<components["schemas"]["PatchEventoRequestBase"], "tipoComedor"> & {
+            /** Format: int64 */
+            puntoDeVentaId?: number;
             /** @enum {string} */
-            formaDePagoPredeterminada?: "CREDITO" | "DEBITO" | "EFECTIVO" | "CUENTA_CORRIENTE" | "MERCADO_PAGO" | "TRANSFERENCIA_BANCARIA" | "ECHEQ" | "CHEQUE_FISICO" | "OPERACION_INTERNA" | "NAVE" | "PAGO_ONLINE" | "CONSUMOS_TECHINT";
-            puntosDeVenta?: number[];
-        };
-        AgregarPuntoDeVentaRequest: {
-            puntosDeVenta?: number[];
-        };
-        PatchImportRowProveedorRequest: {
-            /** Format: int64 */
-            version?: number;
-            nombre?: string;
-            taxId?: string;
-            formaDePagoPredeterminada?: string;
-            puntosDeVenta?: string;
-        };
-        PatchImportRowFacturaRequest: {
-            /** Format: int64 */
-            version?: number;
-            /** Format: int64 */
-            proveedorId?: number;
-            /** Format: int64 */
-            comedorId?: number;
-            /** Format: int64 */
-            bancoId?: number;
+            estado?: "CARGA_PARCIAL" | "SOLICITADO" | "REALIZADO" | "FACTURA_EMITIDA" | "COBRADO" | "ANULADO";
             /** @enum {string} */
-            medioPago?: "CREDITO" | "DEBITO" | "EFECTIVO" | "CUENTA_CORRIENTE" | "MERCADO_PAGO" | "TRANSFERENCIA_BANCARIA" | "ECHEQ" | "CHEQUE_FISICO" | "OPERACION_INTERNA" | "NAVE" | "PAGO_ONLINE" | "CONSUMOS_TECHINT";
+            medioPago?: "CREDITO" | "DEBITO" | "EFECTIVO" | "CUENTA_CORRIENTE" | "MERCADO_PAGO" | "TRANSFERENCIA_BANCARIA" | "ECHEQ" | "CHEQUE_FISICO" | "OPERACION_INTERNA" | "NAVE" | "PAGO_ONLINE" | "REMITOS" | "TICKET_ACCESO";
             /** Format: date */
-            fechaCarga?: string;
+            fechaEvento?: string;
             /** Format: date */
             fechaEmision?: string;
             /** Format: date */
             fechaPago?: string;
-            /** Format: date */
-            fechaFactura?: string;
-            numeroFactura?: string;
-            monto?: number;
-            numeroOperacion?: string;
-        };
-        PatchImportRowEmpleadoRequest: {
+            /** Format: int32 */
+            cantidadPersonas?: number;
+            montoTotal?: number;
+            observaciones?: string;
+            servicios?: {
+                [key: string]: number;
+            };
             /** Format: int64 */
-            version?: number;
+            solicitanteId?: number;
+            solicitanteNombre?: string;
+            emailSolicitante?: string;
+            ordenCompra?: string;
             /** Format: int64 */
-            comedorId?: number;
-            nombre?: string;
-            email?: string;
-            taxId?: string;
-        };
-        PatchImportRowConsumidorRequest: {
+            legajoId?: number;
+            legajoNombre?: string;
             /** Format: int64 */
-            version?: number;
+            recepcionId?: number;
+            recepcionNombre?: string;
+        });
+        PatchEventoGaliciaRequest: {
+            tipoComedor: "PatchEventoGaliciaRequest";
+        } & (Omit<components["schemas"]["PatchEventoRequestBase"], "tipoComedor"> & {
             /** Format: int64 */
-            comedorId?: number;
-            nombre?: string;
-            taxId?: string;
-            posicion?: string;
-        };
-        PatchFacturaRequest: {
-            /** Format: int64 */
-            puntoDeVentaProveedor?: number;
-            puntoDeVentaComedor?: components["schemas"]["FacturaPuntoDeVentaMontoRequest"][];
-            /** Format: int64 */
-            comedorId?: number;
-            /** Format: date */
-            fechaFactura?: string;
-            numeroFactura?: string;
-            /** Format: int64 */
-            proveedorId?: number;
-            monto?: number;
-            comentarios?: string;
-            numeroOperacion?: string;
+            puntoDeVentaId?: number;
             /** @enum {string} */
-            medioPago?: "CREDITO" | "DEBITO" | "EFECTIVO" | "CUENTA_CORRIENTE" | "MERCADO_PAGO" | "TRANSFERENCIA_BANCARIA" | "ECHEQ" | "CHEQUE_FISICO" | "OPERACION_INTERNA" | "NAVE" | "PAGO_ONLINE" | "CONSUMOS_TECHINT";
-            /** Format: int64 */
-            bancoId?: number;
+            estado?: "CARGA_PARCIAL" | "SOLICITADO" | "REALIZADO" | "FACTURA_EMITIDA" | "COBRADO" | "ANULADO";
+            /** @enum {string} */
+            medioPago?: "CREDITO" | "DEBITO" | "EFECTIVO" | "CUENTA_CORRIENTE" | "MERCADO_PAGO" | "TRANSFERENCIA_BANCARIA" | "ECHEQ" | "CHEQUE_FISICO" | "OPERACION_INTERNA" | "NAVE" | "PAGO_ONLINE" | "REMITOS" | "TICKET_ACCESO";
+            /** Format: date */
+            fechaEvento?: string;
             /** Format: date */
             fechaEmision?: string;
             /** Format: date */
             fechaPago?: string;
+            /** Format: int32 */
+            cantidadPersonas?: number;
+            montoTotal?: number;
+            observaciones?: string;
+            servicios?: {
+                [key: string]: number;
+            };
+            /** Format: int64 */
+            solicitanteId?: number;
+            solicitanteNombre?: string;
+            emailSolicitante?: string;
+            /** Format: int64 */
+            funcionarioId?: number;
+            funcionarioNombre?: string;
+            /** Format: int64 */
+            responsableId?: number;
+            responsableNombre?: string;
+            /** Format: int64 */
+            centroCostoId?: number;
+            centroCostoNombre?: string;
+            /** Format: int64 */
+            partidaId?: number;
+            partidaNombre?: string;
+            precioUnitario?: number;
+            retenciones?: number;
+            numeroOperacion?: string;
+            /** Format: int64 */
+            razonSocialId?: number;
+            destinatarioFacturacion?: string;
+            tipoComprobante?: string;
+            numeroComprobante?: string;
+        });
+        PatchEventoRequestBase: {
+            tipoComedor: string;
         };
-        PagarFacturaRequest: {
+        PatchEventoTechintRequest: {
+            tipoComedor: "PatchEventoTechintRequest";
+        } & (Omit<components["schemas"]["PatchEventoRequestBase"], "tipoComedor"> & {
+            /** Format: int64 */
+            puntoDeVentaId?: number;
+            /** @enum {string} */
+            estado?: "CARGA_PARCIAL" | "SOLICITADO" | "REALIZADO" | "FACTURA_EMITIDA" | "COBRADO" | "ANULADO";
+            /** @enum {string} */
+            medioPago?: "CREDITO" | "DEBITO" | "EFECTIVO" | "CUENTA_CORRIENTE" | "MERCADO_PAGO" | "TRANSFERENCIA_BANCARIA" | "ECHEQ" | "CHEQUE_FISICO" | "OPERACION_INTERNA" | "NAVE" | "PAGO_ONLINE" | "REMITOS" | "TICKET_ACCESO";
+            /** Format: date */
+            fechaEvento?: string;
+            /** Format: date */
+            fechaEmision?: string;
             /** Format: date */
             fechaPago?: string;
+            /** Format: int32 */
+            cantidadPersonas?: number;
+            montoTotal?: number;
+            observaciones?: string;
+            servicios?: {
+                [key: string]: number;
+            };
+            numeroPedido?: string;
+            /** Format: int64 */
+            razonSocialId?: number;
+            concepto?: string;
+            tipoComprobante?: string;
+            numeroComprobante?: string;
+        });
+        PatchEventoUDESARequest: {
+            tipoComedor: "PatchEventoUDESARequest";
+        } & (Omit<components["schemas"]["PatchEventoRequestBase"], "tipoComedor"> & {
+            /** Format: int64 */
+            puntoDeVentaId?: number;
+            /** @enum {string} */
+            estado?: "CARGA_PARCIAL" | "SOLICITADO" | "REALIZADO" | "FACTURA_EMITIDA" | "COBRADO" | "ANULADO";
+            /** @enum {string} */
+            medioPago?: "CREDITO" | "DEBITO" | "EFECTIVO" | "CUENTA_CORRIENTE" | "MERCADO_PAGO" | "TRANSFERENCIA_BANCARIA" | "ECHEQ" | "CHEQUE_FISICO" | "OPERACION_INTERNA" | "NAVE" | "PAGO_ONLINE" | "REMITOS" | "TICKET_ACCESO";
+            /** Format: date */
+            fechaEvento?: string;
+            /** Format: date */
+            fechaEmision?: string;
+            /** Format: date */
+            fechaPago?: string;
+            /** Format: int32 */
+            cantidadPersonas?: number;
+            montoTotal?: number;
+            observaciones?: string;
+            servicios?: {
+                [key: string]: number;
+            };
+            /** Format: int64 */
+            solicitanteId?: number;
+            solicitanteNombre?: string;
+            /** Format: int64 */
+            centroCostoId?: number;
+            centroCostoNombre?: string;
+            /** Format: int64 */
+            areaId?: number;
+            areaNombre?: string;
+            precioUnitario?: number;
+            adicionales?: number;
+        });
+        RegistrarPagoEventoRequest: {
+            /** Format: date */
+            fechaPago?: string;
+            /** @enum {string} */
+            medioPago?: "CREDITO" | "DEBITO" | "EFECTIVO" | "CUENTA_CORRIENTE" | "MERCADO_PAGO" | "TRANSFERENCIA_BANCARIA" | "ECHEQ" | "CHEQUE_FISICO" | "OPERACION_INTERNA" | "NAVE" | "PAGO_ONLINE" | "REMITOS" | "TICKET_ACCESO";
             numeroOperacion: string;
         };
         EmitirFacturaRequest: {
@@ -2481,66 +4703,12 @@ export interface components {
             fechaEmision: string;
             /** Format: date */
             fechaPago?: string;
-            numeroOperacion?: string;
-        };
-        PatchEventoRequest: {
-            /** Format: int64 */
-            puntoDeVentaId?: number;
-            /** Format: int64 */
-            tipoEventoId?: number;
-            /** @enum {string} */
-            estado?: "SOLICITADO" | "REALIZADO" | "FACTURA_EMITIDA" | "COBRADO" | "ANULADO";
-            /** @enum {string} */
-            medioPago?: "CREDITO" | "DEBITO" | "EFECTIVO" | "CUENTA_CORRIENTE" | "MERCADO_PAGO" | "TRANSFERENCIA_BANCARIA" | "ECHEQ" | "CHEQUE_FISICO" | "OPERACION_INTERNA" | "NAVE" | "PAGO_ONLINE" | "CONSUMOS_TECHINT";
-            /** Format: date */
-            fechaEvento?: string;
-            /** Format: date */
-            fechaEmision?: string;
-            /** Format: date */
-            fechaPago?: string;
-            /** Format: int64 */
-            solicitanteId?: number;
-            emailSolicitante?: string;
-            /** Format: int64 */
-            funcionarioId?: number;
-            /** Format: int64 */
-            responsableId?: number;
-            /** Format: int32 */
-            cantidadPersonas?: number;
-            precioUnitario?: number;
-            montoTotal?: number;
-            numeroOperacion?: string;
-            centroCosto?: string;
-            razonSocial?: string;
-            destinatarioFacturacion?: string;
-            tipoComprobante?: string;
             numeroComprobante?: string;
-            observaciones?: string;
-            retenciones?: number;
-        };
-        RegistrarPagoEventoRequest: {
-            /** Format: date */
-            fechaPago?: string;
-            /** @enum {string} */
-            medioPago?: "CREDITO" | "DEBITO" | "EFECTIVO" | "CUENTA_CORRIENTE" | "MERCADO_PAGO" | "TRANSFERENCIA_BANCARIA" | "ECHEQ" | "CHEQUE_FISICO" | "OPERACION_INTERNA" | "NAVE" | "PAGO_ONLINE" | "CONSUMOS_TECHINT";
-            numeroOperacion: string;
-        };
-        AdjuntarFacturaPdfRequest: {
-            facturaPdfObjectKey: string;
-            facturaPdfNombreArchivo: string;
-            facturaPdfContentType: string;
-            /** Format: int64 */
-            facturaPdfByteSize: number;
+            tipoComprobante?: string;
+            adjuntarFacturaPdfRequest?: components["schemas"]["AdjuntarFacturaPdfRequest"];
         };
         AnularEventoRequest: {
             motivo: string;
-        };
-        PatchTipoEventoRequest: {
-            /** Format: int64 */
-            comedorId?: number;
-            nombre?: string;
-            precio?: number;
-            sapId?: string;
         };
         PatchConsumoRequest: {
             /** Format: int64 */
@@ -2561,6 +4729,25 @@ export interface components {
             precio?: number;
             sapId?: string;
         };
+        PatchImportRowProductoRequest: {
+            /** Format: int64 */
+            version?: number;
+            /** Format: int64 */
+            comedorId?: number;
+            nombre?: string;
+            precio?: number;
+            sapId?: string;
+            activo?: boolean;
+        };
+        PatchImportRowConsumidorRequest: {
+            /** Format: int64 */
+            version?: number;
+            /** Format: int64 */
+            comedorId?: number;
+            nombre?: string;
+            taxId?: string;
+            posicion?: string;
+        };
         PatchConsumidorRequest: {
             /** Format: int64 */
             comedorId?: number;
@@ -2568,6 +4755,136 @@ export interface components {
             /** Format: int64 */
             taxId?: number;
             posicion?: string;
+        };
+        PatchProveedorItemRequest: {
+            codigo?: string;
+            nombre?: string;
+            unidadMedida?: string;
+            precioUnitario?: number;
+        };
+        PatchProveedorRequest: {
+            nombre: string;
+            taxId: string;
+            /** @enum {string} */
+            formaDePagoPredeterminada?: "CREDITO" | "DEBITO" | "EFECTIVO" | "CUENTA_CORRIENTE" | "MERCADO_PAGO" | "TRANSFERENCIA_BANCARIA" | "ECHEQ" | "CHEQUE_FISICO" | "OPERACION_INTERNA" | "NAVE" | "PAGO_ONLINE" | "REMITOS" | "TICKET_ACCESO";
+            puntosDeVenta?: number[];
+        };
+        AgregarPuntoDeVentaRequest: {
+            puntosDeVenta?: number[];
+        };
+        PatchOrdenDeCompraRequest: {
+            /** Format: date */
+            fecha?: string;
+            /** Format: date */
+            fechaEstimadaEntrega?: string;
+            /** Format: date */
+            fechaRecepcion?: string;
+            solicitante?: string;
+            /** Format: int64 */
+            sociedadId?: number;
+            /** Format: int64 */
+            comedorId?: number;
+            /** Format: int64 */
+            proveedorId?: number;
+            plazoEntrega?: string;
+            condicionEntrega?: string;
+            tipoFactura?: string;
+            descuento?: number;
+            observaciones?: string;
+            items?: components["schemas"]["CreateOrdenDeCompraItemRequest"][];
+        };
+        PatchImportRowProveedorRequest: {
+            /** Format: int64 */
+            version?: number;
+            nombre?: string;
+            taxId?: string;
+            formaDePagoPredeterminada?: string;
+            puntosDeVenta?: string;
+        };
+        PatchImportRowFacturaRequest: {
+            /** Format: int64 */
+            version?: number;
+            /** Format: int64 */
+            proveedorId?: number;
+            /** Format: int64 */
+            comedorId?: number;
+            /** Format: int64 */
+            bancoId?: number;
+            /** @enum {string} */
+            medioPago?: "CREDITO" | "DEBITO" | "EFECTIVO" | "CUENTA_CORRIENTE" | "MERCADO_PAGO" | "TRANSFERENCIA_BANCARIA" | "ECHEQ" | "CHEQUE_FISICO" | "OPERACION_INTERNA" | "NAVE" | "PAGO_ONLINE" | "REMITOS" | "TICKET_ACCESO";
+            /** Format: date */
+            fechaCarga?: string;
+            /** Format: date */
+            fechaEmision?: string;
+            /** Format: date */
+            fechaPago?: string;
+            /** Format: date */
+            fechaFactura?: string;
+            numeroFactura?: string;
+            monto?: number;
+            numeroOperacion?: string;
+        };
+        PatchFacturaRequest: {
+            /** Format: int64 */
+            puntoDeVentaProveedor?: number;
+            puntoDeVentaComedor?: components["schemas"]["FacturaPuntoDeVentaMontoRequest"][];
+            /** Format: int64 */
+            comedorId?: number;
+            /** Format: date */
+            fechaFactura?: string;
+            numeroFactura?: string;
+            /** Format: int64 */
+            proveedorId?: number;
+            monto?: number;
+            comentarios?: string;
+            numeroOperacion?: string;
+            /** @enum {string} */
+            medioPago?: "CREDITO" | "DEBITO" | "EFECTIVO" | "CUENTA_CORRIENTE" | "MERCADO_PAGO" | "TRANSFERENCIA_BANCARIA" | "ECHEQ" | "CHEQUE_FISICO" | "OPERACION_INTERNA" | "NAVE" | "PAGO_ONLINE" | "REMITOS" | "TICKET_ACCESO";
+            /** Format: int64 */
+            bancoId?: number;
+            /** Format: date */
+            fechaEmision?: string;
+            /** Format: date */
+            fechaPago?: string;
+        };
+        PagarFacturaRequest: {
+            /** Format: date */
+            fechaPago?: string;
+            numeroOperacion: string;
+        };
+        PatchSociedadRequest: {
+            nombre: string;
+            direccion: string;
+            cuit: string;
+        };
+        PatchImportRowRazonSocialRequest: {
+            /** Format: int64 */
+            version?: number;
+            /** Format: int64 */
+            comedorId?: number;
+            nombre?: string;
+            taxId?: string;
+        };
+        PatchImportRowEmpleadoRequest: {
+            /** Format: int64 */
+            version?: number;
+            /** Format: int64 */
+            comedorId?: number;
+            nombre?: string;
+            email?: string;
+            taxId?: string;
+            centroCosto?: string;
+            partida?: string;
+        };
+        PatchImportRowCentroCostoPartidaRequest: {
+            /** Format: int64 */
+            version?: number;
+            /** Format: int64 */
+            ccComedorId?: number;
+            ccNombre?: string;
+            /** Format: int64 */
+            partidaComedorId?: number;
+            partidaNombre?: string;
         };
         PatchComedorRequest: {
             nombre: string;
@@ -2584,39 +4901,33 @@ export interface components {
         PatchPuntoDeVentaRequest: {
             nombre: string;
         };
+        PatchPartidaRequest: {
+            nombre?: string;
+            /** Format: int64 */
+            comedorId?: number;
+        };
         PatchEmpleadoComedorRequest: {
             /** Format: int64 */
             comedorId?: number;
             nombre?: string;
+            /** Format: email */
             email?: string;
             /** Format: int64 */
             taxId?: number;
-            centroCosto?: string;
-            partida?: string;
+            /** Format: int64 */
+            centroCostoId?: number;
+            /** Format: int64 */
+            partidaId?: number;
         };
-        PatchCierreCajaRequest: {
-            /** Format: date */
-            fechaOperacion: string;
+        PatchCentroCostoRequest: {
+            nombre?: string;
             /** Format: int64 */
-            comedorId: number;
-            /** Format: int64 */
-            puntoDeVentaId: number;
-            /** Format: int64 */
-            totalPlatosVendidos: number;
-            comentarios?: string;
+            comedorId?: number;
         };
         PatchBancoRequest: {
             nombre: string;
             /** Format: int64 */
             sociedadId?: number;
-        };
-        AnulacionMovimientoResponse: {
-            /** Format: int64 */
-            id?: number;
-            anuladoPor?: components["schemas"]["UsuarioResponse"];
-            /** Format: date-time */
-            fechaAnulacion?: string;
-            motivoAnulacion?: string;
         };
         Pageable: {
             /** Format: int32 */
@@ -2625,20 +4936,20 @@ export interface components {
             size?: number;
             sort?: string[];
         };
-        PageFacturaProveedorResponse: {
+        PageMovimientoResponse: {
             /** Format: int64 */
             totalElements?: number;
             /** Format: int32 */
             totalPages?: number;
             pageable?: components["schemas"]["PageableObject"];
-            /** Format: int32 */
-            size?: number;
-            content?: components["schemas"]["FacturaProveedorResponse"][];
-            /** Format: int32 */
-            number?: number;
-            sort?: components["schemas"]["SortObject"][];
             first?: boolean;
             last?: boolean;
+            /** Format: int32 */
+            size?: number;
+            content?: components["schemas"]["MovimientoResponse"][];
+            /** Format: int32 */
+            number?: number;
+            sort?: components["schemas"]["SortObject"];
             /** Format: int32 */
             numberOfElements?: number;
             empty?: boolean;
@@ -2647,43 +4958,25 @@ export interface components {
             paged?: boolean;
             /** Format: int32 */
             pageNumber?: number;
-            /** Format: int32 */
-            pageSize?: number;
             /** Format: int64 */
             offset?: number;
-            sort?: components["schemas"]["SortObject"][];
+            sort?: components["schemas"]["SortObject"];
+            /** Format: int32 */
+            pageSize?: number;
             unpaged?: boolean;
         };
         SortObject: {
-            direction?: string;
-            nullHandling?: string;
-            ascending?: boolean;
-            property?: string;
-            ignoreCase?: boolean;
+            empty?: boolean;
+            sorted?: boolean;
+            unsorted?: boolean;
         };
-        AnulacionFacturaResponse: {
+        AnulacionMovimientoResponse: {
+            /** Format: int64 */
+            id?: number;
+            anuladoPor?: components["schemas"]["UsuarioResponse"];
             /** Format: date-time */
             fechaAnulacion?: string;
-            motivo?: string;
-            /** Format: int64 */
-            anuladoPorId?: number;
-        };
-        AnulacionEventoResponse: {
-            /** Format: date-time */
-            fechaAnulacion?: string;
-            motivo?: string;
-            /** Format: int64 */
-            anuladoPorId?: number;
-        };
-        AgrupadosResponse: {
-            /** Format: date */
-            fecha?: string;
-            puntosDeVenta?: string[];
-            total?: number;
-            /** Format: int64 */
-            cantidadConsumos?: number;
-            /** Format: int64 */
-            cantidadConsumidores?: number;
+            motivoAnulacion?: string;
         };
         ComedorCompressedResponse: {
             /** Format: int64 */
@@ -2708,6 +5001,34 @@ export interface components {
             anulacionId?: number;
             movimientos?: components["schemas"]["MovimientoResponse"][];
         };
+        PageDetailedCierreCajaResponse: {
+            /** Format: int64 */
+            totalElements?: number;
+            /** Format: int32 */
+            totalPages?: number;
+            pageable?: components["schemas"]["PageableObject"];
+            first?: boolean;
+            last?: boolean;
+            /** Format: int32 */
+            size?: number;
+            content?: components["schemas"]["DetailedCierreCajaResponse"][];
+            /** Format: int32 */
+            number?: number;
+            sort?: components["schemas"]["SortObject"];
+            /** Format: int32 */
+            numberOfElements?: number;
+            empty?: boolean;
+        };
+        CierreCajaStatsResponse: {
+            /** Format: int64 */
+            total?: number;
+            /** Format: int64 */
+            activos?: number;
+            /** Format: int64 */
+            anulados?: number;
+            montoTotalActivo?: number;
+            montoFiltradoActivo?: number;
+        };
         AnulacionCierreResponse: {
             /** Format: int64 */
             id?: number;
@@ -2716,13 +5037,219 @@ export interface components {
             fechaAnulacion?: string;
             motivoAnulacion?: string;
         };
-        PorcentajeCompraResponse: {
-            /** Format: double */
-            porcentaje?: number;
+        PageMovimientoCajaChicaResponse: {
+            /** Format: int64 */
+            totalElements?: number;
+            /** Format: int32 */
+            totalPages?: number;
+            pageable?: components["schemas"]["PageableObject"];
+            first?: boolean;
+            last?: boolean;
+            /** Format: int32 */
+            size?: number;
+            content?: components["schemas"]["MovimientoCajaChicaResponse"][];
+            /** Format: int32 */
+            number?: number;
+            sort?: components["schemas"]["SortObject"];
+            /** Format: int32 */
+            numberOfElements?: number;
+            empty?: boolean;
+        };
+        CajaChicaParaCargaResponse: {
+            /** Format: int64 */
+            id?: number;
+            nombre?: string;
+            /** Format: int64 */
+            comedorId?: number;
+            comedorName?: string;
+        };
+        PageEventoResponseBase: {
+            /** Format: int64 */
+            totalElements?: number;
+            /** Format: int32 */
+            totalPages?: number;
+            pageable?: components["schemas"]["PageableObject"];
+            first?: boolean;
+            last?: boolean;
+            /** Format: int32 */
+            size?: number;
+            content?: (components["schemas"]["EventoBBVAResponse"] | components["schemas"]["EventoGaliciaResponse"] | components["schemas"]["EventoTechintResponse"] | components["schemas"]["EventoUDESAResponse"])[];
+            /** Format: int32 */
+            number?: number;
+            sort?: components["schemas"]["SortObject"];
+            /** Format: int32 */
+            numberOfElements?: number;
+            empty?: boolean;
+        };
+        AnulacionEventoResponse: {
+            /** Format: date-time */
+            fechaAnulacion?: string;
+            motivo?: string;
+            /** Format: int64 */
+            anuladoPorId?: number;
+        };
+        EventoStatsResponse: {
+            /** Format: int64 */
+            total?: number;
+            /** Format: int64 */
+            activos?: number;
+            /** Format: int64 */
+            anulados?: number;
+            montoTotalActivo?: number;
+            montoFiltradoActivo?: number;
+            countsByTipo?: {
+                [key: string]: number;
+            };
+        };
+        PageConsumoResponse: {
+            /** Format: int64 */
+            totalElements?: number;
+            /** Format: int32 */
+            totalPages?: number;
+            pageable?: components["schemas"]["PageableObject"];
+            first?: boolean;
+            last?: boolean;
+            /** Format: int32 */
+            size?: number;
+            content?: components["schemas"]["ConsumoResponse"][];
+            /** Format: int32 */
+            number?: number;
+            sort?: components["schemas"]["SortObject"];
+            /** Format: int32 */
+            numberOfElements?: number;
+            empty?: boolean;
+        };
+        ConsumoStatsResponse: {
+            /** Format: int64 */
+            total?: number;
+            /** Format: int64 */
+            activos?: number;
+            /** Format: int64 */
+            anulados?: number;
+            montoTotalActivo?: number;
+            montoFiltradoActivo?: number;
+        };
+        AgrupadosResponse: {
+            /** Format: date */
+            fecha?: string;
+            puntosDeVenta?: string[];
+            total?: number;
+            /** Format: int64 */
+            cantidadConsumos?: number;
+            /** Format: int64 */
+            cantidadConsumidores?: number;
+        };
+        PageOrdenDeCompraResponse: {
+            /** Format: int64 */
+            totalElements?: number;
+            /** Format: int32 */
+            totalPages?: number;
+            pageable?: components["schemas"]["PageableObject"];
+            first?: boolean;
+            last?: boolean;
+            /** Format: int32 */
+            size?: number;
+            content?: components["schemas"]["OrdenDeCompraResponse"][];
+            /** Format: int32 */
+            number?: number;
+            sort?: components["schemas"]["SortObject"];
+            /** Format: int32 */
+            numberOfElements?: number;
+            empty?: boolean;
+        };
+        OrdenDeCompraStatsResponse: {
+            /** Format: int64 */
+            total?: number;
+            /** Format: int64 */
+            pendientes?: number;
+            /** Format: int64 */
+            aprobadas?: number;
+            /** Format: int64 */
+            enviadas?: number;
+            /** Format: int64 */
+            canceladas?: number;
+            montoTotalActivo?: number;
+            montoFiltradoActivo?: number;
+        };
+        PageFacturaProveedorResponse: {
+            /** Format: int64 */
+            totalElements?: number;
+            /** Format: int32 */
+            totalPages?: number;
+            pageable?: components["schemas"]["PageableObject"];
+            first?: boolean;
+            last?: boolean;
+            /** Format: int32 */
+            size?: number;
+            content?: components["schemas"]["FacturaProveedorResponse"][];
+            /** Format: int32 */
+            number?: number;
+            sort?: components["schemas"]["SortObject"];
+            /** Format: int32 */
+            numberOfElements?: number;
+            empty?: boolean;
+        };
+        AnulacionFacturaResponse: {
+            /** Format: date-time */
+            fechaAnulacion?: string;
+            motivo?: string;
+            /** Format: int64 */
+            anuladoPorId?: number;
+        };
+        FacturaProveedorStatsResponse: {
+            /** Format: int64 */
+            total?: number;
+            /** Format: int64 */
+            pendientes?: number;
+            /** Format: int64 */
+            emitidas?: number;
+            /** Format: int64 */
+            pagadas?: number;
+            /** Format: int64 */
+            anuladas?: number;
+            montoTotalActivo?: number;
+            montoFiltradoActivo?: number;
+        };
+        PagedResponseProveedorItemSearchResponse: {
+            content?: components["schemas"]["ProveedorItemSearchResponse"][];
+            /** Format: int32 */
+            page?: number;
+            /** Format: int32 */
+            size?: number;
+            /** Format: int64 */
+            totalElements?: number;
+            /** Format: int32 */
+            totalPages?: number;
+            hasNext?: boolean;
+        };
+        ProveedorItemSearchResponse: {
+            /** Format: int64 */
+            id?: number;
+            /** Format: int64 */
+            proveedorId?: number;
+            proveedorNombre?: string;
+            codigo?: string;
+            nombre?: string;
+            unidadMedida?: string;
+            precioUnitario?: number;
+            activo?: boolean;
+        };
+        GrupoArticuloResponse: {
+            codigo?: string;
+            nombre?: string;
+        };
+        FamiliaArticuloResponse: {
+            codigo?: string;
+            nombre?: string;
+        };
+        CatalogoArticuloResponse: {
+            codigo?: string;
+            nombre?: string;
         };
         Egresos: {
             total?: number;
             compras?: number;
+            ordenCompras?: number;
         };
         Ingresos: {
             total?: number;
@@ -2735,16 +5262,27 @@ export interface components {
             egresos?: components["schemas"]["Egresos"];
             total?: number;
         };
+        PorcentajeCompraResponse: {
+            /** Format: double */
+            porcentaje?: number;
+        };
+        AnalyticsSummedTotalResponse: {
+            total?: number;
+        };
+        AnalyticsCountResponse: {
+            /** Format: int64 */
+            total?: number;
+        };
         AnularMovimientoRequest: {
             motivo: string;
         };
-        AnularFacturaRequest: {
+        AnularCierreCajaRequest: {
             motivo: string;
         };
         AnulacionConsumoRequest: {
             motivo: string;
         };
-        AnularCierreCajaRequest: {
+        AnularFacturaRequest: {
             motivo: string;
         };
     };
@@ -2756,6 +5294,442 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    setAccesos: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SetAccesosRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CajaChicaResponse"];
+                };
+            };
+        };
+    };
+    updatePlantilla: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SavePlantillaOrdenDeCompraRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PlantillaOrdenDeCompraResponse"];
+                };
+            };
+        };
+    };
+    deletePlantilla: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getAllMovimientos: {
+        parameters: {
+            query: {
+                pageable: components["schemas"]["Pageable"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PageMovimientoResponse"];
+                };
+            };
+        };
+    };
+    createMovimiento: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateMovimientoRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["MovimientoResponse"];
+                };
+            };
+        };
+    };
+    getAllCierres: {
+        parameters: {
+            query: {
+                comedorId?: number;
+                puntoDeVentaIds?: number[];
+                anulado?: boolean;
+                fechaInicio?: string;
+                fechaFin?: string;
+                unpaged?: boolean;
+                pageable: components["schemas"]["Pageable"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PageDetailedCierreCajaResponse"];
+                };
+            };
+        };
+    };
+    createCierreCaja: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateCierreCajaRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CierreCajaResponse"];
+                };
+            };
+        };
+    };
+    bulkAnular: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BulkAnularRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["BulkActionResponse"];
+                };
+            };
+        };
+    };
+    getCajas: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CajaChicaResponse"][];
+                };
+            };
+        };
+    };
+    createCaja: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateCajaChicaRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CajaChicaResponse"];
+                };
+            };
+        };
+    };
+    getMovimientos: {
+        parameters: {
+            query: {
+                desde?: string;
+                hasta?: string;
+                tipo?: "INGRESO" | "EGRESO";
+                conceptoId?: number;
+                incluirAnulados?: boolean;
+                pageable: components["schemas"]["Pageable"];
+            };
+            header?: never;
+            path: {
+                cajaId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PageMovimientoCajaChicaResponse"];
+                };
+            };
+        };
+    };
+    createMovimiento_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                cajaId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateMovimientoCajaChicaRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["MovimientoCajaChicaResponse"];
+                };
+            };
+        };
+    };
+    getConceptos: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ConceptoCajaChicaResponse"][];
+                };
+            };
+        };
+    };
+    createConcepto: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateConceptoCajaChicaRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ConceptoCajaChicaResponse"];
+                };
+            };
+        };
+    };
+    listar: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["LegajoResponse"][];
+                };
+            };
+        };
+    };
+    crear: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LegajoRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["LegajoResponse"];
+                };
+            };
+        };
+    };
+    subirArchivo: {
+        parameters: {
+            query: {
+                nombre: string;
+            };
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["LegajoResponse"];
+                };
+            };
+        };
+    };
+    quitarArchivo: {
+        parameters: {
+            query: {
+                nombre: string;
+            };
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["LegajoResponse"];
+                };
+            };
+        };
+    };
     register: {
         parameters: {
             query?: never;
@@ -2804,9 +5778,19 @@ export interface operations {
             };
         };
     };
-    findAll: {
+    getAll: {
         parameters: {
-            query?: never;
+            query: {
+                puntoDeVentaIds?: number[];
+                comedorId?: number;
+                estado?: "CARGA_PARCIAL" | "SOLICITADO" | "REALIZADO" | "FACTURA_EMITIDA" | "COBRADO" | "ANULADO";
+                tipoComedor?: string;
+                fechaInicio?: string;
+                fechaFin?: string;
+                search?: string;
+                unpaged?: boolean;
+                pageable: components["schemas"]["Pageable"];
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -2819,7 +5803,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["SociedadResponse"][];
+                    "*/*": components["schemas"]["PageEventoResponseBase"];
                 };
             };
         };
@@ -2833,7 +5817,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["CreateSociedadRequest"];
+                "application/json": components["schemas"]["CreateEventoBBVARequest"] | components["schemas"]["CreateEventoGaliciaRequest"] | components["schemas"]["CreateEventoTechintRequest"] | components["schemas"]["CreateEventoUDESARequest"];
             };
         };
         responses: {
@@ -2843,14 +5827,120 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["SociedadResponse"];
+                    "*/*": components["schemas"]["EventoBBVAResponse"] | components["schemas"]["EventoGaliciaResponse"] | components["schemas"]["EventoTechintResponse"] | components["schemas"]["EventoUDESAResponse"];
                 };
             };
         };
     };
-    getAll: {
+    bulkRealizar: {
         parameters: {
             query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BulkIdsRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["BulkActionResponse"];
+                };
+            };
+        };
+    };
+    bulkEmitir: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BulkEmitirFacturaEventoRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["BulkActionResponse"];
+                };
+            };
+        };
+    };
+    bulkCobrar: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BulkRegistrarPagoEventoRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["BulkActionResponse"];
+                };
+            };
+        };
+    };
+    bulkAnular_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BulkAnularRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["BulkActionResponse"];
+                };
+            };
+        };
+    };
+    findAll: {
+        parameters: {
+            query: {
+                comedorId?: number;
+                consumidorId?: number;
+                puntoDeVentaIds?: number[];
+                anulado?: boolean;
+                fechaInicio?: string;
+                fechaFin?: string;
+                search?: string;
+                unpaged?: boolean;
+                pageable: components["schemas"]["Pageable"];
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -2863,7 +5953,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["ProveedorResponse"][];
+                    "*/*": components["schemas"]["PageConsumoResponse"];
                 };
             };
         };
@@ -2877,7 +5967,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["CreateProveedorRequest"];
+                "application/json": components["schemas"]["CreateConsumoRequest"];
             };
         };
         responses: {
@@ -2887,14 +5977,16 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["ProveedorResponse"];
+                    "*/*": components["schemas"]["ConsumoResponse"];
                 };
             };
         };
     };
-    getAllMovimientos: {
+    findAll_1: {
         parameters: {
-            query?: never;
+            query?: {
+                comedorId?: number;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -2907,12 +5999,12 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["MovimientoResponse"][];
+                    "*/*": components["schemas"]["ProductoResponse"][];
                 };
             };
         };
     };
-    createMovimiento: {
+    create_2: {
         parameters: {
             query?: never;
             header?: never;
@@ -2921,7 +6013,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["CreateMovimientoRequest"];
+                "application/json": components["schemas"]["CreateProductoRequest"];
             };
         };
         responses: {
@@ -2931,7 +6023,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["MovimientoResponse"];
+                    "*/*": components["schemas"]["ProductoResponse"];
                 };
             };
         };
@@ -2963,7 +6055,7 @@ export interface operations {
             };
         };
     };
-    revalidar: {
+    revalidarRow: {
         parameters: {
             query?: never;
             header?: never;
@@ -2985,12 +6077,12 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["ImportRowProveedorResponse"];
+                    "*/*": components["schemas"]["ImportRowProductoResponse"];
                 };
             };
         };
     };
-    release: {
+    releaseRow: {
         parameters: {
             query?: never;
             header?: never;
@@ -3012,12 +6104,12 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["ImportRowProveedorResponse"];
+                    "*/*": components["schemas"]["ImportRowProductoResponse"];
                 };
             };
         };
     };
-    assign: {
+    assignRow: {
         parameters: {
             query?: never;
             header?: never;
@@ -3039,7 +6131,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["ImportRowProveedorResponse"];
+                    "*/*": components["schemas"]["ImportRowProductoResponse"];
                 };
             };
         };
@@ -3066,12 +6158,12 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["ImportRowProveedorResponse"];
+                    "*/*": components["schemas"]["ImportRowProductoResponse"];
                 };
             };
         };
     };
-    cancel: {
+    cancelJob: {
         parameters: {
             query?: never;
             header?: never;
@@ -3142,7 +6234,7 @@ export interface operations {
             };
         };
     };
-    revalidar_1: {
+    revalidar: {
         parameters: {
             query?: never;
             header?: never;
@@ -3164,12 +6256,12 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["ImportRowFacturaResponse"];
+                    "*/*": components["schemas"]["ImportRowConsumidorResponse"];
                 };
             };
         };
     };
-    release_1: {
+    release: {
         parameters: {
             query?: never;
             header?: never;
@@ -3191,12 +6283,12 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["ImportRowFacturaResponse"];
+                    "*/*": components["schemas"]["ImportRowConsumidorResponse"];
                 };
             };
         };
     };
-    assign_1: {
+    assign: {
         parameters: {
             query?: never;
             header?: never;
@@ -3218,7 +6310,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["ImportRowFacturaResponse"];
+                    "*/*": components["schemas"]["ImportRowConsumidorResponse"];
                 };
             };
         };
@@ -3245,12 +6337,12 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["ImportRowFacturaResponse"];
+                    "*/*": components["schemas"]["ImportRowConsumidorResponse"];
                 };
             };
         };
     };
-    cancel_1: {
+    cancel: {
         parameters: {
             query?: never;
             header?: never;
@@ -3294,6 +6386,268 @@ export interface operations {
             };
         };
     };
+    create_3: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateConsumidorRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ConsumidorResponse"];
+                };
+            };
+        };
+    };
+    bulkAnular_2: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BulkAnularRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["BulkActionResponse"];
+                };
+            };
+        };
+    };
+    batchUdesa: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BatchConsumoUdesaRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["BatchConsumoUdesaResponse"];
+                };
+            };
+        };
+    };
+    getAll_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ProveedorResponse"][];
+                };
+            };
+        };
+    };
+    create_4: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateProveedorRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ProveedorResponse"];
+                };
+            };
+        };
+    };
+    getAll_2: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                proveedorId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ProveedorItemResponse"][];
+                };
+            };
+        };
+    };
+    create_5: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                proveedorId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateProveedorItemRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ProveedorItemResponse"];
+                };
+            };
+        };
+    };
+    getAll_3: {
+        parameters: {
+            query: {
+                comedorId?: number;
+                sociedadId?: number;
+                proveedorId?: number;
+                estado?: "PENDIENTE" | "APROBADA" | "ENVIADA" | "CANCELADA";
+                fechaInicio?: string;
+                fechaFin?: string;
+                search?: string;
+                unpaged?: boolean;
+                pageable: components["schemas"]["Pageable"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PageOrdenDeCompraResponse"];
+                };
+            };
+        };
+    };
+    create_6: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateOrdenDeCompraRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["OrdenDeCompraResponse"];
+                };
+            };
+        };
+    };
+    getMisPlantillas: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PlantillaOrdenDeCompraResponse"][];
+                };
+            };
+        };
+    };
+    createPlantilla: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SavePlantillaOrdenDeCompraRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PlantillaOrdenDeCompraResponse"];
+                };
+            };
+        };
+    };
     upload_2: {
         parameters: {
             query?: never;
@@ -3321,7 +6675,7 @@ export interface operations {
             };
         };
     };
-    revalidar_2: {
+    revalidar_1: {
         parameters: {
             query?: never;
             header?: never;
@@ -3343,12 +6697,12 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["ImportRowEmpleadoResponse"];
+                    "*/*": components["schemas"]["ImportRowProveedorResponse"];
                 };
             };
         };
     };
-    release_2: {
+    release_1: {
         parameters: {
             query?: never;
             header?: never;
@@ -3370,12 +6724,12 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["ImportRowEmpleadoResponse"];
+                    "*/*": components["schemas"]["ImportRowProveedorResponse"];
                 };
             };
         };
     };
-    assign_2: {
+    assign_1: {
         parameters: {
             query?: never;
             header?: never;
@@ -3397,7 +6751,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["ImportRowEmpleadoResponse"];
+                    "*/*": components["schemas"]["ImportRowProveedorResponse"];
                 };
             };
         };
@@ -3424,12 +6778,12 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["ImportRowEmpleadoResponse"];
+                    "*/*": components["schemas"]["ImportRowProveedorResponse"];
                 };
             };
         };
     };
-    cancel_2: {
+    cancel_1: {
         parameters: {
             query?: never;
             header?: never;
@@ -3500,7 +6854,7 @@ export interface operations {
             };
         };
     };
-    revalidar_3: {
+    revalidar_2: {
         parameters: {
             query?: never;
             header?: never;
@@ -3522,12 +6876,12 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["ImportRowConsumidorResponse"];
+                    "*/*": components["schemas"]["ImportRowFacturaResponse"];
                 };
             };
         };
     };
-    release_3: {
+    release_2: {
         parameters: {
             query?: never;
             header?: never;
@@ -3549,12 +6903,12 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["ImportRowConsumidorResponse"];
+                    "*/*": components["schemas"]["ImportRowFacturaResponse"];
                 };
             };
         };
     };
-    assign_3: {
+    assign_2: {
         parameters: {
             query?: never;
             header?: never;
@@ -3576,7 +6930,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["ImportRowConsumidorResponse"];
+                    "*/*": components["schemas"]["ImportRowFacturaResponse"];
                 };
             };
         };
@@ -3603,12 +6957,12 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["ImportRowConsumidorResponse"];
+                    "*/*": components["schemas"]["ImportRowFacturaResponse"];
                 };
             };
         };
     };
-    cancel_3: {
+    cancel_2: {
         parameters: {
             query?: never;
             header?: never;
@@ -3652,12 +7006,18 @@ export interface operations {
             };
         };
     };
-    getAll_1: {
+    getAll_4: {
         parameters: {
             query: {
                 comedorId?: number;
                 sociedadId?: number;
                 proveedorId?: number;
+                fechaInicio?: string;
+                fechaFin?: string;
+                dateField?: string;
+                search?: string;
+                estado?: "PENDIENTE" | "EMITIDA" | "PAGADA" | "ANULADA";
+                unpaged?: boolean;
                 pageable: components["schemas"]["Pageable"];
             };
             header?: never;
@@ -3677,7 +7037,7 @@ export interface operations {
             };
         };
     };
-    create_2: {
+    create_7: {
         parameters: {
             query?: never;
             header?: never;
@@ -3701,31 +7061,7 @@ export interface operations {
             };
         };
     };
-    getAll_2: {
-        parameters: {
-            query?: {
-                puntoDeVentaId?: number;
-                comedorId?: number;
-                estado?: "SOLICITADO" | "REALIZADO" | "FACTURA_EMITIDA" | "COBRADO" | "ANULADO";
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["EventoResponse"][];
-                };
-            };
-        };
-    };
-    create_3: {
+    bulkPagar: {
         parameters: {
             query?: never;
             header?: never;
@@ -3734,7 +7070,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["CreateEventoRequest"];
+                "application/json": components["schemas"]["BulkPagarFacturaRequest"];
             };
         };
         responses: {
@@ -3744,34 +7080,12 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["EventoResponse"];
+                    "*/*": components["schemas"]["BulkActionResponse"];
                 };
             };
         };
     };
-    getAll_3: {
-        parameters: {
-            query?: {
-                comedorId?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["TipoEventoResponse"][];
-                };
-            };
-        };
-    };
-    create_4: {
+    bulkEmitir_1: {
         parameters: {
             query?: never;
             header?: never;
@@ -3780,7 +7094,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["CreateTipoEventoRequest"];
+                "application/json": components["schemas"]["BulkEmitirFacturaRequest"];
             };
         };
         responses: {
@@ -3790,32 +7104,12 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["TipoEventoResponse"];
+                    "*/*": components["schemas"]["BulkActionResponse"];
                 };
             };
         };
     };
-    findAll_1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ConsumoResponse"][];
-                };
-            };
-        };
-    };
-    create_5: {
+    bulkAnular_3: {
         parameters: {
             query?: never;
             header?: never;
@@ -3824,7 +7118,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["CreateConsumoRequest"];
+                "application/json": components["schemas"]["BulkAnularRequest"];
             };
         };
         responses: {
@@ -3834,16 +7128,14 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["ConsumoResponse"];
+                    "*/*": components["schemas"]["BulkActionResponse"];
                 };
             };
         };
     };
     findAll_2: {
         parameters: {
-            query?: {
-                comedorId?: number;
-            };
+            query?: never;
             header?: never;
             path?: never;
             cookie?: never;
@@ -3856,12 +7148,12 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["ProductoResponse"][];
+                    "*/*": components["schemas"]["SociedadResponse"][];
                 };
             };
         };
     };
-    create_6: {
+    create_8: {
         parameters: {
             query?: never;
             header?: never;
@@ -3870,7 +7162,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["CreateProductoRequest"];
+                "application/json": components["schemas"]["CreateSociedadRequest"];
             };
         };
         responses: {
@@ -3880,21 +7172,24 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["ProductoResponse"];
+                    "*/*": components["schemas"]["SociedadResponse"];
                 };
             };
         };
     };
-    create_7: {
+    upload_4: {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        requestBody: {
+        requestBody?: {
             content: {
-                "application/json": components["schemas"]["CreateConsumidorRequest"];
+                "application/json": {
+                    /** Format: binary */
+                    file: string;
+                };
             };
         };
         responses: {
@@ -3904,21 +7199,24 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["ConsumidorResponse"];
+                    "*/*": components["schemas"]["ImportJobResponse"];
                 };
             };
         };
     };
-    batchUdesa: {
+    revalidar_3: {
         parameters: {
             query?: never;
             header?: never;
-            path?: never;
+            path: {
+                jobId: number;
+                rowId: number;
+            };
             cookie?: never;
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["BatchConsumoUdesaRequest"];
+                "application/json": components["schemas"]["ImportRowVersionRequest"];
             };
         };
         responses: {
@@ -3928,16 +7226,497 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["BatchConsumoUdesaResponse"];
+                    "*/*": components["schemas"]["ImportRowRazonSocialResponse"];
+                };
+            };
+        };
+    };
+    release_3: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                jobId: number;
+                rowId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ImportRowVersionRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ImportRowRazonSocialResponse"];
+                };
+            };
+        };
+    };
+    assign_3: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                jobId: number;
+                rowId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ImportRowVersionRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ImportRowRazonSocialResponse"];
+                };
+            };
+        };
+    };
+    applyRow_4: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                jobId: number;
+                rowId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ImportRowVersionRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ImportRowRazonSocialResponse"];
+                };
+            };
+        };
+    };
+    cancel_3: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                jobId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ImportJobResponse"];
+                };
+            };
+        };
+    };
+    applyReady_4: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                jobId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ImportJobResponse"];
+                };
+            };
+        };
+    };
+    upload_5: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    /** Format: binary */
+                    file: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ImportJobResponse"];
+                };
+            };
+        };
+    };
+    revalidar_4: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                jobId: number;
+                rowId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ImportRowVersionRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ImportRowEmpleadoResponse"];
+                };
+            };
+        };
+    };
+    release_4: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                jobId: number;
+                rowId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ImportRowVersionRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ImportRowEmpleadoResponse"];
+                };
+            };
+        };
+    };
+    assign_4: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                jobId: number;
+                rowId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ImportRowVersionRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ImportRowEmpleadoResponse"];
+                };
+            };
+        };
+    };
+    applyRow_5: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                jobId: number;
+                rowId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ImportRowVersionRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ImportRowEmpleadoResponse"];
+                };
+            };
+        };
+    };
+    cancel_4: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                jobId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ImportJobResponse"];
+                };
+            };
+        };
+    };
+    applyReady_5: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                jobId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ImportJobResponse"];
+                };
+            };
+        };
+    };
+    upload_6: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    /** Format: binary */
+                    file: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ImportJobResponse"];
+                };
+            };
+        };
+    };
+    revalidar_5: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                jobId: number;
+                rowId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ImportRowVersionRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ImportRowCentroCostoPartidaResponse"];
+                };
+            };
+        };
+    };
+    release_5: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                jobId: number;
+                rowId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ImportRowVersionRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ImportRowCentroCostoPartidaResponse"];
+                };
+            };
+        };
+    };
+    assign_5: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                jobId: number;
+                rowId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ImportRowVersionRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ImportRowCentroCostoPartidaResponse"];
+                };
+            };
+        };
+    };
+    applyRow_6: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                jobId: number;
+                rowId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ImportRowVersionRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ImportRowCentroCostoPartidaResponse"];
+                };
+            };
+        };
+    };
+    cancel_5: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                jobId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ImportJobResponse"];
+                };
+            };
+        };
+    };
+    applyReady_6: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                jobId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ImportJobResponse"];
                 };
             };
         };
     };
     getComedores: {
         parameters: {
-            query?: {
-                detailed?: boolean;
-            };
+            query?: never;
             header?: never;
             path?: never;
             cookie?: never;
@@ -3950,7 +7729,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": Record<string, never>[];
+                    "*/*": unknown[];
                 };
             };
         };
@@ -3981,8 +7760,8 @@ export interface operations {
     };
     findAllByComedorId: {
         parameters: {
-            query: {
-                comedorId: number;
+            query?: {
+                comedorId?: number;
             };
             header?: never;
             path?: never;
@@ -4001,7 +7780,7 @@ export interface operations {
             };
         };
     };
-    create_8: {
+    create_9: {
         parameters: {
             query?: never;
             header?: never;
@@ -4045,7 +7824,7 @@ export interface operations {
             };
         };
     };
-    create_9: {
+    create_10: {
         parameters: {
             query?: never;
             header?: never;
@@ -4065,6 +7844,52 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["PuntoDeVentaResponse"];
+                };
+            };
+        };
+    };
+    findAll_3: {
+        parameters: {
+            query?: {
+                comedorId?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PartidaResponse"][];
+                };
+            };
+        };
+    };
+    create_11: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreatePartidaRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PartidaResponse"];
                 };
             };
         };
@@ -4091,7 +7916,7 @@ export interface operations {
             };
         };
     };
-    create_10: {
+    create_12: {
         parameters: {
             query?: never;
             header?: never;
@@ -4115,9 +7940,11 @@ export interface operations {
             };
         };
     };
-    getAllCierres: {
+    findAll_5: {
         parameters: {
-            query?: never;
+            query?: {
+                comedorId?: number;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -4130,12 +7957,12 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["DetailedCierreCajaResponse"][];
+                    "*/*": components["schemas"]["CentroCostoResponse"][];
                 };
             };
         };
     };
-    createCierreCaja: {
+    create_13: {
         parameters: {
             query?: never;
             header?: never;
@@ -4144,7 +7971,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["CreateCierreCajaRequest"];
+                "application/json": components["schemas"]["CreateCentroCostoRequest"];
             };
         };
         responses: {
@@ -4154,12 +7981,12 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["CierreCajaResponse"];
+                    "*/*": components["schemas"]["CentroCostoResponse"];
                 };
             };
         };
     };
-    findAll_5: {
+    findAll_6: {
         parameters: {
             query?: {
                 sociedadId?: number;
@@ -4181,7 +8008,7 @@ export interface operations {
             };
         };
     };
-    create_11: {
+    create_14: {
         parameters: {
             query?: never;
             header?: never;
@@ -4205,12 +8032,12 @@ export interface operations {
             };
         };
     };
-    getByCuil: {
+    getCierreById: {
         parameters: {
             query?: never;
             header?: never;
             path: {
-                cuil: number;
+                id: number;
             };
             cookie?: never;
         };
@@ -4222,7 +8049,155 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["UsuarioResponse"];
+                    "*/*": Record<string, never>;
+                };
+            };
+        };
+    };
+    patchCierreCaja: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PatchCierreCajaRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CierreCajaResponse"];
+                };
+            };
+        };
+    };
+    getCaja: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CajaChicaResponse"];
+                };
+            };
+        };
+    };
+    patchCaja: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PatchCajaChicaRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CajaChicaResponse"];
+                };
+            };
+        };
+    };
+    anularMovimiento: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AnularMovimientoCajaChicaRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["MovimientoCajaChicaResponse"];
+                };
+            };
+        };
+    };
+    patchConcepto: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PatchConceptoCajaChicaRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ConceptoCajaChicaResponse"];
+                };
+            };
+        };
+    };
+    obtener: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["LegajoResponse"];
                 };
             };
         };
@@ -4232,7 +8207,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                cuil: number;
+                id: number;
             };
             cookie?: never;
         };
@@ -4252,61 +8227,13 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                cuil: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["PatchUsuarioRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["UsuarioResponse"];
-                };
-            };
-        };
-    };
-    findById: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["SociedadResponse"];
-                };
-            };
-        };
-    };
-    patch_1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
                 id: number;
             };
             cookie?: never;
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["PatchSociedadRequest"];
+                "application/json": components["schemas"]["PatchLegajoRequest"];
             };
         };
         responses: {
@@ -4316,7 +8243,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["SociedadResponse"];
+                    "*/*": components["schemas"]["LegajoResponse"];
                 };
             };
         };
@@ -4338,12 +8265,640 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["ProveedorResponse"];
+                    "*/*": components["schemas"]["UsuarioResponse"];
+                };
+            };
+        };
+    };
+    eliminar_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    patch_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PatchUsuarioRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["UsuarioResponse"];
+                };
+            };
+        };
+    };
+    getById_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["EventoBBVAResponse"] | components["schemas"]["EventoGaliciaResponse"] | components["schemas"]["EventoTechintResponse"] | components["schemas"]["EventoUDESAResponse"];
+                };
+            };
+        };
+    };
+    editEvento: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PatchEventoBBVARequest"] | components["schemas"]["PatchEventoGaliciaRequest"] | components["schemas"]["PatchEventoTechintRequest"] | components["schemas"]["PatchEventoUDESARequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["EventoBBVAResponse"] | components["schemas"]["EventoGaliciaResponse"] | components["schemas"]["EventoTechintResponse"] | components["schemas"]["EventoUDESAResponse"];
+                };
+            };
+        };
+    };
+    marcarRealizado: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["EventoBBVAResponse"] | components["schemas"]["EventoGaliciaResponse"] | components["schemas"]["EventoTechintResponse"] | components["schemas"]["EventoUDESAResponse"];
+                };
+            };
+        };
+    };
+    marcarPago: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RegistrarPagoEventoRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["EventoBBVAResponse"] | components["schemas"]["EventoGaliciaResponse"] | components["schemas"]["EventoTechintResponse"] | components["schemas"]["EventoUDESAResponse"];
+                };
+            };
+        };
+    };
+    emitirFactura: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EmitirFacturaRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["EventoBBVAResponse"] | components["schemas"]["EventoGaliciaResponse"] | components["schemas"]["EventoTechintResponse"] | components["schemas"]["EventoUDESAResponse"];
+                };
+            };
+        };
+    };
+    eliminarFacturaPdf: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["EventoBBVAResponse"] | components["schemas"]["EventoGaliciaResponse"] | components["schemas"]["EventoTechintResponse"] | components["schemas"]["EventoUDESAResponse"];
+                };
+            };
+        };
+    };
+    anularEvento: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AnularEventoRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["EventoBBVAResponse"] | components["schemas"]["EventoGaliciaResponse"] | components["schemas"]["EventoTechintResponse"] | components["schemas"]["EventoUDESAResponse"];
+                };
+            };
+        };
+    };
+    adjuntarFacturaPdf: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdjuntarFacturaPdfRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["EventoBBVAResponse"] | components["schemas"]["EventoGaliciaResponse"] | components["schemas"]["EventoTechintResponse"] | components["schemas"]["EventoUDESAResponse"];
+                };
+            };
+        };
+    };
+    findById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ConsumoResponse"];
+                };
+            };
+        };
+    };
+    anular: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AnulacionConsumoRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ConsumoResponse"];
                 };
             };
         };
     };
     patch_2: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PatchConsumoRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ConsumoResponse"];
+                };
+            };
+        };
+    };
+    getById_2: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ProductoResponse"];
+                };
+            };
+        };
+    };
+    delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    patch_3: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PatchProductoRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ProductoResponse"];
+                };
+            };
+        };
+    };
+    deleteRow: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                jobId: number;
+                rowId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ImportRowVersionRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    patchRow: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                jobId: number;
+                rowId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PatchImportRowProductoRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ImportRowProductoResponse"];
+                };
+            };
+        };
+    };
+    deleteRow_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                jobId: number;
+                rowId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ImportRowVersionRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    patchRow_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                jobId: number;
+                rowId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PatchImportRowConsumidorRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ImportRowConsumidorResponse"];
+                };
+            };
+        };
+    };
+    findById_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ConsumidorResponse"];
+                };
+            };
+        };
+    };
+    delete_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    patch_4: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PatchConsumidorRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ConsumidorResponse"];
+                };
+            };
+        };
+    };
+    patch_5: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                proveedorId: number;
+                itemId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PatchProveedorItemRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ProveedorItemResponse"];
+                };
+            };
+        };
+    };
+    desactivar: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                proveedorId: number;
+                itemId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ProveedorItemResponse"];
+                };
+            };
+        };
+    };
+    getById_3: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ProveedorResponse"];
+                };
+            };
+        };
+    };
+    patch_6: {
         parameters: {
             query?: never;
             header?: never;
@@ -4395,44 +8950,40 @@ export interface operations {
             };
         };
     };
-    deleteRow: {
+    getById_4: {
         parameters: {
             query?: never;
             header?: never;
             path: {
-                jobId: number;
-                rowId: number;
+                id: number;
             };
             cookie?: never;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ImportRowVersionRequest"];
-            };
-        };
+        requestBody?: never;
         responses: {
             /** @description OK */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "*/*": components["schemas"]["OrdenDeCompraResponse"];
+                };
             };
         };
     };
-    patchRow: {
+    patch_7: {
         parameters: {
             query?: never;
             header?: never;
             path: {
-                jobId: number;
-                rowId: number;
+                id: number;
             };
             cookie?: never;
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["PatchImportRowProveedorRequest"];
+                "application/json": components["schemas"]["PatchOrdenDeCompraRequest"];
             };
         };
         responses: {
@@ -4442,51 +8993,21 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["ImportRowProveedorResponse"];
+                    "*/*": components["schemas"]["OrdenDeCompraResponse"];
                 };
             };
         };
     };
-    deleteRow_1: {
+    enviar: {
         parameters: {
             query?: never;
             header?: never;
             path: {
-                jobId: number;
-                rowId: number;
+                id: number;
             };
             cookie?: never;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ImportRowVersionRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    patchRow_1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                jobId: number;
-                rowId: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["PatchImportRowFacturaRequest"];
-            };
-        };
+        requestBody?: never;
         responses: {
             /** @description OK */
             200: {
@@ -4494,7 +9015,51 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["ImportRowFacturaResponse"];
+                    "*/*": components["schemas"]["OrdenDeCompraResponse"];
+                };
+            };
+        };
+    };
+    cancelar: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["OrdenDeCompraResponse"];
+                };
+            };
+        };
+    };
+    aprobar: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["OrdenDeCompraResponse"];
                 };
             };
         };
@@ -4536,7 +9101,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["PatchImportRowEmpleadoRequest"];
+                "application/json": components["schemas"]["PatchImportRowProveedorRequest"];
             };
         };
         responses: {
@@ -4546,7 +9111,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["ImportRowEmpleadoResponse"];
+                    "*/*": components["schemas"]["ImportRowProveedorResponse"];
                 };
             };
         };
@@ -4588,7 +9153,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["PatchImportRowConsumidorRequest"];
+                "application/json": components["schemas"]["PatchImportRowFacturaRequest"];
             };
         };
         responses: {
@@ -4598,12 +9163,12 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["ImportRowConsumidorResponse"];
+                    "*/*": components["schemas"]["ImportRowFacturaResponse"];
                 };
             };
         };
     };
-    getById_1: {
+    getById_5: {
         parameters: {
             query?: never;
             header?: never;
@@ -4625,7 +9190,7 @@ export interface operations {
             };
         };
     };
-    anular: {
+    anular_1: {
         parameters: {
             query?: never;
             header?: never;
@@ -4665,6 +9230,28 @@ export interface operations {
                 "application/json": components["schemas"]["PatchFacturaRequest"];
             };
         };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["FacturaProveedorResponse"];
+                };
+            };
+        };
+    };
+    revertirPago: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
         responses: {
             /** @description OK */
             200: {
@@ -4729,7 +9316,7 @@ export interface operations {
             };
         };
     };
-    getById_2: {
+    desanular: {
         parameters: {
             query?: never;
             header?: never;
@@ -4746,391 +9333,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["EventoResponse"];
-                };
-            };
-        };
-    };
-    editEvento: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["PatchEventoRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["EventoResponse"];
-                };
-            };
-        };
-    };
-    marcarRealizado: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["EventoResponse"];
-                };
-            };
-        };
-    };
-    marcarPago: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["RegistrarPagoEventoRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["EventoResponse"];
-                };
-            };
-        };
-    };
-    emitirFactura: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["EmitirFacturaRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["EventoResponse"];
-                };
-            };
-        };
-    };
-    eliminarFacturaPdf: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["EventoResponse"];
-                };
-            };
-        };
-    };
-    anularEvento: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["AnularEventoRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["EventoResponse"];
-                };
-            };
-        };
-    };
-    adjuntarFacturaPdf: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["AdjuntarFacturaPdfRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["EventoResponse"];
-                };
-            };
-        };
-    };
-    getById_3: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["TipoEventoResponse"];
-                };
-            };
-        };
-    };
-    delete: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    patch_3: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["PatchTipoEventoRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["TipoEventoResponse"];
-                };
-            };
-        };
-    };
-    findById_1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ConsumoResponse"];
-                };
-            };
-        };
-    };
-    anular_1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["AnulacionConsumoRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ConsumoResponse"];
-                };
-            };
-        };
-    };
-    patch_4: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["PatchConsumoRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ConsumoResponse"];
-                };
-            };
-        };
-    };
-    getById_4: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ProductoResponse"];
-                };
-            };
-        };
-    };
-    delete_1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    patch_5: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["PatchProductoRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ProductoResponse"];
+                    "*/*": components["schemas"]["FacturaProveedorResponse"];
                 };
             };
         };
@@ -5152,32 +9355,12 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["ConsumidorResponse"];
+                    "*/*": components["schemas"]["SociedadResponse"];
                 };
             };
         };
     };
-    delete_2: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    patch_6: {
+    patch_8: {
         parameters: {
             query?: never;
             header?: never;
@@ -5188,7 +9371,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["PatchConsumidorRequest"];
+                "application/json": components["schemas"]["PatchSociedadRequest"];
             };
         };
         responses: {
@@ -5198,7 +9381,163 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["ConsumidorResponse"];
+                    "*/*": components["schemas"]["SociedadResponse"];
+                };
+            };
+        };
+    };
+    deleteRow_4: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                jobId: number;
+                rowId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ImportRowVersionRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    patchRow_4: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                jobId: number;
+                rowId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PatchImportRowRazonSocialRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ImportRowRazonSocialResponse"];
+                };
+            };
+        };
+    };
+    deleteRow_5: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                jobId: number;
+                rowId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ImportRowVersionRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    patchRow_5: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                jobId: number;
+                rowId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PatchImportRowEmpleadoRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ImportRowEmpleadoResponse"];
+                };
+            };
+        };
+    };
+    deleteRow_6: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                jobId: number;
+                rowId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ImportRowVersionRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    patchRow_6: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                jobId: number;
+                rowId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PatchImportRowCentroCostoPartidaRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ImportRowCentroCostoPartidaResponse"];
                 };
             };
         };
@@ -5225,7 +9564,7 @@ export interface operations {
             };
         };
     };
-    patch_7: {
+    patch_9: {
         parameters: {
             query?: never;
             header?: never;
@@ -5273,7 +9612,7 @@ export interface operations {
             };
         };
     };
-    delete_3: {
+    delete_2: {
         parameters: {
             query?: never;
             header?: never;
@@ -5295,7 +9634,7 @@ export interface operations {
             };
         };
     };
-    patch_8: {
+    patch_10: {
         parameters: {
             query?: never;
             header?: never;
@@ -5343,7 +9682,7 @@ export interface operations {
             };
         };
     };
-    patch_9: {
+    patch_11: {
         parameters: {
             query?: never;
             header?: never;
@@ -5386,6 +9725,76 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    "*/*": components["schemas"]["PartidaResponse"];
+                };
+            };
+        };
+    };
+    delete_3: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PartidaResponse"];
+                };
+            };
+        };
+    };
+    patch_12: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PatchPartidaRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PartidaResponse"];
+                };
+            };
+        };
+    };
+    findById_5: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
                     "*/*": components["schemas"]["EmpleadoComedorResponse"];
                 };
             };
@@ -5411,7 +9820,7 @@ export interface operations {
             };
         };
     };
-    patch_10: {
+    patch_13: {
         parameters: {
             query?: never;
             header?: never;
@@ -5437,7 +9846,7 @@ export interface operations {
             };
         };
     };
-    getCierreById: {
+    findById_6: {
         parameters: {
             query?: never;
             header?: never;
@@ -5454,12 +9863,34 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": Record<string, never>;
+                    "*/*": components["schemas"]["CentroCostoResponse"];
                 };
             };
         };
     };
-    patchCierreCaja: {
+    delete_5: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CentroCostoResponse"];
+                };
+            };
+        };
+    };
+    patch_14: {
         parameters: {
             query?: never;
             header?: never;
@@ -5470,7 +9901,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["PatchCierreCajaRequest"];
+                "application/json": components["schemas"]["PatchCentroCostoRequest"];
             };
         };
         responses: {
@@ -5480,12 +9911,12 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["CierreCajaResponse"];
+                    "*/*": components["schemas"]["CentroCostoResponse"];
                 };
             };
         };
     };
-    findById_5: {
+    findById_7: {
         parameters: {
             query?: never;
             header?: never;
@@ -5507,7 +9938,7 @@ export interface operations {
             };
         };
     };
-    patch_11: {
+    patch_15: {
         parameters: {
             query?: never;
             header?: never;
@@ -5529,6 +9960,194 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["BancoResponse"];
+                };
+            };
+        };
+    };
+    getAnulacionByMovimientoId: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                movimientoId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AnulacionMovimientoResponse"];
+                };
+            };
+        };
+    };
+    getStats: {
+        parameters: {
+            query?: {
+                comedorId?: number;
+                puntoDeVentaIds?: number[];
+                fechaInicio?: string;
+                fechaFin?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CierreCajaStatsResponse"];
+                };
+            };
+        };
+    };
+    getAllCierresMine: {
+        parameters: {
+            query: {
+                comedorId?: number;
+                puntoDeVentaIds?: number[];
+                anulado?: boolean;
+                fechaInicio?: string;
+                fechaFin?: string;
+                unpaged?: boolean;
+                pageable: components["schemas"]["Pageable"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PageDetailedCierreCajaResponse"];
+                };
+            };
+        };
+    };
+    getMineStats: {
+        parameters: {
+            query?: {
+                comedorId?: number;
+                puntoDeVentaIds?: number[];
+                fechaInicio?: string;
+                fechaFin?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CierreCajaStatsResponse"];
+                };
+            };
+        };
+    };
+    getDetailedCierreById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["DetailedCierreCajaResponse"];
+                };
+            };
+        };
+    };
+    getAnulacionCierre: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                cierreId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AnulacionCierreResponse"];
+                };
+            };
+        };
+    };
+    getCajasParaCarga: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CajaChicaParaCargaResponse"][];
+                };
+            };
+        };
+    };
+    descargarArchivo: {
+        parameters: {
+            query: {
+                nombre: string;
+            };
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": string;
                 };
             };
         };
@@ -5573,7 +10192,7 @@ export interface operations {
             };
         };
     };
-    getPuntosVenta: {
+    getAnulacion: {
         parameters: {
             query?: never;
             header?: never;
@@ -5590,17 +10209,101 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": number[];
+                    "*/*": components["schemas"]["AnulacionEventoResponse"];
                 };
             };
         };
     };
-    getAnulacionByMovimientoId: {
+    getStats_1: {
+        parameters: {
+            query?: {
+                puntoDeVentaIds?: number[];
+                comedorId?: number;
+                tipoComedor?: string;
+                fechaInicio?: string;
+                fechaFin?: string;
+                search?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["EventoStatsResponse"];
+                };
+            };
+        };
+    };
+    getMyCierres: {
+        parameters: {
+            query: {
+                puntoDeVentaIds?: number[];
+                comedorId?: number;
+                estado?: "CARGA_PARCIAL" | "SOLICITADO" | "REALIZADO" | "FACTURA_EMITIDA" | "COBRADO" | "ANULADO";
+                tipoComedor?: string;
+                fechaInicio?: string;
+                fechaFin?: string;
+                search?: string;
+                unpaged?: boolean;
+                pageable: components["schemas"]["Pageable"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PageEventoResponseBase"];
+                };
+            };
+        };
+    };
+    getMyCierresStats: {
+        parameters: {
+            query?: {
+                puntoDeVentaIds?: number[];
+                comedorId?: number;
+                tipoComedor?: string;
+                fechaInicio?: string;
+                fechaFin?: string;
+                search?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["EventoStatsResponse"];
+                };
+            };
+        };
+    };
+    getAnulacion_1: {
         parameters: {
             query?: never;
             header?: never;
             path: {
-                movimientoId: number;
+                id: number;
             };
             cookie?: never;
         };
@@ -5612,7 +10315,91 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["AnulacionMovimientoResponse"];
+                    "*/*": components["schemas"]["AnulacionConsumoResponse"];
+                };
+            };
+        };
+    };
+    getStats_2: {
+        parameters: {
+            query?: {
+                comedorId?: number;
+                consumidorId?: number;
+                puntoDeVentaIds?: number[];
+                fechaInicio?: string;
+                fechaFin?: string;
+                search?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ConsumoStatsResponse"];
+                };
+            };
+        };
+    };
+    getAllByMe: {
+        parameters: {
+            query: {
+                comedorId?: number;
+                consumidorId?: number;
+                puntoDeVentaIds?: number[];
+                anulado?: boolean;
+                fechaInicio?: string;
+                fechaFin?: string;
+                search?: string;
+                unpaged?: boolean;
+                pageable: components["schemas"]["Pageable"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PageConsumoResponse"];
+                };
+            };
+        };
+    };
+    getMineStats_1: {
+        parameters: {
+            query?: {
+                comedorId?: number;
+                consumidorId?: number;
+                puntoDeVentaIds?: number[];
+                fechaInicio?: string;
+                fechaFin?: string;
+                search?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ConsumoStatsResponse"];
                 };
             };
         };
@@ -5678,7 +10465,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["ImportRowProveedorResponse"][];
+                    "*/*": components["schemas"]["ImportRowProductoResponse"][];
                 };
             };
         };
@@ -5744,7 +10531,200 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["ImportRowFacturaResponse"][];
+                    "*/*": components["schemas"]["ImportRowConsumidorResponse"][];
+                };
+            };
+        };
+    };
+    findAllByDate: {
+        parameters: {
+            query: {
+                fechaInicio: string;
+                fechaFin: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ConsumoResponse"][];
+                };
+            };
+        };
+    };
+    findAll_7: {
+        parameters: {
+            query?: {
+                comedorId?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ConsumidorResponse"][];
+                };
+            };
+        };
+    };
+    findAllGroupedByComedorAndDate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AgrupadosResponse"][];
+                };
+            };
+        };
+    };
+    getPuntosVenta: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": number[];
+                };
+            };
+        };
+    };
+    getPdf: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": string;
+                };
+            };
+        };
+    };
+    getStats_3: {
+        parameters: {
+            query?: {
+                comedorId?: number;
+                sociedadId?: number;
+                proveedorId?: number;
+                fechaInicio?: string;
+                fechaFin?: string;
+                search?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["OrdenDeCompraStatsResponse"];
+                };
+            };
+        };
+    };
+    getMyOrdenes: {
+        parameters: {
+            query: {
+                comedorId?: number;
+                sociedadId?: number;
+                proveedorId?: number;
+                estado?: "PENDIENTE" | "APROBADA" | "ENVIADA" | "CANCELADA";
+                fechaInicio?: string;
+                fechaFin?: string;
+                search?: string;
+                unpaged?: boolean;
+                pageable: components["schemas"]["Pageable"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PageOrdenDeCompraResponse"];
+                };
+            };
+        };
+    };
+    getMyOrdenesStats: {
+        parameters: {
+            query?: {
+                comedorId?: number;
+                sociedadId?: number;
+                proveedorId?: number;
+                fechaInicio?: string;
+                fechaFin?: string;
+                search?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["OrdenDeCompraStatsResponse"];
                 };
             };
         };
@@ -5810,7 +10790,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["ImportRowEmpleadoResponse"][];
+                    "*/*": components["schemas"]["ImportRowProveedorResponse"][];
                 };
             };
         };
@@ -5876,113 +10856,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["ImportRowConsumidorResponse"][];
-                };
-            };
-        };
-    };
-    getAnulacion: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["AnulacionFacturaResponse"];
-                };
-            };
-        };
-    };
-    getMyFacturas: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["FacturaProveedorResponse"][];
-                };
-            };
-        };
-    };
-    getAnulacion_1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["AnulacionEventoResponse"];
-                };
-            };
-        };
-    };
-    getAllActive: {
-        parameters: {
-            query: {
-                comedorId: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["TipoEventoResponse"][];
-                };
-            };
-        };
-    };
-    getMyCierres: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["EventoResponse"][];
+                    "*/*": components["schemas"]["ImportRowFacturaResponse"][];
                 };
             };
         };
@@ -6004,38 +10878,21 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["AnulacionConsumoResponse"];
+                    "*/*": components["schemas"]["AnulacionFacturaResponse"];
                 };
             };
         };
     };
-    findAllByDate: {
-        parameters: {
-            query: {
-                fechaInicio: string;
-                fechaFin: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ConsumoResponse"][];
-                };
-            };
-        };
-    };
-    findAll_3: {
+    getStats_4: {
         parameters: {
             query?: {
                 comedorId?: number;
+                sociedadId?: number;
+                proveedorId?: number;
+                fechaInicio?: string;
+                fechaFin?: string;
+                dateField?: string;
+                search?: string;
             };
             header?: never;
             path?: never;
@@ -6049,12 +10906,116 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["ConsumidorResponse"][];
+                    "*/*": components["schemas"]["FacturaProveedorStatsResponse"];
                 };
             };
         };
     };
-    findAllGroupedByComedorAndDate: {
+    getMyFacturas: {
+        parameters: {
+            query: {
+                comedorId?: number;
+                fechaInicio?: string;
+                fechaFin?: string;
+                dateField?: string;
+                search?: string;
+                estado?: "PENDIENTE" | "EMITIDA" | "PAGADA" | "ANULADA";
+                unpaged?: boolean;
+                pageable: components["schemas"]["Pageable"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PageFacturaProveedorResponse"];
+                };
+            };
+        };
+    };
+    getMyFacturasStats: {
+        parameters: {
+            query?: {
+                comedorId?: number;
+                fechaInicio?: string;
+                fechaFin?: string;
+                dateField?: string;
+                search?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["FacturaProveedorStatsResponse"];
+                };
+            };
+        };
+    };
+    nextCodigo: {
+        parameters: {
+            query: {
+                grupo: string;
+                familia: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": {
+                        [key: string]: string;
+                    };
+                };
+            };
+        };
+    };
+    items: {
+        parameters: {
+            query?: {
+                q?: string;
+                page?: number;
+                unpaged?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PagedResponseProveedorItemSearchResponse"];
+                };
+            };
+        };
+    };
+    grupos: {
         parameters: {
             query?: never;
             header?: never;
@@ -6069,37 +11030,17 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["AgrupadosResponse"][];
+                    "*/*": components["schemas"]["GrupoArticuloResponse"][];
                 };
             };
         };
     };
-    getAllCierresMine: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["DetailedCierreCajaResponse"][];
-                };
-            };
-        };
-    };
-    getDetailedCierreById: {
+    familias: {
         parameters: {
             query?: never;
             header?: never;
             path: {
-                id: number;
+                grupoCodigo: string;
             };
             cookie?: never;
         };
@@ -6111,17 +11052,59 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["DetailedCierreCajaResponse"];
+                    "*/*": components["schemas"]["FamiliaArticuloResponse"][];
                 };
             };
         };
     };
-    getAnulacionCierre: {
+    buscar: {
+        parameters: {
+            query: {
+                q: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CatalogoArticuloResponse"][];
+                };
+            };
+        };
+    };
+    listJobs_4: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ImportJobResponse"][];
+                };
+            };
+        };
+    };
+    getJob_4: {
         parameters: {
             query?: never;
             header?: never;
             path: {
-                cierreId: number;
+                jobId: number;
             };
             cookie?: never;
         };
@@ -6133,7 +11116,211 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["AnulacionCierreResponse"];
+                    "*/*": components["schemas"]["ImportJobResponse"];
+                };
+            };
+        };
+    };
+    getRows_4: {
+        parameters: {
+            query?: {
+                estado?: "READY" | "INVALID" | "CONFLICT" | "APPLIED";
+            };
+            header?: never;
+            path: {
+                jobId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ImportRowRazonSocialResponse"][];
+                };
+            };
+        };
+    };
+    listJobs_5: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ImportJobResponse"][];
+                };
+            };
+        };
+    };
+    getJob_5: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                jobId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ImportJobResponse"];
+                };
+            };
+        };
+    };
+    getRows_5: {
+        parameters: {
+            query?: {
+                estado?: "READY" | "INVALID" | "CONFLICT" | "APPLIED";
+            };
+            header?: never;
+            path: {
+                jobId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ImportRowEmpleadoResponse"][];
+                };
+            };
+        };
+    };
+    listJobs_6: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ImportJobResponse"][];
+                };
+            };
+        };
+    };
+    getJob_6: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                jobId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ImportJobResponse"];
+                };
+            };
+        };
+    };
+    getRows_6: {
+        parameters: {
+            query?: {
+                estado?: "READY" | "INVALID" | "CONFLICT" | "APPLIED";
+            };
+            header?: never;
+            path: {
+                jobId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ImportRowCentroCostoPartidaResponse"][];
+                };
+            };
+        };
+    };
+    findFuncionarios: {
+        parameters: {
+            query: {
+                comedorId: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["EmpleadoComedorResponse"][];
+                };
+            };
+        };
+    };
+    getMisTotales: {
+        parameters: {
+            query?: {
+                fechaInicio?: string;
+                fechaFin?: string;
+                comedorId?: number;
+                sociedadId?: number;
+                puntoDeVentaIds?: number[];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["TotalResponse"];
                 };
             };
         };
@@ -6145,7 +11332,7 @@ export interface operations {
                 fechaFin?: string;
                 comedorId?: number;
                 sociedadId?: number;
-                puntoDeVentaId?: number;
+                puntoDeVentaIds?: number[];
             };
             header?: never;
             path?: never;
@@ -6164,6 +11351,56 @@ export interface operations {
             };
         };
     };
+    getEncargadoEstimadoOrdenesCompra: {
+        parameters: {
+            query?: {
+                comedorId?: number;
+                sociedadId?: number;
+                fechaInicio?: string;
+                fechaFin?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AnalyticsSummedTotalResponse"];
+                };
+            };
+        };
+    };
+    getEventosCountEncargado: {
+        parameters: {
+            query?: {
+                comedorId?: number;
+                puntoDeVentaIds?: number[];
+                fechaInicio?: string;
+                fechaFin?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AnalyticsCountResponse"];
+                };
+            };
+        };
+    };
     getTotalContabilidad: {
         parameters: {
             query?: {
@@ -6171,7 +11408,7 @@ export interface operations {
                 fechaFin?: string;
                 comedorId?: number;
                 sociedadId?: number;
-                puntoDeVentaId?: number;
+                puntoDeVentaIds?: number[];
             };
             header?: never;
             path?: never;
@@ -6197,7 +11434,7 @@ export interface operations {
                 fechaFin?: string;
                 comedorId?: number;
                 sociedadId?: number;
-                puntoDeVentaId?: number;
+                puntoDeVentaIds?: number[];
             };
             header?: never;
             path?: never;
@@ -6216,7 +11453,32 @@ export interface operations {
             };
         };
     };
-    anularMovimiento: {
+    getEstimadoOrdenesCompra: {
+        parameters: {
+            query?: {
+                comedorId?: number;
+                sociedadId?: number;
+                fechaInicio?: string;
+                fechaFin?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AnalyticsSummedTotalResponse"];
+                };
+            };
+        };
+    };
+    anularMovimiento_1: {
         parameters: {
             query?: never;
             header?: never;
