@@ -10,8 +10,10 @@ import {
 import { useApi } from "@/hooks/useApi";
 import { cn, fmtCurrency } from "@/lib/utils";
 import { ArrowLeft, Ban, Download, Loader2, MoreHorizontal, Plus } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useExpandableRows } from "@/hooks/useExpandableRows";
+import { ConsumoDetail } from "../components/ConsumoDetail";
 import { DataTable, FilterPills, SortableTh } from "@/components/data-table";
 import { Pagination } from "@/components/Pagination";
 import { ConsumosStatusFilter } from "../components/filters/ConsumosStatusFilter";
@@ -51,6 +53,7 @@ type StatusFilter = "all" | "active" | "anulado";
 
 export default function ConsumosContabilidad() {
   const navigate = useNavigate();
+  const expansion = useExpandableRows();
   const { get, post, del } = useApi();
 
   const [consumidores, setConsumidores] = useState<ConsumidorResponse[]>([]);
@@ -486,16 +489,17 @@ export default function ConsumosContabilidad() {
                       String(consumo.PuntoDeVentaId);
 
                     return (
+                      <Fragment key={consumo.id}>
                       <tr
-                        key={consumo.id}
+                        onClick={() => expansion.toggleRow(consumo.id)}
                         className={cn(
-                          "border-b transition-colors",
+                          "border-b transition-colors cursor-pointer",
                           isAnulado
                             ? "bg-red-50/30 text-gray-400"
                             : "hover:bg-gray-50/80",
                         )}
                       >
-                        <td className="px-4 py-4">
+                        <td className="px-4 py-4" onClick={(e) => e.stopPropagation()}>
                           <input
                             type="checkbox"
                             className="rounded border-gray-300"
@@ -581,6 +585,19 @@ export default function ConsumosContabilidad() {
                           )}
                         </td>
                       </tr>
+                      {expansion.expandedRows.has(consumo.id) && (
+                        <tr className="border-b bg-gray-50/60">
+                          <td colSpan={20} className="px-8 py-5">
+                            <ConsumoDetail
+                              consumo={consumo}
+                              comedorName={consumidor ? comedorNameById[consumidor.comedorId] : undefined}
+                              puntoDeVentaName={puntoDeVentaNameById[consumo.PuntoDeVentaId]}
+                              consumidorName={consumidor?.nombre}
+                            />
+                          </td>
+                        </tr>
+                      )}
+                      </Fragment>
                     );
                   })}
                 </>

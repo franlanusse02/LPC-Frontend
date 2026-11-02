@@ -21,6 +21,7 @@ import { EstadoEventoLabel } from "@/domain/enums/EstadoEvento";
 import type { ComedorResponse } from "@/domain/dto/comedor/ComedorResponse";
 import type { ComedorCaseKey } from "../config/comedorCases";
 import { StatCard } from "@/modules/cierres/components/CierreStat";
+import { EventoDetail } from "@/modules/eventos/components/EventoDetail";
 import { ListFilters, type ListFilterState } from "@/components/ListFilters";
 import { defaultFilters } from "@/components/list-filter-defaults";
 import { buildQuery } from "@/lib/query-string";
@@ -49,88 +50,6 @@ const ESTADO_STYLES: Record<EstadoEvento, { bg: string; text: string }> = {
 };
 
 const ev = (e: EventoResponse, k: string): unknown => (e as Record<string, unknown>)[k];
-
-function DetailField({ label, value }: { label: string; value: string | number | null | undefined }) {
-  if (value === null || value === undefined || value === "") return null;
-  return (
-    <div className="flex flex-col gap-0.5">
-      <span className="text-xs font-medium uppercase tracking-wide text-gray-400">{label}</span>
-      <span className="text-sm text-gray-700">{value}</span>
-    </div>
-  );
-}
-
-function EventoDetail({ evento, comedorName }: { evento: EventoResponse; comedorName: string }) {
-  return (
-    <div className="grid grid-cols-2 gap-x-8 gap-y-3 sm:grid-cols-3 lg:grid-cols-4">
-      <DetailField label="Comedor" value={comedorName} />
-      <DetailField label="Cantidad personas" value={evento.cantidadPersonas} />
-      <DetailField label="Medio de pago" value={evento.medioPago} />
-      <DetailField label="Observaciones" value={evento.observaciones} />
-
-      {evento.tipoComedor === "GALICIA" && (
-        <>
-          <DetailField label="Solicitante" value={evento.solicitanteNombre} />
-          <DetailField label="Email solicitante" value={evento.emailSolicitante} />
-          <DetailField label="Funcionario" value={evento.funcionarioNombre} />
-          <DetailField label="Responsable" value={evento.responsableNombre} />
-          <DetailField label="Centro de costo" value={evento.centroCosto} />
-          <DetailField label="Partida" value={evento.partida} />
-          <DetailField label="Precio unitario" value={evento.precioUnitario !== null ? fmtCurrency(evento.precioUnitario) : null} />
-          <DetailField label="Retenciones" value={evento.retenciones !== null ? fmtCurrency(evento.retenciones) : null} />
-          <DetailField label="Nro. operación" value={evento.numeroOperacion} />
-          <DetailField label="Razón social" value={evento.razonSocial} />
-          <DetailField label="Dest. facturación" value={evento.destinatarioFacturacion} />
-          <DetailField label="Tipo comprobante" value={evento.tipoComprobante} />
-          <DetailField label="Nro. comprobante" value={evento.numeroComprobante} />
-        </>
-      )}
-
-      {evento.tipoComedor === "BBVA" && (
-        <>
-          <DetailField label="Solicitante" value={evento.solicitanteNombre} />
-          <DetailField label="Email solicitante" value={evento.emailSolicitante} />
-          <DetailField label="Orden de compra" value={evento.ordenCompra} />
-          <DetailField label="Legajo" value={evento.legajo} />
-          <DetailField label="Recepción" value={evento.recepcion} />
-        </>
-      )}
-
-      {evento.tipoComedor === "TECHINT" && (
-        <>
-          <DetailField label="Nro. pedido" value={evento.numeroPedido} />
-          <DetailField label="Razón social" value={evento.razonSocial} />
-          <DetailField label="Concepto" value={evento.concepto} />
-          <DetailField label="Tipo comprobante" value={evento.tipoComprobante} />
-          <DetailField label="Nro. comprobante" value={evento.numeroComprobante} />
-        </>
-      )}
-
-      {evento.tipoComedor === "UDESA" && (
-        <>
-          <DetailField label="Solicitante" value={evento.solicitanteNombre} />
-          <DetailField label="Centro de costo" value={evento.centroCosto} />
-          <DetailField label="Área" value={evento.area} />
-          <DetailField label="Precio unitario" value={evento.precioUnitario !== null ? fmtCurrency(evento.precioUnitario) : null} />
-          <DetailField label="Adicionales" value={evento.adicionales !== null ? fmtCurrency(evento.adicionales) : null} />
-        </>
-      )}
-
-      {evento.servicios.length > 0 && (
-        <div className="col-span-full mt-2">
-          <span className="text-xs font-medium uppercase tracking-wide text-gray-400">Servicios</span>
-          <div className="mt-1 space-y-1">
-            {evento.servicios.map((s, i) => (
-              <div key={i} className="text-sm text-gray-700">
-                {s.producto.nombre} x{s.cantidad} — {fmtCurrency(s.precioUnitario * s.cantidad)}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
 
 function extraHeaders(tab: TabKey): ReactNode {
   switch (tab) {
@@ -355,7 +274,7 @@ export default function EventosCargaDatos() {
     { key: "medioPago", header: "Medio de Pago" },
     { key: (e) => ev(e, "solicitanteNombre"), header: "Solicitante" },
     { key: (e) => ev(e, "emailSolicitante"), header: "Email Solicitante" },
-    { key: (e) => ev(e, "funcionarioNombre"), header: "Funcionario" },
+    { key: (e) => ev(e, "funcionarioNombre"), header: "Gerente" },
     { key: (e) => ev(e, "responsableNombre"), header: "Responsable" },
     { key: (e) => ev(e, "centroCosto"), header: "Centro de Costo" },
     { key: (e) => ev(e, "partida"), header: "Partida" },
@@ -541,7 +460,11 @@ export default function EventosCargaDatos() {
                         <tr className="bg-gray-50/60">
                           <td colSpan={20} className="px-8 py-5">
                             <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-                              <EventoDetail evento={evento} comedorName={comedorName} />
+                              <EventoDetail
+                                evento={evento}
+                                comedorName={comedorName}
+                                puntoDeVentaName={puntoDeVentaNameById[evento.puntoDeVentaId]}
+                              />
                             </div>
                           </td>
                         </tr>

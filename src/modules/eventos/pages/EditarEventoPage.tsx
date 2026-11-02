@@ -135,6 +135,25 @@ export default function EditarEventoPage({ basePath = "/contabilidad" }: { baseP
     setAdicionales(str("adicionales"));
   }, [evento]);
 
+  // Eventos whose response carries only the cc/partida name snapshot (no id):
+  // preselect by matching the name once the comedor's options are loaded.
+  useEffect(() => {
+    if (!evento) return;
+    const ev = evento as Record<string, unknown>;
+    const byName = <T extends { id: number; nombre: string }>(list: T[], nombre: unknown) =>
+      typeof nombre === "string" && nombre
+        ? list.find((x) => x.nombre.trim().toLowerCase() === nombre.trim().toLowerCase())
+        : undefined;
+    if (ev.centroCostoId == null) {
+      const cc = byName(centrosCosto, ev.centroCosto);
+      if (cc) setCentroCostoId((cur) => cur || String(cc.id));
+    }
+    if (ev.partidaId == null) {
+      const p = byName(partidas, ev.partida);
+      if (p) setPartidaId((cur) => cur || String(p.id));
+    }
+  }, [evento, centrosCosto, partidas]);
+
   const empleadoOptions = useMemo(
     () => empleados.filter((e) => e.activo).map((e) => ({ value: String(e.id), label: e.nombre, subtitle: e.email || undefined })),
     [empleados],
@@ -219,6 +238,8 @@ export default function EditarEventoPage({ basePath = "/contabilidad" }: { baseP
             funcionarioNombre: func.nombre ?? undefined,
             responsableId: resp.id ?? undefined,
             responsableNombre: resp.nombre ?? undefined,
+            centroCostoId: centroCostoId ? Number(centroCostoId) : undefined,
+            partidaId: partidaId ? Number(partidaId) : undefined,
             precioUnitario: precioUnitario ? Number(precioUnitario) : undefined,
             retenciones: retenciones ? Number(retenciones) : undefined,
             numeroOperacion: numeroOperacion || undefined,

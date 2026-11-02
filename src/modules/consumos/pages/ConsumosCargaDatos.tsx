@@ -3,8 +3,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useApi } from "@/hooks/useApi";
 import { cn, fmtCurrency } from "@/lib/utils";
 import { ArrowLeft, Ban, Plus } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useExpandableRows } from "@/hooks/useExpandableRows";
+import { ConsumoDetail } from "../components/ConsumoDetail";
 import { DataTable, SortableTh } from "@/components/data-table";
 import { Pagination } from "@/components/Pagination";
 import { ConsumosStatusFilter } from "../components/filters/ConsumosStatusFilter";
@@ -23,6 +25,7 @@ type StatusFilter = "all" | "active" | "anulado";
 
 export default function ConsumosCargaDatos() {
   const navigate = useNavigate();
+  const expansion = useExpandableRows();
   const { get } = useApi();
 
   const [consumidores, setConsumidores] = useState<ConsumidorResponse[]>([]);
@@ -232,10 +235,11 @@ export default function ConsumosCargaDatos() {
                     String(consumo.PuntoDeVentaId);
 
                   return (
+                    <Fragment key={consumo.id}>
                     <tr
-                      key={consumo.id}
+                      onClick={() => expansion.toggleRow(consumo.id)}
                       className={cn(
-                        "border-b transition-colors",
+                        "border-b transition-colors cursor-pointer",
                         isAnulado
                           ? "bg-red-50/30 text-gray-400"
                           : "hover:bg-gray-50/80",
@@ -282,6 +286,19 @@ export default function ConsumosCargaDatos() {
                         )}
                       </td>
                     </tr>
+                    {expansion.expandedRows.has(consumo.id) && (
+                      <tr className="border-b bg-gray-50/60">
+                        <td colSpan={20} className="px-8 py-5">
+                          <ConsumoDetail
+                            consumo={consumo}
+                            comedorName={consumidor ? comedorNameById[consumidor.comedorId] : undefined}
+                            puntoDeVentaName={puntoDeVentaNameById[consumo.PuntoDeVentaId]}
+                            consumidorName={consumidor?.nombre}
+                          />
+                        </td>
+                      </tr>
+                    )}
+                    </Fragment>
                   );
                 })}
               </>

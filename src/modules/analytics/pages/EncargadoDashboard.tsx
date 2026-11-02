@@ -22,6 +22,7 @@ import {
 } from "@/components/ListFilters";
 import { defaultFilters } from "@/components/list-filter-defaults";
 import type { ComedorResponse } from "@/domain/dto/comedor/ComedorResponse";
+import type { UsuarioResponse } from "@/domain/dto/auth/UsuarioResponse";
 
 const ACCESO_ITEMS: ModuleButton[] = [
   { icon: BanknoteArrowUp, label: "Cargar Cierres", to: "/encargado/cierres" },
@@ -43,11 +44,23 @@ export default function EncargadoDashboard() {
       .then(setComedores);
   }, [get]);
 
+  // The comedor picker is hidden here; the legajo's comedor drives which puntos de
+  // venta the POS filter offers. It is NOT sent to analytics: "mis-totales" already
+  // scopes to the encargado's own records + that comedor.
+  useEffect(() => {
+    get("/usuarios/me")
+      .then((r) => r.json() as Promise<UsuarioResponse>)
+      .then((me) => {
+        if (me.comedorId != null) {
+          setFilters((f) => ({ ...f, comedorId: String(me.comedorId) }));
+        }
+      });
+  }, [get]);
+
   const analyticsFilters = useMemo(
     () => ({
       fechaInicio: filters.desde || undefined,
       fechaFin: filters.hasta || undefined,
-      comedorId: filters.comedorId || undefined,
       puntoDeVentaIds: filters.puntoDeVentaIds.length ? filters.puntoDeVentaIds : undefined,
     }),
     [filters],
