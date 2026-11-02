@@ -6,4 +6,6 @@ export type UsuarioResponse = {
   cuil: number;
   rol: UserRole;
   nombre: string;
+  /** Comedor on the account's legajo; null until assigned. */
+  comedorId: number | null;
 };
