@@ -135,40 +135,44 @@ function tabHeaders(tab: TabKey): ReactNode {
   }
 }
 
-function tabCells(evento: EventoResponse): ReactNode {
+function tabCells(evento: EventoResponse, tab: TabKey): ReactNode {
   const click = "px-4 py-4 cursor-pointer";
-  switch (evento.tipoComedor) {
+  // Cells follow the tab's headers, not the row's own type, so every row has one cell per
+  // column; an empty value shows as a dash instead of the cell being left out.
+  const show = (v: unknown): ReactNode => (v == null || v === "" ? dash : String(v));
+  const money = (v: unknown): ReactNode => (typeof v === "number" ? fmtCurrency(v) : dash);
+  switch (tab) {
     case "GALICIA":
       return (
         <>
-          <td className={click}>{evento.solicitanteNombre ?? dash}</td>
-          <td className={click}>{evento.funcionarioNombre ?? dash}</td>
-          <td className={click}>{evento.centroCosto ?? dash}</td>
-          <td className={click}>{evento.partida ?? dash}</td>
+          <td className={click}>{show(ev(evento, "solicitanteNombre"))}</td>
+          <td className={click}>{show(ev(evento, "funcionarioNombre"))}</td>
+          <td className={click}>{show(ev(evento, "centroCosto"))}</td>
+          <td className={click}>{show(ev(evento, "partida"))}</td>
         </>
       );
     case "BBVA":
       return (
         <>
-          <td className={click}>{evento.solicitanteNombre ?? dash}</td>
-          <td className={click}>{evento.legajo ?? dash}</td>
-          <td className={click}>{evento.recepcion ?? dash}</td>
+          <td className={click}>{show(ev(evento, "solicitanteNombre"))}</td>
+          <td className={click}>{show(ev(evento, "legajo"))}</td>
+          <td className={click}>{show(ev(evento, "recepcion"))}</td>
         </>
       );
     case "TECHINT":
       return (
         <>
-          <td className={click}>{evento.numeroPedido ?? dash}</td>
-          <td className={click}>{evento.razonSocial ?? dash}</td>
+          <td className={click}>{show(ev(evento, "numeroPedido"))}</td>
+          <td className={click}>{show(ev(evento, "razonSocial"))}</td>
         </>
       );
     case "UDESA":
       return (
         <>
-          <td className={click}>{evento.solicitanteNombre ?? dash}</td>
-          <td className={click}>{evento.centroCosto ?? dash}</td>
-          <td className={click}>{evento.area ?? dash}</td>
-          <td className={cn(click, "text-right font-mono")}>{evento.precioUnitario !== null ? fmtCurrency(evento.precioUnitario) : dash}</td>
+          <td className={click}>{show(ev(evento, "solicitanteNombre"))}</td>
+          <td className={click}>{show(ev(evento, "centroCosto"))}</td>
+          <td className={click}>{show(ev(evento, "area"))}</td>
+          <td className={cn(click, "text-right font-mono")}>{money(ev(evento, "precioUnitario"))}</td>
         </>
       );
     default:
@@ -788,7 +792,7 @@ export default function EventosContabilidad() {
                         <td className="px-4 py-4 cursor-pointer" onClick={() => expansion.toggleRow(evento.id)}>
                           {comedorName}
                         </td>
-                        {hasExtraCols && tabCells(evento)}
+                        {hasExtraCols && tabCells(evento, activeTab)}
                         <td className="px-4 py-4 text-right font-mono cursor-pointer" onClick={() => expansion.toggleRow(evento.id)}>
                           {evento.cantidadPersonas?.toLocaleString("es-AR") ?? dash}
                         </td>

@@ -90,40 +90,43 @@ function extraHeaders(tab: TabKey): ReactNode {
   }
 }
 
-function extraCells(evento: EventoResponse): ReactNode {
+function extraCells(evento: EventoResponse, tab: TabKey): ReactNode {
   const click = "px-4 py-4 cursor-pointer";
   const dash = <span className="text-gray-300">—</span>;
-  switch (evento.tipoComedor) {
+  // Cells follow the tab's headers, not the row's own type, so every row has one cell per
+  // column; an empty value shows as a dash instead of the cell being left out.
+  const show = (v: unknown): ReactNode => (v == null || v === "" ? dash : String(v));
+  switch (tab) {
     case "GALICIA":
       return (
         <>
-          <td className={click}>{evento.solicitanteNombre ?? dash}</td>
-          <td className={click}>{evento.funcionarioNombre ?? dash}</td>
-          <td className={click}>{evento.centroCosto ?? dash}</td>
-          <td className={click}>{evento.partida ?? dash}</td>
+          <td className={click}>{show(ev(evento, "solicitanteNombre"))}</td>
+          <td className={click}>{show(ev(evento, "funcionarioNombre"))}</td>
+          <td className={click}>{show(ev(evento, "centroCosto"))}</td>
+          <td className={click}>{show(ev(evento, "partida"))}</td>
         </>
       );
     case "BBVA":
       return (
         <>
-          <td className={click}>{evento.solicitanteNombre ?? dash}</td>
-          <td className={click}>{evento.legajo ?? dash}</td>
-          <td className={click}>{evento.recepcion ?? dash}</td>
+          <td className={click}>{show(ev(evento, "solicitanteNombre"))}</td>
+          <td className={click}>{show(ev(evento, "legajo"))}</td>
+          <td className={click}>{show(ev(evento, "recepcion"))}</td>
         </>
       );
     case "TECHINT":
       return (
         <>
-          <td className={click}>{evento.numeroPedido ?? dash}</td>
-          <td className={click}>{evento.razonSocial ?? dash}</td>
+          <td className={click}>{show(ev(evento, "numeroPedido"))}</td>
+          <td className={click}>{show(ev(evento, "razonSocial"))}</td>
         </>
       );
     case "UDESA":
       return (
         <>
-          <td className={click}>{evento.solicitanteNombre ?? dash}</td>
-          <td className={click}>{evento.centroCosto ?? dash}</td>
-          <td className={click}>{evento.area ?? dash}</td>
+          <td className={click}>{show(ev(evento, "solicitanteNombre"))}</td>
+          <td className={click}>{show(ev(evento, "centroCosto"))}</td>
+          <td className={click}>{show(ev(evento, "area"))}</td>
         </>
       );
     default:
@@ -445,7 +448,7 @@ export default function EventosCargaDatos() {
                         <td className="px-4 py-4 cursor-pointer" onClick={() => expansion.toggleRow(evento.id)}>
                           {comedorName}
                         </td>
-                        {hasExtraCols && extraCells(evento)}
+                        {hasExtraCols && extraCells(evento, activeTab)}
                         <td className="px-4 py-4 text-right font-mono cursor-pointer" onClick={() => expansion.toggleRow(evento.id)}>
                           {evento.cantidadPersonas?.toLocaleString("es-AR") ?? <span className="text-gray-300">—</span>}
                         </td>
