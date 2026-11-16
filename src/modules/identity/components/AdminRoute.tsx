@@ -1,20 +1,21 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { LoadingScreen } from "@/components/loading";
+import { homeFor } from "@/modules/identity/homeFor";
 
+// Admin pages: only ADMIN. Any other role goes to its own home (LPC-234: an allow-list, so a
+// new role never falls through into admin pages).
 export function AdminRoute() {
   const { isLoading, session } = useAuth();
 
   if (isLoading) return <LoadingScreen />;
 
-  if (!session?.rol) {
+  const home = homeFor(session?.rol);
+  if (!home) {
     return <Navigate to="/login" replace />;
-  } else if (session?.rol.toUpperCase() === "ENCARGADO") {
-    return <Navigate to="/encargado" replace />;
-  } else if (session?.rol.toUpperCase() === "CONTABILIDAD") {
-    return <Navigate to="/contabilidad" replace />;
-  } else if (session?.rol.toUpperCase() === "CARGA_DATOS") {
-    return <Navigate to="/carga-datos" replace />;
+  }
+  if (session!.rol.toUpperCase() !== "ADMIN") {
+    return <Navigate to={home} replace />;
   }
 
   return <Outlet />;

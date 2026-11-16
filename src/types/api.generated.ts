@@ -2260,6 +2260,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/identity/jwks/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["jwks"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/eventos/{id}/anulacion": {
         parameters: {
             query?: never;
@@ -3395,7 +3411,7 @@ export interface components {
             /** Format: int64 */
             cuil?: number;
             /** @enum {string} */
-            rol: "ENCARGADO" | "CONTABILIDAD" | "ADMIN" | "CARGA_DATOS";
+            rol: "ENCARGADO" | "CONTABILIDAD" | "ADMIN" | "CARGA_DATOS" | "RRHH";
             password: string;
         };
         LoginResponse: {
@@ -3841,7 +3857,7 @@ export interface components {
             cuil?: number;
             nombre?: string;
             /** @enum {string} */
-            rol?: "ENCARGADO" | "CONTABILIDAD" | "ADMIN" | "CARGA_DATOS";
+            rol?: "ENCARGADO" | "CONTABILIDAD" | "ADMIN" | "CARGA_DATOS" | "RRHH";
         };
         CreateProductoRequest: {
             /** Format: int64 */
@@ -4539,7 +4555,7 @@ export interface components {
         PatchUsuarioRequest: {
             nombre?: string;
             /** @enum {string} */
-            rol?: "ENCARGADO" | "CONTABILIDAD" | "ADMIN" | "CARGA_DATOS";
+            rol?: "ENCARGADO" | "CONTABILIDAD" | "ADMIN" | "CARGA_DATOS" | "RRHH";
             password?: string;
             /** Format: int64 */
             cuil?: number;
@@ -10188,6 +10204,26 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["UsuarioResponse"];
+                };
+            };
+        };
+    };
+    jwks: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/jwk-set+json": string;
                 };
             };
         };

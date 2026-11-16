@@ -20,6 +20,7 @@ import ComedoresPage from "./modules/catalogo/pages/comedores";
 import PuntosDeVentaPage from "./modules/catalogo/pages/puntos-de-venta";
 import UsuariosPage from "./modules/catalogo/pages/usuarios";
 import LegajosPage from "./modules/rrhh/pages/legajos";
+import RrhhDashboard from "./modules/rrhh/pages/RrhhDashboard";
 import ProductosPage from "./modules/catalogo/pages/productos";
 import ConsumidoresPage from "./modules/catalogo/pages/consumidores";
 import ProveedoresPage from "./modules/catalogo/pages/proveedores";
@@ -157,6 +158,14 @@ export default function App() {
           </Route>
 
           {/* Contabilidad */}
+          {/* RRHH */}
+          <Route element={<ProtectedRoute allowOnly="RRHH" />}>
+            <Route element={<RootLayout />}>
+              <Route path="/rrhh" element={<RrhhDashboard />} />
+              <Route path="/rrhh/legajos" element={<LegajosPage />} />
+            </Route>
+          </Route>
+
           <Route element={<ProtectedRoute allowOnly="CONTABILIDAD" />}>
             <Route element={<RootLayout />}>
               <Route
