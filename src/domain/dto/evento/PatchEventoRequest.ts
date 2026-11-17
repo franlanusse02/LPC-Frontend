@@ -27,6 +27,8 @@ export type PatchEventoGaliciaRequest = PatchEventoBase & {
   funcionarioNombre?: string;
   responsableId?: number;
   responsableNombre?: string;
+  centroCostoId?: number;
+  partidaId?: number;
   precioUnitario?: number;
   retenciones?: number;
   numeroOperacion?: string;

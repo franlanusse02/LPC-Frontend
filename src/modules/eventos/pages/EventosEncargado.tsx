@@ -28,6 +28,7 @@ import {
 import { AnularEventoModal } from "../components/AnularEventoModal";
 import { toast } from "sonner";
 import { StatCard } from "@/modules/cierres/components/CierreStat";
+import { EventoDetail } from "@/modules/eventos/components/EventoDetail";
 import { ListFilters, type ListFilterState } from "@/components/ListFilters";
 import { defaultFilters } from "@/components/list-filter-defaults";
 import { buildQuery } from "@/lib/query-string";
@@ -58,89 +59,6 @@ const ESTADO_STYLES: Record<EstadoEvento, { bg: string; text: string }> = {
 
 const dash = <span className="text-gray-300">—</span>;
 const ev = (e: EventoResponse, k: string): unknown => (e as Record<string, unknown>)[k];
-
-function DetailField({ label, value }: { label: string; value: string | number | null | undefined }) {
-  if (value === null || value === undefined || value === "") return null;
-  return (
-    <div className="flex flex-col gap-0.5">
-      <span className="text-xs font-medium uppercase tracking-wide text-gray-400">{label}</span>
-      <span className="text-sm text-gray-700">{value}</span>
-    </div>
-  );
-}
-
-function EventoDetail({ evento, comedorName }: { evento: EventoResponse; comedorName: string }) {
-  return (
-    <div className="grid grid-cols-2 gap-x-8 gap-y-3 sm:grid-cols-3 lg:grid-cols-4">
-      <DetailField label="Comedor" value={comedorName} />
-      <DetailField label="Cantidad personas" value={evento.cantidadPersonas} />
-      <DetailField label="Monto total" value={evento.montoTotal !== null ? fmtCurrency(evento.montoTotal) : null} />
-      <DetailField label="Medio de pago" value={evento.medioPago} />
-      <DetailField label="Observaciones" value={evento.observaciones} />
-
-      {evento.tipoComedor === "GALICIA" && (
-        <>
-          <DetailField label="Solicitante" value={evento.solicitanteNombre} />
-          <DetailField label="Email solicitante" value={evento.emailSolicitante} />
-          <DetailField label="Funcionario" value={evento.funcionarioNombre} />
-          <DetailField label="Responsable" value={evento.responsableNombre} />
-          <DetailField label="Centro de costo" value={evento.centroCosto} />
-          <DetailField label="Partida" value={evento.partida} />
-          <DetailField label="Precio unitario" value={evento.precioUnitario !== null ? fmtCurrency(evento.precioUnitario) : null} />
-          <DetailField label="Retenciones" value={evento.retenciones !== null ? fmtCurrency(evento.retenciones) : null} />
-          <DetailField label="Nro. operación" value={evento.numeroOperacion} />
-          <DetailField label="Razón social" value={evento.razonSocial} />
-          <DetailField label="Dest. facturación" value={evento.destinatarioFacturacion} />
-          <DetailField label="Tipo comprobante" value={evento.tipoComprobante} />
-          <DetailField label="Nro. comprobante" value={evento.numeroComprobante} />
-        </>
-      )}
-
-      {evento.tipoComedor === "BBVA" && (
-        <>
-          <DetailField label="Solicitante" value={evento.solicitanteNombre} />
-          <DetailField label="Email solicitante" value={evento.emailSolicitante} />
-          <DetailField label="Orden de compra" value={evento.ordenCompra} />
-          <DetailField label="Legajo" value={evento.legajo} />
-          <DetailField label="Recepción" value={evento.recepcion} />
-        </>
-      )}
-
-      {evento.tipoComedor === "TECHINT" && (
-        <>
-          <DetailField label="Nro. pedido" value={evento.numeroPedido} />
-          <DetailField label="Razón social" value={evento.razonSocial} />
-          <DetailField label="Concepto" value={evento.concepto} />
-          <DetailField label="Tipo comprobante" value={evento.tipoComprobante} />
-          <DetailField label="Nro. comprobante" value={evento.numeroComprobante} />
-        </>
-      )}
-
-      {evento.tipoComedor === "UDESA" && (
-        <>
-          <DetailField label="Solicitante" value={evento.solicitanteNombre} />
-          <DetailField label="Centro de costo" value={evento.centroCosto} />
-          <DetailField label="Área" value={evento.area} />
-          <DetailField label="Precio unitario" value={evento.precioUnitario !== null ? fmtCurrency(evento.precioUnitario) : null} />
-          <DetailField label="Adicionales" value={evento.adicionales !== null ? fmtCurrency(evento.adicionales) : null} />
-        </>
-      )}
-
-      {evento.servicios.length > 0 && (
-        <div className="col-span-full mt-2">
-          <span className="text-xs font-medium uppercase tracking-wide text-gray-400">Servicios</span>
-          <div className="mt-1 space-y-1">
-            {evento.servicios.map((s, i) => (
-              <div key={i} className="text-sm text-gray-700">
-                {s.producto.nombre} x{s.cantidad} — {fmtCurrency(s.precioUnitario * s.cantidad)}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
 
 function extraHeaders(tab: TabKey): ReactNode {
   switch (tab) {
@@ -182,40 +100,44 @@ function extraHeaders(tab: TabKey): ReactNode {
   }
 }
 
-function extraCells(evento: EventoResponse): ReactNode {
+function extraCells(evento: EventoResponse, tab: TabKey): ReactNode {
   const click = "px-4 py-4 cursor-pointer";
-  switch (evento.tipoComedor) {
+  // Cells follow the tab's headers, not the row's own type, so every row has one cell per
+  // column; an empty value shows as a dash instead of the cell being left out.
+  const show = (v: unknown): ReactNode => (v == null || v === "" ? dash : String(v));
+  const money = (v: unknown): ReactNode => (typeof v === "number" ? fmtCurrency(v) : dash);
+  switch (tab) {
     case "GALICIA":
       return (
         <>
-          <td className={click}>{evento.solicitanteNombre ?? dash}</td>
-          <td className={click}>{evento.funcionarioNombre ?? dash}</td>
-          <td className={click}>{evento.centroCosto ?? dash}</td>
-          <td className={click}>{evento.partida ?? dash}</td>
+          <td className={click}>{show(ev(evento, "solicitanteNombre"))}</td>
+          <td className={click}>{show(ev(evento, "funcionarioNombre"))}</td>
+          <td className={click}>{show(ev(evento, "centroCosto"))}</td>
+          <td className={click}>{show(ev(evento, "partida"))}</td>
         </>
       );
     case "BBVA":
       return (
         <>
-          <td className={click}>{evento.solicitanteNombre ?? dash}</td>
-          <td className={click}>{evento.legajo ?? dash}</td>
-          <td className={click}>{evento.recepcion ?? dash}</td>
+          <td className={click}>{show(ev(evento, "solicitanteNombre"))}</td>
+          <td className={click}>{show(ev(evento, "legajo"))}</td>
+          <td className={click}>{show(ev(evento, "recepcion"))}</td>
         </>
       );
     case "TECHINT":
       return (
         <>
-          <td className={click}>{evento.numeroPedido ?? dash}</td>
-          <td className={click}>{evento.razonSocial ?? dash}</td>
+          <td className={click}>{show(ev(evento, "numeroPedido"))}</td>
+          <td className={click}>{show(ev(evento, "razonSocial"))}</td>
         </>
       );
     case "UDESA":
       return (
         <>
-          <td className={click}>{evento.solicitanteNombre ?? dash}</td>
-          <td className={click}>{evento.centroCosto ?? dash}</td>
-          <td className={click}>{evento.area ?? dash}</td>
-          <td className={cn(click, "text-right font-mono")}>{evento.precioUnitario !== null ? fmtCurrency(evento.precioUnitario) : dash}</td>
+          <td className={click}>{show(ev(evento, "solicitanteNombre"))}</td>
+          <td className={click}>{show(ev(evento, "centroCosto"))}</td>
+          <td className={click}>{show(ev(evento, "area"))}</td>
+          <td className={cn(click, "text-right font-mono")}>{money(ev(evento, "precioUnitario"))}</td>
         </>
       );
     default:
@@ -387,7 +309,7 @@ export default function EventosEncargado() {
     { key: "medioPago", header: "Medio de Pago" },
     { key: (e) => ev(e, "solicitanteNombre"), header: "Solicitante" },
     { key: (e) => ev(e, "emailSolicitante"), header: "Email Solicitante" },
-    { key: (e) => ev(e, "funcionarioNombre"), header: "Funcionario" },
+    { key: (e) => ev(e, "funcionarioNombre"), header: "Gerente" },
     { key: (e) => ev(e, "responsableNombre"), header: "Responsable" },
     { key: (e) => ev(e, "centroCosto"), header: "Centro de Costo" },
     { key: (e) => ev(e, "partida"), header: "Partida" },
@@ -561,7 +483,7 @@ export default function EventosEncargado() {
                         <td className="px-4 py-4 cursor-pointer" onClick={() => expansion.toggleRow(evento.id)}>
                           {comedorName}
                         </td>
-                        {hasExtraCols && extraCells(evento)}
+                        {hasExtraCols && extraCells(evento, activeTab)}
                         <td className="px-4 py-4 text-right font-mono cursor-pointer" onClick={() => expansion.toggleRow(evento.id)}>
                           {evento.cantidadPersonas?.toLocaleString("es-AR") ?? dash}
                         </td>
@@ -613,7 +535,11 @@ export default function EventosEncargado() {
                         <tr className="bg-gray-50/60">
                           <td colSpan={20} className="px-8 py-5">
                             <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-                              <EventoDetail evento={evento} comedorName={comedorName} />
+                              <EventoDetail
+                                evento={evento}
+                                comedorName={comedorName}
+                                puntoDeVentaName={puntoDeVentaNameById[evento.puntoDeVentaId]}
+                              />
                             </div>
                           </td>
                         </tr>

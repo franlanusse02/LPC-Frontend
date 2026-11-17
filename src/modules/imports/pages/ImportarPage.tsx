@@ -1,10 +1,19 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Upload } from "lucide-react";
+import { AlertTriangle, ArrowLeft, Upload } from "lucide-react";
 import { toast } from "sonner";
+import * as XLSX from "xlsx-js-style";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Combobox } from "@/components/ui/combobox";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Spinner } from "@/components/ui/spinner";
 import { cn } from "@/lib/utils";
 import { useApi } from "@/hooks/useApi";
@@ -19,6 +28,28 @@ const ESTADO_JOB_STYLES: Record<string, { label: string; bg: string; text: strin
 
 const typeOptions = IMPORT_TYPES.map((t) => ({ value: t.key, label: t.label }));
 
+type SinIdAccion = "CREAR" | "OMITIR";
+
+/**
+ * Counts the data rows of a productos sheet that carry no internal ID. Mirrors the backend
+ * parser: the ID column exists only when the first header cell is "ID"; a legacy sheet
+ * without it has no ids at all.
+ */
+async function contarFilasSinId(file: File): Promise<number> {
+  const wb = XLSX.read(await file.arrayBuffer(), { type: "array" });
+  const sheet = wb.Sheets[wb.SheetNames[0]];
+  if (!sheet) return 0;
+  const rows = XLSX.utils.sheet_to_json<unknown[]>(sheet, { header: 1, defval: "", blankrows: false });
+  const [header, ...data] = rows;
+  const conId = String(header?.[0] ?? "").trim().toLowerCase() === "id";
+  const off = conId ? 1 : 0;
+  const blank = (v: unknown) => String(v ?? "").trim() === "";
+  return data.filter((r) => {
+    const tieneDatos = [0, 1, 2, 3].some((i) => !blank(r[off + i]));
+    return tieneDatos && (!conId || blank(r[0]));
+  }).length;
+}
+
 export default function ImportarPage() {
   const navigate = useNavigate();
   const { get, postFile } = useApi();
@@ -26,6 +57,7 @@ export default function ImportarPage() {
   const [selectedType, setSelectedType] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [filasSinId, setFilasSinId] = useState(0);
   const [jobsResult, setJobsResult] = useState<{ forType: string | null; jobs: ImportJob[] }>({ forType: null, jobs: [] });
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -45,11 +77,31 @@ export default function ImportarPage() {
 
   const handleUpload = async () => {
     if (!file || !importType) return;
+    if (importType.key === "productos") {
+      let sinId = 0;
+      try {
+        sinId = await contarFilasSinId(file);
+      } catch {
+        toast.error("No se pudo leer el archivo. Verificá el formato.");
+        return;
+      }
+      if (sinId > 0) {
+        setFilasSinId(sinId);
+        return;
+      }
+    }
+    await upload();
+  };
+
+  const upload = async (sinId?: SinIdAccion) => {
+    if (!file || !importType) return;
+    setFilasSinId(0);
     setUploading(true);
     try {
       const form = new FormData();
       form.append("file", file);
-      const res = await postFile(importType.endpoint, form);
+      const endpoint = sinId ? `${importType.endpoint}?sinId=${sinId}` : importType.endpoint;
+      const res = await postFile(endpoint, form);
       const job = (await res.json()) as ImportJob;
       toast("Archivo subido", { description: `Job #${job.id} creado.` });
       setFile(null);
@@ -122,6 +174,40 @@ export default function ImportarPage() {
           )}
         </CardContent>
       </Card>
+
+      <Dialog open={filasSinId > 0} onOpenChange={(open) => !open && setFilasSinId(0)}>
+        <DialogContent className="sm:max-w-md shadow-xl border-0 p-0 overflow-hidden">
+          <div className="h-1.5 w-full bg-amber-500" />
+          <div className="px-6 pt-5 pb-6 space-y-5">
+            <DialogHeader className="space-y-3">
+              <div className="flex items-center gap-3">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-50 text-amber-500">
+                  <AlertTriangle className="h-5 w-5" />
+                </span>
+                <DialogTitle className="text-lg font-bold text-gray-900">
+                  Hay items sin id, desea crearlos?
+                </DialogTitle>
+              </div>
+              <DialogDescription className="text-sm text-gray-500 leading-relaxed">
+                {filasSinId === 1 ? "1 fila no tiene" : `${filasSinId} filas no tienen`} ID. Si las
+                creás, se darán de alta como productos nuevos; si las omitís, no se importan.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter className="flex-row justify-end gap-2 pt-2">
+              <Button
+                variant="outline"
+                onClick={() => upload("OMITIR")}
+                className="rounded-lg border-gray-200 text-gray-600 hover:bg-gray-50"
+              >
+                Omitir items
+              </Button>
+              <Button onClick={() => upload("CREAR")} className="rounded-lg font-semibold">
+                Crear
+              </Button>
+            </DialogFooter>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {selectedType && (
         <Card className="mx-auto max-w-5xl mt-6 border-0 shadow-md rounded-xl">

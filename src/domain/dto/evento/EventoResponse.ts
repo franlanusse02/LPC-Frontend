@@ -40,7 +40,9 @@ export type EventoGaliciaResponse = EventoBase & {
   funcionarioNombre: string | null;
   responsableId: number | null;
   responsableNombre: string | null;
+  centroCostoId: number | null;
   centroCosto: string | null;
+  partidaId: number | null;
   partida: string | null;
   precioUnitario: number | null;
   retenciones: number | null;

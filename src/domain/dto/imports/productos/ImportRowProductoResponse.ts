@@ -15,6 +15,7 @@ export type ImportRowProductoResponse = {
   aplicadoPorId: number | null;
   aplicadoEn: string | null;
   errors: string | null;
+  productoId: number | null;
   comedorNombre: string | null;
   comedorId: number | null;
   nombre: string | null;

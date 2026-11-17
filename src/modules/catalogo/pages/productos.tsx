@@ -81,7 +81,9 @@ export default function ProductosPage() {
 
   const comedorMap = new Map(comedores.map((c) => [c.id, c.nombre]));
 
+  // Same column order as the productos import (ID first), so an export can be edited and re-imported.
   const exportColumns: ExportColumn<any>[] = [
+    { key: "productoId", header: "ID" },
     { key: (p) => comedorMap.get(p.comedorId) ?? p.comedorId, header: "Comedor" },
     { key: "nombre", header: "Nombre" },
     { key: "precio", header: "Precio" },
