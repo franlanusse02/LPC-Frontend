@@ -58,6 +58,7 @@ export const IMPORT_TYPES: ImportTypeConfig[] = [
     endpoint: "/consumos/import/productos",
     label: "Productos",
     columns: [
+      { key: "productoId", label: "ID" },
       { key: "comedorNombre", label: "Comedor" },
       { key: "nombre", label: "Nombre" },
       { key: "precio", label: "Precio" },
