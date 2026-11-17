@@ -20,5 +20,7 @@ export type ImportRow = {
   estado: EstadoFila;
   version: number;
   errors: string | null;
+  asignadoAId?: number | null;
+  asignadoANombre?: string | null;
   [key: string]: unknown;
 };

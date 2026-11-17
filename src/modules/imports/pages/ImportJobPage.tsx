@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Check, Trash2, X } from "lucide-react";
+import { ArrowLeft, Check, Hand, Pencil, RotateCcw, Trash2, Undo2, X } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,6 +8,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { cn } from "@/lib/utils";
 import { useApi } from "@/hooks/useApi";
 import { getImportType } from "../config/importTypes";
+import { ProductoRowEditor } from "../components/ProductoRowEditor";
 import type { ImportJob, ImportRow } from "../config/sharedTypes";
 import type { EstadoFila } from "@/domain/enums/EstadoFila";
 
@@ -30,6 +31,8 @@ export default function ImportJobPage() {
   const navigate = useNavigate();
   const { type, jobId } = useParams<{ type: string; jobId: string }>();
   const { get, post, del } = useApi();
+  const [meId, setMeId] = useState<number | null>(null);
+  const [editing, setEditing] = useState<ImportRow | null>(null);
 
   const importType = getImportType(type ?? "");
   const basePath = importType ? `${importType.endpoint}/jobs/${jobId}` : "";
@@ -56,6 +59,14 @@ export default function ImportJobPage() {
       .then((data) => setRows(Array.isArray(data) ? data : []))
       .finally(() => setLoading(false));
   };
+
+  // Row actions need the row taken by the current user; compare against the row's asignadoAId.
+  useEffect(() => {
+    get("/identity/usuarios/me")
+      .then((r) => r.json())
+      .then((me) => setMeId(typeof me?.id === "number" ? me.id : null))
+      .catch(() => setMeId(null));
+  }, [get]);
 
   useEffect(() => {
     if (!basePath) return;
@@ -96,6 +107,26 @@ export default function ImportJobPage() {
       toast.error(err instanceof Error ? err.message : "No se pudo cancelar la importación.");
     } finally {
       setCancelling(false);
+    }
+  };
+
+  const handleTake = async (row: ImportRow) => {
+    try {
+      await post(`${basePath}/rows/${row.id}/asignar`, { version: row.version });
+      toast("Fila tomada");
+      fetchRows();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "No se pudo tomar la fila.");
+    }
+  };
+
+  const handleRelease = async (row: ImportRow) => {
+    try {
+      await post(`${basePath}/rows/${row.id}/desasignar`, { version: row.version });
+      toast("Fila liberada");
+      fetchRows();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "No se pudo liberar la fila.");
     }
   };
 
@@ -248,7 +279,7 @@ export default function ImportJobPage() {
                     ))}
                     <th className="px-4 py-3 text-center">Estado</th>
                     <th className="px-4 py-3">Errores</th>
-                    <th className="px-4 py-3 w-24">Acciones</th>
+                    <th className="px-4 py-3 w-40">Acciones</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
@@ -289,42 +320,18 @@ export default function ImportJobPage() {
                           {row.errors || <span className="text-gray-300">—</span>}
                         </td>
                         <td className="px-4 py-3">
-                          {!isApplied && (
-                            <div className="flex items-center gap-1">
-                              {row.estado === "READY" && (
-                                <Button
-                                  size="icon"
-                                  variant="ghost"
-                                  className="h-7 w-7 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
-                                  onClick={() => handleApplyRow(row)}
-                                  title="Aplicar"
-                                >
-                                  <Check className="h-3.5 w-3.5" />
-                                </Button>
-                              )}
-                              {(row.estado === "INVALID" || row.estado === "CONFLICT") && (
-                                <>
-                                  <Button
-                                    size="icon"
-                                    variant="ghost"
-                                    className="h-7 w-7 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                                    onClick={() => handleRevalidate(row)}
-                                    title="Revalidar"
-                                  >
-                                    <Check className="h-3.5 w-3.5" />
-                                  </Button>
-                                  <Button
-                                    size="icon"
-                                    variant="ghost"
-                                    className="h-7 w-7 text-red-500 hover:text-red-600 hover:bg-red-50"
-                                    onClick={() => handleDeleteRow(row)}
-                                    title="Eliminar"
-                                  >
-                                    <Trash2 className="h-3.5 w-3.5" />
-                                  </Button>
-                                </>
-                              )}
-                            </div>
+                          {!isApplied && !isJobDone && (
+                            <RowActions
+                              row={row}
+                              meId={meId}
+                              canEdit={importType.key === "productos"}
+                              onTake={() => handleTake(row)}
+                              onRelease={() => handleRelease(row)}
+                              onEdit={() => setEditing(row)}
+                              onRevalidate={() => handleRevalidate(row)}
+                              onApply={() => handleApplyRow(row)}
+                              onDelete={() => handleDeleteRow(row)}
+                            />
                           )}
                         </td>
                       </tr>
@@ -336,7 +343,98 @@ export default function ImportJobPage() {
           )}
         </CardContent>
       </Card>
+
+      {importType.key === "productos" && (
+        <ProductoRowEditor
+          basePath={basePath}
+          row={editing}
+          onClose={() => setEditing(null)}
+          onSaved={() => {
+            setEditing(null);
+            fetchJob();
+            fetchRows();
+          }}
+        />
+      )}
     </div>
+  );
+}
+
+type RowActionsProps = {
+  row: ImportRow;
+  meId: number | null;
+  canEdit: boolean;
+  onTake: () => void;
+  onRelease: () => void;
+  onEdit: () => void;
+  onRevalidate: () => void;
+  onApply: () => void;
+  onDelete: () => void;
+};
+
+/**
+ * The backend only lets the user who took a row (asignar) edit, revalidate, apply or delete it,
+ * and only invalid or conflicting rows can be taken. Ready rows nobody took go through
+ * "Aplicar listas".
+ */
+function RowActions({ row, meId, canEdit, onTake, onRelease, onEdit, onRevalidate, onApply, onDelete }: RowActionsProps) {
+  const takenBy = row.asignadoAId ?? null;
+  const mine = takenBy != null && meId != null && takenBy === meId;
+  const problem = row.estado === "INVALID" || row.estado === "CONFLICT";
+
+  if (takenBy != null && !mine) {
+    return <span className="text-xs text-gray-400">En revisión por {row.asignadoANombre ?? "otro usuario"}</span>;
+  }
+  if (!mine) {
+    return problem ? (
+      <ActionButton title="Tomar para editar" className="text-gray-700 hover:bg-gray-100" onClick={onTake}>
+        <Hand className="h-3.5 w-3.5" />
+      </ActionButton>
+    ) : null;
+  }
+  return (
+    <div className="flex items-center gap-1">
+      {canEdit && (
+        <ActionButton title="Editar" className="text-gray-700 hover:bg-gray-100" onClick={onEdit}>
+          <Pencil className="h-3.5 w-3.5" />
+        </ActionButton>
+      )}
+      {row.estado === "READY" ? (
+        <ActionButton title="Aplicar" className="text-emerald-600 hover:bg-emerald-50" onClick={onApply}>
+          <Check className="h-3.5 w-3.5" />
+        </ActionButton>
+      ) : (
+        <ActionButton title="Revalidar" className="text-blue-600 hover:bg-blue-50" onClick={onRevalidate}>
+          <RotateCcw className="h-3.5 w-3.5" />
+        </ActionButton>
+      )}
+      {problem && (
+        <ActionButton title="Eliminar" className="text-red-500 hover:bg-red-50" onClick={onDelete}>
+          <Trash2 className="h-3.5 w-3.5" />
+        </ActionButton>
+      )}
+      <ActionButton title="Soltar" className="text-gray-500 hover:bg-gray-100" onClick={onRelease}>
+        <Undo2 className="h-3.5 w-3.5" />
+      </ActionButton>
+    </div>
+  );
+}
+
+function ActionButton({
+  title,
+  className,
+  onClick,
+  children,
+}: {
+  title: string;
+  className: string;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <Button size="icon" variant="ghost" className={cn("h-7 w-7", className)} onClick={onClick} title={title}>
+      {children}
+    </Button>
   );
 }
 
