@@ -7,8 +7,9 @@ type ProtectedRouteProps = {
   allowOnly?: string;
 };
 
-// Logged-in pages. With allowOnly, only that role; any other goes to its own home. A role this
-// frontend doesn't know is sent to log in again (LPC-234).
+// Logged-in pages. With allowOnly, only that role (and ADMIN, who reaches every area, as before
+// LPC-234); any other goes to its own home. A role this frontend doesn't know is sent to log in
+// again (LPC-234).
 export function ProtectedRoute({ allowOnly }: ProtectedRouteProps) {
   const { session, isLoading } = useAuth();
 
@@ -18,7 +19,8 @@ export function ProtectedRoute({ allowOnly }: ProtectedRouteProps) {
   if (!home) {
     return <Navigate to="/login" replace />;
   }
-  if (allowOnly && session!.rol.toUpperCase() !== allowOnly) {
+  const rol = session!.rol.toUpperCase();
+  if (allowOnly && rol !== allowOnly && rol !== "ADMIN") {
     return <Navigate to={home} replace />;
   }
 
