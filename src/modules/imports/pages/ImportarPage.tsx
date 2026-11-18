@@ -197,11 +197,12 @@ export default function ImportarPage() {
               <Button
                 variant="outline"
                 onClick={() => upload("OMITIR")}
+                disabled={uploading}
                 className="rounded-lg border-gray-200 text-gray-600 hover:bg-gray-50"
               >
                 Omitir items
               </Button>
-              <Button onClick={() => upload("CREAR")} className="rounded-lg font-semibold">
+              <Button onClick={() => upload("CREAR")} disabled={uploading} className="rounded-lg font-semibold">
                 Crear
               </Button>
             </DialogFooter>
