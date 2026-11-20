@@ -30,10 +30,15 @@ const typeOptions = IMPORT_TYPES.map((t) => ({ value: t.key, label: t.label }));
 
 type SinIdAccion = "CREAR" | "OMITIR";
 
+const SIN_COLUMNA_ID =
+  "El archivo no tiene la columna ID: exportá los productos de nuevo y usá esa planilla (ID | Comedor | Nombre | Precio | SAP ID | Activo)";
+
+/** Thrown for a sheet without the ID column, which the backend rejects too. */
+class SinColumnaIdError extends Error {}
+
 /**
  * Counts the data rows of a productos sheet that carry no internal ID. Mirrors the backend
- * parser: the ID column exists only when the first header cell is "ID"; a legacy sheet
- * without it has no ids at all.
+ * parser: the first header cell must be "ID", and a sheet without it is rejected.
  */
 async function contarFilasSinId(file: File): Promise<number> {
   const wb = XLSX.read(await file.arrayBuffer(), { type: "array" });
@@ -41,12 +46,11 @@ async function contarFilasSinId(file: File): Promise<number> {
   if (!sheet) return 0;
   const rows = XLSX.utils.sheet_to_json<unknown[]>(sheet, { header: 1, defval: "", blankrows: false });
   const [header, ...data] = rows;
-  const conId = String(header?.[0] ?? "").trim().toLowerCase() === "id";
-  const off = conId ? 1 : 0;
+  if (String(header?.[0] ?? "").trim().toLowerCase() !== "id") throw new SinColumnaIdError(SIN_COLUMNA_ID);
   const blank = (v: unknown) => String(v ?? "").trim() === "";
   return data.filter((r) => {
-    const tieneDatos = [0, 1, 2, 3].some((i) => !blank(r[off + i]));
-    return tieneDatos && (!conId || blank(r[0]));
+    const tieneDatos = [1, 2, 3, 4].some((i) => !blank(r[i]));
+    return tieneDatos && blank(r[0]);
   }).length;
 }
 
@@ -81,8 +85,8 @@ export default function ImportarPage() {
       let sinId = 0;
       try {
         sinId = await contarFilasSinId(file);
-      } catch {
-        toast.error("No se pudo leer el archivo. Verificá el formato.");
+      } catch (err) {
+        toast.error(err instanceof SinColumnaIdError ? err.message : "No se pudo leer el archivo. Verificá el formato.");
         return;
       }
       if (sinId > 0) {
